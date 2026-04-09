@@ -5,6 +5,110 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>CADH</title>
   <link rel="stylesheet" href="/assets/app.css">
+  <style>
+    .cadh-layout {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+    }
+
+    .cadh-sidebar {
+      width: 250px;
+      min-height: 330px;
+      background: #e5e7eb;
+      border-radius: 10px;
+      padding: 14px;
+      flex-shrink: 0;
+    }
+
+    .cadh-search-form {
+      display: grid;
+      gap: 6px;
+    }
+
+    .cadh-search-form input {
+      min-height: 30px;
+      border-radius: 0;
+      padding: 6px 8px;
+      font-size: 0.95rem;
+    }
+
+    .cadh-search-form .btn {
+      justify-self: start;
+    }
+
+    .cadh-user-info {
+      margin-top: 14px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .cadh-user-info-item {
+      background: #cbd5e1;
+      border-radius: 8px;
+      padding: 8px;
+      line-height: 1.4;
+    }
+
+    .cadh-content {
+      flex: 1;
+    }
+
+    .cadh-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .cadh-card-item {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 78px;
+      background: #e5e7eb;
+      border-radius: 10px;
+      padding: 18px;
+      text-align: center;
+      text-decoration: none;
+      color: #111827;
+    }
+
+    .cadh-card-item:hover {
+      background: #cbd5e1;
+    }
+
+    .cadh-card-item-disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    .cadh-section-title {
+      margin: 20px 0 14px;
+      font-size: 1rem;
+    }
+
+    @media (max-width: 860px) {
+      .cadh-layout {
+        flex-direction: column;
+      }
+
+      .cadh-sidebar {
+        width: 100%;
+        min-height: 0;
+      }
+
+      .cadh-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 560px) {
+      .cadh-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body data-page="cadh">
   <header class="topbar">
@@ -12,6 +116,7 @@
     <nav class="menu">
       <a id="nav-home" href="/index.html">Home</a>
       <a id="nav-cadh" href="/cadh/index.html">CADH</a>
+      <a href="#">UBS</a>
       <a id="nav-patients" href="/patients/list.html">Pacientes</a>
       <a id="nav-careplans" href="/care-plans/list.html">Planos</a>
       <a id="nav-encounters" href="/encounters/list.html">Atendimentos</a>
@@ -24,24 +129,41 @@
   <main class="container">
     <section class="card">
       <h1 class="page-title">CADH</h1>
-      <div class="form-grid">
-        <div class="field">
-          <form id="cadh-form" class="form-grid" style="grid-template-columns:1fr;">
+      <div class="cadh-layout">
+        <aside class="cadh-sidebar">
+          <form id="cadh-form" class="cadh-search-form">
             <label for="ses">Buscar por SES</label>
             <input id="ses" name="ses" placeholder="Digite o SES">
             <button class="btn btn-primary" type="submit">Buscar</button>
           </form>
-        </div>
 
-        <div id="cadh-patient-details" class="field">
-          <div class="card">Busque um paciente para ver os dados aqui.</div>
-        </div>
-      </div>
+          <div id="cadh-patient-details" class="cadh-user-info"></div>
+        </aside>
 
-      <div id="cadh-cards" class="summary-grid" style="margin-top:20px;">
-        <div class="summary-card">Cadastro</div>
-        <div class="summary-card">Mapa do Usuario</div>
-        <div class="summary-card" style="opacity:.5; pointer-events:none;">Plano de Cuidado</div>
+        <div class="cadh-content">
+          <div id="cadh-cards" class="cadh-grid">
+            <div class="cadh-card-item">Cadastro</div>
+            <div class="cadh-card-item">Mapa do Usuario</div>
+            <div class="cadh-card-item cadh-card-item-disabled">Plano de Cuidado</div>
+          </div>
+
+          <h2 class="cadh-section-title">Especialidades e Corpo Clinico</h2>
+
+          <div class="cadh-grid">
+            <div class="cadh-card-item">Gestor do Cuidado</div>
+            <div class="cadh-card-item">Tecnico de Enfermagem</div>
+            <div class="cadh-card-item">Psicologo</div>
+            <div class="cadh-card-item">Enfermeiro</div>
+            <div class="cadh-card-item">Nutricionista</div>
+            <div class="cadh-card-item">Endocrinologista</div>
+            <div class="cadh-card-item">Cardiologista</div>
+            <div class="cadh-card-item">Fisioterapeuta</div>
+            <div class="cadh-card-item">Farmaceutico</div>
+            <div class="cadh-card-item">Servico Social</div>
+            <div class="cadh-card-item">Oftamologista</div>
+            <div class="cadh-card-item">Nefrologista</div>
+          </div>
+        </div>
       </div>
     </section>
   </main>

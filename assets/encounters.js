@@ -24,7 +24,7 @@ async function setupEncountersListPage() {
       <td>${SISELO.escapeHtml(row.specialty)}</td>
       <td>${SISELO.escapeHtml(row.summary || '')}</td>
       <td>
-        <a class="btn" href="/patients/show.html?id=${row.patient_id}">Paciente 360</a>
+        <a class="btn" href="/patients/show.html?id=${row.patient_id}&tab=atendimentos">Paciente 360</a>
         ${user.permissions.includes('encounters.update') ? `<a class="btn" href="/encounters/form.html?id=${row.id}">Editar</a>` : ''}
         ${user.permissions.includes('encounters.delete') ? `<button class="btn btn-danger" data-delete-id="${row.id}">Apagar</button>` : ''}
       </td>
