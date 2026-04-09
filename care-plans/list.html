@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Planos de Cuidado</title>
+  <link rel="stylesheet" href="/assets/app.css">
+</head>
+<body data-page="care-plans-list">
+  <header class="topbar">
+    <div class="topbar-brand">Intranet CADH</div>
+    <nav class="menu">
+      <a id="nav-home" href="/index.html">Home</a>
+      <a id="nav-cadh" href="#">CADH</a>
+      <a id="nav-patients" href="/patients/list.html">Pacientes</a>
+      <a id="nav-careplans" href="/care-plans/list.html">Planos</a>
+      <a id="nav-encounters" href="/encounters/list.html">Atendimentos</a>
+      <a id="nav-transitions" href="/transitions/list.html">Transicoes</a>
+      <a id="nav-admin" href="/admin/users/list.html">Admin</a>
+      <a id="logout-button" href="/login.html">Sair</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <h1 class="page-title">Planos de Cuidado</h1>
+
+      <form id="search-form" class="toolbar">
+        <input id="search-input" name="q" placeholder="Buscar paciente (nome/CPF/SES)">
+        <div class="actions">
+          <button class="btn btn-primary" type="submit">Buscar</button>
+          <a id="new-plan-link" class="btn" href="/care-plans/form.html">+ Novo plano</a>
+          <a id="trash-link" class="btn" href="/care-plans/trash.html">Lixeira</a>
+        </div>
+      </form>
+
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Paciente</th>
+            <th>Inicio</th>
+            <th>Fim</th>
+            <th>Acoes</th>
+          </tr>
+        </thead>
+        <tbody id="care-plans-table-body"></tbody>
+      </table>
+    </section>
+  </main>
+
+  <script src="/assets/config.js"></script>
+  <script src="/assets/app.js"></script>
+  <script src="/assets/care-plans.js"></script>
+</body>
+</html>

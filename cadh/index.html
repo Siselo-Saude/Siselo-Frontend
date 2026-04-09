@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CADH</title>
+  <link rel="stylesheet" href="/assets/app.css">
+</head>
+<body data-page="cadh">
+  <header class="topbar">
+    <div class="topbar-brand">Intranet CADH</div>
+    <nav class="menu">
+      <a id="nav-home" href="/index.html">Home</a>
+      <a id="nav-cadh" href="/cadh/index.html">CADH</a>
+      <a id="nav-patients" href="/patients/list.html">Pacientes</a>
+      <a id="nav-careplans" href="/care-plans/list.html">Planos</a>
+      <a id="nav-encounters" href="/encounters/list.html">Atendimentos</a>
+      <a id="nav-transitions" href="/transitions/list.html">Transicoes</a>
+      <a id="nav-admin" href="/admin/users/list.html">Admin</a>
+      <a id="logout-button" href="/login.html">Sair</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <h1 class="page-title">CADH</h1>
+      <div class="form-grid">
+        <div class="field">
+          <form id="cadh-form" class="form-grid" style="grid-template-columns:1fr;">
+            <label for="ses">Buscar por SES</label>
+            <input id="ses" name="ses" placeholder="Digite o SES">
+            <button class="btn btn-primary" type="submit">Buscar</button>
+          </form>
+        </div>
+
+        <div id="cadh-patient-details" class="field">
+          <div class="card">Busque um paciente para ver os dados aqui.</div>
+        </div>
+      </div>
+
+      <div id="cadh-cards" class="summary-grid" style="margin-top:20px;">
+        <div class="summary-card">Cadastro</div>
+        <div class="summary-card">Mapa do Usuario</div>
+        <div class="summary-card" style="opacity:.5; pointer-events:none;">Plano de Cuidado</div>
+      </div>
+    </section>
+  </main>
+
+  <script src="/assets/config.js"></script>
+  <script src="/assets/app.js"></script>
+  <script src="/assets/cadh.js"></script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin - Formulario de Usuario</title>
+  <link rel="stylesheet" href="/assets/app.css">
+</head>
+<body data-page="admin-users-form">
+  <header class="topbar">
+    <div class="topbar-brand">Intranet CADH</div>
+    <nav class="menu">
+      <a id="nav-home" href="/index.html">Home</a>
+      <a id="nav-cadh" href="#">CADH</a>
+      <a id="nav-patients" href="/patients/list.html">Pacientes</a>
+      <a id="nav-careplans" href="#">Planos</a>
+      <a id="nav-encounters" href="#">Atendimentos</a>
+      <a id="nav-transitions" href="#">Transicoes</a>
+      <a id="nav-admin" href="/admin/users/list.html">Admin</a>
+      <a id="logout-button" href="/login.html">Sair</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <a class="btn" href="/admin/users/list.html">&larr; Voltar</a>
+      <h1 id="form-title" class="page-title" style="margin-top:14px;">Novo Usuario</h1>
+
+      <div id="page-alert" class="alert" hidden></div>
+
+      <form id="admin-user-form" class="form-grid">
+        <div class="field">
+          <label for="name">Nome</label>
+          <input id="name" name="name" required>
+        </div>
+
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" required>
+        </div>
+
+        <div class="field-full">
+          <label style="display:flex; align-items:center; gap:8px;">
+            <input id="is_active" name="is_active" type="checkbox" style="width:auto; min-height:auto;">
+            Ativo
+          </label>
+        </div>
+
+        <div id="temp-password-field" class="field-full">
+          <label for="temp_password">Senha temporaria</label>
+          <input id="temp_password" name="temp_password" placeholder="Ex: Temporaria@123">
+        </div>
+
+        <div class="field-full">
+          <label>Roles</label>
+          <div id="roles-container"></div>
+        </div>
+
+        <div class="actions field-full">
+          <a class="btn" href="/admin/users/list.html">Cancelar</a>
+          <button class="btn btn-primary" type="submit">Salvar</button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <script src="/assets/config.js"></script>
+  <script src="/assets/app.js"></script>
+  <script src="/assets/admin-users.js"></script>
+</body>
+</html>

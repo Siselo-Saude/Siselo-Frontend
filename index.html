@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SISELO</title>
+  <link rel="stylesheet" href="/assets/app.css">
+</head>
+<body data-page="home">
+  <header class="topbar">
+    <div class="topbar-brand">Intranet CADH</div>
+    <nav class="menu">
+      <a id="nav-home" href="/index.html">Home</a>
+      <a id="nav-cadh" href="#">CADH</a>
+      <a id="nav-patients" href="/patients/list.html">Pacientes</a>
+      <a id="nav-careplans" href="#">Planos</a>
+      <a id="nav-encounters" href="#">Atendimentos</a>
+      <a id="nav-transitions" href="#">Transicoes</a>
+      <a id="nav-admin" href="/admin/users/list.html">Admin</a>
+      <a id="logout-button" href="/login.html">Sair</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <h1 class="page-title">SISELO - UBS-CADH</h1>
+      <p class="page-subtitle">Usuario autenticado: <strong id="current-user-name"></strong></p>
+
+      <div class="summary-grid">
+        <a id="home-patients-card" class="summary-card" href="/patients/list.html">
+          <strong>Pacientes</strong>
+          <span class="muted">Fluxo migrado para o frontend separado.</span>
+        </a>
+
+        <a id="home-admin-card" class="summary-card" href="/admin/users/list.html">
+          <strong>Admin: Usuarios</strong>
+          <span class="muted">Gestao de usuarios usando a camada nova de API.</span>
+        </a>
+
+        <a class="summary-card" id="legacy-careplans-link" href="/care-plans/list.html">
+          <strong>Planos de Cuidado</strong>
+          <span class="muted">Migrado para o frontend separado.</span>
+        </a>
+
+        <a class="summary-card" id="legacy-encounters-link" href="/encounters/list.html">
+          <strong>Atendimentos</strong>
+          <span class="muted">Migrado para o frontend separado.</span>
+        </a>
+
+        <a class="summary-card" id="legacy-transitions-link" href="/transitions/list.html">
+          <strong>Transicoes</strong>
+          <span class="muted">Migrado para o frontend separado.</span>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <script src="/assets/config.js"></script>
+  <script src="/assets/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = await SISELO.requireSession();
+      if (!user) return;
+
+      SISELO.bindShell('home');
+      document.getElementById('home-patients-card').hidden = !user.permissions.includes('patients.view');
+      document.getElementById('home-admin-card').hidden = !user.permissions.includes('admin.manage');
+      document.getElementById('legacy-careplans-link').hidden = !user.permissions.includes('careplans.view');
+      document.getElementById('legacy-encounters-link').hidden = !user.permissions.includes('encounters.view');
+      document.getElementById('legacy-transitions-link').hidden = !user.permissions.includes('transitions.view');
+    });
+  </script>
+</body>
+</html>

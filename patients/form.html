@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Paciente - SISELO</title>
+  <link rel="stylesheet" href="/assets/app.css">
+</head>
+<body data-page="patients-form">
+  <header class="topbar">
+    <div class="topbar-brand">Intranet CADH</div>
+    <nav class="menu">
+      <a id="nav-home" href="/index.html">Home</a>
+      <a id="nav-cadh" href="#">CADH</a>
+      <a id="nav-patients" href="/patients/list.html">Pacientes</a>
+      <a id="nav-careplans" href="#">Planos</a>
+      <a id="nav-encounters" href="#">Atendimentos</a>
+      <a id="nav-transitions" href="#">Transicoes</a>
+      <a id="nav-admin" href="/admin/users/list.html">Admin</a>
+      <a id="logout-button" href="/login.html">Sair</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <a class="btn" href="/patients/list.html">&larr; Voltar</a>
+      <h1 id="form-title" class="page-title" style="margin-top:14px;">Novo Paciente</h1>
+      <p class="page-subtitle">Preencha os dados para cadastrar o paciente</p>
+
+      <div id="page-alert" class="alert" hidden></div>
+
+      <form id="patient-form">
+        <section class="form-section">
+          <h2 class="form-section-title">Identificacao</h2>
+          <div class="form-grid">
+            <div class="field">
+              <label for="attendance_date">Data de Atendimento</label>
+              <input id="attendance_date" name="attendance_date" data-field="first_cadh_date" type="date" required>
+              <div class="field-error" data-error-for="first_cadh_date"></div>
+            </div>
+
+            <div class="field">
+              <label for="full_name">Nome Completo</label>
+              <input id="full_name" name="full_name" maxlength="180" required>
+              <div class="field-error" data-error-for="full_name"></div>
+            </div>
+
+            <div class="field">
+              <label for="ses">SES</label>
+              <input id="ses" name="ses" maxlength="9" required>
+              <div class="field-error" data-error-for="ses"></div>
+            </div>
+
+            <div class="field">
+              <label for="cpf">CPF</label>
+              <input id="cpf" name="cpf" maxlength="14" required>
+              <div class="field-error" data-error-for="cpf"></div>
+            </div>
+
+            <div class="field">
+              <label for="birth_date">Data de Nascimento</label>
+              <input id="birth_date" name="birth_date" type="date" required>
+              <div class="field-error" data-error-for="birth_date"></div>
+            </div>
+
+            <div class="field">
+              <label for="gender">Sexo</label>
+              <select id="gender" name="gender" required></select>
+              <div class="field-error" data-error-for="sex"></div>
+            </div>
+
+            <div class="field">
+              <label for="race">Cor/Raca</label>
+              <select id="race" name="race" required></select>
+              <div class="field-error" data-error-for="race"></div>
+            </div>
+
+            <div class="field">
+              <label for="responsible">Responsavel</label>
+              <input id="responsible" name="responsible" data-field="responsible_name" maxlength="180" required>
+              <div class="field-error" data-error-for="responsible_name"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <h2 class="form-section-title">Contato</h2>
+          <div class="form-grid">
+            <div class="field">
+              <label for="phone">Telefone</label>
+              <input id="phone" name="phone" maxlength="15" required>
+              <div class="field-error" data-error-for="phone"></div>
+            </div>
+
+            <div class="field">
+              <label for="email">Email</label>
+              <input id="email" name="email" type="email" maxlength="190" required>
+              <div class="field-error" data-error-for="email"></div>
+            </div>
+
+            <div class="field">
+              <label for="address">Endereco</label>
+              <input id="address" name="address" maxlength="255" required>
+              <div class="field-error" data-error-for="address"></div>
+            </div>
+
+            <div class="field">
+              <label for="emergency_contact">Contato de Emergencia</label>
+              <input id="emergency_contact" name="emergency_contact" maxlength="15" required>
+              <div class="field-error" data-error-for="emergency_contact"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <h2 class="form-section-title">Referencia</h2>
+          <div class="form-grid">
+            <div class="field">
+              <label for="uds_reference">UDS Referencia</label>
+              <input id="uds_reference" name="uds_reference" data-field="ubs_ref" maxlength="120" required>
+              <div class="field-error" data-error-for="ubs_ref"></div>
+            </div>
+
+            <div class="field">
+              <label for="team_reference">Equipe Referencia</label>
+              <input id="team_reference" name="team_reference" data-field="team_ref" maxlength="120" required>
+              <div class="field-error" data-error-for="team_ref"></div>
+            </div>
+
+            <div class="field">
+              <label for="health_insurance">Convenio</label>
+              <input id="health_insurance" name="health_insurance" maxlength="160" required>
+              <div class="field-error" data-error-for="health_insurance"></div>
+            </div>
+
+            <div class="field">
+              <label for="blood_type">Tipo Sanguineo</label>
+              <select id="blood_type" name="blood_type" required></select>
+              <div class="field-error" data-error-for="blood_type"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section">
+          <h2 class="form-section-title">Informacoes Clinicas</h2>
+          <div class="form-grid">
+            <div class="field">
+              <label for="allergies">Alergias</label>
+              <textarea id="allergies" name="allergies" required></textarea>
+              <div class="field-error" data-error-for="allergies"></div>
+            </div>
+
+            <div class="field">
+              <label for="chronic_conditions">Condicoes Cronicas</label>
+              <textarea id="chronic_conditions" name="chronic_conditions" required></textarea>
+              <div class="field-error" data-error-for="chronic_conditions"></div>
+            </div>
+          </div>
+        </section>
+
+        <input type="hidden" name="status" value="ativo">
+
+        <div class="actions">
+          <a class="btn" href="/patients/list.html">Cancelar</a>
+          <button class="btn btn-primary" type="submit">Salvar paciente</button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <script src="/assets/config.js"></script>
+  <script src="/assets/app.js"></script>
+  <script src="/assets/patients.js"></script>
+</body>
+</html>

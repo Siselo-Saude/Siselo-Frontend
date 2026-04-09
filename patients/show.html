@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Usuario 360 - SISELO</title>
+  <link rel="stylesheet" href="/assets/app.css">
+</head>
+<body data-page="patients-show">
+  <header class="topbar">
+    <div class="topbar-brand">Intranet CADH</div>
+    <nav class="menu">
+      <a id="nav-home" href="/index.html">Home</a>
+      <a id="nav-cadh" href="#">CADH</a>
+      <a id="nav-patients" href="/patients/list.html">Pacientes</a>
+      <a id="nav-careplans" href="#">Planos</a>
+      <a id="nav-encounters" href="#">Atendimentos</a>
+      <a id="nav-transitions" href="#">Transicoes</a>
+      <a id="nav-admin" href="/admin/users/list.html">Admin</a>
+      <a id="logout-button" href="/login.html">Sair</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <h1 class="page-title">Usuario 360</h1>
+      <div id="page-alert" class="alert" hidden></div>
+
+      <p id="patient-summary" class="profile-block"></p>
+      <div id="patient-notes"></div>
+
+      <div id="patient-actions" class="actions" style="margin:18px 0;"></div>
+
+      <div class="tabs" style="margin:20px 0;">
+        <a class="tab-link" id="patient-careplans-link" href="#">Planos de Cuidado</a>
+        <a class="tab-link" id="patient-encounters-link" href="#">Atendimentos</a>
+        <a class="tab-link" id="patient-transitions-link" href="#">Transicoes</a>
+      </div>
+
+      <h2 class="page-title" style="font-size:1.1rem;">Planos de Cuidado</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Inicio</th>
+            <th>Fim</th>
+            <th>Acoes</th>
+          </tr>
+        </thead>
+        <tbody id="care-plans-table-body"></tbody>
+      </table>
+
+      <h2 class="page-title" style="font-size:1.1rem; margin-top:24px;">Atendimentos</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Especialidade</th>
+            <th>Resumo</th>
+            <th>Acoes</th>
+          </tr>
+        </thead>
+        <tbody id="encounters-table-body"></tbody>
+      </table>
+
+      <h2 class="page-title" style="font-size:1.1rem; margin-top:24px;">Transicoes</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>De</th>
+            <th>Para</th>
+            <th>Status</th>
+            <th>Notas</th>
+            <th>Acoes</th>
+          </tr>
+        </thead>
+        <tbody id="transitions-table-body"></tbody>
+      </table>
+
+      <div class="actions" style="margin-top:18px;">
+        <a class="btn" href="/patients/list.html">Voltar</a>
+        <a class="btn btn-primary" href="/index.html">Home</a>
+      </div>
+    </section>
+  </main>
+
+  <script src="/assets/config.js"></script>
+  <script src="/assets/app.js"></script>
+  <script src="/assets/patients.js"></script>
+</body>
+</html>

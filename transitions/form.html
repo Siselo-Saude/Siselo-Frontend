@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Transicao</title>
+  <link rel="stylesheet" href="/assets/app.css">
+</head>
+<body data-page="transitions-form">
+  <header class="topbar">
+    <div class="topbar-brand">Intranet CADH</div>
+    <nav class="menu">
+      <a id="nav-home" href="/index.html">Home</a>
+      <a id="nav-cadh" href="#">CADH</a>
+      <a id="nav-patients" href="/patients/list.html">Pacientes</a>
+      <a id="nav-careplans" href="/care-plans/list.html">Planos</a>
+      <a id="nav-encounters" href="/encounters/list.html">Atendimentos</a>
+      <a id="nav-transitions" href="/transitions/list.html">Transicoes</a>
+      <a id="nav-admin" href="/admin/users/list.html">Admin</a>
+      <a id="logout-button" href="/login.html">Sair</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <a class="btn" href="/transitions/list.html">&larr; Voltar</a>
+      <h1 id="form-title" class="page-title" style="margin-top:14px;">Nova Transicao</h1>
+      <div id="page-alert" class="alert" hidden></div>
+
+      <form id="transition-form" class="form-grid">
+        <div class="field-full">
+          <label for="patient_id">Paciente</label>
+          <select id="patient_id" name="patient_id" required></select>
+        </div>
+
+        <div class="field">
+          <label for="transition_date">Data</label>
+          <input id="transition_date" name="transition_date" type="date" required>
+        </div>
+
+        <div class="field">
+          <label for="status">Status</label>
+          <select id="status" name="status" required></select>
+        </div>
+
+        <div class="field">
+          <label for="from_service">De (servico/origem)</label>
+          <input id="from_service" name="from_service">
+        </div>
+
+        <div class="field">
+          <label for="to_service">Para (servico/destino)</label>
+          <input id="to_service" name="to_service">
+        </div>
+
+        <div class="field-full">
+          <label for="notes">Notas</label>
+          <textarea id="notes" name="notes"></textarea>
+        </div>
+
+        <div class="actions field-full">
+          <a class="btn" href="/transitions/list.html">Cancelar</a>
+          <button class="btn btn-primary" type="submit">Salvar</button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <script src="/assets/config.js"></script>
+  <script src="/assets/app.js"></script>
+  <script src="/assets/transitions.js"></script>
+</body>
+</html>

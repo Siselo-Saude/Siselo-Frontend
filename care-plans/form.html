@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Plano de Cuidado</title>
+  <link rel="stylesheet" href="/assets/app.css">
+</head>
+<body data-page="care-plans-form">
+  <header class="topbar">
+    <div class="topbar-brand">Intranet CADH</div>
+    <nav class="menu">
+      <a id="nav-home" href="/index.html">Home</a>
+      <a id="nav-cadh" href="#">CADH</a>
+      <a id="nav-patients" href="/patients/list.html">Pacientes</a>
+      <a id="nav-careplans" href="/care-plans/list.html">Planos</a>
+      <a id="nav-encounters" href="/encounters/list.html">Atendimentos</a>
+      <a id="nav-transitions" href="/transitions/list.html">Transicoes</a>
+      <a id="nav-admin" href="/admin/users/list.html">Admin</a>
+      <a id="logout-button" href="/login.html">Sair</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <a class="btn" href="/care-plans/list.html">&larr; Voltar</a>
+      <h1 id="form-title" class="page-title" style="margin-top:14px;">Novo Plano de Cuidado</h1>
+      <div id="page-alert" class="alert" hidden></div>
+
+      <form id="care-plan-form">
+        <div class="form-grid">
+          <div class="field-full">
+            <label for="patient_id">Paciente</label>
+            <select id="patient_id" name="patient_id" required></select>
+          </div>
+
+          <div class="field">
+            <label for="start_date">Inicio</label>
+            <input id="start_date" name="start_date" type="date" required>
+          </div>
+
+          <div class="field">
+            <label for="end_date">Fim</label>
+            <input id="end_date" name="end_date" type="date">
+          </div>
+
+          <div class="field-full">
+            <label for="interventions">Intervencoes medicamentosas e nao medicamentosas</label>
+            <textarea id="interventions" name="interventions"></textarea>
+          </div>
+        </div>
+
+        <div class="actions" style="margin-top:18px;">
+          <button type="button" class="btn" data-add-item="alerta">+ Alerta</button>
+          <button type="button" class="btn" data-add-item="meta">+ Meta</button>
+          <button type="button" class="btn" data-add-item="dificuldade">+ Dificuldade</button>
+          <button type="button" class="btn" data-add-item="recomendacao">+ Recomendacao</button>
+        </div>
+
+        <div id="items"></div>
+
+        <div class="actions" style="margin-top:18px;">
+          <a class="btn" href="/care-plans/list.html">Cancelar</a>
+          <button class="btn btn-primary" type="submit">Salvar</button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <script src="/assets/config.js"></script>
+  <script src="/assets/app.js"></script>
+  <script src="/assets/care-plans.js"></script>
+</body>
+</html>
