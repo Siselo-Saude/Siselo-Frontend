@@ -25,7 +25,7 @@ async function setupTransitionsListPage() {
       <td>${SISELO.escapeHtml(row.to_service || '')}</td>
       <td>${SISELO.escapeHtml(row.status)}</td>
       <td>
-        <a class="btn" href="/patients/show.html?id=${row.patient_id}">Paciente 360</a>
+        <a class="btn" href="/patients/show.html?id=${row.patient_id}&tab=transicoes">Paciente 360</a>
         ${user.permissions.includes('transitions.update') ? `<a class="btn" href="/transitions/form.html?id=${row.id}">Editar</a>` : ''}
         ${user.permissions.includes('transitions.delete') ? `<button class="btn btn-danger" data-delete-id="${row.id}">Apagar</button>` : ''}
       </td>

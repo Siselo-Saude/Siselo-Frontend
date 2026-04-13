@@ -155,6 +155,13 @@ async function setupPatientShowPage() {
   const data = await SISELO.apiRequest('/patients/show.php?id=' + encodeURIComponent(id));
   const patient = data.patient;
   const permissions = new Set(user.permissions || []);
+  const availableTabs = [
+    permissions.has('careplans.view') ? 'planos' : null,
+    permissions.has('encounters.view') ? 'atendimentos' : null,
+    permissions.has('transitions.view') ? 'transicoes' : null,
+  ].filter(Boolean);
+  const requestedTab = normalizePatientTab(SISELO.queryParam('tab'));
+  const activeTab = availableTabs.includes(requestedTab) ? requestedTab : (availableTabs[0] || 'planos');
 
   document.getElementById('patient-summary').innerHTML = `
     <strong>${SISELO.escapeHtml(patient.full_name)}</strong><br>
@@ -171,9 +178,8 @@ async function setupPatientShowPage() {
     ${patient.chronic_conditions ? `<p><strong>Condicoes cronicas:</strong> ${SISELO.escapeHtml(patient.chronic_conditions)}</p>` : ''}
   `;
 
-  document.getElementById('patient-careplans-link').href = '/care-plans/list.html?patient_id=' + encodeURIComponent(id);
-  document.getElementById('patient-encounters-link').href = '/encounters/list.html';
-  document.getElementById('patient-transitions-link').href = '/transitions/list.html';
+  configurePatientTabs(id, activeTab, permissions);
+  configurePatientBackLink(activeTab);
 
   document.getElementById('patient-actions').innerHTML = `
     ${permissions.has('careplans.create') ? `<a class="btn" href="/care-plans/form.html?patient_id=${id}">+ Novo plano</a>` : ''}
@@ -201,7 +207,7 @@ function renderPatientsTable(targetId, rows, permissions, isTrash) {
       <td>${SISELO.escapeHtml(row.blood_type || '')}</td>
       <td>${SISELO.escapeHtml(row.status_label || '')}</td>
       <td>
-        <a class="btn" href="/patients/show.html?id=${row.id}">Usuario 360</a>
+        <a class="btn" href="/patients/show.html?id=${row.id}&tab=planos">Usuario 360</a>
         ${permissions.includes('patients.update') ? `<a class="btn" href="/patients/form.html?id=${row.id}">Editar</a>` : ''}
         ${!isTrash && permissions.includes('patients.delete') ? `<button class="btn btn-danger" data-delete-id="${row.id}">Apagar</button>` : ''}
       </td>
@@ -269,6 +275,64 @@ function renderTransitionRows(targetId, rows, permissions) {
       <td>${permissions.has('transitions.update') ? `<a class="btn" href="/transitions/form.html?id=${row.id}">Editar</a>` : ''}</td>
     </tr>
   `).join('');
+}
+
+function normalizePatientTab(value) {
+  return ['planos', 'atendimentos', 'transicoes'].includes(String(value || '')) ? String(value) : 'planos';
+}
+
+function configurePatientTabs(id, activeTab, permissions) {
+  const tabs = [
+    {
+      key: 'planos',
+      permission: 'careplans.view',
+      linkId: 'patient-careplans-link',
+      panelId: 'patient-panel-planos',
+    },
+    {
+      key: 'atendimentos',
+      permission: 'encounters.view',
+      linkId: 'patient-encounters-link',
+      panelId: 'patient-panel-atendimentos',
+    },
+    {
+      key: 'transicoes',
+      permission: 'transitions.view',
+      linkId: 'patient-transitions-link',
+      panelId: 'patient-panel-transicoes',
+    },
+  ];
+
+  tabs.forEach((tab) => {
+    const link = document.getElementById(tab.linkId);
+    const panel = document.getElementById(tab.panelId);
+    const allowed = permissions.has(tab.permission);
+
+    if (link) {
+      link.href = '/patients/show.html?id=' + encodeURIComponent(id) + '&tab=' + tab.key;
+      link.hidden = !allowed;
+      link.classList.toggle('is-active', allowed && tab.key === activeTab);
+    }
+
+    if (panel) {
+      panel.hidden = !allowed || tab.key !== activeTab;
+    }
+  });
+}
+
+function configurePatientBackLink(activeTab) {
+  const link = document.getElementById('patient-back-link');
+  if (!link) {
+    return;
+  }
+
+  const destinations = {
+    planos: '/patients/list.html',
+    atendimentos: '/encounters/list.html',
+    transicoes: '/transitions/list.html',
+  };
+
+  link.href = destinations[activeTab] || '/patients/list.html';
 }
 
 function fillSelect(id, options, currentValue, allowBlank) {
