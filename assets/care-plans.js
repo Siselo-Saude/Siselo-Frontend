@@ -42,7 +42,7 @@ async function setupCarePlansListPage() {
       <td>${SISELO.escapeHtml(row.start_date)}</td>
       <td>${SISELO.escapeHtml(row.end_date || '')}</td>
       <td>
-        <a class="btn" href="${SISELO.getLegacyBaseUrl()}/care_plans/pdf.php?id=${row.id}" target="_blank" rel="noreferrer">PDF</a>
+        <a class="btn" href="${SISELO.getApiBaseUrl()}/care_plans/pdf.php?id=${row.id}" target="_blank" rel="noreferrer">PDF</a>
         ${user.permissions.includes('careplans.update') ? `<a class="btn" href="/care-plans/form.html?id=${row.id}">Editar</a>` : ''}
         ${user.permissions.includes('careplans.delete') ? `<button class="btn btn-danger" data-delete-id="${row.id}">Apagar</button>` : ''}
       </td>

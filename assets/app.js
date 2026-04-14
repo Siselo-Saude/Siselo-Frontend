@@ -16,10 +16,6 @@
     return String(config.apiBaseUrl || '').replace(/\/+$/, '');
   }
 
-  function getLegacyBaseUrl() {
-    return String(config.legacyBaseUrl || '').replace(/\/+$/, '');
-  }
-
   function saveSessionPayload(payload) {
     if (payload && payload.user) {
       sessionStorage.setItem(SESSION_KEY, JSON.stringify(payload.user));
@@ -199,7 +195,7 @@
     bindShell,
     clearSession,
     escapeHtml,
-    getLegacyBaseUrl,
+    getApiBaseUrl,
     getSession,
     queryParam,
     requireSession,
