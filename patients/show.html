@@ -39,53 +39,59 @@
 
       <section id="patient-panel-planos">
         <h2 class="page-title" style="font-size:1.1rem;">Planos de Cuidado</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Inicio</th>
-              <th>Fim</th>
-              <th>Acoes</th>
-            </tr>
-          </thead>
-          <tbody id="care-plans-table-body"></tbody>
-        </table>
+        <div class="table-scroll">
+          <table class="data-table care-plans-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Inicio</th>
+                <th>Fim</th>
+                <th>Acoes</th>
+              </tr>
+            </thead>
+            <tbody id="care-plans-table-body"></tbody>
+          </table>
+        </div>
       </section>
 
       <section id="patient-panel-atendimentos">
         <h2 class="page-title" style="font-size:1.1rem; margin-top:24px;">Atendimentos</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Data</th>
-              <th>Especialidade</th>
-              <th>Resumo</th>
-              <th>Acoes</th>
-            </tr>
-          </thead>
-          <tbody id="encounters-table-body"></tbody>
-        </table>
+        <div class="table-scroll">
+          <table class="data-table encounters-table">
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Especialidade</th>
+                <th>Resumo</th>
+                <th>Acoes</th>
+              </tr>
+            </thead>
+            <tbody id="encounters-table-body"></tbody>
+          </table>
+        </div>
       </section>
 
       <section id="patient-panel-transicoes">
         <h2 class="page-title" style="font-size:1.1rem; margin-top:24px;">Transicoes</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Data</th>
-              <th>De</th>
-              <th>Para</th>
-              <th>Status</th>
-              <th>Notas</th>
-              <th>Acoes</th>
-            </tr>
-          </thead>
-          <tbody id="transitions-table-body"></tbody>
-        </table>
+        <div class="table-scroll">
+          <table class="data-table transitions-table">
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>De</th>
+                <th>Para</th>
+                <th>Status</th>
+                <th>Notas</th>
+                <th>Acoes</th>
+              </tr>
+            </thead>
+            <tbody id="transitions-table-body"></tbody>
+          </table>
+        </div>
       </section>
 
       <div class="actions" style="margin-top:18px;">
-        <a class="btn" id="patient-back-link" href="/patients/list.html">Voltar</a>
+        <a class="btn" id="patient-back-link" href="/patients/list.html" data-back-link data-fallback="/patients/list.html">Voltar</a>
         <a class="btn btn-primary" href="/index.html">Home</a>
       </div>
     </section>

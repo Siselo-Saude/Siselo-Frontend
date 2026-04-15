@@ -16,9 +16,13 @@ async function setupCadhPage() {
   renderCadhPatient(null, false);
 
   if (ses) {
-    const data = await SISELO.apiRequest('/patients/list.php?q=' + encodeURIComponent(ses));
-    const patient = (data.rows || []).find((row) => String(row.ses || '') === ses) || null;
-    renderCadhPatient(patient, true);
+    try {
+      const data = await SISELO.apiRequest('/patients/list.php?q=' + encodeURIComponent(ses));
+      const patient = (data.rows || []).find((row) => String(row.ses || '') === ses) || null;
+      renderCadhPatient(patient, true);
+    } catch (error) {
+      renderCadhPatient(null, true);
+    }
   }
 
   document.getElementById('cadh-form').addEventListener('submit', (event) => {

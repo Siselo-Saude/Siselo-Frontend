@@ -23,7 +23,7 @@
 
   <main class="container">
     <section class="card">
-      <a class="btn" href="/admin/users/list.html">&larr; Voltar</a>
+      <a class="btn" href="/admin/users/list.html" data-back-link data-fallback="/admin/users/list.html">&larr; Voltar</a>
       <h1 id="form-title" class="page-title" style="margin-top:14px;">Novo Usuario</h1>
 
       <div id="page-alert" class="alert" hidden></div>
@@ -31,12 +31,12 @@
       <form id="admin-user-form" class="form-grid">
         <div class="field">
           <label for="name">Nome</label>
-          <input id="name" name="name" required>
+          <input id="name" name="name" placeholder="Nome completo" required>
         </div>
 
         <div class="field">
           <label for="email">Email</label>
-          <input id="email" name="email" type="email" required>
+          <input id="email" name="email" type="email" placeholder="email@instituicao.com" required>
         </div>
 
         <div class="field-full">
@@ -56,8 +56,8 @@
           <div id="roles-container"></div>
         </div>
 
-        <div class="actions field-full">
-          <a class="btn" href="/admin/users/list.html">Cancelar</a>
+        <div class="form-actions field-full">
+          <a class="btn" href="/admin/users/list.html" data-back-link data-fallback="/admin/users/list.html">Cancelar</a>
           <button class="btn btn-primary" type="submit">Salvar</button>
         </div>
       </form>

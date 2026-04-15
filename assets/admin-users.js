@@ -18,11 +18,35 @@ async function setupAdminUsersListPage() {
   SISELO.bindShell('admin');
   const query = SISELO.queryParam('q') || '';
   document.getElementById('search-input').value = query;
-
-  const data = await SISELO.apiRequest('/admin/users/list.php?q=' + encodeURIComponent(query));
   const tbody = document.getElementById('users-table-body');
+  let rows = [];
 
-  tbody.innerHTML = data.rows.map((row) => `
+  try {
+    const data = await SISELO.apiRequest('/admin/users/list.php?q=' + encodeURIComponent(query));
+    rows = Array.isArray(data.rows) ? data.rows : [];
+  } catch (error) {
+    rows = [];
+  }
+
+  if (rows.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td class="muted">-</td>
+        <td class="muted">Nenhum usuario carregado.</td>
+        <td class="muted">-</td>
+        <td class="muted">-</td>
+        <td class="muted">-</td>
+        <td>
+          <div class="table-actions">
+            ${SISELO.iconLink('edit', '/admin/users/form.html', 'Editar usuario')}
+            ${SISELO.iconButton('toggle', 'Ativar ou desativar usuario', { 'data-empty-toggle': true })}
+            ${SISELO.iconButton('reset', 'Resetar senha', { 'data-empty-reset': true })}
+          </div>
+        </td>
+      </tr>
+    `;
+  } else {
+    tbody.innerHTML = rows.map((row) => `
     <tr>
       <td>${row.id}</td>
       <td>${SISELO.escapeHtml(row.name)}</td>
@@ -30,12 +54,15 @@ async function setupAdminUsersListPage() {
       <td>${SISELO.escapeHtml((row.roles || []).join(', '))}</td>
       <td>${Number(row.is_active) === 1 ? 'Ativo' : 'Inativo'}</td>
       <td>
-        <a class="btn" href="/admin/users/form.html?id=${row.id}">Editar</a>
-        <button class="btn" data-toggle-id="${row.id}">${Number(row.is_active) === 1 ? 'Desativar' : 'Ativar'}</button>
-        <button class="btn" data-reset-id="${row.id}">Reset senha</button>
+        <div class="table-actions">
+          ${SISELO.iconLink('edit', `/admin/users/form.html?id=${row.id}`, 'Editar usuario')}
+          ${SISELO.iconButton('toggle', Number(row.is_active) === 1 ? 'Desativar usuario' : 'Ativar usuario', { 'data-toggle-id': row.id })}
+          ${SISELO.iconButton('reset', 'Resetar senha', { 'data-reset-id': row.id })}
+        </div>
       </td>
     </tr>
-  `).join('');
+    `).join('');
+  }
 
   tbody.querySelectorAll('[data-toggle-id]').forEach((button) => {
     button.addEventListener('click', async () => {
@@ -61,6 +88,18 @@ async function setupAdminUsersListPage() {
     });
   });
 
+  tbody.querySelectorAll('[data-empty-toggle]').forEach((button) => {
+    button.addEventListener('click', () => {
+      SISELO.showUnavailableAction('Nenhum usuario carregado para ativar ou desativar.');
+    });
+  });
+
+  tbody.querySelectorAll('[data-empty-reset]').forEach((button) => {
+    button.addEventListener('click', () => {
+      SISELO.showUnavailableAction('Nenhum usuario carregado para resetar senha.');
+    });
+  });
+
   document.getElementById('search-form').addEventListener('submit', (event) => {
     event.preventDefault();
     const value = document.getElementById('search-input').value.trim();
@@ -76,9 +115,23 @@ async function setupAdminUsersFormPage() {
 
   SISELO.bindShell('admin');
 
-  const id = SISELO.queryParam('id');
+  const id = SISELO.normalizeEntityId(SISELO.queryParam('id'));
   const endpoint = '/admin/users/form.php' + (id ? '?id=' + encodeURIComponent(id) : '');
-  const data = await SISELO.apiRequest(endpoint);
+  let data = {
+    editing: Boolean(id),
+    user: {
+      name: '',
+      email: '',
+      is_active: 1,
+      role_ids: [],
+    },
+    roles: [],
+  };
+
+  try {
+    data = await SISELO.apiRequest(endpoint || '/admin/users/form.php');
+  } catch (error) {
+  }
 
   document.getElementById('form-title').textContent = data.editing ? 'Editar Usuario' : 'Novo Usuario';
 
@@ -108,7 +161,7 @@ async function setupAdminUsersFormPage() {
     const roleIds = formData.getAll('role_ids[]').map((value) => Number(value));
 
     try {
-      await SISELO.apiRequest(endpoint, {
+      await SISELO.apiRequest(endpoint || '/admin/users/form.php', {
         method: 'POST',
         body: {
           name: formData.get('name'),

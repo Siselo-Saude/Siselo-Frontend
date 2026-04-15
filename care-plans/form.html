@@ -23,7 +23,7 @@
 
   <main class="container">
     <section class="card">
-      <a class="btn" href="/care-plans/list.html">&larr; Voltar</a>
+      <a class="btn" href="/care-plans/list.html" data-back-link data-fallback="/care-plans/list.html">&larr; Voltar</a>
       <h1 id="form-title" class="page-title" style="margin-top:14px;">Novo Plano de Cuidado</h1>
       <div id="page-alert" class="alert" hidden></div>
 
@@ -36,17 +36,17 @@
 
           <div class="field">
             <label for="start_date">Inicio</label>
-            <input id="start_date" name="start_date" type="date" required>
+            <input id="start_date" name="start_date" type="date" placeholder="dd/mm/aaaa" required>
           </div>
 
           <div class="field">
             <label for="end_date">Fim</label>
-            <input id="end_date" name="end_date" type="date">
+            <input id="end_date" name="end_date" type="date" placeholder="dd/mm/aaaa">
           </div>
 
           <div class="field-full">
             <label for="interventions">Intervencoes medicamentosas e nao medicamentosas</label>
-            <textarea id="interventions" name="interventions"></textarea>
+            <textarea id="interventions" name="interventions" placeholder="Intervencoes principais do plano"></textarea>
           </div>
         </div>
 
@@ -59,8 +59,8 @@
 
         <div id="items"></div>
 
-        <div class="actions" style="margin-top:18px;">
-          <a class="btn" href="/care-plans/list.html">Cancelar</a>
+        <div class="form-actions">
+          <a class="btn" href="/care-plans/list.html" data-back-link data-fallback="/care-plans/list.html">Cancelar</a>
           <button class="btn btn-primary" type="submit">Salvar</button>
         </div>
       </form>

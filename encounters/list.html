@@ -24,7 +24,7 @@
   <main class="container">
     <section class="card">
       <h1 class="page-title">Atendimentos</h1>
-      <form id="search-form" class="toolbar">
+      <form id="search-form" class="toolbar search-toolbar">
         <input id="search-input" name="q" placeholder="Buscar paciente/CPF/SES/especialidade">
         <div class="actions">
           <button class="btn btn-primary" type="submit">Buscar</button>
@@ -33,18 +33,20 @@
         </div>
       </form>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Data</th>
-            <th>Paciente</th>
-            <th>Especialidade</th>
-            <th>Resumo</th>
-            <th>Acoes</th>
-          </tr>
-        </thead>
-        <tbody id="encounters-table-body"></tbody>
-      </table>
+      <div class="table-scroll">
+        <table class="data-table encounters-table">
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Paciente</th>
+              <th>Especialidade</th>
+              <th>Resumo</th>
+              <th>Acoes</th>
+            </tr>
+          </thead>
+          <tbody id="encounters-table-body"></tbody>
+        </table>
+      </div>
     </section>
   </main>
 

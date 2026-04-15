@@ -24,28 +24,31 @@
   <main class="container">
     <section class="card">
       <h1 class="page-title">Lixeira: Transicoes</h1>
-      <form id="search-form" class="toolbar">
-        <input id="search-input" name="q" placeholder="Buscar paciente/CPF/SES/status/servico">
+      <form id="search-form" class="toolbar search-toolbar">
+        <input id="search-input" name="q" placeholder="Buscar por nome, CPF, SES, status ou servico">
         <div class="actions">
           <button class="btn btn-primary" type="submit">Buscar</button>
-          <a class="btn" href="/transitions/list.html">Voltar</a>
+          <a class="btn" href="/transitions/list.html" data-back-link data-fallback="/transitions/list.html">Voltar</a>
         </div>
       </form>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Apagado em</th>
-            <th>Data</th>
-            <th>Paciente</th>
-            <th>De</th>
-            <th>Para</th>
-            <th>Status</th>
-            <th>Acoes</th>
-          </tr>
-        </thead>
-        <tbody id="transitions-table-body"></tbody>
-      </table>
+      <div class="table-scroll">
+        <table class="data-table transitions-table">
+          <thead>
+            <tr>
+              <th>Apagado em</th>
+              <th>Data</th>
+              <th>Paciente</th>
+              <th>SES</th>
+              <th>CPF</th>
+              <th>Origem &rarr; Destino</th>
+              <th>Status</th>
+              <th>Acoes</th>
+            </tr>
+          </thead>
+          <tbody id="transitions-table-body"></tbody>
+        </table>
+      </div>
     </section>
   </main>
 
