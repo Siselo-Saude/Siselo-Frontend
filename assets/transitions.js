@@ -14,8 +14,10 @@ async function setupTransitionsListPage() {
   const query = SISELO.queryParam('q') || '';
   const searchInput = document.getElementById('search-input');
   const searchForm = document.getElementById('search-form');
+  const newTransitionLink = document.getElementById('new-transition-link');
+  const canCreateTransition = permissions.has('transitions.create');
   searchInput.value = query;
-  document.getElementById('new-transition-link').hidden = !permissions.has('transitions.create');
+  newTransitionLink.hidden = !canCreateTransition;
   document.getElementById('trash-link').hidden = !permissions.has('transitions.restore');
 
   let rows = [];
@@ -29,7 +31,9 @@ async function setupTransitionsListPage() {
 
   const tbody = document.getElementById('transitions-table-body');
   const applySearch = (value) => {
-    renderTransitionsTable(tbody, filterTransitionRows(rows, value), permissions, value);
+    const filteredRows = filterTransitionRows(rows, value);
+    newTransitionLink.hidden = !canCreateTransition || filteredRows.length === 0;
+    renderTransitionsTable(tbody, filteredRows, permissions, value);
     bindTransitionListActions(tbody);
     SISELO.syncSearchUrl('/transitions/list.html', value);
   };
@@ -148,7 +152,13 @@ async function setupTransitionsTrashPage() {
 
 function renderTransitionsTable(tbody, rows, permissions, query = '') {
   if (!Array.isArray(rows) || rows.length === 0) {
-    tbody.innerHTML = SISELO.emptyTableRow(7, 'Nenhuma transicao encontrada.');
+    tbody.innerHTML = SISELO.emptyTableRow(
+      7,
+      'Nenhuma transicao encontrada.',
+      permissions.has('transitions.create')
+        ? { label: '+ Nova transicao', href: '/transitions/form.html' }
+        : null
+    );
     return;
   }
 

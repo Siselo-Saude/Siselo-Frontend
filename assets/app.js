@@ -26,38 +26,6 @@
     'transitions.restore',
     'admin.manage',
   ];
-  const MOCK_API_SCRIPT_PATH = '/assets/mock-api.js';
-  let mockApiLoader = null;
-
-  function isMockDataEnabled() {
-    return config.useMockData === true;
-  }
-
-  function loadMockApi() {
-    if (!isMockDataEnabled()) {
-      return Promise.resolve(null);
-    }
-
-    if (window.SISELO_MOCK_API) {
-      return Promise.resolve(window.SISELO_MOCK_API);
-    }
-
-    if (mockApiLoader) {
-      return mockApiLoader;
-    }
-
-    mockApiLoader = new Promise((resolve, reject) => {
-      const script = document.createElement('script');
-      script.src = MOCK_API_SCRIPT_PATH;
-      script.async = true;
-      script.onload = () => resolve(window.SISELO_MOCK_API || null);
-      script.onerror = () => reject(new Error('Nao foi possivel carregar os dados mock do frontend.'));
-      document.head.appendChild(script);
-    });
-
-    return mockApiLoader;
-  }
-
   function escapeHtml(value) {
     return String(value ?? '')
       .replace(/&/g, '&amp;')
@@ -116,11 +84,7 @@
 
   function matchesPersonNamePrefix(value, search) {
     const state = getSearchState(search);
-    if (!state.hasLetters || !state.nameText) {
-      return false;
-    }
-
-    return normalizeSearchText(value).startsWith(state.nameText);
+    return Boolean(findPersonNamePrefixRange(value, state));
   }
 
   function matchesSearchText(value, search) {
@@ -168,7 +132,7 @@
     }
   }
 
-  function buildNormalizedCharMap(value) {
+  function buildPersonNameCharMap(value) {
     const original = String(value ?? '');
     let normalized = '';
     const indexMap = [];
@@ -179,20 +143,56 @@
         .replace(/[\u0300-\u036f]/g, '')
         .toLowerCase();
 
-      if (!normalizedChunk) {
-        continue;
-      }
-
       for (const character of normalizedChunk) {
-        normalized += character;
-        indexMap.push(index);
+        if (/[a-z]/.test(character)) {
+          normalized += character;
+          indexMap.push(index);
+        } else if (normalized && !normalized.endsWith(' ')) {
+          normalized += ' ';
+          indexMap.push(index);
+        }
       }
+    }
+
+    while (normalized.endsWith(' ')) {
+      normalized = normalized.slice(0, -1);
+      indexMap.pop();
     }
 
     return {
       original,
       normalized,
       indexMap,
+    };
+  }
+
+  function findPersonNamePrefixRange(value, search) {
+    const state = getSearchState(search);
+    if (!state.hasLetters || !state.nameText) {
+      return null;
+    }
+
+    const mapped = buildPersonNameCharMap(value);
+    let highlightStart = mapped.normalized.startsWith(state.nameText) ? 0 : -1;
+    if (highlightStart === -1) {
+      const matchIndex = mapped.normalized.indexOf(` ${state.nameText}`);
+      highlightStart = matchIndex === -1 ? -1 : matchIndex + 1;
+    }
+
+    if (highlightStart === -1) {
+      return null;
+    }
+
+    const highlightEnd = highlightStart + state.nameText.length - 1;
+    const originalStart = mapped.indexMap[highlightStart];
+    const originalEnd = mapped.indexMap[highlightEnd];
+    if (originalStart === undefined || originalEnd === undefined) {
+      return null;
+    }
+
+    return {
+      start: originalStart,
+      end: originalEnd + 1,
     };
   }
 
@@ -207,19 +207,13 @@
       return escapeHtml(original);
     }
 
-    const mapped = buildNormalizedCharMap(original);
-    if (!mapped.normalized.startsWith(state.nameText)) {
+    const matchRange = findPersonNamePrefixRange(original, state);
+    if (!matchRange) {
       return escapeHtml(original);
     }
 
-    const lastMatchedIndex = mapped.indexMap[state.nameText.length - 1];
-    if (lastMatchedIndex === undefined) {
-      return escapeHtml(original);
-    }
-
-    const highlightEnd = lastMatchedIndex + 1;
     return `
-      <mark class="search-highlight">${escapeHtml(original.slice(0, highlightEnd))}</mark>${escapeHtml(original.slice(highlightEnd))}
+      ${escapeHtml(original.slice(0, matchRange.start))}<mark class="search-highlight">${escapeHtml(original.slice(matchRange.start, matchRange.end))}</mark>${escapeHtml(original.slice(matchRange.end))}
     `.trim();
   }
 
@@ -343,17 +337,6 @@
   }
 
   async function apiRequest(path, options = {}) {
-    if (isMockDataEnabled()) {
-      const mockApi = await loadMockApi().catch(() => null);
-      if (mockApi && typeof mockApi.supports === 'function' && mockApi.supports(path)) {
-        const mockPayload = await mockApi.handle(path, options);
-        if (mockPayload && typeof mockPayload === 'object' && (mockPayload.user || typeof mockPayload.csrf === 'string')) {
-          saveSessionPayload(mockPayload);
-        }
-        return mockPayload;
-      }
-    }
-
     const method = options.method || 'GET';
     const headers = new Headers(options.headers || {});
     const body = options.body || null;
@@ -417,7 +400,7 @@
     try {
       await apiRequest('/auth/logout.php', { method: 'POST', body: {} });
     } catch (error) {
-      // ignora para manter a saida simples
+      // Mantem a saida local mesmo se o backend nao responder.
     } finally {
       clearSession();
       location.href = '/login.html';
@@ -431,55 +414,84 @@
     }
   }
 
+  function ensureTopbarActions(user, permissions) {
+    const topbar = document.querySelector('.topbar');
+    if (!topbar) {
+      return;
+    }
+
+    const brand = topbar.querySelector('.topbar-brand');
+    let left = topbar.querySelector('.topbar-left');
+    if (!left) {
+      left = document.createElement('div');
+      left.className = 'topbar-left';
+
+      if (brand) {
+        topbar.insertBefore(left, brand);
+        left.appendChild(brand);
+      } else {
+        topbar.prepend(left);
+      }
+    }
+
+    let logoutButton = left.querySelector('#logout-button');
+    if (!logoutButton) {
+      logoutButton = document.createElement('a');
+      logoutButton.id = 'logout-button';
+      logoutButton.className = 'topbar-logout';
+      logoutButton.href = '/login.html';
+      logoutButton.textContent = 'Sair';
+      left.insertBefore(logoutButton, left.firstChild);
+    }
+
+    if (logoutButton.dataset.bound !== 'true') {
+      logoutButton.dataset.bound = 'true';
+      logoutButton.addEventListener('click', (event) => {
+        event.preventDefault();
+        logout();
+      });
+    }
+
+    let accountLink = topbar.querySelector('#topbar-account-link');
+    if (!accountLink) {
+      accountLink = document.createElement('a');
+      accountLink.id = 'topbar-account-link';
+      accountLink.className = 'topbar-account';
+      topbar.appendChild(accountLink);
+    }
+
+    accountLink.href = permissions.has('admin.manage') ? '/admin/users/list.html' : '#';
+    accountLink.textContent = user && user.name ? user.name : 'Admin';
+    accountLink.title = 'Admin';
+    accountLink.setAttribute('aria-label', 'Admin');
+    accountLink.hidden = !permissions.has('admin.manage');
+  }
+
   function bindShell(activeKey) {
     rememberNavigationPage();
 
     const user = getSession();
     const permissions = getUiPermissions(user);
+    const cadhPages = ['patients', 'careplans', 'encounters', 'transitions'];
+    const activeNavKey = cadhPages.includes(activeKey) ? 'cadh' : activeKey;
     const links = {
       home: '/index.html',
-      patients: '/patients/list.html',
-      admin: '/admin/users/list.html',
-      careplans: '/care-plans/list.html',
-      encounters: '/encounters/list.html',
-      transitions: '/transitions/list.html',
       cadh: '/cadh/index.html',
+      ubs: '#',
     };
 
     Object.keys(links).forEach((key) => {
       const link = document.getElementById(`nav-${key}`);
       if (link) {
         link.href = links[key];
-        if (key === activeKey) {
+        if (key === activeNavKey) {
           link.classList.add('is-active');
         }
       }
     });
 
-    const guardedLinks = {
-      'nav-patients': permissions.has('patients.view'),
-      'nav-careplans': permissions.has('careplans.view'),
-      'nav-encounters': permissions.has('encounters.view'),
-      'nav-transitions': permissions.has('transitions.view'),
-      'nav-admin': permissions.has('admin.manage'),
-    };
-
-    Object.keys(guardedLinks).forEach((id) => {
-      const link = document.getElementById(id);
-      if (link) {
-        link.hidden = !guardedLinks[id];
-      }
-    });
-
     setText('current-user-name', user ? user.name : '');
-
-    const logoutButton = document.getElementById('logout-button');
-    if (logoutButton) {
-      logoutButton.addEventListener('click', (event) => {
-        event.preventDefault();
-        logout();
-      });
-    }
+    ensureTopbarActions(user, permissions);
 
     bindBackLinks();
   }
@@ -1346,10 +1358,17 @@
     return `<button ${attrs}>${actionIcon(kind)}</button>`;
   }
 
-  function emptyTableRow(colspan, title, description = '') {
+  function emptyTableRow(colspan, title, description = '', action = null) {
+    const resolvedAction = description && typeof description === 'object' ? description : action;
     const safeColspan = Math.max(1, Number(colspan || 1));
     const safeTitle = String(title || 'Nenhum registro encontrado.').trim();
-    const safeDescription = String(description || '').trim();
+    const safeDescription = typeof description === 'object' ? '' : String(description || '').trim();
+    const actionHtml = resolvedAction && resolvedAction.href && resolvedAction.label
+      ? `<a ${actionAttributes({
+        class: resolvedAction.class || 'btn btn-primary table-empty-action',
+        href: resolvedAction.href,
+      })}>${escapeHtml(resolvedAction.label)}</a>`
+      : '';
 
     return `
       <tr class="table-empty-row">
@@ -1362,6 +1381,7 @@
             </div>
             <p class="table-empty-title">${escapeHtml(safeTitle)}</p>
             ${safeDescription ? `<p class="table-empty-text">${escapeHtml(safeDescription)}</p>` : ''}
+            ${actionHtml}
           </div>
         </td>
       </tr>

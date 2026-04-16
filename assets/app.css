@@ -35,8 +35,8 @@ a {
   background: var(--primary);
   color: #fff;
   padding: 12px 16px;
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
   gap: 16px;
 }
@@ -45,10 +45,18 @@ a {
   font-weight: 800;
 }
 
+.topbar-left {
+  justify-self: start;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
 .menu {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
+  justify-self: center;
 }
 
 .menu a {
@@ -61,6 +69,39 @@ a {
 
 .menu a.is-active {
   background: rgba(255, 255, 255, 0.3);
+}
+
+.topbar-logout,
+.topbar-account {
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  padding: 6px 12px;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.topbar-logout {
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+}
+
+.topbar-account {
+  justify-self: end;
+  min-width: 112px;
+  background: #fff;
+  color: #475569;
+}
+
+.topbar-account::before {
+  content: "";
+  inline-size: 12px;
+  block-size: 12px;
+  margin-right: 8px;
+  border: 2px solid #64748b;
+  border-radius: 50%;
 }
 
 .container {
@@ -80,6 +121,18 @@ a {
 .page-title {
   margin: 0 0 16px 0;
   font-size: 1.35rem;
+}
+
+.page-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.page-heading .page-title {
+  margin: 0;
 }
 
 .page-subtitle {
@@ -650,6 +703,10 @@ th {
   max-width: 420px;
   font-size: 0.95rem;
   line-height: 1.5;
+}
+
+.table-empty-action {
+  margin-top: 4px;
 }
 
 .patient-name {

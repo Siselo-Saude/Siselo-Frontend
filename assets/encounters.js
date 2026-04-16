@@ -14,8 +14,10 @@ async function setupEncountersListPage() {
   const query = SISELO.queryParam('q') || '';
   const searchInput = document.getElementById('search-input');
   const searchForm = document.getElementById('search-form');
+  const newEncounterLink = document.getElementById('new-encounter-link');
+  const canCreateEncounter = permissions.has('encounters.create');
   searchInput.value = query;
-  document.getElementById('new-encounter-link').hidden = !permissions.has('encounters.create');
+  newEncounterLink.hidden = !canCreateEncounter;
   document.getElementById('trash-link').hidden = !permissions.has('encounters.restore');
 
   let rows = [];
@@ -29,7 +31,9 @@ async function setupEncountersListPage() {
 
   const tbody = document.getElementById('encounters-table-body');
   const applySearch = (value) => {
-    renderEncountersTable(tbody, filterEncounterRows(rows, value), permissions, value);
+    const filteredRows = filterEncounterRows(rows, value);
+    newEncounterLink.hidden = !canCreateEncounter || filteredRows.length === 0;
+    renderEncountersTable(tbody, filteredRows, permissions, value);
     bindEncounterListActions(tbody);
     SISELO.syncSearchUrl('/encounters/list.html', value);
   };
@@ -131,7 +135,13 @@ async function setupEncountersTrashPage() {
 
 function renderEncountersTable(tbody, rows, permissions, query = '') {
   if (!Array.isArray(rows) || rows.length === 0) {
-    tbody.innerHTML = SISELO.emptyTableRow(5, 'Nenhum atendimento encontrado.');
+    tbody.innerHTML = SISELO.emptyTableRow(
+      5,
+      'Nenhum atendimento encontrado.',
+      permissions.has('encounters.create')
+        ? { label: '+ Novo atendimento', href: '/encounters/form.html' }
+        : null
+    );
     return;
   }
 

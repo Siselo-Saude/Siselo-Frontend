@@ -11,19 +11,17 @@
     <div class="topbar-brand">Intranet CADH</div>
     <nav class="menu">
       <a id="nav-home" href="/index.html">Home</a>
-      <a id="nav-cadh" href="#">CADH</a>
-      <a id="nav-patients" href="/patients/list.html">Pacientes</a>
-      <a id="nav-careplans" href="#">Planos</a>
-      <a id="nav-encounters" href="#">Atendimentos</a>
-      <a id="nav-transitions" href="#">Transicoes</a>
-      <a id="nav-admin" href="/admin/users/list.html">Admin</a>
-      <a id="logout-button" href="/login.html">Sair</a>
+      <a id="nav-cadh" href="/cadh/index.html">CADH</a>
+      <a id="nav-ubs" href="#">UBS</a>
     </nav>
   </header>
 
   <main class="container">
     <section class="card">
-      <h1 class="page-title">Usuarios</h1>
+      <div class="page-heading">
+        <h1 class="page-title">Usuarios</h1>
+        <a class="btn" href="/cadh/index.html" data-back-link data-fallback="/cadh/index.html">&larr; Voltar</a>
+      </div>
 
       <form id="search-form" class="toolbar search-toolbar">
         <input id="search-input" name="q" placeholder="Buscar por nome/CPF/SES/telefone/email" aria-label="Buscar pacientes" autocomplete="off">

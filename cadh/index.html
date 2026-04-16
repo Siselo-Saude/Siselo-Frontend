@@ -6,105 +6,158 @@
   <title>CADH</title>
   <link rel="stylesheet" href="/assets/app.css">
   <style>
-    .cadh-layout {
-      display: flex;
-      gap: 20px;
-      align-items: flex-start;
+    .cadh-page {
+      padding: 22px;
     }
 
-    .cadh-sidebar {
-      width: 250px;
-      min-height: 330px;
-      background: #e5e7eb;
-      border-radius: 10px;
-      padding: 14px;
-      flex-shrink: 0;
+    .cadh-section-label {
+      margin: 22px 0 12px;
+      color: #7b8794;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
     }
 
-    .cadh-search-form {
-      display: grid;
-      gap: 6px;
-    }
-
-    .cadh-search-form input {
-      min-height: 30px;
-      border-radius: 0;
-      padding: 6px 8px;
-      font-size: 0.95rem;
-    }
-
-    .cadh-search-form .btn {
-      justify-self: start;
-    }
-
-    .cadh-user-info {
-      margin-top: 14px;
-      display: grid;
-      gap: 8px;
-    }
-
-    .cadh-user-info-item {
-      background: #cbd5e1;
-      border-radius: 8px;
-      padding: 8px;
-      line-height: 1.4;
-    }
-
-    .cadh-content {
-      flex: 1;
-    }
-
-    .cadh-grid {
+    .cadh-module-grid,
+    .cadh-specialty-grid {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 10px;
+      gap: 12px;
     }
 
-    .cadh-card-item {
+    .cadh-module-card,
+    .cadh-specialty-card {
       display: flex;
-      align-items: center;
+      flex-direction: column;
       justify-content: center;
-      min-height: 78px;
-      background: #e5e7eb;
+      min-height: 102px;
+      border: 2px solid #cbd5e1;
       border-radius: 10px;
-      padding: 18px;
-      text-align: center;
+      padding: 16px;
       text-decoration: none;
-      color: #111827;
+      color: #1f2937;
+      background: #fff;
     }
 
-    .cadh-card-item:hover {
-      background: #cbd5e1;
+    .cadh-module-card:hover,
+    .cadh-specialty-card:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 22px rgba(15, 37, 65, 0.08);
     }
 
-    .cadh-card-item-disabled {
+    .cadh-module-card[hidden] {
+      display: none;
+    }
+
+    .cadh-module-icon,
+    .cadh-specialty-icon {
+      margin-bottom: 10px;
+      color: #64748b;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .cadh-module-title {
+      font-weight: 800;
+    }
+
+    .cadh-module-text {
+      margin-top: 4px;
+      color: #6b7280;
+      font-size: 0.86rem;
+    }
+
+    .cadh-card-patients {
+      border-color: #0f766e;
+      background: #eefaf7;
+    }
+
+    .cadh-card-plans {
+      border-color: #3b7190;
+      background: #eef6fb;
+    }
+
+    .cadh-card-encounters {
+      border-color: #b98a16;
+      background: #fff9e8;
+    }
+
+    .cadh-card-transitions {
+      border-color: #7c5a9f;
+      background: #f7f0fb;
+    }
+
+    .cadh-specialty-card {
+      min-height: 80px;
+      align-items: center;
+      text-align: center;
+      font-weight: 700;
+    }
+
+    .cadh-specialty-card[aria-disabled="true"] {
       opacity: 0.5;
       cursor: not-allowed;
-      pointer-events: none;
     }
 
-    .cadh-section-title {
-      margin: 20px 0 14px;
-      font-size: 1rem;
+    .cadh-specialty-endocrino {
+      background: #d8c5e7;
+    }
+
+    .cadh-specialty-cardio {
+      background: #7fb7d8;
+    }
+
+    .cadh-specialty-psico {
+      background: #f5bdab;
+    }
+
+    .cadh-specialty-enf {
+      background: #b7dac7;
+    }
+
+    .cadh-specialty-nutri {
+      background: #f7df80;
+    }
+
+    .cadh-specialty-fisio {
+      background: #bcd0ef;
+    }
+
+    .cadh-specialty-farma {
+      background: #f4caa5;
+    }
+
+    .cadh-specialty-social {
+      background: #d6cba8;
+    }
+
+    .cadh-specialty-oftalmo {
+      background: #b4d9d8;
+    }
+
+    .cadh-specialty-nefro {
+      background: #d3aabd;
+    }
+
+    .cadh-specialty-tecnico {
+      background: #b5d0da;
+    }
+
+    .cadh-specialty-gestor {
+      background: #d1dbad;
     }
 
     @media (max-width: 860px) {
-      .cadh-layout {
-        flex-direction: column;
-      }
-
-      .cadh-sidebar {
-        width: 100%;
-        min-height: 0;
-      }
-
-      .cadh-grid {
+      .cadh-module-grid,
+      .cadh-specialty-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
     }
 
     @media (max-width: 560px) {
-      .cadh-grid {
+      .cadh-module-grid,
+      .cadh-specialty-grid {
         grid-template-columns: 1fr;
       }
     }
@@ -116,54 +169,55 @@
     <nav class="menu">
       <a id="nav-home" href="/index.html">Home</a>
       <a id="nav-cadh" href="/cadh/index.html">CADH</a>
-      <a href="#">UBS</a>
-      <a id="nav-patients" href="/patients/list.html">Pacientes</a>
-      <a id="nav-careplans" href="/care-plans/list.html">Planos</a>
-      <a id="nav-encounters" href="/encounters/list.html">Atendimentos</a>
-      <a id="nav-transitions" href="/transitions/list.html">Transicoes</a>
-      <a id="nav-admin" href="/admin/users/list.html">Admin</a>
-      <a id="logout-button" href="/login.html">Sair</a>
+      <a id="nav-ubs" href="#">UBS</a>
     </nav>
   </header>
 
   <main class="container">
-    <section class="card">
+    <section class="card cadh-page">
       <h1 class="page-title">CADH</h1>
-      <div class="cadh-layout">
-        <aside class="cadh-sidebar">
-          <form id="cadh-form" class="cadh-search-form">
-            <label for="ses">Buscar por SES</label>
-            <input id="ses" name="ses" placeholder="Digite o SES">
-            <button class="btn btn-primary" type="submit">Buscar</button>
-          </form>
 
-          <div id="cadh-patient-details" class="cadh-user-info"></div>
-        </aside>
+      <h2 class="cadh-section-label">Modulos principais</h2>
+      <div class="cadh-module-grid">
+        <a id="cadh-patients-card" class="cadh-module-card cadh-card-patients" href="/patients/list.html">
+          <span class="cadh-module-icon">P</span>
+          <span class="cadh-module-title">Cadastro de Pacientes</span>
+          <span class="cadh-module-text">Gerenciar cadastros</span>
+        </a>
 
-        <div class="cadh-content">
-          <div id="cadh-cards" class="cadh-grid">
-            <div class="cadh-card-item">Cadastro</div>
-            <div class="cadh-card-item">Mapa do Usuario</div>
-            <div class="cadh-card-item cadh-card-item-disabled">Plano de Cuidado</div>
-          </div>
+        <a id="cadh-careplans-card" class="cadh-module-card cadh-card-plans" href="/care-plans/list.html">
+          <span class="cadh-module-icon">PC</span>
+          <span class="cadh-module-title">Planos de Cuidado</span>
+          <span class="cadh-module-text">Criar e editar planos</span>
+        </a>
 
-          <h2 class="cadh-section-title">Especialidades e Corpo Clinico</h2>
+        <a id="cadh-encounters-card" class="cadh-module-card cadh-card-encounters" href="/encounters/list.html">
+          <span class="cadh-module-icon">A</span>
+          <span class="cadh-module-title">Atendimentos</span>
+          <span class="cadh-module-text">Registrar atendimentos</span>
+        </a>
 
-          <div class="cadh-grid">
-            <div class="cadh-card-item">Gestor do Cuidado</div>
-            <div class="cadh-card-item">Tecnico de Enfermagem</div>
-            <div class="cadh-card-item">Psicologo</div>
-            <div class="cadh-card-item">Enfermeiro</div>
-            <div class="cadh-card-item">Nutricionista</div>
-            <div class="cadh-card-item">Endocrinologista</div>
-            <div class="cadh-card-item">Cardiologista</div>
-            <div class="cadh-card-item">Fisioterapeuta</div>
-            <div class="cadh-card-item">Farmaceutico</div>
-            <div class="cadh-card-item">Servico Social</div>
-            <div class="cadh-card-item">Oftamologista</div>
-            <div class="cadh-card-item">Nefrologista</div>
-          </div>
-        </div>
+        <a id="cadh-transitions-card" class="cadh-module-card cadh-card-transitions" href="/transitions/list.html">
+          <span class="cadh-module-icon">T</span>
+          <span class="cadh-module-title">Transicao do Cuidado</span>
+          <span class="cadh-module-text">Visao geral</span>
+        </a>
+      </div>
+
+      <h2 class="cadh-section-label">Modulos clinicos por especialidade</h2>
+      <div class="cadh-specialty-grid">
+        <div class="cadh-specialty-card cadh-specialty-endocrino"><span class="cadh-specialty-icon">+</span>Endocrinologista</div>
+        <div class="cadh-specialty-card cadh-specialty-cardio"><span class="cadh-specialty-icon">+</span>Cardiologista</div>
+        <div class="cadh-specialty-card cadh-specialty-psico"><span class="cadh-specialty-icon">+</span>Psicologo</div>
+        <div class="cadh-specialty-card cadh-specialty-enf"><span class="cadh-specialty-icon">+</span>Enfermeiro</div>
+        <div class="cadh-specialty-card cadh-specialty-nutri"><span class="cadh-specialty-icon">+</span>Nutricionista</div>
+        <div class="cadh-specialty-card cadh-specialty-fisio"><span class="cadh-specialty-icon">+</span>Fisioterapeuta</div>
+        <div class="cadh-specialty-card cadh-specialty-farma"><span class="cadh-specialty-icon">+</span>Farmaceutico</div>
+        <div class="cadh-specialty-card cadh-specialty-social"><span class="cadh-specialty-icon">+</span>Servico Social</div>
+        <div class="cadh-specialty-card cadh-specialty-oftalmo"><span class="cadh-specialty-icon">+</span>Oftalmologia</div>
+        <div class="cadh-specialty-card cadh-specialty-nefro"><span class="cadh-specialty-icon">+</span>Nefrologia</div>
+        <div class="cadh-specialty-card cadh-specialty-tecnico"><span class="cadh-specialty-icon">+</span>Tecnico de Enfermagem</div>
+        <div class="cadh-specialty-card cadh-specialty-gestor"><span class="cadh-specialty-icon">+</span>Gestor do Cuidado</div>
       </div>
     </section>
   </main>
