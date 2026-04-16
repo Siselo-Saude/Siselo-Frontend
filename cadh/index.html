@@ -52,10 +52,31 @@
 
     .cadh-module-icon,
     .cadh-specialty-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      align-self: flex-start;
       margin-bottom: 10px;
-      color: #64748b;
-      font-weight: 800;
+      color: var(--cadh-accent, #64748b);
       line-height: 1;
+    }
+
+    .cadh-module-icon svg,
+    .cadh-specialty-icon svg {
+      inline-size: 20px;
+      block-size: 20px;
+      stroke: currentColor;
+      stroke-width: 1.9;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .cadh-specialty-icon svg {
+      inline-size: 17px;
+      block-size: 17px;
+      stroke-width: 1.8;
+      opacity: 0.78;
     }
 
     .cadh-module-title {
@@ -69,30 +90,37 @@
     }
 
     .cadh-card-patients {
-      border-color: #0f766e;
-      background: #eefaf7;
+      --cadh-accent: #08796c;
+      border-color: #08796c;
+      background: #effaf7;
     }
 
     .cadh-card-plans {
-      border-color: #3b7190;
-      background: #eef6fb;
+      --cadh-accent: #477d99;
+      border-color: #477d99;
+      background: #eff7fc;
     }
 
     .cadh-card-encounters {
-      border-color: #b98a16;
-      background: #fff9e8;
+      --cadh-accent: #b48716;
+      border-color: #b48716;
+      background: #fff9e7;
     }
 
     .cadh-card-transitions {
-      border-color: #7c5a9f;
+      --cadh-accent: #7c5aa3;
+      border-color: #7c5aa3;
       background: #f7f0fb;
     }
 
     .cadh-specialty-card {
       min-height: 80px;
-      align-items: center;
+      align-items: flex-start;
       text-align: center;
       font-weight: 700;
+      border-width: 1px;
+      border-color: rgba(15, 23, 42, 0.12);
+      color: #102236;
     }
 
     .cadh-specialty-card[aria-disabled="true"] {
@@ -101,51 +129,63 @@
     }
 
     .cadh-specialty-endocrino {
-      background: #d8c5e7;
+      --cadh-accent: #775e8c;
+      background: #d8c4e7;
     }
 
     .cadh-specialty-cardio {
-      background: #7fb7d8;
+      --cadh-accent: #3f7191;
+      background: #82b8d8;
     }
 
     .cadh-specialty-psico {
-      background: #f5bdab;
+      --cadh-accent: #9d6658;
+      background: #f6b9a8;
     }
 
     .cadh-specialty-enf {
-      background: #b7dac7;
+      --cadh-accent: #5f8870;
+      background: #b8dcc9;
     }
 
     .cadh-specialty-nutri {
+      --cadh-accent: #9b8122;
       background: #f7df80;
     }
 
     .cadh-specialty-fisio {
-      background: #bcd0ef;
+      --cadh-accent: #5d789f;
+      background: #bfd2ef;
     }
 
     .cadh-specialty-farma {
-      background: #f4caa5;
+      --cadh-accent: #966943;
+      background: #f4c9a5;
     }
 
     .cadh-specialty-social {
-      background: #d6cba8;
+      --cadh-accent: #7d7351;
+      background: #d6caa8;
     }
 
     .cadh-specialty-oftalmo {
+      --cadh-accent: #5a8584;
       background: #b4d9d8;
     }
 
     .cadh-specialty-nefro {
+      --cadh-accent: #8a6074;
       background: #d3aabd;
     }
 
     .cadh-specialty-tecnico {
-      background: #b5d0da;
+      --cadh-accent: #607d88;
+      background: #b7d0da;
     }
 
     .cadh-specialty-gestor {
-      background: #d1dbad;
+      --cadh-accent: #708050;
+      background: #d0dcad;
     }
 
     @media (max-width: 860px) {
@@ -175,30 +215,65 @@
 
   <main class="container">
     <section class="card cadh-page">
+      <svg aria-hidden="true" style="display:none">
+        <symbol id="cadh-icon-users" viewBox="0 0 24 24">
+          <path d="M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/>
+          <path d="M3.5 19a5.5 5.5 0 0 1 11 0"/>
+          <path d="M16 11a2.5 2.5 0 0 0 0-5"/>
+          <path d="M18 18a4.5 4.5 0 0 0-3-4.2"/>
+        </symbol>
+        <symbol id="cadh-icon-file" viewBox="0 0 24 24">
+          <path d="M7 3h7l4 4v14H7V3Z"/>
+          <path d="M14 3v5h5"/>
+          <path d="M10 12h6"/>
+          <path d="M10 16h6"/>
+        </symbol>
+        <symbol id="cadh-icon-care" viewBox="0 0 24 24">
+          <path d="M7 4v5a4 4 0 0 0 8 0V4"/>
+          <path d="M5 4h4"/>
+          <path d="M13 4h4"/>
+          <path d="M11 13v2a4 4 0 0 0 8 0v-1"/>
+          <circle cx="19" cy="12" r="2"/>
+        </symbol>
+        <symbol id="cadh-icon-transition" viewBox="0 0 24 24">
+          <path d="M8 7h12"/>
+          <path d="M16 3l4 4-4 4"/>
+          <path d="M16 17H4"/>
+          <path d="M8 13l-4 4 4 4"/>
+        </symbol>
+        <symbol id="cadh-icon-clipboard" viewBox="0 0 24 24">
+          <path d="M9 5h6"/>
+          <path d="M10 3h4l1 3H9l1-3Z"/>
+          <path d="M7 5H5v16h14V5h-2"/>
+          <path d="M8 11h8"/>
+          <path d="M8 15h8"/>
+        </symbol>
+      </svg>
+
       <h1 class="page-title">CADH</h1>
 
       <h2 class="cadh-section-label">Modulos principais</h2>
       <div class="cadh-module-grid">
         <a id="cadh-patients-card" class="cadh-module-card cadh-card-patients" href="/patients/list.html">
-          <span class="cadh-module-icon">P</span>
+          <span class="cadh-module-icon"><svg><use href="#cadh-icon-users"></use></svg></span>
           <span class="cadh-module-title">Cadastro de Pacientes</span>
           <span class="cadh-module-text">Gerenciar cadastros</span>
         </a>
 
         <a id="cadh-careplans-card" class="cadh-module-card cadh-card-plans" href="/care-plans/list.html">
-          <span class="cadh-module-icon">PC</span>
+          <span class="cadh-module-icon"><svg><use href="#cadh-icon-file"></use></svg></span>
           <span class="cadh-module-title">Planos de Cuidado</span>
           <span class="cadh-module-text">Criar e editar planos</span>
         </a>
 
         <a id="cadh-encounters-card" class="cadh-module-card cadh-card-encounters" href="/encounters/list.html">
-          <span class="cadh-module-icon">A</span>
+          <span class="cadh-module-icon"><svg><use href="#cadh-icon-care"></use></svg></span>
           <span class="cadh-module-title">Atendimentos</span>
           <span class="cadh-module-text">Registrar atendimentos</span>
         </a>
 
         <a id="cadh-transitions-card" class="cadh-module-card cadh-card-transitions" href="/transitions/list.html">
-          <span class="cadh-module-icon">T</span>
+          <span class="cadh-module-icon"><svg><use href="#cadh-icon-transition"></use></svg></span>
           <span class="cadh-module-title">Transicao do Cuidado</span>
           <span class="cadh-module-text">Visao geral</span>
         </a>
@@ -206,18 +281,18 @@
 
       <h2 class="cadh-section-label">Modulos clinicos por especialidade</h2>
       <div class="cadh-specialty-grid">
-        <div class="cadh-specialty-card cadh-specialty-endocrino"><span class="cadh-specialty-icon">+</span>Endocrinologista</div>
-        <div class="cadh-specialty-card cadh-specialty-cardio"><span class="cadh-specialty-icon">+</span>Cardiologista</div>
-        <div class="cadh-specialty-card cadh-specialty-psico"><span class="cadh-specialty-icon">+</span>Psicologo</div>
-        <div class="cadh-specialty-card cadh-specialty-enf"><span class="cadh-specialty-icon">+</span>Enfermeiro</div>
-        <div class="cadh-specialty-card cadh-specialty-nutri"><span class="cadh-specialty-icon">+</span>Nutricionista</div>
-        <div class="cadh-specialty-card cadh-specialty-fisio"><span class="cadh-specialty-icon">+</span>Fisioterapeuta</div>
-        <div class="cadh-specialty-card cadh-specialty-farma"><span class="cadh-specialty-icon">+</span>Farmaceutico</div>
-        <div class="cadh-specialty-card cadh-specialty-social"><span class="cadh-specialty-icon">+</span>Servico Social</div>
-        <div class="cadh-specialty-card cadh-specialty-oftalmo"><span class="cadh-specialty-icon">+</span>Oftalmologia</div>
-        <div class="cadh-specialty-card cadh-specialty-nefro"><span class="cadh-specialty-icon">+</span>Nefrologia</div>
-        <div class="cadh-specialty-card cadh-specialty-tecnico"><span class="cadh-specialty-icon">+</span>Tecnico de Enfermagem</div>
-        <div class="cadh-specialty-card cadh-specialty-gestor"><span class="cadh-specialty-icon">+</span>Gestor do Cuidado</div>
+        <div class="cadh-specialty-card cadh-specialty-endocrino"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-clipboard"></use></svg></span>Endocrinologista</div>
+        <div class="cadh-specialty-card cadh-specialty-cardio"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-clipboard"></use></svg></span>Cardiologista</div>
+        <div class="cadh-specialty-card cadh-specialty-psico"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-clipboard"></use></svg></span>Psicologo</div>
+        <div class="cadh-specialty-card cadh-specialty-enf"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-clipboard"></use></svg></span>Enfermeiro</div>
+        <div class="cadh-specialty-card cadh-specialty-nutri"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-clipboard"></use></svg></span>Nutricionista</div>
+        <div class="cadh-specialty-card cadh-specialty-fisio"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-clipboard"></use></svg></span>Fisioterapeuta</div>
+        <div class="cadh-specialty-card cadh-specialty-farma"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-clipboard"></use></svg></span>Farmaceutico</div>
+        <div class="cadh-specialty-card cadh-specialty-social"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-clipboard"></use></svg></span>Servico Social</div>
+        <div class="cadh-specialty-card cadh-specialty-oftalmo"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-clipboard"></use></svg></span>Oftalmologia</div>
+        <div class="cadh-specialty-card cadh-specialty-nefro"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-clipboard"></use></svg></span>Nefrologia</div>
+        <div class="cadh-specialty-card cadh-specialty-tecnico"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-clipboard"></use></svg></span>Tecnico de Enfermagem</div>
+        <div class="cadh-specialty-card cadh-specialty-gestor"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-clipboard"></use></svg></span>Gestor do Cuidado</div>
       </div>
     </section>
   </main>
