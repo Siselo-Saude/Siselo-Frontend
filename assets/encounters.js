@@ -12,27 +12,37 @@ async function setupEncountersListPage() {
   const permissions = SISELO.getUiPermissions(user);
   SISELO.bindShell('encounters');
   const query = SISELO.queryParam('q') || '';
-  document.getElementById('search-input').value = query;
+  const searchInput = document.getElementById('search-input');
+  const searchForm = document.getElementById('search-form');
+  searchInput.value = query;
   document.getElementById('new-encounter-link').hidden = !permissions.has('encounters.create');
   document.getElementById('trash-link').hidden = !permissions.has('encounters.restore');
 
   let rows = [];
 
   try {
-    const data = await SISELO.apiRequest('/encounters/list.php?q=' + encodeURIComponent(query));
+    const data = await SISELO.apiRequest('/encounters/list.php');
     rows = Array.isArray(data.rows) ? data.rows : [];
   } catch (error) {
     rows = [];
   }
 
   const tbody = document.getElementById('encounters-table-body');
-  renderEncountersTable(tbody, rows, permissions);
-  bindEncounterListActions(tbody);
+  const applySearch = (value) => {
+    renderEncountersTable(tbody, filterEncounterRows(rows, value), permissions, value);
+    bindEncounterListActions(tbody);
+    SISELO.syncSearchUrl('/encounters/list.html', value);
+  };
 
-  document.getElementById('search-form').addEventListener('submit', (event) => {
+  applySearch(query);
+
+  searchInput.addEventListener('input', (event) => {
+    applySearch(event.currentTarget.value);
+  });
+
+  searchForm.addEventListener('submit', (event) => {
     event.preventDefault();
-    const value = document.getElementById('search-input').value.trim();
-    location.href = '/encounters/list.html' + (value ? '?q=' + encodeURIComponent(value) : '');
+    applySearch(searchInput.value);
   });
 }
 
@@ -87,52 +97,48 @@ async function setupEncountersTrashPage() {
 
   SISELO.bindShell('encounters');
   const query = SISELO.queryParam('q') || '';
-  document.getElementById('search-input').value = query;
+  const searchInput = document.getElementById('search-input');
+  const searchForm = document.getElementById('search-form');
+  searchInput.value = query;
 
   let rows = [];
 
   try {
-    const data = await SISELO.apiRequest('/encounters/trash.php?q=' + encodeURIComponent(query));
+    const data = await SISELO.apiRequest('/encounters/trash.php');
     rows = Array.isArray(data.rows) ? data.rows : [];
   } catch (error) {
     rows = [];
   }
 
   const tbody = document.getElementById('encounters-table-body');
-  renderEncountersTrashTable(tbody, rows);
-  bindEncounterTrashActions(tbody);
+  const applySearch = (value) => {
+    renderEncountersTrashTable(tbody, filterEncounterRows(rows, value), value);
+    bindEncounterTrashActions(tbody);
+    SISELO.syncSearchUrl('/encounters/trash.html', value);
+  };
 
-  document.getElementById('search-form').addEventListener('submit', (event) => {
+  applySearch(query);
+
+  searchInput.addEventListener('input', (event) => {
+    applySearch(event.currentTarget.value);
+  });
+
+  searchForm.addEventListener('submit', (event) => {
     event.preventDefault();
-    const value = document.getElementById('search-input').value.trim();
-    location.href = '/encounters/trash.html' + (value ? '?q=' + encodeURIComponent(value) : '');
+    applySearch(searchInput.value);
   });
 }
 
-function renderEncountersTable(tbody, rows, permissions) {
+function renderEncountersTable(tbody, rows, permissions, query = '') {
   if (!Array.isArray(rows) || rows.length === 0) {
-    tbody.innerHTML = `
-      <tr>
-        <td class="muted">-</td>
-        <td class="muted">Nenhum atendimento carregado.</td>
-        <td class="muted">-</td>
-        <td class="muted">-</td>
-        <td>
-          <div class="table-actions">
-            ${SISELO.iconLink('view', '/patients/show.html?id=0&tab=atendimentos', 'Paciente 360')}
-            ${permissions.has('encounters.update') ? SISELO.iconLink('edit', '/encounters/form.html', 'Editar atendimento') : ''}
-            ${permissions.has('encounters.delete') ? SISELO.iconButton('delete', 'Apagar atendimento', { 'data-empty-delete': true }) : ''}
-          </div>
-        </td>
-      </tr>
-    `;
+    tbody.innerHTML = SISELO.emptyTableRow(5, 'Nenhum atendimento encontrado.');
     return;
   }
 
   tbody.innerHTML = rows.map((row) => `
     <tr>
       <td>${SISELO.escapeHtml(row.encounter_date)}</td>
-      <td>${SISELO.escapeHtml(row.full_name)}<br><small>CPF: ${SISELO.escapeHtml(row.cpf)} | SES: ${SISELO.escapeHtml(row.ses)}</small></td>
+      <td><span class="patient-name">${SISELO.highlightPersonName(row.full_name, query)}</span><br><small>CPF: ${SISELO.escapeHtml(row.cpf)} | SES: ${SISELO.escapeHtml(row.ses)}</small></td>
       <td>${SISELO.escapeHtml(row.specialty)}</td>
       <td>${SISELO.escapeHtml(row.summary || '')}</td>
       <td>
@@ -146,21 +152,9 @@ function renderEncountersTable(tbody, rows, permissions) {
   `).join('');
 }
 
-function renderEncountersTrashTable(tbody, rows) {
+function renderEncountersTrashTable(tbody, rows, query = '') {
   if (!Array.isArray(rows) || rows.length === 0) {
-    tbody.innerHTML = `
-      <tr>
-        <td class="muted">-</td>
-        <td class="muted">-</td>
-        <td class="muted">Nenhum atendimento na lixeira.</td>
-        <td class="muted">-</td>
-        <td>
-          <div class="table-actions">
-            ${SISELO.iconButton('restore', 'Restaurar atendimento', { 'data-empty-restore': true })}
-          </div>
-        </td>
-      </tr>
-    `;
+    tbody.innerHTML = SISELO.emptyTableRow(5, 'Nenhum atendimento na lixeira.');
     return;
   }
 
@@ -168,7 +162,7 @@ function renderEncountersTrashTable(tbody, rows) {
     <tr>
       <td>${SISELO.escapeHtml(row.deleted_at || '')}</td>
       <td>${SISELO.escapeHtml(row.encounter_date)}</td>
-      <td>${SISELO.escapeHtml(row.full_name)}<br><small>CPF: ${SISELO.escapeHtml(row.cpf)} | SES: ${SISELO.escapeHtml(row.ses)}</small></td>
+      <td><span class="patient-name">${SISELO.highlightPersonName(row.full_name, query)}</span><br><small>CPF: ${SISELO.escapeHtml(row.cpf)} | SES: ${SISELO.escapeHtml(row.ses)}</small></td>
       <td>${SISELO.escapeHtml(row.specialty)}</td>
       <td>
         <div class="table-actions">
@@ -195,12 +189,6 @@ function bindEncounterListActions(tbody) {
       }
     });
   });
-
-  tbody.querySelectorAll('[data-empty-delete]').forEach((button) => {
-    button.addEventListener('click', () => {
-      SISELO.showUnavailableAction('Nao ha atendimento carregado para apagar.');
-    });
-  });
 }
 
 function bindEncounterTrashActions(tbody) {
@@ -213,11 +201,23 @@ function bindEncounterTrashActions(tbody) {
       location.reload();
     });
   });
+}
 
-  tbody.querySelectorAll('[data-empty-restore]').forEach((button) => {
-    button.addEventListener('click', () => {
-      SISELO.showUnavailableAction('Nao ha atendimento carregado para restaurar.');
-    });
+function filterEncounterRows(rows, query) {
+  const search = SISELO.createSearchState(query);
+  if (!search.hasLetters && !search.hasDigits) {
+    return Array.isArray(rows) ? rows : [];
+  }
+
+  return (Array.isArray(rows) ? rows : []).filter((row) => {
+    const matchesLetters = search.hasLetters
+      ? SISELO.matchesPersonNamePrefix(row.full_name, search) || SISELO.matchesSearchText(row.specialty, search)
+      : true;
+    const matchesDigits = search.hasDigits
+      ? SISELO.matchesSearchDigits(row.cpf, search) || SISELO.matchesSearchDigits(row.ses, search)
+      : true;
+
+    return matchesLetters && matchesDigits;
   });
 }
 
@@ -236,9 +236,9 @@ function getEmptyEncounterContext(patientId) {
 
 function fillEncounterPatientSelect(patients, currentValue) {
   const select = document.getElementById('patient_id');
-  select.innerHTML = '<option value="">-- selecione --</option>' + (patients || []).map((patient) => `
+  select.innerHTML = '<option value="">Selecione um paciente</option>' + (patients || []).map((patient) => `
     <option value="${patient.id}" ${Number(currentValue || 0) === Number(patient.id) ? 'selected' : ''}>
-      ${SISELO.escapeHtml(patient.full_name)} (CPF: ${SISELO.escapeHtml(patient.cpf)} | SES: ${SISELO.escapeHtml(patient.ses)})
+      ${SISELO.escapeHtml(patient.full_name)}
     </option>
   `).join('');
 }

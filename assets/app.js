@@ -26,6 +26,37 @@
     'transitions.restore',
     'admin.manage',
   ];
+  const MOCK_API_SCRIPT_PATH = '/assets/mock-api.js';
+  let mockApiLoader = null;
+
+  function isMockDataEnabled() {
+    return config.useMockData === true;
+  }
+
+  function loadMockApi() {
+    if (!isMockDataEnabled()) {
+      return Promise.resolve(null);
+    }
+
+    if (window.SISELO_MOCK_API) {
+      return Promise.resolve(window.SISELO_MOCK_API);
+    }
+
+    if (mockApiLoader) {
+      return mockApiLoader;
+    }
+
+    mockApiLoader = new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = MOCK_API_SCRIPT_PATH;
+      script.async = true;
+      script.onload = () => resolve(window.SISELO_MOCK_API || null);
+      script.onerror = () => reject(new Error('Nao foi possivel carregar os dados mock do frontend.'));
+      document.head.appendChild(script);
+    });
+
+    return mockApiLoader;
+  }
 
   function escapeHtml(value) {
     return String(value ?? '')
@@ -34,6 +65,162 @@
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#39;');
+  }
+
+  function digitsOnly(value) {
+    return String(value ?? '').replace(/\D+/g, '');
+  }
+
+  function normalizeSearchText(value) {
+    return String(value ?? '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  function createSearchState(value) {
+    const raw = String(value ?? '');
+    const text = normalizeSearchText(raw);
+    const nameText = text
+      .replace(/[^a-z\s]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+    const digits = digitsOnly(raw);
+
+    return {
+      raw,
+      text,
+      nameText,
+      digits,
+      hasText: Boolean(text),
+      hasLetters: /[a-z]/.test(nameText),
+      hasDigits: Boolean(digits),
+    };
+  }
+
+  function getSearchState(value) {
+    if (
+      value &&
+      typeof value === 'object' &&
+      Object.prototype.hasOwnProperty.call(value, 'text') &&
+      Object.prototype.hasOwnProperty.call(value, 'nameText') &&
+      Object.prototype.hasOwnProperty.call(value, 'digits')
+    ) {
+      return value;
+    }
+
+    return createSearchState(value);
+  }
+
+  function matchesPersonNamePrefix(value, search) {
+    const state = getSearchState(search);
+    if (!state.hasLetters || !state.nameText) {
+      return false;
+    }
+
+    return normalizeSearchText(value).startsWith(state.nameText);
+  }
+
+  function matchesSearchText(value, search) {
+    const state = getSearchState(search);
+    if (!state.hasText) {
+      return false;
+    }
+
+    return normalizeSearchText(value).includes(state.text);
+  }
+
+  function matchesSearchDigits(value, search) {
+    const state = getSearchState(search);
+    if (!state.hasDigits) {
+      return false;
+    }
+
+    return digitsOnly(value).includes(state.digits);
+  }
+
+  function buildSearchUrl(basePath, query, extraParams = {}) {
+    const url = new URL(basePath, location.origin);
+    const normalizedQuery = String(query ?? '').trim();
+
+    if (normalizedQuery) {
+      url.searchParams.set('q', normalizedQuery);
+    }
+
+    Object.entries(extraParams || {}).forEach(([key, value]) => {
+      const normalizedValue = String(value ?? '').trim();
+      if (normalizedValue) {
+        url.searchParams.set(key, normalizedValue);
+      }
+    });
+
+    return `${url.pathname}${url.search}${url.hash}`;
+  }
+
+  function syncSearchUrl(basePath, query, extraParams = {}) {
+    const nextUrl = buildSearchUrl(basePath, query, extraParams);
+    const currentUrl = `${location.pathname}${location.search}${location.hash}`;
+
+    if (currentUrl !== nextUrl) {
+      history.replaceState(null, '', nextUrl);
+    }
+  }
+
+  function buildNormalizedCharMap(value) {
+    const original = String(value ?? '');
+    let normalized = '';
+    const indexMap = [];
+
+    for (let index = 0; index < original.length; index += 1) {
+      const normalizedChunk = original[index]
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase();
+
+      if (!normalizedChunk) {
+        continue;
+      }
+
+      for (const character of normalizedChunk) {
+        normalized += character;
+        indexMap.push(index);
+      }
+    }
+
+    return {
+      original,
+      normalized,
+      indexMap,
+    };
+  }
+
+  function highlightPersonName(value, search, fallback = '<span class="muted">-</span>') {
+    const original = String(value ?? '').trim();
+    if (!original) {
+      return fallback;
+    }
+
+    const state = getSearchState(search);
+    if (!state.hasLetters || !state.nameText) {
+      return escapeHtml(original);
+    }
+
+    const mapped = buildNormalizedCharMap(original);
+    if (!mapped.normalized.startsWith(state.nameText)) {
+      return escapeHtml(original);
+    }
+
+    const lastMatchedIndex = mapped.indexMap[state.nameText.length - 1];
+    if (lastMatchedIndex === undefined) {
+      return escapeHtml(original);
+    }
+
+    const highlightEnd = lastMatchedIndex + 1;
+    return `
+      <mark class="search-highlight">${escapeHtml(original.slice(0, highlightEnd))}</mark>${escapeHtml(original.slice(highlightEnd))}
+    `.trim();
   }
 
   function getApiBaseUrl() {
@@ -156,6 +343,17 @@
   }
 
   async function apiRequest(path, options = {}) {
+    if (isMockDataEnabled()) {
+      const mockApi = await loadMockApi().catch(() => null);
+      if (mockApi && typeof mockApi.supports === 'function' && mockApi.supports(path)) {
+        const mockPayload = await mockApi.handle(path, options);
+        if (mockPayload && typeof mockPayload === 'object' && (mockPayload.user || typeof mockPayload.csrf === 'string')) {
+          saveSessionPayload(mockPayload);
+        }
+        return mockPayload;
+      }
+    }
+
     const method = options.method || 'GET';
     const headers = new Headers(options.headers || {});
     const body = options.body || null;
@@ -1148,19 +1346,49 @@
     return `<button ${attrs}>${actionIcon(kind)}</button>`;
   }
 
+  function emptyTableRow(colspan, title, description = '') {
+    const safeColspan = Math.max(1, Number(colspan || 1));
+    const safeTitle = String(title || 'Nenhum registro encontrado.').trim();
+    const safeDescription = String(description || '').trim();
+
+    return `
+      <tr class="table-empty-row">
+        <td colspan="${safeColspan}">
+          <div class="table-empty-state">
+            <div class="table-empty-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M7 7h11l-2.6-2.6L17 3l5 5-5 5-1.6-1.4L18 9H7V7Zm10 10H6l2.6 2.6L7 21l-5-5 5-5 1.6 1.4L6 15h11v2Z"/>
+              </svg>
+            </div>
+            <p class="table-empty-title">${escapeHtml(safeTitle)}</p>
+            ${safeDescription ? `<p class="table-empty-text">${escapeHtml(safeDescription)}</p>` : ''}
+          </div>
+        </td>
+      </tr>
+    `;
+  }
+
   window.SISELO = {
     apiRequest,
     bindShell,
     clampDateInputValue,
     confirmDeletion,
     clearSession,
+    createSearchState,
+    digitsOnly,
     enhanceDateInput,
     escapeHtml,
     formatDateInputValue,
     getApiBaseUrl,
     getSession,
+    highlightPersonName,
     iconButton,
     iconLink,
+    emptyTableRow,
+    matchesPersonNamePrefix,
+    matchesSearchDigits,
+    matchesSearchText,
+    normalizeSearchText,
     parseDateInputValue,
     queryParam,
     requireSession,
@@ -1169,6 +1397,7 @@
     setText,
     shiftDateInputValue,
     syncEnhancedDateInput,
+    syncSearchUrl,
     showActionError,
     showUnavailableAction,
     showAlert,

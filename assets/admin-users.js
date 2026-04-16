@@ -17,39 +17,47 @@ async function setupAdminUsersListPage() {
 
   SISELO.bindShell('admin');
   const query = SISELO.queryParam('q') || '';
-  document.getElementById('search-input').value = query;
+  const searchInput = document.getElementById('search-input');
+  const searchForm = document.getElementById('search-form');
+  searchInput.value = query;
   const tbody = document.getElementById('users-table-body');
   let rows = [];
 
   try {
-    const data = await SISELO.apiRequest('/admin/users/list.php?q=' + encodeURIComponent(query));
+    const data = await SISELO.apiRequest('/admin/users/list.php');
     rows = Array.isArray(data.rows) ? data.rows : [];
   } catch (error) {
     rows = [];
   }
 
-  if (rows.length === 0) {
-    tbody.innerHTML = `
-      <tr>
-        <td class="muted">-</td>
-        <td class="muted">Nenhum usuario carregado.</td>
-        <td class="muted">-</td>
-        <td class="muted">-</td>
-        <td class="muted">-</td>
-        <td>
-          <div class="table-actions">
-            ${SISELO.iconLink('edit', '/admin/users/form.html', 'Editar usuario')}
-            ${SISELO.iconButton('toggle', 'Ativar ou desativar usuario', { 'data-empty-toggle': true })}
-            ${SISELO.iconButton('reset', 'Resetar senha', { 'data-empty-reset': true })}
-          </div>
-        </td>
-      </tr>
-    `;
-  } else {
-    tbody.innerHTML = rows.map((row) => `
+  const applySearch = (value) => {
+    renderAdminUsersTable(tbody, filterAdminUserRows(rows, value), value);
+    bindAdminUserActions(tbody);
+    SISELO.syncSearchUrl('/admin/users/list.html', value);
+  };
+
+  applySearch(query);
+
+  searchInput.addEventListener('input', (event) => {
+    applySearch(event.currentTarget.value);
+  });
+
+  searchForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    applySearch(searchInput.value);
+  });
+}
+
+function renderAdminUsersTable(tbody, rows, query = '') {
+  if (!Array.isArray(rows) || rows.length === 0) {
+    tbody.innerHTML = SISELO.emptyTableRow(6, 'Nenhum usuario encontrado.');
+    return;
+  }
+
+  tbody.innerHTML = rows.map((row) => `
     <tr>
       <td>${row.id}</td>
-      <td>${SISELO.escapeHtml(row.name)}</td>
+      <td>${SISELO.highlightPersonName(row.name, query, SISELO.escapeHtml(row.name || '-'))}</td>
       <td>${SISELO.escapeHtml(row.email)}</td>
       <td>${SISELO.escapeHtml((row.roles || []).join(', '))}</td>
       <td>${Number(row.is_active) === 1 ? 'Ativo' : 'Inativo'}</td>
@@ -61,9 +69,10 @@ async function setupAdminUsersListPage() {
         </div>
       </td>
     </tr>
-    `).join('');
-  }
+  `).join('');
+}
 
+function bindAdminUserActions(tbody) {
   tbody.querySelectorAll('[data-toggle-id]').forEach((button) => {
     button.addEventListener('click', async () => {
       await SISELO.apiRequest('/admin/users/toggle_active.php', {
@@ -87,23 +96,26 @@ async function setupAdminUsersListPage() {
       location.reload();
     });
   });
+}
 
-  tbody.querySelectorAll('[data-empty-toggle]').forEach((button) => {
-    button.addEventListener('click', () => {
-      SISELO.showUnavailableAction('Nenhum usuario carregado para ativar ou desativar.');
-    });
-  });
+function filterAdminUserRows(rows, query) {
+  const search = SISELO.createSearchState(query);
+  if (!search.hasLetters && !search.hasDigits) {
+    return Array.isArray(rows) ? rows : [];
+  }
 
-  tbody.querySelectorAll('[data-empty-reset]').forEach((button) => {
-    button.addEventListener('click', () => {
-      SISELO.showUnavailableAction('Nenhum usuario carregado para resetar senha.');
-    });
-  });
+  return (Array.isArray(rows) ? rows : []).filter((row) => {
+    const matchesLetters = search.hasLetters
+      ? SISELO.matchesPersonNamePrefix(row.name, search) ||
+        SISELO.matchesSearchText(row.email, search) ||
+        SISELO.matchesSearchText((row.roles || []).join(' '), search)
+      : true;
+    const matchesDigits = search.hasDigits
+      ? SISELO.matchesSearchDigits(row.id, search) ||
+        SISELO.matchesSearchText(row.email, search)
+      : true;
 
-  document.getElementById('search-form').addEventListener('submit', (event) => {
-    event.preventDefault();
-    const value = document.getElementById('search-input').value.trim();
-    location.href = '/admin/users/list.html' + (value ? '?q=' + encodeURIComponent(value) : '');
+    return matchesLetters && matchesDigits;
   });
 }
 

@@ -27,25 +27,41 @@ async function setupPatientsListPage() {
   const permissions = SISELO.getUiPermissions(user);
   SISELO.bindShell('patients');
   const query = SISELO.queryParam('q') || '';
-  document.getElementById('search-input').value = query;
+  const searchInput = document.getElementById('search-input');
+  const searchForm = document.getElementById('search-form');
+  searchInput.value = query;
   document.getElementById('new-patient-link').hidden = !permissions.has('patients.create');
   document.getElementById('trash-link').hidden = !permissions.has('patients.restore');
 
   let rows = [];
 
   try {
-    const data = await SISELO.apiRequest('/patients/list.php?q=' + encodeURIComponent(query));
+    const data = await SISELO.apiRequest('/patients/list.php');
     rows = Array.isArray(data.rows) ? data.rows : [];
   } catch (error) {
     rows = [];
   }
 
-  renderPatientsTable('patients-table-body', rows, permissions, false);
+  const applySearch = (value) => {
+    renderPatientsTable(
+      'patients-table-body',
+      filterPatientRows(rows, value),
+      permissions,
+      false,
+      value
+    );
+    SISELO.syncSearchUrl('/patients/list.html', value);
+  };
 
-  document.getElementById('search-form').addEventListener('submit', (event) => {
+  applySearch(query);
+
+  searchInput.addEventListener('input', (event) => {
+    applySearch(event.currentTarget.value);
+  });
+
+  searchForm.addEventListener('submit', (event) => {
     event.preventDefault();
-    const value = document.getElementById('search-input').value.trim();
-    location.href = '/patients/list.html' + (value ? '?q=' + encodeURIComponent(value) : '');
+    applySearch(searchInput.value);
   });
 }
 
@@ -57,25 +73,35 @@ async function setupPatientsTrashPage() {
 
   SISELO.bindShell('patients');
   const query = SISELO.queryParam('q') || '';
-  document.getElementById('search-input').value = query;
+  const searchInput = document.getElementById('search-input');
+  const searchForm = document.getElementById('search-form');
+  searchInput.value = query;
 
   let rows = [];
 
   try {
-    const data = await SISELO.apiRequest('/patients/trash.php?q=' + encodeURIComponent(query));
+    const data = await SISELO.apiRequest('/patients/trash.php');
     rows = Array.isArray(data.rows) ? data.rows : [];
   } catch (error) {
     rows = [];
   }
 
   const tbody = document.getElementById('patients-table-body');
-  renderPatientsTrashTable(tbody, rows);
-  bindPatientsTrashActions(tbody);
+  const applySearch = (value) => {
+    renderPatientsTrashTable(tbody, filterPatientRows(rows, value), value);
+    bindPatientsTrashActions(tbody);
+    SISELO.syncSearchUrl('/patients/trash.html', value);
+  };
 
-  document.getElementById('search-form').addEventListener('submit', (event) => {
+  applySearch(query);
+
+  searchInput.addEventListener('input', (event) => {
+    applySearch(event.currentTarget.value);
+  });
+
+  searchForm.addEventListener('submit', (event) => {
     event.preventDefault();
-    const value = document.getElementById('search-input').value.trim();
-    location.href = '/patients/trash.html' + (value ? '?q=' + encodeURIComponent(value) : '');
+    applySearch(searchInput.value);
   });
 }
 
@@ -203,38 +229,18 @@ async function setupPatientShowPage() {
   renderTransitionRows('transitions-table-body', data && Array.isArray(data.transitions) ? data.transitions : [], permissions);
 }
 
-function renderPatientsTable(targetId, rows, permissions, isTrash) {
+function renderPatientsTable(targetId, rows, permissions, isTrash, query = '') {
   const tbody = document.getElementById(targetId);
 
   if (!Array.isArray(rows) || rows.length === 0) {
-    tbody.innerHTML = `
-      <tr>
-        <td>
-          <strong>Cadastro em branco</strong><br>
-          <small class="muted">Sem usuario carregado</small>
-        </td>
-        <td class="muted">-</td>
-        <td class="muted">-</td>
-        <td class="muted">-</td>
-        <td class="muted">-</td>
-        <td class="muted">-</td>
-        <td>
-          <div class="table-actions">
-            ${SISELO.iconLink('view', '/patients/show.html?id=0&tab=planos', 'Usuario 360')}
-            ${permissions.has('patients.update') ? SISELO.iconLink('edit', '/patients/form.html', 'Editar paciente') : ''}
-            ${!isTrash && permissions.has('patients.delete') ? SISELO.iconButton('delete', 'Apagar paciente', { 'data-empty-delete': true }) : ''}
-          </div>
-        </td>
-      </tr>
-    `;
-    bindPatientListActions(tbody);
+    tbody.innerHTML = SISELO.emptyTableRow(7, 'Nenhum paciente encontrado.');
     return;
   }
 
   tbody.innerHTML = rows.map((row) => `
     <tr>
       <td>
-        <strong>${SISELO.escapeHtml(row.full_name)}</strong><br>
+        <strong>${SISELO.highlightPersonName(row.full_name, query)}</strong><br>
         <small>${SISELO.escapeHtml(row.age_label || '')}${row.age_label && row.gender_label ? ' | ' : ''}${SISELO.escapeHtml(row.gender_label || '')}</small>
       </td>
       <td>${SISELO.escapeHtml(row.cpf)}</td>
@@ -255,27 +261,33 @@ function renderPatientsTable(targetId, rows, permissions, isTrash) {
   bindPatientListActions(tbody);
 }
 
-function renderPatientsTrashTable(tbody, rows) {
+function filterPatientRows(rows, query) {
+  const search = SISELO.createSearchState(query);
+  if (!search.hasLetters && !search.hasDigits) {
+    return Array.isArray(rows) ? rows : [];
+  }
+
+  return (Array.isArray(rows) ? rows : []).filter((row) => {
+    const matchesName = search.hasLetters
+      ? SISELO.matchesPersonNamePrefix(row.full_name, search)
+      : true;
+    const matchesDigits = search.hasDigits
+      ? SISELO.matchesSearchDigits(row.cpf, search) || SISELO.matchesSearchDigits(row.ses, search)
+      : true;
+
+    return matchesName && matchesDigits;
+  });
+}
+
+function renderPatientsTrashTable(tbody, rows, query = '') {
   if (!Array.isArray(rows) || rows.length === 0) {
-    tbody.innerHTML = `
-      <tr>
-        <td class="muted">Nenhum paciente na lixeira.</td>
-        <td class="muted">-</td>
-        <td class="muted">-</td>
-        <td class="muted">-</td>
-        <td>
-          <div class="table-actions">
-            ${SISELO.iconButton('restore', 'Restaurar paciente', { 'data-empty-restore': true })}
-          </div>
-        </td>
-      </tr>
-    `;
+    tbody.innerHTML = SISELO.emptyTableRow(5, 'Nenhum paciente na lixeira.');
     return;
   }
 
   tbody.innerHTML = rows.map((row) => `
     <tr>
-      <td>${SISELO.escapeHtml(row.full_name)}</td>
+      <td>${SISELO.highlightPersonName(row.full_name, query)}</td>
       <td>${SISELO.escapeHtml(row.cpf)}</td>
       <td>${SISELO.escapeHtml(row.ses)}</td>
       <td>${SISELO.escapeHtml(row.deleted_at)}</td>
@@ -306,12 +318,6 @@ function bindPatientListActions(tbody) {
       }
     });
   });
-
-  tbody.querySelectorAll('[data-empty-delete]').forEach((button) => {
-    button.addEventListener('click', () => {
-      SISELO.showUnavailableAction('Nao ha paciente carregado para apagar.');
-    });
-  });
 }
 
 function bindPatientsTrashActions(tbody) {
@@ -324,37 +330,14 @@ function bindPatientsTrashActions(tbody) {
       location.reload();
     });
   });
-
-  tbody.querySelectorAll('[data-empty-restore]').forEach((button) => {
-    button.addEventListener('click', () => {
-      SISELO.showUnavailableAction('Nao ha paciente carregado para restaurar.');
-    });
-  });
 }
 
 function renderCarePlanRows(targetId, rows, permissions) {
   const tbody = document.getElementById(targetId);
+  const isMockData = window.SISELO_CONFIG && window.SISELO_CONFIG.useMockData === true;
 
   if (!Array.isArray(rows) || rows.length === 0) {
-    tbody.innerHTML = `
-      <tr>
-        <td class="muted">-</td>
-        <td class="muted">-</td>
-        <td class="muted">-</td>
-        <td>
-          <div class="table-actions">
-            ${SISELO.iconButton('pdf', 'Gerar PDF', { 'data-empty-pdf': true })}
-            ${permissions.has('careplans.update') ? SISELO.iconLink('edit', '/care-plans/form.html', 'Editar plano') : ''}
-          </div>
-        </td>
-      </tr>
-    `;
-
-    tbody.querySelectorAll('[data-empty-pdf]').forEach((button) => {
-      button.addEventListener('click', () => {
-        SISELO.showUnavailableAction('Nao ha plano carregado para gerar PDF.');
-      });
-    });
+    tbody.innerHTML = SISELO.emptyTableRow(4, 'Nenhum plano de cuidado encontrado.');
     return;
   }
 
@@ -365,30 +348,27 @@ function renderCarePlanRows(targetId, rows, permissions) {
       <td>${SISELO.escapeHtml(row.end_date || '')}</td>
       <td>
         <div class="table-actions">
-          ${SISELO.iconLink('pdf', `${SISELO.getApiBaseUrl()}/care_plans/pdf.php?id=${row.id}`, 'Gerar PDF', { target: '_blank', rel: 'noreferrer' })}
+          ${isMockData
+            ? SISELO.iconButton('pdf', 'Gerar PDF', { 'data-demo-pdf': true })
+            : SISELO.iconLink('pdf', `${SISELO.getApiBaseUrl()}/care_plans/pdf.php?id=${row.id}`, 'Gerar PDF', { target: '_blank', rel: 'noreferrer' })}
           ${permissions.has('careplans.update') ? SISELO.iconLink('edit', `/care-plans/form.html?id=${row.id}`, 'Editar plano') : ''}
         </div>
       </td>
     </tr>
   `).join('');
+
+  tbody.querySelectorAll('[data-demo-pdf]').forEach((button) => {
+    button.addEventListener('click', () => {
+      SISELO.showUnavailableAction('PDF indisponivel no modo demonstracao do frontend.');
+    });
+  });
 }
 
 function renderEncounterRows(targetId, rows, permissions) {
   const tbody = document.getElementById(targetId);
 
   if (!Array.isArray(rows) || rows.length === 0) {
-    tbody.innerHTML = `
-      <tr>
-        <td class="muted">-</td>
-        <td class="muted">-</td>
-        <td class="muted">Nenhum atendimento carregado.</td>
-        <td>
-          <div class="table-actions">
-            ${permissions.has('encounters.update') ? SISELO.iconLink('edit', '/encounters/form.html', 'Editar atendimento') : ''}
-          </div>
-        </td>
-      </tr>
-    `;
+    tbody.innerHTML = SISELO.emptyTableRow(4, 'Nenhum atendimento encontrado.');
     return;
   }
 
@@ -410,20 +390,7 @@ function renderTransitionRows(targetId, rows, permissions) {
   const tbody = document.getElementById(targetId);
 
   if (!Array.isArray(rows) || rows.length === 0) {
-    tbody.innerHTML = `
-      <tr>
-        <td class="muted">-</td>
-        <td class="muted">-</td>
-        <td class="muted">-</td>
-        <td class="muted">-</td>
-        <td class="muted">Nenhuma transicao carregada.</td>
-        <td>
-          <div class="table-actions">
-            ${permissions.has('transitions.update') ? SISELO.iconLink('edit', '/transitions/form.html', 'Editar transicao') : ''}
-          </div>
-        </td>
-      </tr>
-    `;
+    tbody.innerHTML = SISELO.emptyTableRow(6, 'Nenhuma transicao encontrada.');
     return;
   }
 
