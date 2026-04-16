@@ -229,7 +229,7 @@ function renderCarePlansTrashTable(tbody, rows, query = '') {
 function bindCarePlanListActions(tbody) {
   tbody.querySelectorAll('[data-delete-id]').forEach((button) => {
     button.addEventListener('click', async () => {
-      if (!SISELO.confirmDeletion('o plano de cuidado', button.dataset.deleteLabel)) return;
+      if (!await SISELO.confirmDeletion('o plano de cuidado', button.dataset.deleteLabel)) return;
 
       try {
         await SISELO.apiRequest('/care_plans/soft_delete.php', {

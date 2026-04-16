@@ -313,7 +313,7 @@ function renderPatientsTrashTable(tbody, rows, query = '') {
 function bindPatientListActions(tbody) {
   tbody.querySelectorAll('[data-delete-id]').forEach((button) => {
     button.addEventListener('click', async () => {
-      if (!SISELO.confirmDeletion('o paciente', button.dataset.deleteLabel)) {
+      if (!await SISELO.confirmDeletion('o paciente', button.dataset.deleteLabel)) {
         return;
       }
 

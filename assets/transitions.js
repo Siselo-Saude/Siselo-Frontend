@@ -304,7 +304,7 @@ function getTransitionStatusConfig(status) {
 function bindTransitionListActions(tbody) {
   tbody.querySelectorAll('[data-delete-id]').forEach((button) => {
     button.addEventListener('click', async () => {
-      if (!SISELO.confirmDeletion('a transicao de', button.dataset.deleteLabel)) return;
+      if (!await SISELO.confirmDeletion('a transicao de', button.dataset.deleteLabel)) return;
 
       try {
         await SISELO.apiRequest('/transitions/soft_delete.php', {

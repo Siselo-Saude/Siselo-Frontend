@@ -519,6 +519,138 @@
     window.alert(message || 'Nao foi possivel concluir esta acao agora.');
   }
 
+  function ensureConfirmationModal() {
+    let overlay = document.getElementById('siselo-confirmation-modal');
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.id = 'siselo-confirmation-modal';
+      overlay.className = 'confirmation-modal-overlay';
+      overlay.hidden = true;
+      overlay.innerHTML = `
+        <div class="confirmation-modal" role="dialog" aria-modal="true" aria-labelledby="confirmation-modal-title" aria-describedby="confirmation-modal-message confirmation-modal-description" tabindex="-1">
+          <div class="confirmation-modal-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false">
+              <path d="M12 2 2 20h20L12 2Zm1 15h-2v-2h2v2Zm0-4h-2V8h2v5Z"/>
+            </svg>
+          </div>
+          <div class="confirmation-modal-copy">
+            <h2 id="confirmation-modal-title">Confirmar acao</h2>
+            <p id="confirmation-modal-message"></p>
+            <p id="confirmation-modal-description"></p>
+          </div>
+          <div class="confirmation-modal-actions">
+            <button type="button" class="btn confirmation-modal-cancel" data-confirm-cancel>Cancelar</button>
+            <button type="button" class="btn btn-danger confirmation-modal-confirm" data-confirm-ok>Apagar</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(overlay);
+    }
+
+    return {
+      overlay,
+      dialog: overlay.querySelector('.confirmation-modal'),
+      title: overlay.querySelector('#confirmation-modal-title'),
+      message: overlay.querySelector('#confirmation-modal-message'),
+      description: overlay.querySelector('#confirmation-modal-description'),
+      cancelButton: overlay.querySelector('[data-confirm-cancel]'),
+      confirmButton: overlay.querySelector('[data-confirm-ok]'),
+    };
+  }
+
+  function getFocusableElements(container) {
+    return Array.from(container.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'))
+      .filter((element) => !element.disabled && !element.hasAttribute('hidden'));
+  }
+
+  function showConfirmationDialog(options = {}) {
+    if (!document.body) {
+      return Promise.resolve(false);
+    }
+
+    const modal = ensureConfirmationModal();
+    const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+
+    modal.title.textContent = options.title || 'Confirmar acao';
+    modal.message.textContent = options.message || 'Deseja continuar?';
+    modal.description.textContent = options.description || '';
+    modal.description.hidden = !options.description;
+    modal.cancelButton.textContent = options.cancelLabel || 'Cancelar';
+    modal.confirmButton.textContent = options.confirmLabel || 'Confirmar';
+
+    modal.overlay.hidden = false;
+    modal.overlay.classList.add('is-open');
+    document.body.classList.add('modal-open');
+
+    return new Promise((resolve) => {
+      let resolved = false;
+
+      const close = (confirmed) => {
+        if (resolved) {
+          return;
+        }
+
+        resolved = true;
+        modal.overlay.classList.remove('is-open');
+        modal.overlay.hidden = true;
+        document.body.classList.remove('modal-open');
+        modal.confirmButton.removeEventListener('click', confirm);
+        modal.cancelButton.removeEventListener('click', cancel);
+        modal.overlay.removeEventListener('click', cancelFromBackdrop);
+        document.removeEventListener('keydown', handleKeydown);
+
+        if (previousFocus && typeof previousFocus.focus === 'function') {
+          previousFocus.focus();
+        }
+
+        resolve(confirmed);
+      };
+
+      const confirm = () => close(true);
+      const cancel = () => close(false);
+      const cancelFromBackdrop = (event) => {
+        if (event.target === modal.overlay) {
+          close(false);
+        }
+      };
+      const handleKeydown = (event) => {
+        if (event.key === 'Escape') {
+          event.preventDefault();
+          close(false);
+          return;
+        }
+
+        if (event.key !== 'Tab') {
+          return;
+        }
+
+        const focusableElements = getFocusableElements(modal.dialog);
+        if (!focusableElements.length) {
+          event.preventDefault();
+          modal.dialog.focus();
+          return;
+        }
+
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (event.shiftKey && document.activeElement === firstElement) {
+          event.preventDefault();
+          lastElement.focus();
+        } else if (!event.shiftKey && document.activeElement === lastElement) {
+          event.preventDefault();
+          firstElement.focus();
+        }
+      };
+
+      modal.confirmButton.addEventListener('click', confirm);
+      modal.cancelButton.addEventListener('click', cancel);
+      modal.overlay.addEventListener('click', cancelFromBackdrop);
+      document.addEventListener('keydown', handleKeydown);
+      modal.cancelButton.focus();
+    });
+  }
+
   function confirmDeletion(entityName, itemLabel) {
     const normalizedEntityName = String(entityName || 'registro').trim();
     const normalizedLabel = String(itemLabel || '').trim();
@@ -526,9 +658,13 @@
       ? `${normalizedEntityName} "${normalizedLabel}"`
       : `este ${normalizedEntityName}`;
 
-    return window.confirm(
-      `Deseja realmente apagar ${target}?\n\nO item sera enviado para a lixeira e podera ser restaurado depois.`
-    );
+    return showConfirmationDialog({
+      title: 'Apagar registro',
+      message: `Deseja realmente apagar ${target}?`,
+      description: 'O item sera enviado para a lixeira e podera ser restaurado depois.',
+      confirmLabel: 'Apagar',
+      cancelLabel: 'Cancelar',
+    });
   }
 
   function showAlert(id, message, type) {

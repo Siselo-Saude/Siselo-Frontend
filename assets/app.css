@@ -43,6 +43,7 @@ a {
 
 .topbar-brand {
   font-weight: 800;
+  display: none;
 }
 
 .topbar-left {
@@ -84,8 +85,8 @@ a {
 }
 
 .topbar-logout {
-  background: rgba(255, 255, 255, 0.14);
-  color: #fff;
+  background: #fff;
+  color: #475569;
 }
 
 .topbar-account {
@@ -558,6 +559,100 @@ textarea {
   background: #eff6ff;
   border: 1px solid #bfdbfe;
   color: #1d4ed8;
+}
+
+.modal-open {
+  overflow: hidden;
+}
+
+.confirmation-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.46);
+}
+
+.confirmation-modal-overlay[hidden] {
+  display: none;
+}
+
+.confirmation-modal {
+  width: min(440px, 100%);
+  display: grid;
+  gap: 14px;
+  padding: 22px;
+  border: 1px solid rgba(185, 28, 28, 0.14);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 24px 56px rgba(15, 37, 65, 0.22);
+}
+
+.confirmation-modal:focus {
+  outline: none;
+}
+
+.confirmation-modal-icon {
+  inline-size: 44px;
+  block-size: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: #fef2f2;
+  color: var(--danger);
+}
+
+.confirmation-modal-icon svg {
+  inline-size: 24px;
+  block-size: 24px;
+  fill: currentColor;
+}
+
+.confirmation-modal-copy {
+  display: grid;
+  gap: 8px;
+}
+
+.confirmation-modal-copy h2,
+.confirmation-modal-copy p {
+  margin: 0;
+}
+
+.confirmation-modal-copy h2 {
+  font-size: 1.15rem;
+  color: #111827;
+}
+
+.confirmation-modal-copy p {
+  color: #475569;
+  line-height: 1.5;
+}
+
+.confirmation-modal-copy p:first-of-type {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.confirmation-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 2px;
+}
+
+.confirmation-modal-actions .btn {
+  min-width: 112px;
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.confirmation-modal-cancel {
+  background: #fff;
 }
 
 table {
