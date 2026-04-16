@@ -18,47 +18,28 @@ async function setupCarePlansListPage() {
   const user = await SISELO.requireSession();
   if (!user) return;
 
+  const permissions = SISELO.getUiPermissions(user);
   SISELO.bindShell('careplans');
   const query = SISELO.queryParam('q') || '';
-  const patientId = SISELO.queryParam('patient_id') || '';
+  const patientId = SISELO.normalizeEntityId(SISELO.queryParam('patient_id'));
   document.getElementById('search-input').value = query;
-  document.getElementById('new-plan-link').hidden = !user.permissions.includes('careplans.create');
-  document.getElementById('trash-link').hidden = !user.permissions.includes('careplans.restore');
+  document.getElementById('new-plan-link').hidden = !permissions.has('careplans.create');
+  document.getElementById('trash-link').hidden = !permissions.has('careplans.restore');
   document.getElementById('new-plan-link').href = '/care-plans/form.html' + (patientId ? '?patient_id=' + encodeURIComponent(patientId) : '');
 
   const url = '/care_plans/list.php?q=' + encodeURIComponent(query) + (patientId ? '&patient_id=' + encodeURIComponent(patientId) : '');
-  const data = await SISELO.apiRequest(url);
+  let rows = [];
 
-  if (patientId && Array.isArray(data.rows) && data.rows.length === 0 && user.permissions.includes('careplans.create')) {
-    location.href = '/care-plans/form.html?patient_id=' + encodeURIComponent(patientId);
-    return;
+  try {
+    const data = await SISELO.apiRequest(url);
+    rows = Array.isArray(data.rows) ? data.rows : [];
+  } catch (error) {
+    rows = [];
   }
 
   const tbody = document.getElementById('care-plans-table-body');
-  tbody.innerHTML = (data.rows || []).map((row) => `
-    <tr>
-      <td>${row.id}</td>
-      <td>${SISELO.escapeHtml(row.full_name)}</td>
-      <td>${SISELO.escapeHtml(row.start_date)}</td>
-      <td>${SISELO.escapeHtml(row.end_date || '')}</td>
-      <td>
-        <a class="btn" href="${SISELO.getApiBaseUrl()}/care_plans/pdf.php?id=${row.id}" target="_blank" rel="noreferrer">PDF</a>
-        ${user.permissions.includes('careplans.update') ? `<a class="btn" href="/care-plans/form.html?id=${row.id}">Editar</a>` : ''}
-        ${user.permissions.includes('careplans.delete') ? `<button class="btn btn-danger" data-delete-id="${row.id}">Apagar</button>` : ''}
-      </td>
-    </tr>
-  `).join('');
-
-  tbody.querySelectorAll('[data-delete-id]').forEach((button) => {
-    button.addEventListener('click', async () => {
-      if (!window.confirm('Apagar plano? (soft delete)')) return;
-      await SISELO.apiRequest('/care_plans/soft_delete.php', {
-        method: 'POST',
-        body: { id: Number(button.dataset.deleteId) },
-      });
-      location.reload();
-    });
-  });
+  renderCarePlansTable(tbody, rows, permissions);
+  bindCarePlanListActions(tbody);
 
   document.getElementById('search-form').addEventListener('submit', (event) => {
     event.preventDefault();
@@ -76,17 +57,24 @@ async function setupCarePlansFormPage() {
 
   SISELO.bindShell('careplans');
 
-  const id = SISELO.queryParam('id');
-  const patientId = SISELO.queryParam('patient_id');
+  const id = SISELO.normalizeEntityId(SISELO.queryParam('id'));
+  const patientId = SISELO.normalizeEntityId(SISELO.queryParam('patient_id'));
   const endpoint = '/care_plans/form.php' +
     (id ? '?id=' + encodeURIComponent(id) : patientId ? '?patient_id=' + encodeURIComponent(patientId) : '');
-  const data = await SISELO.apiRequest(endpoint);
+  let data = getEmptyCarePlanContext(patientId);
 
+  try {
+    data = await SISELO.apiRequest(endpoint || '/care_plans/form.php');
+  } catch (error) {
+  }
+
+  const plan = data.plan || getEmptyCarePlanContext(patientId).plan;
   document.getElementById('form-title').textContent = data.editing ? 'Editar Plano de Cuidado' : 'Novo Plano de Cuidado';
-  fillPatientSelect('patient_id', data.patients, data.plan.patient_id);
-  document.getElementById('start_date').value = data.plan.start_date || '';
-  document.getElementById('end_date').value = data.plan.end_date || '';
-  document.getElementById('interventions').value = data.plan.interventions || '';
+  fillPatientSelect('patient_id', Array.isArray(data.patients) ? data.patients : [], plan.patient_id);
+  document.getElementById('start_date').value = plan.start_date || '';
+  document.getElementById('end_date').value = plan.end_date || '';
+  document.getElementById('interventions').value = plan.interventions || '';
+  configureCarePlanDateInputs();
 
   const itemsContainer = document.getElementById('items');
   const items = Array.isArray(data.items) && data.items.length ? data.items : [{
@@ -119,10 +107,14 @@ async function setupCarePlansFormPage() {
     event.preventDefault();
     SISELO.showAlert('page-alert', '', 'info');
 
+    if (!SISELO.validateEnhancedDateInputs(event.currentTarget, { alertId: 'page-alert' })) {
+      return;
+    }
+
     const formData = new FormData(event.currentTarget);
 
     try {
-      await SISELO.apiRequest(endpoint, {
+      await SISELO.apiRequest(endpoint || '/care_plans/form.php', {
         method: 'POST',
         body: objectFromFormData(formData),
       });
@@ -141,20 +133,129 @@ async function setupCarePlansTrashPage() {
   const query = SISELO.queryParam('q') || '';
   document.getElementById('search-input').value = query;
 
-  const data = await SISELO.apiRequest('/care_plans/trash.php?q=' + encodeURIComponent(query));
-  const tbody = document.getElementById('care-plans-table-body');
+  let rows = [];
 
-  tbody.innerHTML = (data.rows || []).map((row) => `
+  try {
+    const data = await SISELO.apiRequest('/care_plans/trash.php?q=' + encodeURIComponent(query));
+    rows = Array.isArray(data.rows) ? data.rows : [];
+  } catch (error) {
+    rows = [];
+  }
+
+  const tbody = document.getElementById('care-plans-table-body');
+  renderCarePlansTrashTable(tbody, rows);
+  bindCarePlanTrashActions(tbody);
+
+  document.getElementById('search-form').addEventListener('submit', (event) => {
+    event.preventDefault();
+    const value = document.getElementById('search-input').value.trim();
+    location.href = '/care-plans/trash.html' + (value ? '?q=' + encodeURIComponent(value) : '');
+  });
+}
+
+function renderCarePlansTable(tbody, rows, permissions) {
+  if (!Array.isArray(rows) || rows.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td class="muted">-</td>
+        <td class="muted">Nenhum plano carregado.</td>
+        <td class="muted">-</td>
+        <td class="muted">-</td>
+        <td>
+          <div class="table-actions">
+            ${SISELO.iconButton('pdf', 'Gerar PDF', { 'data-empty-pdf': true })}
+            ${permissions.has('careplans.update') ? SISELO.iconLink('edit', '/care-plans/form.html', 'Editar plano') : ''}
+            ${permissions.has('careplans.delete') ? SISELO.iconButton('delete', 'Apagar plano', { 'data-empty-delete': true }) : ''}
+          </div>
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  tbody.innerHTML = rows.map((row) => `
+    <tr>
+      <td>${row.id}</td>
+      <td>${SISELO.escapeHtml(row.full_name)}</td>
+      <td>${SISELO.escapeHtml(row.start_date)}</td>
+      <td>${SISELO.escapeHtml(row.end_date || '')}</td>
+      <td>
+        <div class="table-actions">
+          ${SISELO.iconLink('pdf', `${SISELO.getApiBaseUrl()}/care_plans/pdf.php?id=${row.id}`, 'Gerar PDF', { target: '_blank', rel: 'noreferrer' })}
+          ${permissions.has('careplans.update') ? SISELO.iconLink('edit', `/care-plans/form.html?id=${row.id}`, 'Editar plano') : ''}
+          ${permissions.has('careplans.delete') ? SISELO.iconButton('delete', 'Apagar plano', { 'data-delete-id': row.id, 'data-delete-label': row.full_name || `Plano ${row.id}` }) : ''}
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function renderCarePlansTrashTable(tbody, rows) {
+  if (!Array.isArray(rows) || rows.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td class="muted">-</td>
+        <td class="muted">Nenhum plano na lixeira.</td>
+        <td class="muted">-</td>
+        <td class="muted">-</td>
+        <td class="muted">-</td>
+        <td>
+          <div class="table-actions">
+            ${SISELO.iconButton('restore', 'Restaurar plano', { 'data-empty-restore': true })}
+          </div>
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  tbody.innerHTML = rows.map((row) => `
     <tr>
       <td>${row.id}</td>
       <td>${SISELO.escapeHtml(row.full_name)}</td>
       <td>${SISELO.escapeHtml(row.start_date)}</td>
       <td>${SISELO.escapeHtml(row.end_date || '')}</td>
       <td>${SISELO.escapeHtml(row.deleted_at || '')}</td>
-      <td><button class="btn btn-primary" data-restore-id="${row.id}">Restaurar</button></td>
+      <td>
+        <div class="table-actions">
+          ${SISELO.iconButton('restore', 'Restaurar plano', { 'data-restore-id': row.id })}
+        </div>
+      </td>
     </tr>
   `).join('');
+}
 
+function bindCarePlanListActions(tbody) {
+  tbody.querySelectorAll('[data-delete-id]').forEach((button) => {
+    button.addEventListener('click', async () => {
+      if (!SISELO.confirmDeletion('o plano de cuidado', button.dataset.deleteLabel)) return;
+
+      try {
+        await SISELO.apiRequest('/care_plans/soft_delete.php', {
+          method: 'POST',
+          body: { id: Number(button.dataset.deleteId) },
+        });
+        location.reload();
+      } catch (error) {
+        SISELO.showActionError(error.message || 'Nao foi possivel apagar o plano.');
+      }
+    });
+  });
+
+  tbody.querySelectorAll('[data-empty-pdf]').forEach((button) => {
+    button.addEventListener('click', () => {
+      SISELO.showUnavailableAction('Nao ha plano carregado para gerar PDF.');
+    });
+  });
+
+  tbody.querySelectorAll('[data-empty-delete]').forEach((button) => {
+    button.addEventListener('click', () => {
+      SISELO.showUnavailableAction('Nao ha plano carregado para apagar.');
+    });
+  });
+}
+
+function bindCarePlanTrashActions(tbody) {
   tbody.querySelectorAll('[data-restore-id]').forEach((button) => {
     button.addEventListener('click', async () => {
       await SISELO.apiRequest('/care_plans/restore.php', {
@@ -165,11 +266,25 @@ async function setupCarePlansTrashPage() {
     });
   });
 
-  document.getElementById('search-form').addEventListener('submit', (event) => {
-    event.preventDefault();
-    const value = document.getElementById('search-input').value.trim();
-    location.href = '/care-plans/trash.html' + (value ? '?q=' + encodeURIComponent(value) : '');
+  tbody.querySelectorAll('[data-empty-restore]').forEach((button) => {
+    button.addEventListener('click', () => {
+      SISELO.showUnavailableAction('Nao ha plano carregado para restaurar.');
+    });
   });
+}
+
+function getEmptyCarePlanContext(patientId) {
+  return {
+    editing: false,
+    plan: {
+      patient_id: patientId || '',
+      start_date: '',
+      end_date: '',
+      interventions: '',
+    },
+    items: [],
+    patients: [],
+  };
 }
 
 function addCarePlanItem(item) {
@@ -243,4 +358,44 @@ function objectFromFormData(formData) {
     payload[key] = value;
   });
   return payload;
+}
+
+function configureCarePlanDateInputs() {
+  const today = SISELO.todayDateInputValue();
+  const maxPlanDate = SISELO.shiftDateInputValue(today, { years: 5 });
+  const startInput = SISELO.enhanceDateInput('start_date', {
+    min: '1900-01-01',
+    max: maxPlanDate,
+  });
+  const endInput = SISELO.enhanceDateInput('end_date', {
+    min: '1900-01-01',
+    max: maxPlanDate,
+  });
+
+  if (!startInput || !endInput) {
+    return;
+  }
+
+  const baseMin = '1900-01-01';
+  const syncCarePlanDates = () => {
+    startInput.max = endInput.value || maxPlanDate;
+    endInput.min = startInput.value && startInput.value > baseMin
+      ? startInput.value
+      : baseMin;
+
+    if (startInput.value) {
+      startInput.value = SISELO.clampDateInputValue(startInput.value, baseMin, startInput.max);
+    }
+
+    if (endInput.value) {
+      endInput.value = SISELO.clampDateInputValue(endInput.value, endInput.min, maxPlanDate);
+    }
+
+    SISELO.syncEnhancedDateInput(startInput);
+    SISELO.syncEnhancedDateInput(endInput);
+  };
+
+  startInput.addEventListener('change', syncCarePlanDates);
+  endInput.addEventListener('change', syncCarePlanDates);
+  syncCarePlanDates();
 }

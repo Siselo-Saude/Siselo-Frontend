@@ -50,6 +50,9 @@ const server = http.createServer((request, response) => {
     const extension = path.extname(finalPath).toLowerCase();
     response.writeHead(200, {
       'Content-Type': contentTypes[extension] || 'application/octet-stream',
+      'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+      Pragma: 'no-cache',
+      Expires: '0',
     });
     response.end(content);
   });

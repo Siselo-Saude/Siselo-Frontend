@@ -63,11 +63,12 @@
       if (!user) return;
 
       SISELO.bindShell('home');
-      document.getElementById('home-patients-card').hidden = !user.permissions.includes('patients.view');
-      document.getElementById('home-admin-card').hidden = !user.permissions.includes('admin.manage');
-      document.getElementById('legacy-careplans-link').hidden = !user.permissions.includes('careplans.view');
-      document.getElementById('legacy-encounters-link').hidden = !user.permissions.includes('encounters.view');
-      document.getElementById('legacy-transitions-link').hidden = !user.permissions.includes('transitions.view');
+      const permissions = SISELO.getUiPermissions(user);
+      document.getElementById('home-patients-card').hidden = !permissions.has('patients.view');
+      document.getElementById('home-admin-card').hidden = !permissions.has('admin.manage');
+      document.getElementById('legacy-careplans-link').hidden = !permissions.has('careplans.view');
+      document.getElementById('legacy-encounters-link').hidden = !permissions.has('encounters.view');
+      document.getElementById('legacy-transitions-link').hidden = !permissions.has('transitions.view');
     });
   </script>
 </body>
