@@ -22,12 +22,14 @@ async function setupCarePlansListPage() {
   SISELO.bindShell('careplans');
   const query = SISELO.queryParam('q') || '';
   const patientId = SISELO.normalizeEntityId(SISELO.queryParam('patient_id'));
-  document.getElementById('search-input').value = query;
+  const searchInput = document.getElementById('search-input');
+  const searchForm = document.getElementById('search-form');
+  searchInput.value = query;
   document.getElementById('new-plan-link').hidden = !permissions.has('careplans.create');
   document.getElementById('trash-link').hidden = !permissions.has('careplans.restore');
   document.getElementById('new-plan-link').href = '/care-plans/form.html' + (patientId ? '?patient_id=' + encodeURIComponent(patientId) : '');
 
-  const url = '/care_plans/list.php?q=' + encodeURIComponent(query) + (patientId ? '&patient_id=' + encodeURIComponent(patientId) : '');
+  const url = '/care_plans/list.php' + (patientId ? '?patient_id=' + encodeURIComponent(patientId) : '');
   let rows = [];
 
   try {
@@ -38,16 +40,21 @@ async function setupCarePlansListPage() {
   }
 
   const tbody = document.getElementById('care-plans-table-body');
-  renderCarePlansTable(tbody, rows, permissions);
-  bindCarePlanListActions(tbody);
+  const applySearch = (value) => {
+    renderCarePlansTable(tbody, filterCarePlanRows(rows, value), permissions, value);
+    bindCarePlanListActions(tbody);
+    SISELO.syncSearchUrl('/care-plans/list.html', value, patientId ? { patient_id: patientId } : {});
+  };
 
-  document.getElementById('search-form').addEventListener('submit', (event) => {
+  applySearch(query);
+
+  searchInput.addEventListener('input', (event) => {
+    applySearch(event.currentTarget.value);
+  });
+
+  searchForm.addEventListener('submit', (event) => {
     event.preventDefault();
-    const value = document.getElementById('search-input').value.trim();
-    const params = new URLSearchParams();
-    if (value) params.set('q', value);
-    if (patientId) params.set('patient_id', patientId);
-    location.href = '/care-plans/list.html' + (params.toString() ? '?' + params.toString() : '');
+    applySearch(searchInput.value);
   });
 }
 
@@ -131,57 +138,57 @@ async function setupCarePlansTrashPage() {
 
   SISELO.bindShell('careplans');
   const query = SISELO.queryParam('q') || '';
-  document.getElementById('search-input').value = query;
+  const searchInput = document.getElementById('search-input');
+  const searchForm = document.getElementById('search-form');
+  searchInput.value = query;
 
   let rows = [];
 
   try {
-    const data = await SISELO.apiRequest('/care_plans/trash.php?q=' + encodeURIComponent(query));
+    const data = await SISELO.apiRequest('/care_plans/trash.php');
     rows = Array.isArray(data.rows) ? data.rows : [];
   } catch (error) {
     rows = [];
   }
 
   const tbody = document.getElementById('care-plans-table-body');
-  renderCarePlansTrashTable(tbody, rows);
-  bindCarePlanTrashActions(tbody);
+  const applySearch = (value) => {
+    renderCarePlansTrashTable(tbody, filterCarePlanRows(rows, value), value);
+    bindCarePlanTrashActions(tbody);
+    SISELO.syncSearchUrl('/care-plans/trash.html', value);
+  };
 
-  document.getElementById('search-form').addEventListener('submit', (event) => {
+  applySearch(query);
+
+  searchInput.addEventListener('input', (event) => {
+    applySearch(event.currentTarget.value);
+  });
+
+  searchForm.addEventListener('submit', (event) => {
     event.preventDefault();
-    const value = document.getElementById('search-input').value.trim();
-    location.href = '/care-plans/trash.html' + (value ? '?q=' + encodeURIComponent(value) : '');
+    applySearch(searchInput.value);
   });
 }
 
-function renderCarePlansTable(tbody, rows, permissions) {
+function renderCarePlansTable(tbody, rows, permissions, query = '') {
+  const isMockData = window.SISELO_CONFIG && window.SISELO_CONFIG.useMockData === true;
+
   if (!Array.isArray(rows) || rows.length === 0) {
-    tbody.innerHTML = `
-      <tr>
-        <td class="muted">-</td>
-        <td class="muted">Nenhum plano carregado.</td>
-        <td class="muted">-</td>
-        <td class="muted">-</td>
-        <td>
-          <div class="table-actions">
-            ${SISELO.iconButton('pdf', 'Gerar PDF', { 'data-empty-pdf': true })}
-            ${permissions.has('careplans.update') ? SISELO.iconLink('edit', '/care-plans/form.html', 'Editar plano') : ''}
-            ${permissions.has('careplans.delete') ? SISELO.iconButton('delete', 'Apagar plano', { 'data-empty-delete': true }) : ''}
-          </div>
-        </td>
-      </tr>
-    `;
+    tbody.innerHTML = SISELO.emptyTableRow(5, 'Nenhum plano de cuidado encontrado.');
     return;
   }
 
   tbody.innerHTML = rows.map((row) => `
     <tr>
       <td>${row.id}</td>
-      <td>${SISELO.escapeHtml(row.full_name)}</td>
+      <td><span class="patient-name">${SISELO.highlightPersonName(row.full_name, query)}</span></td>
       <td>${SISELO.escapeHtml(row.start_date)}</td>
       <td>${SISELO.escapeHtml(row.end_date || '')}</td>
       <td>
         <div class="table-actions">
-          ${SISELO.iconLink('pdf', `${SISELO.getApiBaseUrl()}/care_plans/pdf.php?id=${row.id}`, 'Gerar PDF', { target: '_blank', rel: 'noreferrer' })}
+          ${isMockData
+            ? SISELO.iconButton('pdf', 'Gerar PDF', { 'data-demo-pdf': true })
+            : SISELO.iconLink('pdf', `${SISELO.getApiBaseUrl()}/care_plans/pdf.php?id=${row.id}`, 'Gerar PDF', { target: '_blank', rel: 'noreferrer' })}
           ${permissions.has('careplans.update') ? SISELO.iconLink('edit', `/care-plans/form.html?id=${row.id}`, 'Editar plano') : ''}
           ${permissions.has('careplans.delete') ? SISELO.iconButton('delete', 'Apagar plano', { 'data-delete-id': row.id, 'data-delete-label': row.full_name || `Plano ${row.id}` }) : ''}
         </div>
@@ -190,29 +197,16 @@ function renderCarePlansTable(tbody, rows, permissions) {
   `).join('');
 }
 
-function renderCarePlansTrashTable(tbody, rows) {
+function renderCarePlansTrashTable(tbody, rows, query = '') {
   if (!Array.isArray(rows) || rows.length === 0) {
-    tbody.innerHTML = `
-      <tr>
-        <td class="muted">-</td>
-        <td class="muted">Nenhum plano na lixeira.</td>
-        <td class="muted">-</td>
-        <td class="muted">-</td>
-        <td class="muted">-</td>
-        <td>
-          <div class="table-actions">
-            ${SISELO.iconButton('restore', 'Restaurar plano', { 'data-empty-restore': true })}
-          </div>
-        </td>
-      </tr>
-    `;
+    tbody.innerHTML = SISELO.emptyTableRow(6, 'Nenhum plano na lixeira.');
     return;
   }
 
   tbody.innerHTML = rows.map((row) => `
     <tr>
       <td>${row.id}</td>
-      <td>${SISELO.escapeHtml(row.full_name)}</td>
+      <td><span class="patient-name">${SISELO.highlightPersonName(row.full_name, query)}</span></td>
       <td>${SISELO.escapeHtml(row.start_date)}</td>
       <td>${SISELO.escapeHtml(row.end_date || '')}</td>
       <td>${SISELO.escapeHtml(row.deleted_at || '')}</td>
@@ -242,16 +236,28 @@ function bindCarePlanListActions(tbody) {
     });
   });
 
-  tbody.querySelectorAll('[data-empty-pdf]').forEach((button) => {
+  tbody.querySelectorAll('[data-demo-pdf]').forEach((button) => {
     button.addEventListener('click', () => {
-      SISELO.showUnavailableAction('Nao ha plano carregado para gerar PDF.');
+      SISELO.showUnavailableAction('PDF indisponivel no modo demonstracao do frontend.');
     });
   });
+}
 
-  tbody.querySelectorAll('[data-empty-delete]').forEach((button) => {
-    button.addEventListener('click', () => {
-      SISELO.showUnavailableAction('Nao ha plano carregado para apagar.');
-    });
+function filterCarePlanRows(rows, query) {
+  const search = SISELO.createSearchState(query);
+  if (!search.hasLetters && !search.hasDigits) {
+    return Array.isArray(rows) ? rows : [];
+  }
+
+  return (Array.isArray(rows) ? rows : []).filter((row) => {
+    const matchesName = search.hasLetters
+      ? SISELO.matchesPersonNamePrefix(row.full_name, search)
+      : true;
+    const matchesDigits = search.hasDigits
+      ? SISELO.matchesSearchDigits(row.cpf, search) || SISELO.matchesSearchDigits(row.ses, search)
+      : true;
+
+    return matchesName && matchesDigits;
   });
 }
 
@@ -263,12 +269,6 @@ function bindCarePlanTrashActions(tbody) {
         body: { id: Number(button.dataset.restoreId) },
       });
       location.reload();
-    });
-  });
-
-  tbody.querySelectorAll('[data-empty-restore]').forEach((button) => {
-    button.addEventListener('click', () => {
-      SISELO.showUnavailableAction('Nao ha plano carregado para restaurar.');
     });
   });
 }
@@ -339,9 +339,9 @@ function addCarePlanItem(item) {
 
 function fillPatientSelect(id, patients, currentValue) {
   const select = document.getElementById(id);
-  select.innerHTML = '<option value="">-- selecione --</option>' + (patients || []).map((patient) => `
+  select.innerHTML = '<option value="">Selecione um paciente</option>' + (patients || []).map((patient) => `
     <option value="${patient.id}" ${Number(currentValue || 0) === Number(patient.id) ? 'selected' : ''}>
-      ${SISELO.escapeHtml(patient.full_name)} (CPF: ${SISELO.escapeHtml(patient.cpf)} | SES: ${SISELO.escapeHtml(patient.ses)})
+      ${SISELO.escapeHtml(patient.full_name)}
     </option>
   `).join('');
 }

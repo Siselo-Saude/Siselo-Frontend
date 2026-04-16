@@ -598,8 +598,70 @@ th {
   border-top-color: #eef2f7;
 }
 
+.table-empty-row td {
+  padding: 0 !important;
+  border-right: 0 !important;
+  border-left: 0 !important;
+  border-bottom: 0 !important;
+}
+
+.table-empty-state {
+  inline-size: 100%;
+  min-height: clamp(180px, 32vh, 240px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 28px 20px;
+  text-align: center;
+  color: #94a3b8;
+  background:
+    radial-gradient(circle at top, rgba(15, 118, 110, 0.05), transparent 45%),
+    #fff;
+}
+
+.table-empty-icon {
+  inline-size: 48px;
+  block-size: 48px;
+  display: grid;
+  place-items: center;
+  color: #d7dee7;
+}
+
+.table-empty-icon svg {
+  inline-size: 100%;
+  block-size: 100%;
+  fill: currentColor;
+}
+
+.table-empty-title,
+.table-empty-text {
+  margin: 0;
+}
+
+.table-empty-title {
+  color: #94a3b8;
+  font-size: 1.05rem;
+  font-weight: 500;
+}
+
+.table-empty-text {
+  max-width: 420px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
 .patient-name {
   font-weight: 700;
+}
+
+.search-highlight {
+  padding: 0 0.18em;
+  border-radius: 0.45em;
+  background: rgba(15, 118, 110, 0.18);
+  color: #0b5c56;
+  font-weight: 800;
 }
 
 .transitions-table .patient-name {

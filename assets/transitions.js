@@ -12,27 +12,37 @@ async function setupTransitionsListPage() {
   const permissions = SISELO.getUiPermissions(user);
   SISELO.bindShell('transitions');
   const query = SISELO.queryParam('q') || '';
-  document.getElementById('search-input').value = query;
+  const searchInput = document.getElementById('search-input');
+  const searchForm = document.getElementById('search-form');
+  searchInput.value = query;
   document.getElementById('new-transition-link').hidden = !permissions.has('transitions.create');
   document.getElementById('trash-link').hidden = !permissions.has('transitions.restore');
 
   let rows = [];
 
   try {
-    const data = await SISELO.apiRequest('/transitions/list.php?q=' + encodeURIComponent(query));
+    const data = await SISELO.apiRequest('/transitions/list.php');
     rows = Array.isArray(data.rows) ? data.rows : [];
   } catch (error) {
     rows = [];
   }
 
   const tbody = document.getElementById('transitions-table-body');
-  renderTransitionsTable(tbody, rows, permissions);
-  bindTransitionListActions(tbody);
+  const applySearch = (value) => {
+    renderTransitionsTable(tbody, filterTransitionRows(rows, value), permissions, value);
+    bindTransitionListActions(tbody);
+    SISELO.syncSearchUrl('/transitions/list.html', value);
+  };
 
-  document.getElementById('search-form').addEventListener('submit', (event) => {
+  applySearch(query);
+
+  searchInput.addEventListener('input', (event) => {
+    applySearch(event.currentTarget.value);
+  });
+
+  searchForm.addEventListener('submit', (event) => {
     event.preventDefault();
-    const value = document.getElementById('search-input').value.trim();
-    location.href = '/transitions/list.html' + (value ? '?q=' + encodeURIComponent(value) : '');
+    applySearch(searchInput.value);
   });
 }
 
@@ -104,54 +114,48 @@ async function setupTransitionsTrashPage() {
 
   SISELO.bindShell('transitions');
   const query = SISELO.queryParam('q') || '';
-  document.getElementById('search-input').value = query;
+  const searchInput = document.getElementById('search-input');
+  const searchForm = document.getElementById('search-form');
+  searchInput.value = query;
 
   let rows = [];
 
   try {
-    const data = await SISELO.apiRequest('/transitions/trash.php?q=' + encodeURIComponent(query));
+    const data = await SISELO.apiRequest('/transitions/trash.php');
     rows = Array.isArray(data.rows) ? data.rows : [];
   } catch (error) {
     rows = [];
   }
 
   const tbody = document.getElementById('transitions-table-body');
-  renderTransitionsTrashTable(tbody, rows);
-  bindTransitionTrashActions(tbody);
+  const applySearch = (value) => {
+    renderTransitionsTrashTable(tbody, filterTransitionRows(rows, value), value);
+    bindTransitionTrashActions(tbody);
+    SISELO.syncSearchUrl('/transitions/trash.html', value);
+  };
 
-  document.getElementById('search-form').addEventListener('submit', (event) => {
+  applySearch(query);
+
+  searchInput.addEventListener('input', (event) => {
+    applySearch(event.currentTarget.value);
+  });
+
+  searchForm.addEventListener('submit', (event) => {
     event.preventDefault();
-    const value = document.getElementById('search-input').value.trim();
-    location.href = '/transitions/trash.html' + (value ? '?q=' + encodeURIComponent(value) : '');
+    applySearch(searchInput.value);
   });
 }
 
-function renderTransitionsTable(tbody, rows, permissions) {
+function renderTransitionsTable(tbody, rows, permissions, query = '') {
   if (!Array.isArray(rows) || rows.length === 0) {
-    tbody.innerHTML = `
-      <tr>
-        <td class="muted">-</td>
-        <td class="muted">Nenhuma transicao carregada.</td>
-        <td class="muted">-</td>
-        <td class="muted">-</td>
-        <td class="muted">-</td>
-        <td class="muted">-</td>
-        <td>
-          <div class="table-actions">
-            ${SISELO.iconLink('view', '/patients/show.html?id=0&tab=transicoes', 'Paciente 360')}
-            ${permissions.has('transitions.update') ? SISELO.iconButton('edit', 'Editar transicao', { 'data-empty-edit': true }) : ''}
-            ${permissions.has('transitions.delete') ? SISELO.iconButton('delete', 'Apagar transicao', { 'data-empty-delete': true }) : ''}
-          </div>
-        </td>
-      </tr>
-    `;
+    tbody.innerHTML = SISELO.emptyTableRow(7, 'Nenhuma transicao encontrada.');
     return;
   }
 
   tbody.innerHTML = rows.map((row) => `
     <tr>
       <td>${renderTransitionCellDate(row.transition_date)}</td>
-      <td><span class="patient-name">${SISELO.escapeHtml(row.full_name || '-')}</span></td>
+      <td><span class="patient-name">${SISELO.highlightPersonName(row.full_name, query)}</span></td>
       <td>${renderTransitionCellValue(row.ses)}</td>
       <td>${renderTransitionCellValue(row.cpf)}</td>
       <td>${renderTransitionRoute(row)}</td>
@@ -167,24 +171,9 @@ function renderTransitionsTable(tbody, rows, permissions) {
   `).join('');
 }
 
-function renderTransitionsTrashTable(tbody, rows) {
+function renderTransitionsTrashTable(tbody, rows, query = '') {
   if (!Array.isArray(rows) || rows.length === 0) {
-    tbody.innerHTML = `
-      <tr>
-        <td class="muted">-</td>
-        <td class="muted">-</td>
-        <td class="muted">Nenhuma transicao na lixeira.</td>
-        <td class="muted">-</td>
-        <td class="muted">-</td>
-        <td class="muted">-</td>
-        <td class="muted">-</td>
-        <td>
-          <div class="table-actions">
-            ${SISELO.iconButton('restore', 'Restaurar transicao', { 'data-empty-restore': true })}
-          </div>
-        </td>
-      </tr>
-    `;
+    tbody.innerHTML = SISELO.emptyTableRow(8, 'Nenhuma transicao na lixeira.');
     return;
   }
 
@@ -192,7 +181,7 @@ function renderTransitionsTrashTable(tbody, rows) {
     <tr>
       <td>${renderTransitionCellValue(row.deleted_at)}</td>
       <td>${renderTransitionCellDate(row.transition_date)}</td>
-      <td><span class="patient-name">${SISELO.escapeHtml(row.full_name || '-')}</span></td>
+      <td><span class="patient-name">${SISELO.highlightPersonName(row.full_name, query)}</span></td>
       <td>${renderTransitionCellValue(row.ses)}</td>
       <td>${renderTransitionCellValue(row.cpf)}</td>
       <td>${renderTransitionRoute(row)}</td>
@@ -258,7 +247,7 @@ function renderTransitionEditAction(row, permissions) {
 
   const id = SISELO.normalizeEntityId(row && row.id);
   if (!id) {
-    return SISELO.iconButton('edit', 'Editar transicao', { 'data-empty-edit': true });
+    return '';
   }
 
   return SISELO.iconLink('edit', `/transitions/form.html?id=${encodeURIComponent(id)}`, 'Editar transicao');
@@ -318,18 +307,6 @@ function bindTransitionListActions(tbody) {
       }
     });
   });
-
-  tbody.querySelectorAll('[data-empty-delete]').forEach((button) => {
-    button.addEventListener('click', () => {
-      SISELO.showUnavailableAction('Nao ha transicao carregada para apagar.');
-    });
-  });
-
-  tbody.querySelectorAll('[data-empty-edit]').forEach((button) => {
-    button.addEventListener('click', () => {
-      SISELO.showUnavailableAction('Nao ha transicao carregada para editar.');
-    });
-  });
 }
 
 function bindTransitionTrashActions(tbody) {
@@ -342,11 +319,26 @@ function bindTransitionTrashActions(tbody) {
       location.reload();
     });
   });
+}
 
-  tbody.querySelectorAll('[data-empty-restore]').forEach((button) => {
-    button.addEventListener('click', () => {
-      SISELO.showUnavailableAction('Nao ha transicao carregada para restaurar.');
-    });
+function filterTransitionRows(rows, query) {
+  const search = SISELO.createSearchState(query);
+  if (!search.hasLetters && !search.hasDigits) {
+    return Array.isArray(rows) ? rows : [];
+  }
+
+  return (Array.isArray(rows) ? rows : []).filter((row) => {
+    const matchesLetters = search.hasLetters
+      ? SISELO.matchesPersonNamePrefix(row.full_name, search) ||
+        SISELO.matchesSearchText(row.status, search) ||
+        SISELO.matchesSearchText(row.from_service, search) ||
+        SISELO.matchesSearchText(row.to_service, search)
+      : true;
+    const matchesDigits = search.hasDigits
+      ? SISELO.matchesSearchDigits(row.cpf, search) || SISELO.matchesSearchDigits(row.ses, search)
+      : true;
+
+    return matchesLetters && matchesDigits;
   });
 }
 
@@ -383,9 +375,9 @@ function disableTransitionForm() {
 
 function fillTransitionPatientSelect(patients, currentValue) {
   const select = document.getElementById('patient_id');
-  select.innerHTML = '<option value="">-- selecione --</option>' + (patients || []).map((patient) => `
+  select.innerHTML = '<option value="">Selecione um paciente</option>' + (patients || []).map((patient) => `
     <option value="${patient.id}" ${Number(currentValue || 0) === Number(patient.id) ? 'selected' : ''}>
-      ${SISELO.escapeHtml(patient.full_name)} (CPF: ${SISELO.escapeHtml(patient.cpf)} | SES: ${SISELO.escapeHtml(patient.ses)})
+      ${SISELO.escapeHtml(patient.full_name)}
     </option>
   `).join('');
 }
