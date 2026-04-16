@@ -12,18 +12,22 @@ async function setupEncountersListPage() {
   const permissions = SISELO.getUiPermissions(user);
   SISELO.bindShell('encounters');
   const query = SISELO.queryParam('q') || '';
+  const patientId = SISELO.normalizeEntityId(SISELO.queryParam('patient_id'));
   const searchInput = document.getElementById('search-input');
   const searchForm = document.getElementById('search-form');
   const newEncounterLink = document.getElementById('new-encounter-link');
   const canCreateEncounter = permissions.has('encounters.create');
+  const newEncounterHref = '/encounters/form.html' + (patientId ? '?patient_id=' + encodeURIComponent(patientId) : '');
   searchInput.value = query;
   newEncounterLink.hidden = !canCreateEncounter;
+  newEncounterLink.href = newEncounterHref;
   document.getElementById('trash-link').hidden = !permissions.has('encounters.restore');
 
+  const url = '/encounters/list.php' + (patientId ? '?patient_id=' + encodeURIComponent(patientId) : '');
   let rows = [];
 
   try {
-    const data = await SISELO.apiRequest('/encounters/list.php');
+    const data = await SISELO.apiRequest(url);
     rows = Array.isArray(data.rows) ? data.rows : [];
   } catch (error) {
     rows = [];
@@ -33,9 +37,9 @@ async function setupEncountersListPage() {
   const applySearch = (value) => {
     const filteredRows = filterEncounterRows(rows, value);
     newEncounterLink.hidden = !canCreateEncounter || filteredRows.length === 0;
-    renderEncountersTable(tbody, filteredRows, permissions, value);
+    renderEncountersTable(tbody, filteredRows, permissions, value, newEncounterHref);
     bindEncounterListActions(tbody);
-    SISELO.syncSearchUrl('/encounters/list.html', value);
+    SISELO.syncSearchUrl('/encounters/list.html', value, patientId ? { patient_id: patientId } : {});
   };
 
   applySearch(query);
@@ -133,13 +137,13 @@ async function setupEncountersTrashPage() {
   });
 }
 
-function renderEncountersTable(tbody, rows, permissions, query = '') {
+function renderEncountersTable(tbody, rows, permissions, query = '', newEncounterHref = '/encounters/form.html') {
   if (!Array.isArray(rows) || rows.length === 0) {
     tbody.innerHTML = SISELO.emptyTableRow(
       5,
       'Nenhum atendimento encontrado.',
       permissions.has('encounters.create')
-        ? { label: '+ Novo atendimento', href: '/encounters/form.html' }
+        ? { label: '+ Novo atendimento', href: newEncounterHref }
         : null
     );
     return;

@@ -12,18 +12,22 @@ async function setupTransitionsListPage() {
   const permissions = SISELO.getUiPermissions(user);
   SISELO.bindShell('transitions');
   const query = SISELO.queryParam('q') || '';
+  const patientId = SISELO.normalizeEntityId(SISELO.queryParam('patient_id'));
   const searchInput = document.getElementById('search-input');
   const searchForm = document.getElementById('search-form');
   const newTransitionLink = document.getElementById('new-transition-link');
   const canCreateTransition = permissions.has('transitions.create');
+  const newTransitionHref = '/transitions/form.html' + (patientId ? '?patient_id=' + encodeURIComponent(patientId) : '');
   searchInput.value = query;
   newTransitionLink.hidden = !canCreateTransition;
+  newTransitionLink.href = newTransitionHref;
   document.getElementById('trash-link').hidden = !permissions.has('transitions.restore');
 
+  const url = '/transitions/list.php' + (patientId ? '?patient_id=' + encodeURIComponent(patientId) : '');
   let rows = [];
 
   try {
-    const data = await SISELO.apiRequest('/transitions/list.php');
+    const data = await SISELO.apiRequest(url);
     rows = Array.isArray(data.rows) ? data.rows : [];
   } catch (error) {
     rows = [];
@@ -33,9 +37,9 @@ async function setupTransitionsListPage() {
   const applySearch = (value) => {
     const filteredRows = filterTransitionRows(rows, value);
     newTransitionLink.hidden = !canCreateTransition || filteredRows.length === 0;
-    renderTransitionsTable(tbody, filteredRows, permissions, value);
+    renderTransitionsTable(tbody, filteredRows, permissions, value, newTransitionHref);
     bindTransitionListActions(tbody);
-    SISELO.syncSearchUrl('/transitions/list.html', value);
+    SISELO.syncSearchUrl('/transitions/list.html', value, patientId ? { patient_id: patientId } : {});
   };
 
   applySearch(query);
@@ -150,13 +154,13 @@ async function setupTransitionsTrashPage() {
   });
 }
 
-function renderTransitionsTable(tbody, rows, permissions, query = '') {
+function renderTransitionsTable(tbody, rows, permissions, query = '', newTransitionHref = '/transitions/form.html') {
   if (!Array.isArray(rows) || rows.length === 0) {
     tbody.innerHTML = SISELO.emptyTableRow(
       7,
       'Nenhuma transicao encontrada.',
       permissions.has('transitions.create')
-        ? { label: '+ Nova transicao', href: '/transitions/form.html' }
+        ? { label: '+ Nova transicao', href: newTransitionHref }
         : null
     );
     return;

@@ -107,6 +107,14 @@
       display: none;
     }
 
+    .cadh-module-card.is-locked {
+      opacity: 0.42;
+      cursor: not-allowed;
+      filter: grayscale(0.35);
+      transform: none;
+      box-shadow: none;
+    }
+
     .cadh-module-icon,
     .cadh-specialty-icon {
       display: inline-flex;
@@ -330,19 +338,19 @@
               <span class="cadh-module-text">Gerenciar cadastros</span>
             </a>
 
-            <a id="cadh-careplans-card" class="cadh-module-card cadh-card-plans" href="/care-plans/list.html">
+            <a id="cadh-careplans-card" class="cadh-module-card cadh-card-plans is-locked" href="#" data-base-href="/care-plans/list.html" data-requires-ses="true" aria-disabled="true">
               <span class="cadh-module-icon"><svg><use href="#cadh-icon-file"></use></svg></span>
               <span class="cadh-module-title">Planos de Cuidado</span>
               <span class="cadh-module-text">Criar e editar planos</span>
             </a>
 
-            <a id="cadh-encounters-card" class="cadh-module-card cadh-card-encounters" href="/encounters/list.html">
+            <a id="cadh-encounters-card" class="cadh-module-card cadh-card-encounters is-locked" href="#" data-base-href="/encounters/list.html" data-requires-ses="true" aria-disabled="true">
               <span class="cadh-module-icon"><svg><use href="#cadh-icon-care"></use></svg></span>
               <span class="cadh-module-title">Atendimentos</span>
               <span class="cadh-module-text">Registrar atendimentos</span>
             </a>
 
-            <a id="cadh-transitions-card" class="cadh-module-card cadh-card-transitions" href="/transitions/list.html">
+            <a id="cadh-transitions-card" class="cadh-module-card cadh-card-transitions is-locked" href="#" data-base-href="/transitions/list.html" data-requires-ses="true" aria-disabled="true">
               <span class="cadh-module-icon"><svg><use href="#cadh-icon-transition"></use></svg></span>
               <span class="cadh-module-title">Transicao do Cuidado</span>
               <span class="cadh-module-text">Visao geral</span>

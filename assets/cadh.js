@@ -10,9 +10,11 @@ async function setupCadhPage() {
   const user = await SISELO.requireSession();
   if (!user) return;
 
+  const permissions = SISELO.getUiPermissions(user);
   SISELO.bindShell('cadh');
-  applyCadhModulePermissions(SISELO.getUiPermissions(user));
+  applyCadhModulePermissions(permissions);
   bindCadhSesSearch();
+  setCadhSesCardsUnlocked(false);
 }
 
 function applyCadhModulePermissions(permissions) {
@@ -38,11 +40,31 @@ function bindCadhSesSearch() {
     return;
   }
 
+  document.querySelectorAll('[data-requires-ses="true"]').forEach((card) => {
+    card.addEventListener('click', (event) => {
+      if (card.getAttribute('aria-disabled') === 'true') {
+        event.preventDefault();
+        renderCadhPatientMessage('Busque um SES existente para liberar esta opcao.', 'error');
+        input.focus();
+      }
+    });
+  });
+
+  input.addEventListener('input', () => {
+    setCadhSesCardPatient('');
+    setCadhSesCardsUnlocked(false);
+    const result = document.getElementById('cadh-patient-result');
+    if (result) {
+      result.innerHTML = '';
+    }
+  });
+
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
 
     const ses = String(input.value || '').trim();
     if (!ses) {
+      setCadhSesCardsUnlocked(false);
       renderCadhPatientMessage('Digite um SES para buscar.', 'error');
       return;
     }
@@ -59,12 +81,18 @@ function bindCadhSesSearch() {
       const patient = findCadhPatientBySes(rows, ses);
 
       if (!patient) {
+        setCadhSesCardPatient('');
+        setCadhSesCardsUnlocked(false);
         renderCadhPatientMessage('Nenhum usuario encontrado para este SES.', 'error');
         return;
       }
 
       renderCadhPatient(patient);
+      setCadhSesCardPatient(patient.id);
+      setCadhSesCardsUnlocked(true);
     } catch (error) {
+      setCadhSesCardPatient('');
+      setCadhSesCardsUnlocked(false);
       renderCadhPatientMessage(error.message || 'Nao foi possivel buscar o usuario agora.', 'error');
     } finally {
       if (submitButton) {
@@ -72,6 +100,23 @@ function bindCadhSesSearch() {
         submitButton.textContent = 'Buscar';
       }
     }
+  });
+}
+
+function setCadhSesCardsUnlocked(unlocked) {
+  document.querySelectorAll('[data-requires-ses="true"]').forEach((card) => {
+    const baseHref = card.dataset.baseHref || '#';
+    const patientId = card.dataset.patientId || '';
+    card.href = unlocked && patientId ? `${baseHref}?patient_id=${encodeURIComponent(patientId)}` : '#';
+    card.classList.toggle('is-locked', !unlocked);
+    card.setAttribute('aria-disabled', unlocked ? 'false' : 'true');
+    card.tabIndex = unlocked ? 0 : -1;
+  });
+}
+
+function setCadhSesCardPatient(patientId) {
+  document.querySelectorAll('[data-requires-ses="true"]').forEach((card) => {
+    card.dataset.patientId = patientId ? String(patientId) : '';
   });
 }
 
