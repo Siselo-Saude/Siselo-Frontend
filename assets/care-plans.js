@@ -37,7 +37,7 @@ async function setupCarePlansListPage() {
 
   try {
     const data = await SISELO.apiRequest(url);
-    rows = Array.isArray(data.rows) ? data.rows : [];
+    rows = SISELO.filterRowsByPatientId(Array.isArray(data.rows) ? data.rows : [], patientId);
   } catch (error) {
     rows = [];
   }
@@ -46,7 +46,7 @@ async function setupCarePlansListPage() {
   const applySearch = (value) => {
     const filteredRows = filterCarePlanRows(rows, value);
     newPlanLink.hidden = !canCreatePlan || filteredRows.length === 0;
-    renderCarePlansTable(tbody, filteredRows, permissions, value, newPlanHref);
+    renderCarePlansTable(tbody, filteredRows, permissions, value, newPlanHref, patientId);
     bindCarePlanListActions(tbody);
     SISELO.syncSearchUrl('/care-plans/list.html', value, patientId ? { patient_id: patientId } : {});
   };
@@ -71,8 +71,12 @@ async function setupCarePlansFormPage() {
 
   const id = SISELO.normalizeEntityId(SISELO.queryParam('id'));
   const patientId = SISELO.normalizeEntityId(SISELO.queryParam('patient_id'));
-  const endpoint = '/care_plans/form.php' +
-    (id ? '?id=' + encodeURIComponent(id) : patientId ? '?patient_id=' + encodeURIComponent(patientId) : '');
+  const endpointParams = new URLSearchParams();
+  if (id) endpointParams.set('id', id);
+  if (patientId) endpointParams.set('patient_id', patientId);
+  const endpointQuery = endpointParams.toString();
+  const endpoint = '/care_plans/form.php' + (endpointQuery ? '?' + endpointQuery : '');
+  const listHref = '/care-plans/list.html' + (patientId ? '?patient_id=' + encodeURIComponent(patientId) : '');
   let data = getEmptyCarePlanContext(patientId);
 
   try {
@@ -81,8 +85,11 @@ async function setupCarePlansFormPage() {
   }
 
   const plan = data.plan || getEmptyCarePlanContext(patientId).plan;
+  const patientOptions = patientId
+    ? SISELO.filterPatientsById(Array.isArray(data.patients) ? data.patients : [], patientId)
+    : Array.isArray(data.patients) ? data.patients : [];
   document.getElementById('form-title').textContent = data.editing ? 'Editar Plano de Cuidado' : 'Novo Plano de Cuidado';
-  fillPatientSelect('patient_id', Array.isArray(data.patients) ? data.patients : [], plan.patient_id);
+  fillPatientSelect('patient_id', patientOptions, plan.patient_id);
   document.getElementById('start_date').value = plan.start_date || '';
   document.getElementById('end_date').value = plan.end_date || '';
   document.getElementById('interventions').value = plan.interventions || '';
@@ -130,7 +137,7 @@ async function setupCarePlansFormPage() {
         method: 'POST',
         body: objectFromFormData(formData),
       });
-      location.href = '/care-plans/list.html';
+      location.href = listHref;
     } catch (error) {
       SISELO.showAlert('page-alert', error.message, 'error');
     }
@@ -175,7 +182,7 @@ async function setupCarePlansTrashPage() {
   });
 }
 
-function renderCarePlansTable(tbody, rows, permissions, query = '', newPlanHref = '/care-plans/form.html') {
+function renderCarePlansTable(tbody, rows, permissions, query = '', newPlanHref = '/care-plans/form.html', scopedPatientId = '') {
   if (!Array.isArray(rows) || rows.length === 0) {
     tbody.innerHTML = SISELO.emptyTableRow(
       5,
@@ -196,7 +203,7 @@ function renderCarePlansTable(tbody, rows, permissions, query = '', newPlanHref 
       <td>
         <div class="table-actions">
           ${SISELO.iconLink('pdf', `${SISELO.getApiBaseUrl()}/care_plans/pdf.php?id=${row.id}`, 'Gerar PDF', { target: '_blank', rel: 'noreferrer' })}
-          ${permissions.has('careplans.update') ? SISELO.iconLink('edit', `/care-plans/form.html?id=${row.id}`, 'Editar plano') : ''}
+          ${permissions.has('careplans.update') ? SISELO.iconLink('edit', `/care-plans/form.html?id=${encodeURIComponent(row.id)}${scopedPatientId ? `&patient_id=${encodeURIComponent(scopedPatientId)}` : ''}`, 'Editar plano') : ''}
           ${permissions.has('careplans.delete') ? SISELO.iconButton('delete', 'Apagar plano', { 'data-delete-id': row.id, 'data-delete-label': row.full_name || `Plano ${row.id}` }) : ''}
         </div>
       </td>

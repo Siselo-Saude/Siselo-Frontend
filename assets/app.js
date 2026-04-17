@@ -511,6 +511,25 @@
     return Number.isFinite(numericValue) && numericValue > 0 ? String(numericValue) : '';
   }
 
+  function filterByEntityId(rows, key, value) {
+    const entityId = normalizeEntityId(value);
+    const safeRows = Array.isArray(rows) ? rows : [];
+
+    if (!entityId) {
+      return safeRows;
+    }
+
+    return safeRows.filter((row) => normalizeEntityId(row && row[key]) === entityId);
+  }
+
+  function filterRowsByPatientId(rows, patientId) {
+    return filterByEntityId(rows, 'patient_id', patientId);
+  }
+
+  function filterPatientsById(patients, patientId) {
+    return filterByEntityId(patients, 'id', patientId);
+  }
+
   function showUnavailableAction(message) {
     window.alert(message || 'Nenhum registro carregado para esta acao.');
   }
@@ -1559,6 +1578,8 @@
     showAlert,
     todayDateInputValue,
     getUiPermissions,
+    filterPatientsById,
+    filterRowsByPatientId,
     normalizeEntityId,
     validateEnhancedDateInputs,
   };

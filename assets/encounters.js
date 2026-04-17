@@ -28,7 +28,7 @@ async function setupEncountersListPage() {
 
   try {
     const data = await SISELO.apiRequest(url);
-    rows = Array.isArray(data.rows) ? data.rows : [];
+    rows = SISELO.filterRowsByPatientId(Array.isArray(data.rows) ? data.rows : [], patientId);
   } catch (error) {
     rows = [];
   }
@@ -37,7 +37,7 @@ async function setupEncountersListPage() {
   const applySearch = (value) => {
     const filteredRows = filterEncounterRows(rows, value);
     newEncounterLink.hidden = !canCreateEncounter || filteredRows.length === 0;
-    renderEncountersTable(tbody, filteredRows, permissions, value, newEncounterHref);
+    renderEncountersTable(tbody, filteredRows, permissions, value, newEncounterHref, patientId);
     bindEncounterListActions(tbody);
     SISELO.syncSearchUrl('/encounters/list.html', value, patientId ? { patient_id: patientId } : {});
   };
@@ -61,8 +61,12 @@ async function setupEncounterFormPage() {
   SISELO.bindShell('encounters');
   const id = SISELO.normalizeEntityId(SISELO.queryParam('id'));
   const patientId = SISELO.normalizeEntityId(SISELO.queryParam('patient_id'));
-  const endpoint = '/encounters/form.php' +
-    (id ? '?id=' + encodeURIComponent(id) : patientId ? '?patient_id=' + encodeURIComponent(patientId) : '');
+  const endpointParams = new URLSearchParams();
+  if (id) endpointParams.set('id', id);
+  if (patientId) endpointParams.set('patient_id', patientId);
+  const endpointQuery = endpointParams.toString();
+  const endpoint = '/encounters/form.php' + (endpointQuery ? '?' + endpointQuery : '');
+  const listHref = '/encounters/list.html' + (patientId ? '?patient_id=' + encodeURIComponent(patientId) : '');
   let data = getEmptyEncounterContext(patientId);
 
   try {
@@ -71,8 +75,11 @@ async function setupEncounterFormPage() {
   }
 
   const row = data.row || getEmptyEncounterContext(patientId).row;
+  const patientOptions = patientId
+    ? SISELO.filterPatientsById(Array.isArray(data.patients) ? data.patients : [], patientId)
+    : Array.isArray(data.patients) ? data.patients : [];
   document.getElementById('form-title').textContent = data.editing ? 'Editar Atendimento' : 'Novo Atendimento';
-  fillEncounterPatientSelect(Array.isArray(data.patients) ? data.patients : [], row.patient_id);
+  fillEncounterPatientSelect(patientOptions, row.patient_id);
   document.getElementById('encounter_date').value = row.encounter_date || '';
   document.getElementById('specialty').value = row.specialty || '';
   document.getElementById('summary').value = row.summary || '';
@@ -92,7 +99,7 @@ async function setupEncounterFormPage() {
         method: 'POST',
         body: Object.fromEntries(formData.entries()),
       });
-      location.href = '/encounters/list.html';
+      location.href = listHref;
     } catch (error) {
       SISELO.showAlert('page-alert', error.message, 'error');
     }
@@ -137,7 +144,7 @@ async function setupEncountersTrashPage() {
   });
 }
 
-function renderEncountersTable(tbody, rows, permissions, query = '', newEncounterHref = '/encounters/form.html') {
+function renderEncountersTable(tbody, rows, permissions, query = '', newEncounterHref = '/encounters/form.html', scopedPatientId = '') {
   if (!Array.isArray(rows) || rows.length === 0) {
     tbody.innerHTML = SISELO.emptyTableRow(
       5,
@@ -158,7 +165,7 @@ function renderEncountersTable(tbody, rows, permissions, query = '', newEncounte
       <td>
         <div class="table-actions">
           ${SISELO.iconLink('view', `/patients/show.html?id=${row.patient_id}&tab=atendimentos`, 'Paciente 360')}
-          ${permissions.has('encounters.update') ? SISELO.iconLink('edit', `/encounters/form.html?id=${row.id}`, 'Editar atendimento') : ''}
+          ${permissions.has('encounters.update') ? SISELO.iconLink('edit', `/encounters/form.html?id=${encodeURIComponent(row.id)}${scopedPatientId ? `&patient_id=${encodeURIComponent(scopedPatientId)}` : ''}`, 'Editar atendimento') : ''}
           ${permissions.has('encounters.delete') ? SISELO.iconButton('delete', 'Apagar atendimento', { 'data-delete-id': row.id, 'data-delete-label': row.full_name || '' }) : ''}
         </div>
       </td>
