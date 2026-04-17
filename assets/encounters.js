@@ -16,12 +16,15 @@ async function setupEncountersListPage() {
   const searchInput = document.getElementById('search-input');
   const searchForm = document.getElementById('search-form');
   const newEncounterLink = document.getElementById('new-encounter-link');
+  const trashLink = document.getElementById('trash-link');
   const canCreateEncounter = permissions.has('encounters.create');
   const newEncounterHref = '/encounters/form.html' + (patientId ? '?patient_id=' + encodeURIComponent(patientId) : '');
+  const trashHref = '/encounters/trash.html' + (patientId ? '?patient_id=' + encodeURIComponent(patientId) : '');
   searchInput.value = query;
   newEncounterLink.hidden = !canCreateEncounter;
   newEncounterLink.href = newEncounterHref;
-  document.getElementById('trash-link').hidden = !permissions.has('encounters.restore');
+  trashLink.hidden = !permissions.has('encounters.restore');
+  trashLink.href = trashHref;
 
   const url = '/encounters/list.php' + (patientId ? '?patient_id=' + encodeURIComponent(patientId) : '');
   let rows = [];
@@ -112,15 +115,18 @@ async function setupEncountersTrashPage() {
 
   SISELO.bindShell('encounters');
   const query = SISELO.queryParam('q') || '';
+  const patientId = SISELO.normalizeEntityId(SISELO.queryParam('patient_id'));
   const searchInput = document.getElementById('search-input');
   const searchForm = document.getElementById('search-form');
   searchInput.value = query;
 
   let rows = [];
 
+  const url = '/encounters/trash.php' + (patientId ? '?patient_id=' + encodeURIComponent(patientId) : '');
+
   try {
-    const data = await SISELO.apiRequest('/encounters/trash.php');
-    rows = Array.isArray(data.rows) ? data.rows : [];
+    const data = await SISELO.apiRequest(url);
+    rows = SISELO.filterRowsByPatientId(Array.isArray(data.rows) ? data.rows : [], patientId);
   } catch (error) {
     rows = [];
   }
@@ -129,7 +135,7 @@ async function setupEncountersTrashPage() {
   const applySearch = (value) => {
     renderEncountersTrashTable(tbody, filterEncounterRows(rows, value), value);
     bindEncounterTrashActions(tbody);
-    SISELO.syncSearchUrl('/encounters/trash.html', value);
+    SISELO.syncSearchUrl('/encounters/trash.html', value, patientId ? { patient_id: patientId } : {});
   };
 
   applySearch(query);

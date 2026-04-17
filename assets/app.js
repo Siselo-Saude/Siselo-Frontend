@@ -3,6 +3,7 @@
   const SESSION_KEY = 'siselo_session';
   const CSRF_KEY = 'siselo_csrf';
   const NAVIGATION_KEY = 'siselo_navigation';
+  const CADH_SEARCH_KEY = 'siselo_cadh_search';
   const CRUD_UI_PERMISSIONS = [
     'patients.view',
     'patients.create',
@@ -235,6 +236,7 @@
     sessionStorage.removeItem(SESSION_KEY);
     sessionStorage.removeItem(CSRF_KEY);
     sessionStorage.removeItem(NAVIGATION_KEY);
+    sessionStorage.removeItem(CADH_SEARCH_KEY);
   }
 
   function getSession() {
@@ -307,19 +309,26 @@
   }
 
   function resolveBackTarget(fallback) {
-    const current = getCurrentAppPath();
-    const referrerTarget = normalizeAppPath(document.referrer);
-    if (referrerTarget && referrerTarget !== current) {
-      return referrerTarget;
+    const target = normalizeAppPath(fallback) || '/index.html';
+    const patientId = normalizeEntityId(queryParam('patient_id'));
+
+    if (!patientId) {
+      return target;
     }
 
-    const state = readNavigationState();
-    const previousTarget = normalizeAppPath(state.previous);
-    if (previousTarget && previousTarget !== current) {
-      return previousTarget;
+    const url = new URL(target, location.origin);
+    const scopedListPaths = [
+      '/care-plans/list.html',
+      '/encounters/list.html',
+      '/transitions/list.html',
+    ];
+
+    if (scopedListPaths.includes(url.pathname) && !url.searchParams.get('patient_id')) {
+      url.searchParams.set('patient_id', patientId);
+      return `${url.pathname}${url.search}${url.hash}`;
     }
 
-    return normalizeAppPath(fallback) || '/index.html';
+    return target;
   }
 
   function bindBackLinks() {
@@ -329,6 +338,7 @@
       }
 
       link.dataset.backLinkBound = 'true';
+      link.href = resolveBackTarget(link.dataset.fallback || link.getAttribute('href'));
       link.addEventListener('click', (event) => {
         event.preventDefault();
         location.href = resolveBackTarget(link.dataset.fallback || link.getAttribute('href'));

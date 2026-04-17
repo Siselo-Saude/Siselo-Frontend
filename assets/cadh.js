@@ -1,3 +1,5 @@
+const CADH_SEARCH_KEY = 'siselo_cadh_search';
+
 document.addEventListener('DOMContentLoaded', () => {
   if (document.body.dataset.page !== 'cadh') {
     return;
@@ -14,7 +16,9 @@ async function setupCadhPage() {
   SISELO.bindShell('cadh');
   applyCadhModulePermissions(permissions);
   bindCadhSesSearch();
-  setCadhSesCardsUnlocked(false);
+  if (!restoreCadhSesSearch()) {
+    setCadhSesCardsUnlocked(false);
+  }
 }
 
 function applyCadhModulePermissions(permissions) {
@@ -51,6 +55,7 @@ function bindCadhSesSearch() {
   });
 
   input.addEventListener('input', () => {
+    clearCadhSearchState();
     setCadhSesCardPatient('');
     setCadhSesCardsUnlocked(false);
     const result = document.getElementById('cadh-patient-result');
@@ -64,6 +69,7 @@ function bindCadhSesSearch() {
 
     const ses = String(input.value || '').trim();
     if (!ses) {
+      clearCadhSearchState();
       setCadhSesCardsUnlocked(false);
       renderCadhPatientMessage('Digite um SES para buscar.', 'error');
       return;
@@ -81,16 +87,19 @@ function bindCadhSesSearch() {
       const patient = findCadhPatientBySes(rows, ses);
 
       if (!patient) {
+        clearCadhSearchState();
         setCadhSesCardPatient('');
         setCadhSesCardsUnlocked(false);
         renderCadhPatientMessage('Nenhum usuario encontrado para este SES.', 'error');
         return;
       }
 
+      saveCadhSearchState(patient, ses);
       renderCadhPatient(patient);
       setCadhSesCardPatient(patient.id);
       setCadhSesCardsUnlocked(true);
     } catch (error) {
+      clearCadhSearchState();
       setCadhSesCardPatient('');
       setCadhSesCardsUnlocked(false);
       renderCadhPatientMessage(error.message || 'Nao foi possivel buscar o usuario agora.', 'error');
@@ -101,6 +110,57 @@ function bindCadhSesSearch() {
       }
     }
   });
+}
+
+function restoreCadhSesSearch() {
+  const state = readCadhSearchState();
+  const patient = state && state.patient ? state.patient : null;
+  const patientId = SISELO.normalizeEntityId(patient && patient.id);
+  const input = document.getElementById('cadh-ses-input');
+
+  if (!patientId || !input) {
+    clearCadhSearchState();
+    return false;
+  }
+
+  input.value = state.ses || patient.ses || '';
+  renderCadhPatient(patient);
+  setCadhSesCardPatient(patientId);
+  setCadhSesCardsUnlocked(true);
+  return true;
+}
+
+function readCadhSearchState() {
+  try {
+    return JSON.parse(sessionStorage.getItem(CADH_SEARCH_KEY) || 'null');
+  } catch (error) {
+    return null;
+  }
+}
+
+function saveCadhSearchState(patient, ses) {
+  const patientId = SISELO.normalizeEntityId(patient && patient.id);
+  if (!patientId) {
+    clearCadhSearchState();
+    return;
+  }
+
+  sessionStorage.setItem(CADH_SEARCH_KEY, JSON.stringify({
+    ses: String(ses || patient.ses || '').trim(),
+    patient: {
+      id: patientId,
+      full_name: patient.full_name || '',
+      cpf: patient.cpf || '',
+      ses: patient.ses || '',
+      birth_date: patient.birth_date || '',
+      age_label: patient.age_label || '',
+      race: patient.race || '',
+    },
+  }));
+}
+
+function clearCadhSearchState() {
+  sessionStorage.removeItem(CADH_SEARCH_KEY);
 }
 
 function setCadhSesCardsUnlocked(unlocked) {

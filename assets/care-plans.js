@@ -25,12 +25,15 @@ async function setupCarePlansListPage() {
   const searchInput = document.getElementById('search-input');
   const searchForm = document.getElementById('search-form');
   const newPlanLink = document.getElementById('new-plan-link');
+  const trashLink = document.getElementById('trash-link');
   const canCreatePlan = permissions.has('careplans.create');
   const newPlanHref = '/care-plans/form.html' + (patientId ? '?patient_id=' + encodeURIComponent(patientId) : '');
+  const trashHref = '/care-plans/trash.html' + (patientId ? '?patient_id=' + encodeURIComponent(patientId) : '');
   searchInput.value = query;
   newPlanLink.hidden = !canCreatePlan;
-  document.getElementById('trash-link').hidden = !permissions.has('careplans.restore');
+  trashLink.hidden = !permissions.has('careplans.restore');
   newPlanLink.href = newPlanHref;
+  trashLink.href = trashHref;
 
   const url = '/care_plans/list.php' + (patientId ? '?patient_id=' + encodeURIComponent(patientId) : '');
   let rows = [];
@@ -150,15 +153,18 @@ async function setupCarePlansTrashPage() {
 
   SISELO.bindShell('careplans');
   const query = SISELO.queryParam('q') || '';
+  const patientId = SISELO.normalizeEntityId(SISELO.queryParam('patient_id'));
   const searchInput = document.getElementById('search-input');
   const searchForm = document.getElementById('search-form');
   searchInput.value = query;
 
   let rows = [];
 
+  const url = '/care_plans/trash.php' + (patientId ? '?patient_id=' + encodeURIComponent(patientId) : '');
+
   try {
-    const data = await SISELO.apiRequest('/care_plans/trash.php');
-    rows = Array.isArray(data.rows) ? data.rows : [];
+    const data = await SISELO.apiRequest(url);
+    rows = SISELO.filterRowsByPatientId(Array.isArray(data.rows) ? data.rows : [], patientId);
   } catch (error) {
     rows = [];
   }
@@ -167,7 +173,7 @@ async function setupCarePlansTrashPage() {
   const applySearch = (value) => {
     renderCarePlansTrashTable(tbody, filterCarePlanRows(rows, value), value);
     bindCarePlanTrashActions(tbody);
-    SISELO.syncSearchUrl('/care-plans/trash.html', value);
+    SISELO.syncSearchUrl('/care-plans/trash.html', value, patientId ? { patient_id: patientId } : {});
   };
 
   applySearch(query);

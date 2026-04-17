@@ -16,12 +16,15 @@ async function setupTransitionsListPage() {
   const searchInput = document.getElementById('search-input');
   const searchForm = document.getElementById('search-form');
   const newTransitionLink = document.getElementById('new-transition-link');
+  const trashLink = document.getElementById('trash-link');
   const canCreateTransition = permissions.has('transitions.create');
   const newTransitionHref = '/transitions/form.html' + (patientId ? '?patient_id=' + encodeURIComponent(patientId) : '');
+  const trashHref = '/transitions/trash.html' + (patientId ? '?patient_id=' + encodeURIComponent(patientId) : '');
   searchInput.value = query;
   newTransitionLink.hidden = !canCreateTransition;
   newTransitionLink.href = newTransitionHref;
-  document.getElementById('trash-link').hidden = !permissions.has('transitions.restore');
+  trashLink.hidden = !permissions.has('transitions.restore');
+  trashLink.href = trashHref;
 
   const url = '/transitions/list.php' + (patientId ? '?patient_id=' + encodeURIComponent(patientId) : '');
   let rows = [];
@@ -129,15 +132,18 @@ async function setupTransitionsTrashPage() {
 
   SISELO.bindShell('transitions');
   const query = SISELO.queryParam('q') || '';
+  const patientId = SISELO.normalizeEntityId(SISELO.queryParam('patient_id'));
   const searchInput = document.getElementById('search-input');
   const searchForm = document.getElementById('search-form');
   searchInput.value = query;
 
   let rows = [];
 
+  const url = '/transitions/trash.php' + (patientId ? '?patient_id=' + encodeURIComponent(patientId) : '');
+
   try {
-    const data = await SISELO.apiRequest('/transitions/trash.php');
-    rows = Array.isArray(data.rows) ? data.rows : [];
+    const data = await SISELO.apiRequest(url);
+    rows = SISELO.filterRowsByPatientId(Array.isArray(data.rows) ? data.rows : [], patientId);
   } catch (error) {
     rows = [];
   }
@@ -146,7 +152,7 @@ async function setupTransitionsTrashPage() {
   const applySearch = (value) => {
     renderTransitionsTrashTable(tbody, filterTransitionRows(rows, value), value);
     bindTransitionTrashActions(tbody);
-    SISELO.syncSearchUrl('/transitions/trash.html', value);
+    SISELO.syncSearchUrl('/transitions/trash.html', value, patientId ? { patient_id: patientId } : {});
   };
 
   applySearch(query);
