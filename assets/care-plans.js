@@ -24,24 +24,32 @@ async function setupCarePlansListPage() {
   const patientId = SISELO.normalizeEntityId(SISELO.queryParam('patient_id'));
   const searchInput = document.getElementById('search-input');
   const searchForm = document.getElementById('search-form');
+  const newPlanLink = document.getElementById('new-plan-link');
+  const trashLink = document.getElementById('trash-link');
+  const canCreatePlan = permissions.has('careplans.create');
+  const newPlanHref = '/care-plans/form.html' + (patientId ? '?patient_id=' + encodeURIComponent(patientId) : '');
+  const trashHref = '/care-plans/trash.html' + (patientId ? '?patient_id=' + encodeURIComponent(patientId) : '');
   searchInput.value = query;
-  document.getElementById('new-plan-link').hidden = !permissions.has('careplans.create');
-  document.getElementById('trash-link').hidden = !permissions.has('careplans.restore');
-  document.getElementById('new-plan-link').href = '/care-plans/form.html' + (patientId ? '?patient_id=' + encodeURIComponent(patientId) : '');
+  newPlanLink.hidden = !canCreatePlan;
+  trashLink.hidden = !permissions.has('careplans.restore');
+  newPlanLink.href = newPlanHref;
+  trashLink.href = trashHref;
 
   const url = '/care_plans/list.php' + (patientId ? '?patient_id=' + encodeURIComponent(patientId) : '');
   let rows = [];
 
   try {
     const data = await SISELO.apiRequest(url);
-    rows = Array.isArray(data.rows) ? data.rows : [];
+    rows = SISELO.filterRowsByPatientId(Array.isArray(data.rows) ? data.rows : [], patientId);
   } catch (error) {
     rows = [];
   }
 
   const tbody = document.getElementById('care-plans-table-body');
   const applySearch = (value) => {
-    renderCarePlansTable(tbody, filterCarePlanRows(rows, value), permissions, value);
+    const filteredRows = filterCarePlanRows(rows, value);
+    newPlanLink.hidden = !canCreatePlan || filteredRows.length === 0;
+    renderCarePlansTable(tbody, filteredRows, permissions, value, newPlanHref, patientId);
     bindCarePlanListActions(tbody);
     SISELO.syncSearchUrl('/care-plans/list.html', value, patientId ? { patient_id: patientId } : {});
   };
@@ -66,8 +74,12 @@ async function setupCarePlansFormPage() {
 
   const id = SISELO.normalizeEntityId(SISELO.queryParam('id'));
   const patientId = SISELO.normalizeEntityId(SISELO.queryParam('patient_id'));
-  const endpoint = '/care_plans/form.php' +
-    (id ? '?id=' + encodeURIComponent(id) : patientId ? '?patient_id=' + encodeURIComponent(patientId) : '');
+  const endpointParams = new URLSearchParams();
+  if (id) endpointParams.set('id', id);
+  if (patientId) endpointParams.set('patient_id', patientId);
+  const endpointQuery = endpointParams.toString();
+  const endpoint = '/care_plans/form.php' + (endpointQuery ? '?' + endpointQuery : '');
+  const listHref = '/care-plans/list.html' + (patientId ? '?patient_id=' + encodeURIComponent(patientId) : '');
   let data = getEmptyCarePlanContext(patientId);
 
   try {
@@ -76,8 +88,11 @@ async function setupCarePlansFormPage() {
   }
 
   const plan = data.plan || getEmptyCarePlanContext(patientId).plan;
+  const patientOptions = patientId
+    ? SISELO.filterPatientsById(Array.isArray(data.patients) ? data.patients : [], patientId)
+    : Array.isArray(data.patients) ? data.patients : [];
   document.getElementById('form-title').textContent = data.editing ? 'Editar Plano de Cuidado' : 'Novo Plano de Cuidado';
-  fillPatientSelect('patient_id', Array.isArray(data.patients) ? data.patients : [], plan.patient_id);
+  fillPatientSelect('patient_id', patientOptions, plan.patient_id);
   document.getElementById('start_date').value = plan.start_date || '';
   document.getElementById('end_date').value = plan.end_date || '';
   document.getElementById('interventions').value = plan.interventions || '';
@@ -125,7 +140,7 @@ async function setupCarePlansFormPage() {
         method: 'POST',
         body: objectFromFormData(formData),
       });
-      location.href = '/care-plans/list.html';
+      location.href = listHref;
     } catch (error) {
       SISELO.showAlert('page-alert', error.message, 'error');
     }
@@ -138,15 +153,18 @@ async function setupCarePlansTrashPage() {
 
   SISELO.bindShell('careplans');
   const query = SISELO.queryParam('q') || '';
+  const patientId = SISELO.normalizeEntityId(SISELO.queryParam('patient_id'));
   const searchInput = document.getElementById('search-input');
   const searchForm = document.getElementById('search-form');
   searchInput.value = query;
 
   let rows = [];
 
+  const url = '/care_plans/trash.php' + (patientId ? '?patient_id=' + encodeURIComponent(patientId) : '');
+
   try {
-    const data = await SISELO.apiRequest('/care_plans/trash.php');
-    rows = Array.isArray(data.rows) ? data.rows : [];
+    const data = await SISELO.apiRequest(url);
+    rows = SISELO.filterRowsByPatientId(Array.isArray(data.rows) ? data.rows : [], patientId);
   } catch (error) {
     rows = [];
   }
@@ -155,7 +173,7 @@ async function setupCarePlansTrashPage() {
   const applySearch = (value) => {
     renderCarePlansTrashTable(tbody, filterCarePlanRows(rows, value), value);
     bindCarePlanTrashActions(tbody);
-    SISELO.syncSearchUrl('/care-plans/trash.html', value);
+    SISELO.syncSearchUrl('/care-plans/trash.html', value, patientId ? { patient_id: patientId } : {});
   };
 
   applySearch(query);
@@ -170,11 +188,15 @@ async function setupCarePlansTrashPage() {
   });
 }
 
-function renderCarePlansTable(tbody, rows, permissions, query = '') {
-  const isMockData = window.SISELO_CONFIG && window.SISELO_CONFIG.useMockData === true;
-
+function renderCarePlansTable(tbody, rows, permissions, query = '', newPlanHref = '/care-plans/form.html', scopedPatientId = '') {
   if (!Array.isArray(rows) || rows.length === 0) {
-    tbody.innerHTML = SISELO.emptyTableRow(5, 'Nenhum plano de cuidado encontrado.');
+    tbody.innerHTML = SISELO.emptyTableRow(
+      5,
+      'Nenhum plano de cuidado encontrado.',
+      permissions.has('careplans.create')
+        ? { label: '+ Novo plano', href: newPlanHref }
+        : null
+    );
     return;
   }
 
@@ -186,10 +208,8 @@ function renderCarePlansTable(tbody, rows, permissions, query = '') {
       <td>${SISELO.escapeHtml(row.end_date || '')}</td>
       <td>
         <div class="table-actions">
-          ${isMockData
-            ? SISELO.iconButton('pdf', 'Gerar PDF', { 'data-demo-pdf': true })
-            : SISELO.iconLink('pdf', `${SISELO.getApiBaseUrl()}/care_plans/pdf.php?id=${row.id}`, 'Gerar PDF', { target: '_blank', rel: 'noreferrer' })}
-          ${permissions.has('careplans.update') ? SISELO.iconLink('edit', `/care-plans/form.html?id=${row.id}`, 'Editar plano') : ''}
+          ${SISELO.iconLink('pdf', `${SISELO.getApiBaseUrl()}/care_plans/pdf.php?id=${row.id}`, 'Gerar PDF', { target: '_blank', rel: 'noreferrer' })}
+          ${permissions.has('careplans.update') ? SISELO.iconLink('edit', `/care-plans/form.html?id=${encodeURIComponent(row.id)}${scopedPatientId ? `&patient_id=${encodeURIComponent(scopedPatientId)}` : ''}`, 'Editar plano') : ''}
           ${permissions.has('careplans.delete') ? SISELO.iconButton('delete', 'Apagar plano', { 'data-delete-id': row.id, 'data-delete-label': row.full_name || `Plano ${row.id}` }) : ''}
         </div>
       </td>
@@ -222,7 +242,7 @@ function renderCarePlansTrashTable(tbody, rows, query = '') {
 function bindCarePlanListActions(tbody) {
   tbody.querySelectorAll('[data-delete-id]').forEach((button) => {
     button.addEventListener('click', async () => {
-      if (!SISELO.confirmDeletion('o plano de cuidado', button.dataset.deleteLabel)) return;
+      if (!await SISELO.confirmDeletion('o plano de cuidado', button.dataset.deleteLabel)) return;
 
       try {
         await SISELO.apiRequest('/care_plans/soft_delete.php', {
@@ -233,12 +253,6 @@ function bindCarePlanListActions(tbody) {
       } catch (error) {
         SISELO.showActionError(error.message || 'Nao foi possivel apagar o plano.');
       }
-    });
-  });
-
-  tbody.querySelectorAll('[data-demo-pdf]').forEach((button) => {
-    button.addEventListener('click', () => {
-      SISELO.showUnavailableAction('PDF indisponivel no modo demonstracao do frontend.');
     });
   });
 }

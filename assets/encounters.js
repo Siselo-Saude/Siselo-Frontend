@@ -12,26 +12,37 @@ async function setupEncountersListPage() {
   const permissions = SISELO.getUiPermissions(user);
   SISELO.bindShell('encounters');
   const query = SISELO.queryParam('q') || '';
+  const patientId = SISELO.normalizeEntityId(SISELO.queryParam('patient_id'));
   const searchInput = document.getElementById('search-input');
   const searchForm = document.getElementById('search-form');
+  const newEncounterLink = document.getElementById('new-encounter-link');
+  const trashLink = document.getElementById('trash-link');
+  const canCreateEncounter = permissions.has('encounters.create');
+  const newEncounterHref = '/encounters/form.html' + (patientId ? '?patient_id=' + encodeURIComponent(patientId) : '');
+  const trashHref = '/encounters/trash.html' + (patientId ? '?patient_id=' + encodeURIComponent(patientId) : '');
   searchInput.value = query;
-  document.getElementById('new-encounter-link').hidden = !permissions.has('encounters.create');
-  document.getElementById('trash-link').hidden = !permissions.has('encounters.restore');
+  newEncounterLink.hidden = !canCreateEncounter;
+  newEncounterLink.href = newEncounterHref;
+  trashLink.hidden = !permissions.has('encounters.restore');
+  trashLink.href = trashHref;
 
+  const url = '/encounters/list.php' + (patientId ? '?patient_id=' + encodeURIComponent(patientId) : '');
   let rows = [];
 
   try {
-    const data = await SISELO.apiRequest('/encounters/list.php');
-    rows = Array.isArray(data.rows) ? data.rows : [];
+    const data = await SISELO.apiRequest(url);
+    rows = SISELO.filterRowsByPatientId(Array.isArray(data.rows) ? data.rows : [], patientId);
   } catch (error) {
     rows = [];
   }
 
   const tbody = document.getElementById('encounters-table-body');
   const applySearch = (value) => {
-    renderEncountersTable(tbody, filterEncounterRows(rows, value), permissions, value);
+    const filteredRows = filterEncounterRows(rows, value);
+    newEncounterLink.hidden = !canCreateEncounter || filteredRows.length === 0;
+    renderEncountersTable(tbody, filteredRows, permissions, value, newEncounterHref, patientId);
     bindEncounterListActions(tbody);
-    SISELO.syncSearchUrl('/encounters/list.html', value);
+    SISELO.syncSearchUrl('/encounters/list.html', value, patientId ? { patient_id: patientId } : {});
   };
 
   applySearch(query);
@@ -53,8 +64,12 @@ async function setupEncounterFormPage() {
   SISELO.bindShell('encounters');
   const id = SISELO.normalizeEntityId(SISELO.queryParam('id'));
   const patientId = SISELO.normalizeEntityId(SISELO.queryParam('patient_id'));
-  const endpoint = '/encounters/form.php' +
-    (id ? '?id=' + encodeURIComponent(id) : patientId ? '?patient_id=' + encodeURIComponent(patientId) : '');
+  const endpointParams = new URLSearchParams();
+  if (id) endpointParams.set('id', id);
+  if (patientId) endpointParams.set('patient_id', patientId);
+  const endpointQuery = endpointParams.toString();
+  const endpoint = '/encounters/form.php' + (endpointQuery ? '?' + endpointQuery : '');
+  const listHref = '/encounters/list.html' + (patientId ? '?patient_id=' + encodeURIComponent(patientId) : '');
   let data = getEmptyEncounterContext(patientId);
 
   try {
@@ -63,8 +78,11 @@ async function setupEncounterFormPage() {
   }
 
   const row = data.row || getEmptyEncounterContext(patientId).row;
+  const patientOptions = patientId
+    ? SISELO.filterPatientsById(Array.isArray(data.patients) ? data.patients : [], patientId)
+    : Array.isArray(data.patients) ? data.patients : [];
   document.getElementById('form-title').textContent = data.editing ? 'Editar Atendimento' : 'Novo Atendimento';
-  fillEncounterPatientSelect(Array.isArray(data.patients) ? data.patients : [], row.patient_id);
+  fillEncounterPatientSelect(patientOptions, row.patient_id);
   document.getElementById('encounter_date').value = row.encounter_date || '';
   document.getElementById('specialty').value = row.specialty || '';
   document.getElementById('summary').value = row.summary || '';
@@ -84,7 +102,7 @@ async function setupEncounterFormPage() {
         method: 'POST',
         body: Object.fromEntries(formData.entries()),
       });
-      location.href = '/encounters/list.html';
+      location.href = listHref;
     } catch (error) {
       SISELO.showAlert('page-alert', error.message, 'error');
     }
@@ -97,15 +115,18 @@ async function setupEncountersTrashPage() {
 
   SISELO.bindShell('encounters');
   const query = SISELO.queryParam('q') || '';
+  const patientId = SISELO.normalizeEntityId(SISELO.queryParam('patient_id'));
   const searchInput = document.getElementById('search-input');
   const searchForm = document.getElementById('search-form');
   searchInput.value = query;
 
   let rows = [];
 
+  const url = '/encounters/trash.php' + (patientId ? '?patient_id=' + encodeURIComponent(patientId) : '');
+
   try {
-    const data = await SISELO.apiRequest('/encounters/trash.php');
-    rows = Array.isArray(data.rows) ? data.rows : [];
+    const data = await SISELO.apiRequest(url);
+    rows = SISELO.filterRowsByPatientId(Array.isArray(data.rows) ? data.rows : [], patientId);
   } catch (error) {
     rows = [];
   }
@@ -114,7 +135,7 @@ async function setupEncountersTrashPage() {
   const applySearch = (value) => {
     renderEncountersTrashTable(tbody, filterEncounterRows(rows, value), value);
     bindEncounterTrashActions(tbody);
-    SISELO.syncSearchUrl('/encounters/trash.html', value);
+    SISELO.syncSearchUrl('/encounters/trash.html', value, patientId ? { patient_id: patientId } : {});
   };
 
   applySearch(query);
@@ -129,9 +150,15 @@ async function setupEncountersTrashPage() {
   });
 }
 
-function renderEncountersTable(tbody, rows, permissions, query = '') {
+function renderEncountersTable(tbody, rows, permissions, query = '', newEncounterHref = '/encounters/form.html', scopedPatientId = '') {
   if (!Array.isArray(rows) || rows.length === 0) {
-    tbody.innerHTML = SISELO.emptyTableRow(5, 'Nenhum atendimento encontrado.');
+    tbody.innerHTML = SISELO.emptyTableRow(
+      5,
+      'Nenhum atendimento encontrado.',
+      permissions.has('encounters.create')
+        ? { label: '+ Novo atendimento', href: newEncounterHref }
+        : null
+    );
     return;
   }
 
@@ -144,7 +171,7 @@ function renderEncountersTable(tbody, rows, permissions, query = '') {
       <td>
         <div class="table-actions">
           ${SISELO.iconLink('view', `/patients/show.html?id=${row.patient_id}&tab=atendimentos`, 'Paciente 360')}
-          ${permissions.has('encounters.update') ? SISELO.iconLink('edit', `/encounters/form.html?id=${row.id}`, 'Editar atendimento') : ''}
+          ${permissions.has('encounters.update') ? SISELO.iconLink('edit', `/encounters/form.html?id=${encodeURIComponent(row.id)}${scopedPatientId ? `&patient_id=${encodeURIComponent(scopedPatientId)}` : ''}`, 'Editar atendimento') : ''}
           ${permissions.has('encounters.delete') ? SISELO.iconButton('delete', 'Apagar atendimento', { 'data-delete-id': row.id, 'data-delete-label': row.full_name || '' }) : ''}
         </div>
       </td>
@@ -176,7 +203,7 @@ function renderEncountersTrashTable(tbody, rows, query = '') {
 function bindEncounterListActions(tbody) {
   tbody.querySelectorAll('[data-delete-id]').forEach((button) => {
     button.addEventListener('click', async () => {
-      if (!SISELO.confirmDeletion('o atendimento de', button.dataset.deleteLabel)) return;
+      if (!await SISELO.confirmDeletion('o atendimento de', button.dataset.deleteLabel)) return;
 
       try {
         await SISELO.apiRequest('/encounters/soft_delete.php', {

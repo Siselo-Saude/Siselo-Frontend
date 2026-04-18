@@ -12,26 +12,37 @@ async function setupTransitionsListPage() {
   const permissions = SISELO.getUiPermissions(user);
   SISELO.bindShell('transitions');
   const query = SISELO.queryParam('q') || '';
+  const patientId = SISELO.normalizeEntityId(SISELO.queryParam('patient_id'));
   const searchInput = document.getElementById('search-input');
   const searchForm = document.getElementById('search-form');
+  const newTransitionLink = document.getElementById('new-transition-link');
+  const trashLink = document.getElementById('trash-link');
+  const canCreateTransition = permissions.has('transitions.create');
+  const newTransitionHref = '/transitions/form.html' + (patientId ? '?patient_id=' + encodeURIComponent(patientId) : '');
+  const trashHref = '/transitions/trash.html' + (patientId ? '?patient_id=' + encodeURIComponent(patientId) : '');
   searchInput.value = query;
-  document.getElementById('new-transition-link').hidden = !permissions.has('transitions.create');
-  document.getElementById('trash-link').hidden = !permissions.has('transitions.restore');
+  newTransitionLink.hidden = !canCreateTransition;
+  newTransitionLink.href = newTransitionHref;
+  trashLink.hidden = !permissions.has('transitions.restore');
+  trashLink.href = trashHref;
 
+  const url = '/transitions/list.php' + (patientId ? '?patient_id=' + encodeURIComponent(patientId) : '');
   let rows = [];
 
   try {
-    const data = await SISELO.apiRequest('/transitions/list.php');
-    rows = Array.isArray(data.rows) ? data.rows : [];
+    const data = await SISELO.apiRequest(url);
+    rows = SISELO.filterRowsByPatientId(Array.isArray(data.rows) ? data.rows : [], patientId);
   } catch (error) {
     rows = [];
   }
 
   const tbody = document.getElementById('transitions-table-body');
   const applySearch = (value) => {
-    renderTransitionsTable(tbody, filterTransitionRows(rows, value), permissions, value);
+    const filteredRows = filterTransitionRows(rows, value);
+    newTransitionLink.hidden = !canCreateTransition || filteredRows.length === 0;
+    renderTransitionsTable(tbody, filteredRows, permissions, value, newTransitionHref, patientId);
     bindTransitionListActions(tbody);
-    SISELO.syncSearchUrl('/transitions/list.html', value);
+    SISELO.syncSearchUrl('/transitions/list.html', value, patientId ? { patient_id: patientId } : {});
   };
 
   applySearch(query);
@@ -53,8 +64,12 @@ async function setupTransitionFormPage() {
   SISELO.bindShell('transitions');
   const id = SISELO.normalizeEntityId(SISELO.queryParam('id'));
   const patientId = SISELO.normalizeEntityId(SISELO.queryParam('patient_id'));
-  const endpoint = '/transitions/form.php' +
-    (id ? '?id=' + encodeURIComponent(id) : patientId ? '?patient_id=' + encodeURIComponent(patientId) : '');
+  const endpointParams = new URLSearchParams();
+  if (id) endpointParams.set('id', id);
+  if (patientId) endpointParams.set('patient_id', patientId);
+  const endpointQuery = endpointParams.toString();
+  const endpoint = '/transitions/form.php' + (endpointQuery ? '?' + endpointQuery : '');
+  const listHref = '/transitions/list.html' + (patientId ? '?patient_id=' + encodeURIComponent(patientId) : '');
   let data = getEmptyTransitionContext(patientId);
   let loadError = null;
 
@@ -78,8 +93,11 @@ async function setupTransitionFormPage() {
   }
 
   const row = data.row || getEmptyTransitionContext(patientId).row;
+  const patientOptions = patientId
+    ? SISELO.filterPatientsById(Array.isArray(data.patients) ? data.patients : [], patientId)
+    : Array.isArray(data.patients) ? data.patients : [];
   document.getElementById('form-title').textContent = id || data.editing ? 'Editar Transicao' : 'Nova Transicao';
-  fillTransitionPatientSelect(Array.isArray(data.patients) ? data.patients : [], row.patient_id);
+  fillTransitionPatientSelect(patientOptions, row.patient_id);
   fillTransitionStatusSelect(Array.isArray(data.statuses) && data.statuses.length ? data.statuses : getDefaultTransitionStatuses(), row.status);
   document.getElementById('transition_date').value = row.transition_date || '';
   document.getElementById('from_service').value = row.from_service || '';
@@ -101,7 +119,7 @@ async function setupTransitionFormPage() {
         method: 'POST',
         body: Object.fromEntries(formData.entries()),
       });
-      location.href = '/transitions/list.html';
+      location.href = listHref;
     } catch (error) {
       SISELO.showAlert('page-alert', error.message, 'error');
     }
@@ -114,15 +132,18 @@ async function setupTransitionsTrashPage() {
 
   SISELO.bindShell('transitions');
   const query = SISELO.queryParam('q') || '';
+  const patientId = SISELO.normalizeEntityId(SISELO.queryParam('patient_id'));
   const searchInput = document.getElementById('search-input');
   const searchForm = document.getElementById('search-form');
   searchInput.value = query;
 
   let rows = [];
 
+  const url = '/transitions/trash.php' + (patientId ? '?patient_id=' + encodeURIComponent(patientId) : '');
+
   try {
-    const data = await SISELO.apiRequest('/transitions/trash.php');
-    rows = Array.isArray(data.rows) ? data.rows : [];
+    const data = await SISELO.apiRequest(url);
+    rows = SISELO.filterRowsByPatientId(Array.isArray(data.rows) ? data.rows : [], patientId);
   } catch (error) {
     rows = [];
   }
@@ -131,7 +152,7 @@ async function setupTransitionsTrashPage() {
   const applySearch = (value) => {
     renderTransitionsTrashTable(tbody, filterTransitionRows(rows, value), value);
     bindTransitionTrashActions(tbody);
-    SISELO.syncSearchUrl('/transitions/trash.html', value);
+    SISELO.syncSearchUrl('/transitions/trash.html', value, patientId ? { patient_id: patientId } : {});
   };
 
   applySearch(query);
@@ -146,9 +167,15 @@ async function setupTransitionsTrashPage() {
   });
 }
 
-function renderTransitionsTable(tbody, rows, permissions, query = '') {
+function renderTransitionsTable(tbody, rows, permissions, query = '', newTransitionHref = '/transitions/form.html', scopedPatientId = '') {
   if (!Array.isArray(rows) || rows.length === 0) {
-    tbody.innerHTML = SISELO.emptyTableRow(7, 'Nenhuma transicao encontrada.');
+    tbody.innerHTML = SISELO.emptyTableRow(
+      7,
+      'Nenhuma transicao encontrada.',
+      permissions.has('transitions.create')
+        ? { label: '+ Nova transicao', href: newTransitionHref }
+        : null
+    );
     return;
   }
 
@@ -163,7 +190,7 @@ function renderTransitionsTable(tbody, rows, permissions, query = '') {
       <td>
         <div class="table-actions">
           ${renderTransitionViewAction(row)}
-          ${renderTransitionEditAction(row, permissions)}
+          ${renderTransitionEditAction(row, permissions, scopedPatientId)}
           ${renderTransitionDeleteAction(row, permissions)}
         </div>
       </td>
@@ -240,7 +267,7 @@ function renderTransitionViewAction(row) {
   return SISELO.iconLink('view', `/patients/show.html?id=${row.patient_id}&tab=transicoes`, 'Paciente 360');
 }
 
-function renderTransitionEditAction(row, permissions) {
+function renderTransitionEditAction(row, permissions, scopedPatientId = '') {
   if (!permissions.has('transitions.update')) {
     return '';
   }
@@ -250,7 +277,7 @@ function renderTransitionEditAction(row, permissions) {
     return '';
   }
 
-  return SISELO.iconLink('edit', `/transitions/form.html?id=${encodeURIComponent(id)}`, 'Editar transicao');
+  return SISELO.iconLink('edit', `/transitions/form.html?id=${encodeURIComponent(id)}${scopedPatientId ? `&patient_id=${encodeURIComponent(scopedPatientId)}` : ''}`, 'Editar transicao');
 }
 
 function renderTransitionDeleteAction(row, permissions) {
@@ -294,7 +321,7 @@ function getTransitionStatusConfig(status) {
 function bindTransitionListActions(tbody) {
   tbody.querySelectorAll('[data-delete-id]').forEach((button) => {
     button.addEventListener('click', async () => {
-      if (!SISELO.confirmDeletion('a transicao de', button.dataset.deleteLabel)) return;
+      if (!await SISELO.confirmDeletion('a transicao de', button.dataset.deleteLabel)) return;
 
       try {
         await SISELO.apiRequest('/transitions/soft_delete.php', {

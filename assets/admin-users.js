@@ -16,10 +16,14 @@ async function setupAdminUsersListPage() {
   }
 
   SISELO.bindShell('admin');
+  const permissions = SISELO.getUiPermissions(user);
   const query = SISELO.queryParam('q') || '';
   const searchInput = document.getElementById('search-input');
   const searchForm = document.getElementById('search-form');
+  const newUserLink = document.getElementById('new-admin-user-link');
+  const canCreateUser = permissions.has('admin.manage');
   searchInput.value = query;
+  newUserLink.hidden = !canCreateUser;
   const tbody = document.getElementById('users-table-body');
   let rows = [];
 
@@ -31,7 +35,9 @@ async function setupAdminUsersListPage() {
   }
 
   const applySearch = (value) => {
-    renderAdminUsersTable(tbody, filterAdminUserRows(rows, value), value);
+    const filteredRows = filterAdminUserRows(rows, value);
+    newUserLink.hidden = !canCreateUser || filteredRows.length === 0;
+    renderAdminUsersTable(tbody, filteredRows, value, canCreateUser);
     bindAdminUserActions(tbody);
     SISELO.syncSearchUrl('/admin/users/list.html', value);
   };
@@ -48,9 +54,15 @@ async function setupAdminUsersListPage() {
   });
 }
 
-function renderAdminUsersTable(tbody, rows, query = '') {
+function renderAdminUsersTable(tbody, rows, query = '', canCreateUser = false) {
   if (!Array.isArray(rows) || rows.length === 0) {
-    tbody.innerHTML = SISELO.emptyTableRow(6, 'Nenhum usuario encontrado.');
+    tbody.innerHTML = SISELO.emptyTableRow(
+      6,
+      'Nenhum usuario encontrado.',
+      canCreateUser
+        ? { label: '+ Novo usuario', href: '/admin/users/form.html' }
+        : null
+    );
     return;
   }
 

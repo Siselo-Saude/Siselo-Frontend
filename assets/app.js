@@ -3,6 +3,7 @@
   const SESSION_KEY = 'siselo_session';
   const CSRF_KEY = 'siselo_csrf';
   const NAVIGATION_KEY = 'siselo_navigation';
+  const CADH_SEARCH_KEY = 'siselo_cadh_search';
   const CRUD_UI_PERMISSIONS = [
     'patients.view',
     'patients.create',
@@ -26,38 +27,6 @@
     'transitions.restore',
     'admin.manage',
   ];
-  const MOCK_API_SCRIPT_PATH = '/assets/mock-api.js';
-  let mockApiLoader = null;
-
-  function isMockDataEnabled() {
-    return config.useMockData === true;
-  }
-
-  function loadMockApi() {
-    if (!isMockDataEnabled()) {
-      return Promise.resolve(null);
-    }
-
-    if (window.SISELO_MOCK_API) {
-      return Promise.resolve(window.SISELO_MOCK_API);
-    }
-
-    if (mockApiLoader) {
-      return mockApiLoader;
-    }
-
-    mockApiLoader = new Promise((resolve, reject) => {
-      const script = document.createElement('script');
-      script.src = MOCK_API_SCRIPT_PATH;
-      script.async = true;
-      script.onload = () => resolve(window.SISELO_MOCK_API || null);
-      script.onerror = () => reject(new Error('Nao foi possivel carregar os dados mock do frontend.'));
-      document.head.appendChild(script);
-    });
-
-    return mockApiLoader;
-  }
-
   function escapeHtml(value) {
     return String(value ?? '')
       .replace(/&/g, '&amp;')
@@ -116,11 +85,7 @@
 
   function matchesPersonNamePrefix(value, search) {
     const state = getSearchState(search);
-    if (!state.hasLetters || !state.nameText) {
-      return false;
-    }
-
-    return normalizeSearchText(value).startsWith(state.nameText);
+    return Boolean(findPersonNamePrefixRange(value, state));
   }
 
   function matchesSearchText(value, search) {
@@ -168,7 +133,7 @@
     }
   }
 
-  function buildNormalizedCharMap(value) {
+  function buildPersonNameCharMap(value) {
     const original = String(value ?? '');
     let normalized = '';
     const indexMap = [];
@@ -179,20 +144,56 @@
         .replace(/[\u0300-\u036f]/g, '')
         .toLowerCase();
 
-      if (!normalizedChunk) {
-        continue;
-      }
-
       for (const character of normalizedChunk) {
-        normalized += character;
-        indexMap.push(index);
+        if (/[a-z]/.test(character)) {
+          normalized += character;
+          indexMap.push(index);
+        } else if (normalized && !normalized.endsWith(' ')) {
+          normalized += ' ';
+          indexMap.push(index);
+        }
       }
+    }
+
+    while (normalized.endsWith(' ')) {
+      normalized = normalized.slice(0, -1);
+      indexMap.pop();
     }
 
     return {
       original,
       normalized,
       indexMap,
+    };
+  }
+
+  function findPersonNamePrefixRange(value, search) {
+    const state = getSearchState(search);
+    if (!state.hasLetters || !state.nameText) {
+      return null;
+    }
+
+    const mapped = buildPersonNameCharMap(value);
+    let highlightStart = mapped.normalized.startsWith(state.nameText) ? 0 : -1;
+    if (highlightStart === -1) {
+      const matchIndex = mapped.normalized.indexOf(` ${state.nameText}`);
+      highlightStart = matchIndex === -1 ? -1 : matchIndex + 1;
+    }
+
+    if (highlightStart === -1) {
+      return null;
+    }
+
+    const highlightEnd = highlightStart + state.nameText.length - 1;
+    const originalStart = mapped.indexMap[highlightStart];
+    const originalEnd = mapped.indexMap[highlightEnd];
+    if (originalStart === undefined || originalEnd === undefined) {
+      return null;
+    }
+
+    return {
+      start: originalStart,
+      end: originalEnd + 1,
     };
   }
 
@@ -207,19 +208,13 @@
       return escapeHtml(original);
     }
 
-    const mapped = buildNormalizedCharMap(original);
-    if (!mapped.normalized.startsWith(state.nameText)) {
+    const matchRange = findPersonNamePrefixRange(original, state);
+    if (!matchRange) {
       return escapeHtml(original);
     }
 
-    const lastMatchedIndex = mapped.indexMap[state.nameText.length - 1];
-    if (lastMatchedIndex === undefined) {
-      return escapeHtml(original);
-    }
-
-    const highlightEnd = lastMatchedIndex + 1;
     return `
-      <mark class="search-highlight">${escapeHtml(original.slice(0, highlightEnd))}</mark>${escapeHtml(original.slice(highlightEnd))}
+      ${escapeHtml(original.slice(0, matchRange.start))}<mark class="search-highlight">${escapeHtml(original.slice(matchRange.start, matchRange.end))}</mark>${escapeHtml(original.slice(matchRange.end))}
     `.trim();
   }
 
@@ -241,6 +236,7 @@
     sessionStorage.removeItem(SESSION_KEY);
     sessionStorage.removeItem(CSRF_KEY);
     sessionStorage.removeItem(NAVIGATION_KEY);
+    sessionStorage.removeItem(CADH_SEARCH_KEY);
   }
 
   function getSession() {
@@ -313,19 +309,26 @@
   }
 
   function resolveBackTarget(fallback) {
-    const current = getCurrentAppPath();
-    const referrerTarget = normalizeAppPath(document.referrer);
-    if (referrerTarget && referrerTarget !== current) {
-      return referrerTarget;
+    const target = normalizeAppPath(fallback) || '/index.html';
+    const patientId = normalizeEntityId(queryParam('patient_id'));
+
+    if (!patientId) {
+      return target;
     }
 
-    const state = readNavigationState();
-    const previousTarget = normalizeAppPath(state.previous);
-    if (previousTarget && previousTarget !== current) {
-      return previousTarget;
+    const url = new URL(target, location.origin);
+    const scopedListPaths = [
+      '/care-plans/list.html',
+      '/encounters/list.html',
+      '/transitions/list.html',
+    ];
+
+    if (scopedListPaths.includes(url.pathname) && !url.searchParams.get('patient_id')) {
+      url.searchParams.set('patient_id', patientId);
+      return `${url.pathname}${url.search}${url.hash}`;
     }
 
-    return normalizeAppPath(fallback) || '/index.html';
+    return target;
   }
 
   function bindBackLinks() {
@@ -335,6 +338,7 @@
       }
 
       link.dataset.backLinkBound = 'true';
+      link.href = resolveBackTarget(link.dataset.fallback || link.getAttribute('href'));
       link.addEventListener('click', (event) => {
         event.preventDefault();
         location.href = resolveBackTarget(link.dataset.fallback || link.getAttribute('href'));
@@ -343,17 +347,6 @@
   }
 
   async function apiRequest(path, options = {}) {
-    if (isMockDataEnabled()) {
-      const mockApi = await loadMockApi().catch(() => null);
-      if (mockApi && typeof mockApi.supports === 'function' && mockApi.supports(path)) {
-        const mockPayload = await mockApi.handle(path, options);
-        if (mockPayload && typeof mockPayload === 'object' && (mockPayload.user || typeof mockPayload.csrf === 'string')) {
-          saveSessionPayload(mockPayload);
-        }
-        return mockPayload;
-      }
-    }
-
     const method = options.method || 'GET';
     const headers = new Headers(options.headers || {});
     const body = options.body || null;
@@ -417,7 +410,7 @@
     try {
       await apiRequest('/auth/logout.php', { method: 'POST', body: {} });
     } catch (error) {
-      // ignora para manter a saida simples
+      // Mantem a saida local mesmo se o backend nao responder.
     } finally {
       clearSession();
       location.href = '/login.html';
@@ -431,55 +424,84 @@
     }
   }
 
+  function ensureTopbarActions(user, permissions) {
+    const topbar = document.querySelector('.topbar');
+    if (!topbar) {
+      return;
+    }
+
+    const brand = topbar.querySelector('.topbar-brand');
+    let left = topbar.querySelector('.topbar-left');
+    if (!left) {
+      left = document.createElement('div');
+      left.className = 'topbar-left';
+
+      if (brand) {
+        topbar.insertBefore(left, brand);
+        left.appendChild(brand);
+      } else {
+        topbar.prepend(left);
+      }
+    }
+
+    let logoutButton = left.querySelector('#logout-button');
+    if (!logoutButton) {
+      logoutButton = document.createElement('a');
+      logoutButton.id = 'logout-button';
+      logoutButton.className = 'topbar-logout';
+      logoutButton.href = '/login.html';
+      logoutButton.textContent = 'Sair';
+      left.insertBefore(logoutButton, left.firstChild);
+    }
+
+    if (logoutButton.dataset.bound !== 'true') {
+      logoutButton.dataset.bound = 'true';
+      logoutButton.addEventListener('click', (event) => {
+        event.preventDefault();
+        logout();
+      });
+    }
+
+    let accountLink = topbar.querySelector('#topbar-account-link');
+    if (!accountLink) {
+      accountLink = document.createElement('a');
+      accountLink.id = 'topbar-account-link';
+      accountLink.className = 'topbar-account';
+      topbar.appendChild(accountLink);
+    }
+
+    accountLink.href = permissions.has('admin.manage') ? '/admin/users/list.html' : '#';
+    accountLink.textContent = user && user.name ? user.name : 'Admin';
+    accountLink.title = 'Admin';
+    accountLink.setAttribute('aria-label', 'Admin');
+    accountLink.hidden = !permissions.has('admin.manage');
+  }
+
   function bindShell(activeKey) {
     rememberNavigationPage();
 
     const user = getSession();
     const permissions = getUiPermissions(user);
+    const cadhPages = ['patients', 'careplans', 'encounters', 'transitions'];
+    const activeNavKey = cadhPages.includes(activeKey) ? 'cadh' : activeKey;
     const links = {
       home: '/index.html',
-      patients: '/patients/list.html',
-      admin: '/admin/users/list.html',
-      careplans: '/care-plans/list.html',
-      encounters: '/encounters/list.html',
-      transitions: '/transitions/list.html',
       cadh: '/cadh/index.html',
+      ubs: '#',
     };
 
     Object.keys(links).forEach((key) => {
       const link = document.getElementById(`nav-${key}`);
       if (link) {
         link.href = links[key];
-        if (key === activeKey) {
+        if (key === activeNavKey) {
           link.classList.add('is-active');
         }
       }
     });
 
-    const guardedLinks = {
-      'nav-patients': permissions.has('patients.view'),
-      'nav-careplans': permissions.has('careplans.view'),
-      'nav-encounters': permissions.has('encounters.view'),
-      'nav-transitions': permissions.has('transitions.view'),
-      'nav-admin': permissions.has('admin.manage'),
-    };
-
-    Object.keys(guardedLinks).forEach((id) => {
-      const link = document.getElementById(id);
-      if (link) {
-        link.hidden = !guardedLinks[id];
-      }
-    });
-
     setText('current-user-name', user ? user.name : '');
-
-    const logoutButton = document.getElementById('logout-button');
-    if (logoutButton) {
-      logoutButton.addEventListener('click', (event) => {
-        event.preventDefault();
-        logout();
-      });
-    }
+    ensureTopbarActions(user, permissions);
 
     bindBackLinks();
   }
@@ -499,12 +521,163 @@
     return Number.isFinite(numericValue) && numericValue > 0 ? String(numericValue) : '';
   }
 
+  function filterByEntityId(rows, key, value) {
+    const entityId = normalizeEntityId(value);
+    const safeRows = Array.isArray(rows) ? rows : [];
+
+    if (!entityId) {
+      return safeRows;
+    }
+
+    return safeRows.filter((row) => normalizeEntityId(row && row[key]) === entityId);
+  }
+
+  function filterRowsByPatientId(rows, patientId) {
+    return filterByEntityId(rows, 'patient_id', patientId);
+  }
+
+  function filterPatientsById(patients, patientId) {
+    return filterByEntityId(patients, 'id', patientId);
+  }
+
   function showUnavailableAction(message) {
     window.alert(message || 'Nenhum registro carregado para esta acao.');
   }
 
   function showActionError(message) {
     window.alert(message || 'Nao foi possivel concluir esta acao agora.');
+  }
+
+  function ensureConfirmationModal() {
+    let overlay = document.getElementById('siselo-confirmation-modal');
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.id = 'siselo-confirmation-modal';
+      overlay.className = 'confirmation-modal-overlay';
+      overlay.hidden = true;
+      overlay.innerHTML = `
+        <div class="confirmation-modal" role="dialog" aria-modal="true" aria-labelledby="confirmation-modal-title" aria-describedby="confirmation-modal-message confirmation-modal-description" tabindex="-1">
+          <div class="confirmation-modal-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false">
+              <path d="M12 2 2 20h20L12 2Zm1 15h-2v-2h2v2Zm0-4h-2V8h2v5Z"/>
+            </svg>
+          </div>
+          <div class="confirmation-modal-copy">
+            <h2 id="confirmation-modal-title">Confirmar acao</h2>
+            <p id="confirmation-modal-message"></p>
+            <p id="confirmation-modal-description"></p>
+          </div>
+          <div class="confirmation-modal-actions">
+            <button type="button" class="btn confirmation-modal-cancel" data-confirm-cancel>Cancelar</button>
+            <button type="button" class="btn btn-danger confirmation-modal-confirm" data-confirm-ok>Apagar</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(overlay);
+    }
+
+    return {
+      overlay,
+      dialog: overlay.querySelector('.confirmation-modal'),
+      title: overlay.querySelector('#confirmation-modal-title'),
+      message: overlay.querySelector('#confirmation-modal-message'),
+      description: overlay.querySelector('#confirmation-modal-description'),
+      cancelButton: overlay.querySelector('[data-confirm-cancel]'),
+      confirmButton: overlay.querySelector('[data-confirm-ok]'),
+    };
+  }
+
+  function getFocusableElements(container) {
+    return Array.from(container.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'))
+      .filter((element) => !element.disabled && !element.hasAttribute('hidden'));
+  }
+
+  function showConfirmationDialog(options = {}) {
+    if (!document.body) {
+      return Promise.resolve(false);
+    }
+
+    const modal = ensureConfirmationModal();
+    const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+
+    modal.title.textContent = options.title || 'Confirmar acao';
+    modal.message.textContent = options.message || 'Deseja continuar?';
+    modal.description.textContent = options.description || '';
+    modal.description.hidden = !options.description;
+    modal.cancelButton.textContent = options.cancelLabel || 'Cancelar';
+    modal.confirmButton.textContent = options.confirmLabel || 'Confirmar';
+
+    modal.overlay.hidden = false;
+    modal.overlay.classList.add('is-open');
+    document.body.classList.add('modal-open');
+
+    return new Promise((resolve) => {
+      let resolved = false;
+
+      const close = (confirmed) => {
+        if (resolved) {
+          return;
+        }
+
+        resolved = true;
+        modal.overlay.classList.remove('is-open');
+        modal.overlay.hidden = true;
+        document.body.classList.remove('modal-open');
+        modal.confirmButton.removeEventListener('click', confirm);
+        modal.cancelButton.removeEventListener('click', cancel);
+        modal.overlay.removeEventListener('click', cancelFromBackdrop);
+        document.removeEventListener('keydown', handleKeydown);
+
+        if (previousFocus && typeof previousFocus.focus === 'function') {
+          previousFocus.focus();
+        }
+
+        resolve(confirmed);
+      };
+
+      const confirm = () => close(true);
+      const cancel = () => close(false);
+      const cancelFromBackdrop = (event) => {
+        if (event.target === modal.overlay) {
+          close(false);
+        }
+      };
+      const handleKeydown = (event) => {
+        if (event.key === 'Escape') {
+          event.preventDefault();
+          close(false);
+          return;
+        }
+
+        if (event.key !== 'Tab') {
+          return;
+        }
+
+        const focusableElements = getFocusableElements(modal.dialog);
+        if (!focusableElements.length) {
+          event.preventDefault();
+          modal.dialog.focus();
+          return;
+        }
+
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (event.shiftKey && document.activeElement === firstElement) {
+          event.preventDefault();
+          lastElement.focus();
+        } else if (!event.shiftKey && document.activeElement === lastElement) {
+          event.preventDefault();
+          firstElement.focus();
+        }
+      };
+
+      modal.confirmButton.addEventListener('click', confirm);
+      modal.cancelButton.addEventListener('click', cancel);
+      modal.overlay.addEventListener('click', cancelFromBackdrop);
+      document.addEventListener('keydown', handleKeydown);
+      modal.cancelButton.focus();
+    });
   }
 
   function confirmDeletion(entityName, itemLabel) {
@@ -514,9 +687,13 @@
       ? `${normalizedEntityName} "${normalizedLabel}"`
       : `este ${normalizedEntityName}`;
 
-    return window.confirm(
-      `Deseja realmente apagar ${target}?\n\nO item sera enviado para a lixeira e podera ser restaurado depois.`
-    );
+    return showConfirmationDialog({
+      title: 'Apagar registro',
+      message: `Deseja realmente apagar ${target}?`,
+      description: 'O item sera enviado para a lixeira e podera ser restaurado depois.',
+      confirmLabel: 'Apagar',
+      cancelLabel: 'Cancelar',
+    });
   }
 
   function showAlert(id, message, type) {
@@ -1346,10 +1523,17 @@
     return `<button ${attrs}>${actionIcon(kind)}</button>`;
   }
 
-  function emptyTableRow(colspan, title, description = '') {
+  function emptyTableRow(colspan, title, description = '', action = null) {
+    const resolvedAction = description && typeof description === 'object' ? description : action;
     const safeColspan = Math.max(1, Number(colspan || 1));
     const safeTitle = String(title || 'Nenhum registro encontrado.').trim();
-    const safeDescription = String(description || '').trim();
+    const safeDescription = typeof description === 'object' ? '' : String(description || '').trim();
+    const actionHtml = resolvedAction && resolvedAction.href && resolvedAction.label
+      ? `<a ${actionAttributes({
+        class: resolvedAction.class || 'btn btn-primary table-empty-action',
+        href: resolvedAction.href,
+      })}>${escapeHtml(resolvedAction.label)}</a>`
+      : '';
 
     return `
       <tr class="table-empty-row">
@@ -1362,6 +1546,7 @@
             </div>
             <p class="table-empty-title">${escapeHtml(safeTitle)}</p>
             ${safeDescription ? `<p class="table-empty-text">${escapeHtml(safeDescription)}</p>` : ''}
+            ${actionHtml}
           </div>
         </td>
       </tr>
@@ -1403,6 +1588,8 @@
     showAlert,
     todayDateInputValue,
     getUiPermissions,
+    filterPatientsById,
+    filterRowsByPatientId,
     normalizeEntityId,
     validateEnhancedDateInputs,
   };
