@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Usuario 360 - SISELO</title>
+  <title>Usuário 360 - SISELO</title>
   <link rel="stylesheet" href="/assets/app.css">
 </head>
 <body data-page="patients-show">
@@ -17,31 +17,40 @@
   </header>
 
   <main class="container">
-    <section class="card">
-      <h1 class="page-title">Usuario 360</h1>
-      <div id="page-alert" class="alert" hidden></div>
-
-      <p id="patient-summary" class="profile-block"></p>
-      <div id="patient-notes"></div>
-
-      <div id="patient-actions" class="actions" style="margin:18px 0;"></div>
-
-      <div class="tabs" style="margin:20px 0;">
-        <a class="tab-link" id="patient-careplans-link" href="#">Planos de Cuidado</a>
-        <a class="tab-link" id="patient-encounters-link" href="#">Atendimentos</a>
-        <a class="tab-link" id="patient-transitions-link" href="#">Transicoes</a>
+    <section class="card patient360-card">
+      <div class="page-heading patient360-header">
+        <div>
+          <h1 class="page-title">Usuário 360</h1>
+        </div>
+        <div class="actions patient360-header-actions">
+          <button class="btn btn-primary" id="patient-pdf-button" type="button">Imprimir prontuário</button>
+          <a class="btn" id="patient-back-link" href="/patients/list.html" data-back-link data-fallback="/patients/list.html">Voltar</a>
+        </div>
       </div>
 
-      <section id="patient-panel-planos">
-        <h2 class="page-title" style="font-size:1.1rem;">Planos de Cuidado</h2>
+      <div id="page-alert" class="alert" hidden></div>
+
+      <div id="patient-overview" class="patient360-overview"></div>
+      <div id="patient-notes" class="patient360-note-grid"></div>
+
+      <div id="patient-actions" class="actions patient360-actions"></div>
+
+      <div class="tabs patient360-tabs">
+        <a class="tab-link" id="patient-careplans-link" href="#">Planos de Cuidado</a>
+        <a class="tab-link" id="patient-encounters-link" href="#">Atendimentos</a>
+        <a class="tab-link" id="patient-transitions-link" href="#">Transições</a>
+      </div>
+
+      <section id="patient-panel-planos" class="patient360-panel">
+        <h2 class="page-title patient360-panel-title">Planos de Cuidado</h2>
         <div class="table-scroll">
           <table class="data-table care-plans-table">
             <thead>
               <tr>
                 <th>ID</th>
-                <th>Inicio</th>
+                <th>Início</th>
                 <th>Fim</th>
-                <th>Acoes</th>
+                <th>Ações</th>
               </tr>
             </thead>
             <tbody id="care-plans-table-body"></tbody>
@@ -49,8 +58,8 @@
         </div>
       </section>
 
-      <section id="patient-panel-atendimentos">
-        <h2 class="page-title" style="font-size:1.1rem; margin-top:24px;">Atendimentos</h2>
+      <section id="patient-panel-atendimentos" class="patient360-panel">
+        <h2 class="page-title patient360-panel-title">Atendimentos</h2>
         <div class="table-scroll">
           <table class="data-table encounters-table">
             <thead>
@@ -58,7 +67,7 @@
                 <th>Data</th>
                 <th>Especialidade</th>
                 <th>Resumo</th>
-                <th>Acoes</th>
+                <th>Ações</th>
               </tr>
             </thead>
             <tbody id="encounters-table-body"></tbody>
@@ -66,8 +75,8 @@
         </div>
       </section>
 
-      <section id="patient-panel-transicoes">
-        <h2 class="page-title" style="font-size:1.1rem; margin-top:24px;">Transicoes</h2>
+      <section id="patient-panel-transicoes" class="patient360-panel">
+        <h2 class="page-title patient360-panel-title">Transições</h2>
         <div class="table-scroll">
           <table class="data-table transitions-table">
             <thead>
@@ -77,7 +86,7 @@
                 <th>Para</th>
                 <th>Status</th>
                 <th>Notas</th>
-                <th>Acoes</th>
+                <th>Ações</th>
               </tr>
             </thead>
             <tbody id="transitions-table-body"></tbody>
@@ -85,8 +94,7 @@
         </div>
       </section>
 
-      <div class="actions" style="margin-top:18px;">
-        <a class="btn" id="patient-back-link" href="/patients/list.html" data-back-link data-fallback="/patients/list.html">Voltar</a>
+      <div class="actions patient360-footer">
         <a class="btn btn-primary" href="/index.html">Home</a>
       </div>
     </section>

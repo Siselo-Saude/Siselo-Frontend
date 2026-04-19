@@ -4,29 +4,7 @@
   const CSRF_KEY = 'siselo_csrf';
   const NAVIGATION_KEY = 'siselo_navigation';
   const CADH_SEARCH_KEY = 'siselo_cadh_search';
-  const CRUD_UI_PERMISSIONS = [
-    'patients.view',
-    'patients.create',
-    'patients.update',
-    'patients.delete',
-    'patients.restore',
-    'careplans.view',
-    'careplans.create',
-    'careplans.update',
-    'careplans.delete',
-    'careplans.restore',
-    'encounters.view',
-    'encounters.create',
-    'encounters.update',
-    'encounters.delete',
-    'encounters.restore',
-    'transitions.view',
-    'transitions.create',
-    'transitions.update',
-    'transitions.delete',
-    'transitions.restore',
-    'admin.manage',
-  ];
+  const FLASH_ALERT_KEY = 'siselo_flash_alert';
   function escapeHtml(value) {
     return String(value ?? '')
       .replace(/&/g, '&amp;')
@@ -103,7 +81,7 @@
       return false;
     }
 
-    return digitsOnly(value).includes(state.digits);
+    return digitsOnly(value).startsWith(state.digits);
   }
 
   function buildSearchUrl(basePath, query, extraParams = {}) {
@@ -218,6 +196,99 @@
     `.trim();
   }
 
+  function highlightSearchDigits(value, search, fallback = '<span class="muted">-</span>') {
+    const original = String(value ?? '').trim();
+    if (!original) {
+      return fallback;
+    }
+
+    const state = getSearchState(search);
+    if (!state.hasDigits) {
+      return escapeHtml(original);
+    }
+
+    const digits = digitsOnly(original);
+    const matchIndex = digits.indexOf(state.digits);
+    if (matchIndex === -1) {
+      return escapeHtml(original);
+    }
+
+    let digitPosition = 0;
+    let rangeStart = -1;
+    let rangeEnd = -1;
+
+    for (let index = 0; index < original.length; index += 1) {
+      if (!/\d/.test(original[index])) {
+        continue;
+      }
+
+      if (digitPosition === matchIndex) {
+        rangeStart = index;
+      }
+
+      if (digitPosition === matchIndex + state.digits.length - 1) {
+        rangeEnd = index + 1;
+        break;
+      }
+
+      digitPosition += 1;
+    }
+
+    if (rangeStart === -1 || rangeEnd === -1) {
+      return escapeHtml(original);
+    }
+
+    return `
+      ${escapeHtml(original.slice(0, rangeStart))}<mark class="search-highlight">${escapeHtml(original.slice(rangeStart, rangeEnd))}</mark>${escapeHtml(original.slice(rangeEnd))}
+    `.trim();
+  }
+
+  function filterPatientsForSearch(patients, query) {
+    const search = getSearchState(query);
+    if (!search.hasLetters && !search.hasDigits) {
+      return Array.isArray(patients) ? patients : [];
+    }
+
+    return (Array.isArray(patients) ? patients : []).filter((patient) => {
+      const matchesName = search.hasLetters
+        ? matchesPersonNamePrefix(patient && patient.full_name, search)
+        : true;
+      const matchesSes = search.hasDigits
+        ? digitsOnly(patient && patient.ses).includes(search.digits)
+        : true;
+
+      return matchesName && matchesSes;
+    });
+  }
+
+  function normalizePatientSearchRow(patient) {
+    return {
+      id: normalizeEntityId(patient && patient.id),
+      full_name: String((patient && patient.full_name) || '').trim(),
+      ses: String((patient && patient.ses) || '').trim(),
+    };
+  }
+
+  function mergePatientSearchRows(...rowGroups) {
+    const merged = new Map();
+
+    rowGroups.flat().forEach((row) => {
+      const normalizedRow = normalizePatientSearchRow(row);
+      if (!normalizedRow.id) {
+        return;
+      }
+
+      const sesKey = digitsOnly(normalizedRow.ses);
+      const identityKey = sesKey ? `ses:${sesKey}` : `id:${normalizedRow.id}`;
+      merged.set(identityKey, {
+        ...(merged.get(identityKey) || {}),
+        ...normalizedRow,
+      });
+    });
+
+    return Array.from(merged.values());
+  }
+
   function getApiBaseUrl() {
     return String(config.apiBaseUrl || '').replace(/\/+$/, '');
   }
@@ -237,6 +308,7 @@
     sessionStorage.removeItem(CSRF_KEY);
     sessionStorage.removeItem(NAVIGATION_KEY);
     sessionStorage.removeItem(CADH_SEARCH_KEY);
+    sessionStorage.removeItem(FLASH_ALERT_KEY);
   }
 
   function getSession() {
@@ -253,12 +325,55 @@
     }
   }
 
+  function readCadhSearchState() {
+    try {
+      return JSON.parse(sessionStorage.getItem(CADH_SEARCH_KEY) || 'null');
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function writeCadhSearchState(state) {
+    if (!state) {
+      sessionStorage.removeItem(CADH_SEARCH_KEY);
+      return;
+    }
+
+    sessionStorage.setItem(CADH_SEARCH_KEY, JSON.stringify(state));
+  }
+
   function getCsrfToken() {
     return sessionStorage.getItem(CSRF_KEY) || '';
   }
 
   function getCurrentAppPath() {
     return `${location.pathname}${location.search}${location.hash}`;
+  }
+
+  function getClinicalModuleMeta(moduleKey) {
+    const meta = {
+      careplans: {
+        singular: 'plano de cuidado',
+        emptyTitle: 'Usuário sem plano de cuidado registrado.',
+        emptyDescription: '',
+      },
+      encounters: {
+        singular: 'atendimento',
+        emptyTitle: 'Usuário sem atendimento registrado.',
+        emptyDescription: '',
+      },
+      transitions: {
+        singular: 'transição do cuidado',
+        emptyTitle: 'Usuário sem transição do cuidado registrada.',
+        emptyDescription: '',
+      },
+    };
+
+    return meta[moduleKey] || {
+      singular: 'registro assistencial',
+      emptyTitle: 'Usuário sem registros assistenciais vinculados.',
+      emptyDescription: '',
+    };
   }
 
   function normalizeAppPath(value) {
@@ -310,7 +425,12 @@
 
   function resolveBackTarget(fallback) {
     const target = normalizeAppPath(fallback) || '/index.html';
+    const explicitReturnTarget = normalizeAppPath(queryParam('return_to'));
     const patientId = normalizeEntityId(queryParam('patient_id'));
+
+    if (explicitReturnTarget) {
+      return explicitReturnTarget;
+    }
 
     if (!patientId) {
       return target;
@@ -344,6 +464,382 @@
         location.href = resolveBackTarget(link.dataset.fallback || link.getAttribute('href'));
       });
     });
+  }
+
+  function enhanceSearchInput(input) {
+    if (!(input instanceof HTMLInputElement) || input.dataset.searchDecorated === 'true') {
+      return input;
+    }
+
+    let wrapper = input.parentElement;
+    if (!(wrapper instanceof HTMLElement) || !wrapper.classList.contains('search-input-shell')) {
+      wrapper = document.createElement('div');
+      wrapper.className = 'search-input-shell';
+      input.parentNode?.insertBefore(wrapper, input);
+      wrapper.appendChild(input);
+    }
+
+    let icon = wrapper.querySelector('.search-input-icon');
+    if (!(icon instanceof HTMLElement)) {
+      icon = document.createElement('span');
+      icon.className = 'search-input-icon';
+      icon.setAttribute('aria-hidden', 'true');
+      icon.innerHTML = actionIcon('search');
+      wrapper.prepend(icon);
+    }
+
+    input.classList.add('search-input-control');
+    input.dataset.searchDecorated = 'true';
+    return input;
+  }
+
+  function decorateSearchInputs(root = document) {
+    const scope = root instanceof Document || root instanceof Element ? root : document;
+    const selector = [
+      '.search-toolbar input:not([type="hidden"])',
+      '.cadh-ses-search input:not([type="hidden"])',
+      'input[data-search-input="true"]:not([type="hidden"])',
+    ].join(', ');
+
+    if (scope instanceof HTMLInputElement && scope.matches(selector)) {
+      enhanceSearchInput(scope);
+      return;
+    }
+
+    scope.querySelectorAll(selector).forEach((input) => enhanceSearchInput(input));
+  }
+
+  function setupPatientSearchAutocomplete(input, options = {}) {
+    if (!(input instanceof HTMLInputElement)) {
+      return { destroy() {} };
+    }
+
+    enhanceSearchInput(input);
+    const wrapper = input.parentElement;
+    if (!(wrapper instanceof HTMLElement)) {
+      return { destroy() {} };
+    }
+
+    wrapper.classList.add('search-input-shell-has-suggestions');
+    let panel = wrapper.querySelector('.search-suggestions');
+    if (!(panel instanceof HTMLElement)) {
+      panel = document.createElement('div');
+      panel.className = 'search-suggestions';
+      panel.hidden = true;
+      panel.setAttribute('role', 'listbox');
+      wrapper.appendChild(panel);
+    }
+
+    const onPick = typeof options.onPick === 'function'
+      ? options.onPick
+      : (patient) => {
+        location.href = `/patients/show.html?id=${encodeURIComponent(patient.id)}&tab=planos`;
+      };
+    const getInputValue = typeof options.getInputValue === 'function'
+      ? options.getInputValue
+      : (patient) => patient.full_name || patient.ses || input.value;
+    const renderName = typeof options.renderName === 'function'
+      ? options.renderName
+      : (patient, query) => highlightPersonName(
+        patient.full_name,
+        query,
+        escapeHtml(patient.full_name || '-')
+      );
+    const renderMeta = typeof options.renderMeta === 'function'
+      ? options.renderMeta
+      : (patient, query) => `SES: ${highlightSearchDigits(patient.ses, query, escapeHtml(patient.ses || '-'))}`;
+    const filterRows = typeof options.filterRows === 'function'
+      ? options.filterRows
+      : (rows, search) => filterPatientsForSearch(rows, search);
+    const minLength = Math.max(1, Number(options.minLength || 1));
+    const limit = Math.max(4, Number(options.limit || 8));
+    const localRows = Array.isArray(options.rows) ? options.rows : [];
+    const seenPatients = new Map();
+    let activeIndex = -1;
+    let visiblePatients = [];
+    let debounceTimer = 0;
+    let requestToken = 0;
+
+    const mergeRows = (rows) => {
+      mergePatientSearchRows((Array.isArray(rows) ? rows : []).map((row) => ({
+        id: (row && row.patient_id) || (row && row.id),
+        full_name: row && row.full_name,
+        ses: row && row.ses,
+      }))).forEach((patient) => {
+        const sesKey = digitsOnly(patient.ses);
+        const identityKey = sesKey ? `ses:${sesKey}` : `id:${patient.id}`;
+        seenPatients.set(identityKey, patient);
+      });
+    };
+
+    mergeRows(localRows);
+
+    const updateExpandedState = () => {
+      input.setAttribute('aria-expanded', String(!panel.hidden));
+    };
+
+    const closePanel = () => {
+      panel.hidden = true;
+      activeIndex = -1;
+      input.removeAttribute('aria-activedescendant');
+      updateExpandedState();
+    };
+
+    const renderPanel = (query, patients) => {
+      visiblePatients = patients.slice(0, limit);
+      if (!visiblePatients.length) {
+        panel.innerHTML = '';
+        closePanel();
+        return;
+      }
+
+      panel.innerHTML = visiblePatients.map((patient, index) => `
+        <button
+          type="button"
+          id="search-suggestion-${patient.id}"
+          class="search-suggestion${index === activeIndex ? ' is-active' : ''}"
+          role="option"
+          aria-selected="${index === activeIndex ? 'true' : 'false'}"
+          data-patient-id="${patient.id}"
+        >
+          <span class="search-suggestion-name">${renderName(patient, query)}</span>
+          <span class="search-suggestion-meta">${renderMeta(patient, query)}</span>
+        </button>
+      `).join('');
+
+      panel.hidden = false;
+      updateExpandedState();
+
+      if (activeIndex >= 0 && visiblePatients[activeIndex]) {
+        input.setAttribute('aria-activedescendant', `search-suggestion-${visiblePatients[activeIndex].id}`);
+      } else {
+        input.removeAttribute('aria-activedescendant');
+      }
+
+      panel.querySelectorAll('[data-patient-id]').forEach((button) => {
+        button.addEventListener('mousedown', (event) => {
+          event.preventDefault();
+        });
+
+        button.addEventListener('click', () => {
+          const patient = visiblePatients.find((item) => item.id === button.dataset.patientId);
+          if (!patient) {
+            return;
+          }
+
+          input.value = getInputValue(patient);
+          closePanel();
+          onPick(patient);
+        });
+      });
+    };
+
+    const resolveSuggestions = async (query) => {
+      const trimmedQuery = String(query || '').trim();
+      if (trimmedQuery.length < minLength) {
+        closePanel();
+        return;
+      }
+
+      const search = getSearchState(trimmedQuery);
+      const localMatches = filterRows(Array.from(seenPatients.values()), search);
+      renderPanel(trimmedQuery, localMatches);
+
+      const token = ++requestToken;
+      try {
+        const data = await apiRequest('/patients/list.php?q=' + encodeURIComponent(trimmedQuery));
+        if (token !== requestToken) {
+          return;
+        }
+
+        const rows = Array.isArray(data.rows) ? data.rows : [];
+        mergeRows(rows);
+        renderPanel(trimmedQuery, filterRows(Array.from(seenPatients.values()), search));
+      } catch (error) {
+        if (token !== requestToken) {
+          return;
+        }
+      }
+    };
+
+    const handleInput = () => {
+      window.clearTimeout(debounceTimer);
+      debounceTimer = window.setTimeout(() => {
+        resolveSuggestions(input.value);
+      }, 120);
+    };
+
+    input.setAttribute('role', 'combobox');
+    input.setAttribute('aria-autocomplete', 'list');
+    input.setAttribute('aria-expanded', 'false');
+    input.addEventListener('input', handleInput);
+    input.addEventListener('focus', handleInput);
+    input.addEventListener('keydown', (event) => {
+      if (panel.hidden || !visiblePatients.length) {
+        return;
+      }
+
+      if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        activeIndex = Math.min(activeIndex + 1, visiblePatients.length - 1);
+        renderPanel(input.value, visiblePatients);
+        return;
+      }
+
+      if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        activeIndex = Math.max(activeIndex - 1, 0);
+        renderPanel(input.value, visiblePatients);
+        return;
+      }
+
+      if (event.key === 'Enter' && activeIndex >= 0 && visiblePatients[activeIndex]) {
+        event.preventDefault();
+        const patient = visiblePatients[activeIndex];
+        input.value = getInputValue(patient);
+        closePanel();
+        onPick(patient);
+        return;
+      }
+
+      if (event.key === 'Escape') {
+        closePanel();
+      }
+    });
+
+    document.addEventListener('mousedown', (event) => {
+      if (!wrapper.contains(event.target)) {
+        closePanel();
+      }
+    });
+
+    return {
+      destroy() {
+        closePanel();
+        panel.remove();
+      },
+      setRows(rows) {
+        mergeRows(rows);
+      },
+    };
+  }
+
+  function setupPatientFieldPicker(options = {}) {
+    const select = options.select instanceof HTMLSelectElement
+      ? options.select
+      : document.getElementById(String(options.select || ''));
+    const container = options.container instanceof HTMLElement
+      ? options.container
+      : document.getElementById(String(options.container || ''));
+    const placeholder = String(options.placeholder || 'Digite o nome do usuário cadastrado...');
+    const locked = options.locked === true;
+    const onChange = typeof options.onChange === 'function' ? options.onChange : () => {};
+    let patients = mergePatientSearchRows(options.rows || []);
+    let selectedId = normalizeEntityId(options.currentValue);
+
+    if (!select || !container) {
+      return {
+        getValue: () => selectedId,
+        focus: () => {},
+        setRows: () => {},
+      };
+    }
+
+    container.innerHTML = `
+      <input
+        type="text"
+        autocomplete="off"
+        data-search-input="true"
+        placeholder="${escapeHtml(placeholder)}"
+        aria-label="${escapeHtml(placeholder)}"
+      >
+    `;
+
+    const input = container.querySelector('input');
+    if (!(input instanceof HTMLInputElement)) {
+      return {
+        getValue: () => selectedId,
+        focus: () => {},
+        setRows: () => {},
+      };
+    }
+
+    const syncOptions = () => {
+      select.innerHTML = '<option value=""></option>' + patients.map((patient) => `
+        <option value="${escapeHtml(patient.id)}" ${patient.id === selectedId ? 'selected' : ''}>
+          ${escapeHtml(patient.full_name || patient.ses || patient.id)}
+        </option>
+      `).join('');
+    };
+
+    const getSelectedPatient = () => patients.find((patient) => patient.id === selectedId) || null;
+
+    const setSelectedPatient = (patient) => {
+      const normalizedPatient = patient ? normalizePatientSearchRow(patient) : null;
+      if (!normalizedPatient || !normalizedPatient.id) {
+        selectedId = '';
+        input.value = '';
+        syncOptions();
+        onChange(null);
+        return;
+      }
+
+      patients = mergePatientSearchRows(patients, [normalizedPatient]);
+      selectedId = normalizedPatient.id;
+      input.value = normalizedPatient.full_name || '';
+      syncOptions();
+      onChange(normalizedPatient);
+    };
+
+    syncOptions();
+
+    const autocomplete = setupPatientSearchAutocomplete(input, {
+      rows: patients,
+      minLength: 1,
+      onPick: setSelectedPatient,
+      getInputValue: (patient) => patient.full_name || '',
+      renderMeta: () => '',
+      filterRows: (rows, search) => {
+        if (!search.hasLetters) {
+          return [];
+        }
+
+        return (Array.isArray(rows) ? rows : []).filter((row) => (
+          matchesPersonNamePrefix(row && row.full_name, search)
+        ));
+      },
+    });
+
+    if (locked) {
+      input.readOnly = true;
+      input.setAttribute('aria-readonly', 'true');
+    }
+
+    const initialPatient = getSelectedPatient();
+    if (initialPatient) {
+      input.value = initialPatient.full_name || '';
+      onChange(initialPatient);
+    }
+
+    return {
+      getValue: () => selectedId,
+      focus: () => input.focus(),
+      setRows(nextRows) {
+        patients = mergePatientSearchRows(patients, nextRows || []);
+        syncOptions();
+        autocomplete.setRows(patients);
+        const selectedPatient = getSelectedPatient();
+        if (selectedPatient) {
+          input.value = selectedPatient.full_name || '';
+        }
+      },
+      setValue(patient) {
+        setSelectedPatient(patient);
+      },
+      destroy() {
+        autocomplete.destroy();
+      },
+    };
   }
 
   async function apiRequest(path, options = {}) {
@@ -384,6 +880,52 @@
     return payload.data;
   }
 
+  async function loadPatientClinicalContext(patientId) {
+    const normalizedId = normalizeEntityId(patientId);
+    if (!normalizedId) {
+      return null;
+    }
+
+    try {
+      return await apiRequest('/patients/show.php?id=' + encodeURIComponent(normalizedId));
+    } catch (error) {
+      return null;
+    }
+  }
+
+  async function refreshCachedPatientContext(patientId) {
+    const normalizedId = normalizeEntityId(patientId);
+    if (!normalizedId) {
+      return;
+    }
+
+    const state = readCadhSearchState();
+    if (!state || normalizeEntityId(state.patient && state.patient.id) !== normalizedId) {
+      return;
+    }
+
+    const context = await loadPatientClinicalContext(normalizedId);
+    if (!context || !context.patient) {
+      writeCadhSearchState(null);
+      return;
+    }
+
+    writeCadhSearchState({
+      ...state,
+      ses: String(context.patient.ses || state.ses || '').trim(),
+      patient: {
+        id: normalizedId,
+        full_name: context.patient.full_name || '',
+        cpf: context.patient.cpf || '',
+        ses: context.patient.ses || '',
+        birth_date: context.patient.birth_date || '',
+        first_cadh_date: context.patient.first_cadh_date || '',
+        age_label: context.patient.age_label || '',
+        race: context.patient.race || '',
+      },
+    });
+  }
+
   async function requireSession() {
     try {
       const data = await apiRequest('/auth/me.php');
@@ -392,7 +934,7 @@
       if (error.status !== 401 && error.status !== 403) {
         const cachedUser = getSession();
         if (cachedUser) {
-          showAlert('page-alert', 'Nao foi possivel confirmar a sessao agora, mas voce continuara na tela atual.', 'info');
+          showAlert('page-alert', 'Não foi possível confirmar a sessão agora, mas você continuará na tela atual.', 'info');
           return cachedUser;
         }
       }
@@ -504,6 +1046,8 @@
     ensureTopbarActions(user, permissions);
 
     bindBackLinks();
+    decorateSearchInputs(document);
+    renderFlashAlert('page-alert');
   }
 
   function queryParam(name) {
@@ -511,9 +1055,28 @@
   }
 
   function getUiPermissions(user) {
-    const permissions = new Set(user && Array.isArray(user.permissions) ? user.permissions : []);
-    CRUD_UI_PERMISSIONS.forEach((permission) => permissions.add(permission));
-    return permissions;
+    return new Set(user && Array.isArray(user.permissions) ? user.permissions : []);
+  }
+
+  function buildPatientModuleEmptyState(moduleKey, options = {}) {
+    const meta = getClinicalModuleMeta(moduleKey);
+    const patientKnown = options.patientKnown === true;
+    const canCreate = options.canCreate === true;
+    const actionHref = String(options.actionHref || '').trim();
+
+    if (!patientKnown) {
+      return {
+        title: `Nenhum ${meta.singular} encontrado.`,
+        description: '',
+        action: canCreate && actionHref ? { label: options.actionLabel || 'Novo registro', href: actionHref } : null,
+      };
+    }
+
+    return {
+      title: meta.emptyTitle,
+      description: meta.emptyDescription,
+      action: canCreate && actionHref ? { label: options.actionLabel || 'Novo registro', href: actionHref } : null,
+    };
   }
 
   function normalizeEntityId(value) {
@@ -541,11 +1104,11 @@
   }
 
   function showUnavailableAction(message) {
-    window.alert(message || 'Nenhum registro carregado para esta acao.');
+    window.alert(message || 'Nenhum registro carregado para esta ação.');
   }
 
   function showActionError(message) {
-    window.alert(message || 'Nao foi possivel concluir esta acao agora.');
+    window.alert(message || 'Não foi possível concluir esta ação agora.');
   }
 
   function ensureConfirmationModal() {
@@ -563,7 +1126,7 @@
             </svg>
           </div>
           <div class="confirmation-modal-copy">
-            <h2 id="confirmation-modal-title">Confirmar acao</h2>
+            <h2 id="confirmation-modal-title">Confirmar ação</h2>
             <p id="confirmation-modal-message"></p>
             <p id="confirmation-modal-description"></p>
           </div>
@@ -600,7 +1163,7 @@
     const modal = ensureConfirmationModal();
     const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
 
-    modal.title.textContent = options.title || 'Confirmar acao';
+    modal.title.textContent = options.title || 'Confirmar ação';
     modal.message.textContent = options.message || 'Deseja continuar?';
     modal.description.textContent = options.description || '';
     modal.description.hidden = !options.description;
@@ -688,10 +1251,26 @@
       : `este ${normalizedEntityName}`;
 
     return showConfirmationDialog({
-      title: 'Apagar registro',
+      title: 'Enviar registro para a lixeira',
+      message: `Deseja realmente mover ${target} para a lixeira?`,
+      description: 'O registro poderá ser restaurado posteriormente, se necessário.',
+      confirmLabel: 'Enviar para a lixeira',
+      cancelLabel: 'Cancelar',
+    });
+  }
+
+  function confirmPermanentDeletion(entityName, itemLabel) {
+    const normalizedEntityName = String(entityName || 'registro').trim();
+    const normalizedLabel = String(itemLabel || '').trim();
+    const target = normalizedLabel
+      ? `${normalizedEntityName} "${normalizedLabel}"`
+      : `este ${normalizedEntityName}`;
+
+    return showConfirmationDialog({
+      title: 'Apagar permanentemente',
       message: `Deseja realmente apagar ${target}?`,
-      description: 'O item sera enviado para a lixeira e podera ser restaurado depois.',
-      confirmLabel: 'Apagar',
+      description: 'Se apagar, o registro será removido para sempre e não poderá ser restaurado depois.',
+      confirmLabel: 'Apagar para sempre',
       cancelLabel: 'Cancelar',
     });
   }
@@ -712,6 +1291,46 @@
     element.hidden = false;
     element.textContent = message;
     element.className = `alert alert-${type || 'info'}`;
+  }
+
+  function setFlashAlert(message, type = 'success') {
+    const normalizedMessage = String(message || '').trim();
+    if (!normalizedMessage) {
+      sessionStorage.removeItem(FLASH_ALERT_KEY);
+      return;
+    }
+
+    sessionStorage.setItem(FLASH_ALERT_KEY, JSON.stringify({
+      message: normalizedMessage,
+      type: String(type || 'success').trim() || 'success',
+    }));
+  }
+
+  function renderFlashAlert(id = 'page-alert') {
+    const element = document.getElementById(id);
+    if (!element) {
+      return;
+    }
+
+    let flash = null;
+    try {
+      flash = JSON.parse(sessionStorage.getItem(FLASH_ALERT_KEY) || 'null');
+    } catch (error) {
+      flash = null;
+    }
+
+    sessionStorage.removeItem(FLASH_ALERT_KEY);
+
+    if (!flash || !flash.message) {
+      return;
+    }
+
+    showAlert(id, flash.message, flash.type || 'success');
+    window.setTimeout(() => {
+      if (element.textContent === flash.message) {
+        showAlert(id, '', 'info');
+      }
+    }, 2600);
   }
 
   const DATE_PICKER_MONTH_NAMES = Array.from({ length: 12 }, (_, index) => (
@@ -950,8 +1569,22 @@
     const currentValue = parseDateInputValue(input.value);
     const bounds = getDatePickerBounds(input);
     const today = normalizeDateObject(new Date());
+    const defaultYearsAgo = Number(input.dataset.dateDefaultYearsAgo || '');
 
-    // Empty calendars should open on today, not on the oldest allowed year.
+    if (!currentValue && Number.isFinite(defaultYearsAgo) && defaultYearsAgo > 0 && today) {
+      const referenceDate = createDateAtNoon(
+        today.getFullYear() - defaultYearsAgo,
+        today.getMonth(),
+        today.getDate()
+      );
+
+      return clampDateObject(
+        referenceDate || today || bounds.max || bounds.min,
+        bounds.min,
+        bounds.max
+      ) || referenceDate || today || bounds.min || bounds.max || createDateAtNoon(2026, 0, 1);
+    }
+
     return clampDateObject(
       currentValue || today || bounds.max || bounds.min,
       bounds.min,
@@ -1420,6 +2053,10 @@
       input.max = max;
     }
 
+    if (options.defaultViewYearsAgo !== undefined) {
+      input.dataset.dateDefaultYearsAgo = String(options.defaultViewYearsAgo || '');
+    }
+
     ensureDatePickerGlobalListeners();
 
     const existingInstance = DATE_PICKER_INSTANCES.get(input);
@@ -1466,6 +2103,7 @@
   }
 
   const ACTION_ICON_PATHS = {
+    search: 'M10.5 4a6.5 6.5 0 1 0 4.3 11.4l4 4 1.4-1.4-4-4A6.5 6.5 0 0 0 10.5 4Zm0 2a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9Z',
     view: 'M12 5c5.1 0 8.8 4.2 10 7-1.2 2.8-4.9 7-10 7S3.2 14.8 2 12c1.2-2.8 4.9-7 10-7Zm0 2C8.4 7 5.6 9.6 4.3 12 5.6 14.4 8.4 17 12 17s6.4-2.6 7.7-5C18.4 9.6 15.6 7 12 7Zm0 2.2a2.8 2.8 0 1 1 0 5.6 2.8 2.8 0 0 1 0-5.6Z',
     edit: 'M4 17.3V20h2.7L18.9 7.8l-2.7-2.7L4 17.3ZM20.7 6a1 1 0 0 0 0-1.4l-1.3-1.3a1 1 0 0 0-1.4 0l-1 1 2.7 2.7 1-1Z',
     delete: 'M9 3h6l1 2h4v2H4V5h4l1-2Zm-2 6h10l-.7 11H7.7L7 9Zm3 2v7h2v-7h-2Zm4 0v7h2v-7h-2Z',
@@ -1553,19 +2191,55 @@
     `;
   }
 
+  function confirmPermanentDeletion(entityName, itemLabel) {
+    const normalizedEntityName = String(entityName || 'registro').trim();
+    const normalizedLabel = String(itemLabel || '').trim();
+    const target = normalizedLabel
+      ? `${normalizedEntityName} "${normalizedLabel}"`
+      : `este ${normalizedEntityName}`;
+
+    return showConfirmationDialog({
+      title: 'Excluir permanentemente',
+      message: `Deseja excluir ${target}?`,
+      description: 'Esta aÃ§Ã£o nÃ£o poderÃ¡ ser desfeita.',
+      confirmLabel: 'Excluir',
+      cancelLabel: 'Cancelar',
+    });
+  }
+
+  function confirmPermanentDeletionSafe(entityName, itemLabel) {
+    const normalizedEntityName = String(entityName || 'registro').trim();
+    const normalizedLabel = String(itemLabel || '').trim();
+    const target = normalizedLabel
+      ? `${normalizedEntityName} "${normalizedLabel}"`
+      : `este ${normalizedEntityName}`;
+
+    return showConfirmationDialog({
+      title: 'Excluir permanentemente',
+      message: `Deseja excluir ${target}?`,
+      description: 'Esta a\u00E7\u00E3o n\u00E3o poder\u00E1 ser desfeita.',
+      confirmLabel: 'Excluir',
+      cancelLabel: 'Cancelar',
+    });
+  }
+
   window.SISELO = {
     apiRequest,
     bindShell,
     clampDateInputValue,
     confirmDeletion,
+    confirmPermanentDeletion: confirmPermanentDeletionSafe,
     clearSession,
     createSearchState,
+    decorateSearchInputs,
     digitsOnly,
     enhanceDateInput,
     escapeHtml,
+    filterPatientsForSearch,
     formatDateInputValue,
     getApiBaseUrl,
     getSession,
+    highlightSearchDigits,
     highlightPersonName,
     iconButton,
     iconLink,
@@ -1574,11 +2248,15 @@
     matchesSearchDigits,
     matchesSearchText,
     normalizeSearchText,
+    loadPatientClinicalContext,
     parseDateInputValue,
     queryParam,
+    refreshCachedPatientContext,
     requireSession,
     resolveDateInputValue,
+    resolveBackTarget,
     saveSessionPayload,
+    setFlashAlert,
     setText,
     shiftDateInputValue,
     syncEnhancedDateInput,
@@ -1586,7 +2264,10 @@
     showActionError,
     showUnavailableAction,
     showAlert,
+    setupPatientFieldPicker,
+    setupPatientSearchAutocomplete,
     todayDateInputValue,
+    buildPatientModuleEmptyState,
     getUiPermissions,
     filterPatientsById,
     filterRowsByPatientId,

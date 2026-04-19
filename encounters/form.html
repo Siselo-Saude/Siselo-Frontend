@@ -17,35 +17,52 @@
   </header>
 
   <main class="container">
-    <section class="card">
+    <section class="card transition-card">
       <a class="btn" href="/encounters/list.html" data-back-link data-fallback="/encounters/list.html">&larr; Voltar</a>
       <h1 id="form-title" class="page-title" style="margin-top:14px;">Novo Atendimento</h1>
       <div id="page-alert" class="alert" hidden></div>
 
-      <form id="encounter-form" class="form-grid">
-        <div class="field-full">
-          <label for="patient_id">Paciente *</label>
-          <select id="patient_id" name="patient_id" required></select>
-        </div>
+      <form id="encounter-form" class="transition-form-shell">
+        <section class="transition-panel transition-panel-patient">
+          <div class="transition-panel-header">
+            <h2 class="transition-panel-title">Dados do Usuário</h2>
+          </div>
 
-        <div class="field">
-          <label for="encounter_date">Data</label>
-          <input id="encounter_date" name="encounter_date" type="date" placeholder="dd/mm/aaaa" required>
-        </div>
+          <div class="transition-panel-grid">
+            <div class="field-full">
+              <label for="patient-search-input">Usuário</label>
+              <select id="patient_id" name="patient_id" class="visually-hidden" tabindex="-1" aria-hidden="true"></select>
+              <div id="encounter-user-search" class="transition-patient-search"></div>
+            </div>
+          </div>
+        </section>
 
-        <div class="field">
-          <label for="specialty">Especialidade</label>
-          <input id="specialty" name="specialty" placeholder="Ex.: Nutricao" required>
-        </div>
+        <section class="transition-panel transition-panel-details">
+          <div class="transition-panel-header">
+            <h2 class="transition-panel-title">Dados do Atendimento</h2>
+          </div>
 
-        <div class="field-full">
-          <label for="summary">Resumo</label>
-          <textarea id="summary" name="summary" placeholder="Resumo do atendimento"></textarea>
-        </div>
+          <div class="transition-panel-grid">
+            <div class="field">
+              <label for="encounter_date">Data</label>
+              <input id="encounter_date" name="encounter_date" type="date" placeholder="dd/mm/aaaa">
+            </div>
 
-        <div class="form-actions field-full">
+            <div class="field">
+              <label for="specialty">Especialidade</label>
+              <input id="specialty" name="specialty" placeholder="Ex.: Nutrição">
+            </div>
+
+            <div class="field-full">
+              <label for="summary">Registro clínico</label>
+              <textarea id="summary" name="summary" placeholder="Descreva o atendimento"></textarea>
+            </div>
+          </div>
+        </section>
+
+        <div class="form-actions transition-form-actions">
           <a class="btn" href="/encounters/list.html" data-back-link data-fallback="/encounters/list.html">Cancelar</a>
-          <button class="btn btn-primary" type="submit">Salvar</button>
+          <button class="btn btn-primary" type="submit">Salvar atendimento</button>
         </div>
       </form>
     </section>

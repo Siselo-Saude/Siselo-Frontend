@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Paciente - SISELO</title>
+  <title>Usuário - SISELO</title>
   <link rel="stylesheet" href="/assets/app.css">
 </head>
 <body data-page="patients-form">
@@ -17,147 +17,156 @@
   </header>
 
   <main class="container">
-    <section class="card">
+    <section class="card transition-card">
       <a class="btn" href="/patients/list.html" data-back-link data-fallback="/patients/list.html">&larr; Voltar</a>
-      <h1 id="form-title" class="page-title" style="margin-top:14px;">Novo Paciente</h1>
-      <p class="page-subtitle">Preencha os dados para cadastrar o paciente</p>
-
+      <h1 id="form-title" class="page-title" style="margin-top:14px;">Novo Usuário</h1>
       <div id="page-alert" class="alert" hidden></div>
 
-      <form id="patient-form">
-        <section class="form-section">
-          <h2 class="form-section-title">Identificacao</h2>
-          <div class="form-grid">
+      <form id="patient-form" class="transition-form-shell">
+        <section class="transition-panel transition-panel-patient">
+          <div class="transition-panel-header">
+            <h2 class="transition-panel-title">Identificação</h2>
+          </div>
+
+          <div class="transition-panel-grid">
             <div class="field">
               <label for="attendance_date">Data de Atendimento</label>
-              <input id="attendance_date" name="attendance_date" data-field="first_cadh_date" type="date" placeholder="dd/mm/aaaa" required>
+              <input id="attendance_date" name="attendance_date" data-field="first_cadh_date" type="date" placeholder="dd/mm/aaaa">
               <div class="field-error" data-error-for="first_cadh_date"></div>
             </div>
 
             <div class="field">
               <label for="full_name">Nome Completo</label>
-              <input id="full_name" name="full_name" maxlength="180" placeholder="Nome completo" required>
+              <input id="full_name" name="full_name" maxlength="180" placeholder="Nome completo">
               <div class="field-error" data-error-for="full_name"></div>
             </div>
 
             <div class="field">
               <label for="ses">SES</label>
-              <input id="ses" name="ses" maxlength="9" placeholder="123456789" required>
+              <input id="ses" name="ses" maxlength="20" placeholder="Número do SES">
               <div class="field-error" data-error-for="ses"></div>
             </div>
 
             <div class="field">
               <label for="cpf">CPF</label>
-              <input id="cpf" name="cpf" maxlength="14" placeholder="000.000.000-00" required>
+              <input id="cpf" name="cpf" maxlength="14" placeholder="000.000.000-00">
               <div class="field-error" data-error-for="cpf"></div>
             </div>
 
             <div class="field">
               <label for="birth_date">Data de Nascimento</label>
-              <input id="birth_date" name="birth_date" type="date" placeholder="dd/mm/aaaa" required>
+              <input id="birth_date" name="birth_date" type="date" placeholder="dd/mm/aaaa">
               <div class="field-error" data-error-for="birth_date"></div>
             </div>
 
             <div class="field">
               <label for="gender">Sexo</label>
-              <select id="gender" name="gender" required></select>
+              <select id="gender" name="gender"></select>
               <div class="field-error" data-error-for="sex"></div>
             </div>
 
             <div class="field">
-              <label for="race">Cor/Raca</label>
-              <select id="race" name="race" required></select>
+              <label for="race">Raça/Cor</label>
+              <select id="race" name="race"></select>
               <div class="field-error" data-error-for="race"></div>
             </div>
 
             <div class="field">
-              <label for="responsible">Responsavel</label>
-              <input id="responsible" name="responsible" data-field="responsible_name" maxlength="180" placeholder="Nome do responsavel" required>
+              <label for="responsible">Responsável</label>
+              <input id="responsible" name="responsible" data-field="responsible_name" maxlength="180" placeholder="Nome do responsável">
               <div class="field-error" data-error-for="responsible_name"></div>
             </div>
           </div>
         </section>
 
-        <section class="form-section">
-          <h2 class="form-section-title">Contato</h2>
-          <div class="form-grid">
+        <section class="transition-panel transition-panel-details">
+          <div class="transition-panel-header">
+            <h2 class="transition-panel-title">Contato e Referência</h2>
+          </div>
+
+          <div class="transition-panel-grid">
             <div class="field">
               <label for="phone">Telefone</label>
-              <input id="phone" name="phone" maxlength="15" placeholder="(61) 99999-9999" required>
+              <input id="phone" name="phone" maxlength="15" placeholder="(61) 99999-9999">
               <div class="field-error" data-error-for="phone"></div>
             </div>
 
             <div class="field">
-              <label for="email">Email</label>
-              <input id="email" name="email" type="email" maxlength="190" placeholder="nome@email.com" required>
+              <label for="email">E-mail</label>
+              <input id="email" name="email" type="email" maxlength="190" placeholder="nome@email.com">
               <div class="field-error" data-error-for="email"></div>
             </div>
 
             <div class="field">
-              <label for="address">Endereco</label>
-              <input id="address" name="address" maxlength="255" placeholder="Rua, numero e bairro" required>
+              <label for="address">Endereço</label>
+              <input id="address" name="address" maxlength="255" placeholder="Rua, número e bairro">
               <div class="field-error" data-error-for="address"></div>
             </div>
 
             <div class="field">
-              <label for="emergency_contact">Contato de Emergencia</label>
-              <input id="emergency_contact" name="emergency_contact" maxlength="15" placeholder="(61) 99999-9999" required>
+              <label for="emergency_contact">Contato de Emergência</label>
+              <input id="emergency_contact" name="emergency_contact" maxlength="15" placeholder="(61) 99999-9999">
               <div class="field-error" data-error-for="emergency_contact"></div>
             </div>
-          </div>
-        </section>
 
-        <section class="form-section">
-          <h2 class="form-section-title">Referencia</h2>
-          <div class="form-grid">
             <div class="field">
-              <label for="uds_reference">UDS Referencia</label>
-              <input id="uds_reference" name="uds_reference" data-field="ubs_ref" maxlength="120" placeholder="UBS de referencia" required>
+              <label for="uds_reference">UBS de Referência</label>
+              <input id="uds_reference" name="uds_reference" data-field="ubs_ref" maxlength="120" placeholder="UBS de referência">
               <div class="field-error" data-error-for="ubs_ref"></div>
             </div>
 
             <div class="field">
-              <label for="team_reference">Equipe Referencia</label>
-              <input id="team_reference" name="team_reference" data-field="team_ref" maxlength="120" placeholder="Equipe de referencia" required>
+              <label for="team_reference">Equipe de Referência</label>
+              <input id="team_reference" name="team_reference" data-field="team_ref" maxlength="120" placeholder="Equipe de referência">
               <div class="field-error" data-error-for="team_ref"></div>
             </div>
 
             <div class="field">
-              <label for="health_insurance">Convenio</label>
-              <input id="health_insurance" name="health_insurance" maxlength="160" placeholder="SUS / convenio" required>
+              <label for="health_insurance">Convênio</label>
+              <input id="health_insurance" name="health_insurance" maxlength="160" placeholder="SUS / convênio">
               <div class="field-error" data-error-for="health_insurance"></div>
             </div>
 
             <div class="field">
-              <label for="blood_type">Tipo Sanguineo</label>
-              <select id="blood_type" name="blood_type" required></select>
+              <label for="blood_type">Tipo Sanguíneo</label>
+              <select id="blood_type" name="blood_type"></select>
               <div class="field-error" data-error-for="blood_type"></div>
             </div>
           </div>
         </section>
 
-        <section class="form-section">
-          <h2 class="form-section-title">Informacoes Clinicas</h2>
-          <div class="form-grid">
+        <section class="transition-panel transition-panel-details">
+          <div class="transition-panel-header">
+            <h2 class="transition-panel-title">Situação Assistencial</h2>
+          </div>
+
+          <div class="transition-panel-grid">
+            <div class="field-full">
+              <label for="patient-status">Status</label>
+              <div id="patient-status-toggle" class="status-toggle" role="tablist" aria-label="Status assistencial">
+                <button type="button" class="status-toggle-option" data-status-value="ativo">Ativo</button>
+                <button type="button" class="status-toggle-option" data-status-value="inativo">Inativo</button>
+              </div>
+              <input type="hidden" id="patient-status" name="status" value="ativo">
+            </div>
+
             <div class="field">
               <label for="allergies">Alergias</label>
-              <textarea id="allergies" name="allergies" placeholder="Ex.: Dipirona, amendoim" required></textarea>
+              <textarea id="allergies" name="allergies" placeholder="Ex.: Dipirona, amendoim"></textarea>
               <div class="field-error" data-error-for="allergies"></div>
             </div>
 
             <div class="field">
-              <label for="chronic_conditions">Condicoes Cronicas</label>
-              <textarea id="chronic_conditions" name="chronic_conditions" placeholder="Ex.: Diabetes, hipertensao" required></textarea>
+              <label for="chronic_conditions">Condições Crônicas</label>
+              <textarea id="chronic_conditions" name="chronic_conditions" placeholder="Ex.: Diabetes, hipertensão"></textarea>
               <div class="field-error" data-error-for="chronic_conditions"></div>
             </div>
           </div>
         </section>
 
-        <input type="hidden" name="status" value="ativo">
-
-        <div class="form-actions">
+        <div class="form-actions transition-form-actions">
           <a class="btn" href="/patients/list.html" data-back-link data-fallback="/patients/list.html">Cancelar</a>
-          <button class="btn btn-primary" type="submit">Salvar paciente</button>
+          <button class="btn btn-primary" type="submit">Salvar usuário</button>
         </div>
       </form>
     </section>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Transicao</title>
+  <title>Transição</title>
   <link rel="stylesheet" href="/assets/app.css">
 </head>
 <body data-page="transitions-form">
@@ -17,45 +17,114 @@
   </header>
 
   <main class="container">
-    <section class="card">
+    <section class="card transition-card">
       <a class="btn" href="/transitions/list.html" data-back-link data-fallback="/transitions/list.html">&larr; Voltar</a>
-      <h1 id="form-title" class="page-title" style="margin-top:14px;">Nova Transicao</h1>
+      <h1 id="form-title" class="page-title" style="margin-top:14px;">Nova Transição</h1>
       <div id="page-alert" class="alert" hidden></div>
 
-      <form id="transition-form" class="form-grid">
-        <div class="field-full">
-          <label for="patient_id">Paciente *</label>
-          <select id="patient_id" name="patient_id" required></select>
-        </div>
+      <form id="transition-form" class="transition-form-shell">
+        <section id="transition-specialty-picker" class="transition-specialty-picker" aria-labelledby="transition-specialty-title">
+          <div>
+            <p class="transition-section-kicker">Especialidade de destino</p>
+            <h2 id="transition-specialty-title" class="transition-specialty-title">Selecione a especialidade</h2>
+          </div>
 
-        <div class="field">
-          <label for="transition_date">Data</label>
-          <input id="transition_date" name="transition_date" type="date" placeholder="dd/mm/aaaa" required>
-        </div>
+          <div class="transition-specialty-grid" role="radiogroup" aria-label="Especialidade">
+            <button
+              type="button"
+              class="transition-specialty-chip transition-specialty-chip-endo"
+              data-specialty-option="endocrinologia"
+              role="radio"
+              aria-checked="false"
+            >
+              <span class="transition-specialty-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" focusable="false">
+                  <path d="M3 12h4l2.2-4.2L12 16l2.2-4h6.8"/>
+                </svg>
+              </span>
+              <span class="transition-specialty-chip-label">Endocrinologia</span>
+              <span class="transition-specialty-chip-mark" data-specialty-mark="endocrinologia" aria-hidden="true">+</span>
+            </button>
 
-        <div class="field">
-          <label for="status">Status</label>
-          <select id="status" name="status" required></select>
-        </div>
+            <button
+              type="button"
+              class="transition-specialty-chip transition-specialty-chip-cardio"
+              data-specialty-option="cardiologia"
+              role="radio"
+              aria-checked="false"
+            >
+              <span class="transition-specialty-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" focusable="false">
+                  <path d="M12 20s-7-4.5-8.8-8.4A5.2 5.2 0 0 1 12 5.9a5.2 5.2 0 0 1 8.8 5.7C19 15.5 12 20 12 20Z"/>
+                  <path d="M8.2 11.9h2.3l1.3-2.2 1.7 4 1.2-1.8H17"/>
+                </svg>
+              </span>
+              <span class="transition-specialty-chip-label">Cardiologia</span>
+              <span class="transition-specialty-chip-mark" data-specialty-mark="cardiologia" aria-hidden="true">+</span>
+            </button>
+          </div>
 
-        <div class="field">
-          <label for="from_service">De (servico/origem)</label>
-          <input id="from_service" name="from_service" placeholder="Servico de origem">
-        </div>
+          <p id="transition-specialty-summary" class="transition-specialty-summary" hidden>
+            Especialidade selecionada:
+            <span id="transition-specialty-summary-label" class="transition-specialty-summary-label"></span>
+          </p>
+        </section>
 
-        <div class="field">
-          <label for="to_service">Para (servico/destino)</label>
-          <input id="to_service" name="to_service" placeholder="Servico de destino">
-        </div>
+        <section class="transition-panel transition-panel-patient">
+          <div class="transition-panel-header">
+            <h2 class="transition-panel-title">Dados do Usuário</h2>
+          </div>
 
-        <div class="field-full">
-          <label for="notes">Notas</label>
-          <textarea id="notes" name="notes" placeholder="Observacoes da transicao"></textarea>
-        </div>
+          <div class="transition-panel-grid">
+            <div class="field-full">
+              <label for="patient-search-input">Usuário</label>
+              <select id="patient_id" name="patient_id" class="visually-hidden" tabindex="-1" aria-hidden="true"></select>
+              <div id="transition-patient-search" class="transition-patient-search"></div>
+            </div>
+          </div>
+        </section>
 
-        <div class="form-actions field-full">
+        <section class="transition-panel transition-panel-details">
+          <div class="transition-panel-header">
+            <h2 class="transition-panel-title">Dados da Transição</h2>
+          </div>
+
+          <div class="transition-panel-grid">
+            <div class="field">
+              <label for="transition_date">Data da Transição</label>
+              <input id="transition_date" name="transition_date" type="date" placeholder="dd/mm/aaaa">
+            </div>
+
+            <div class="field">
+              <label for="status">Status</label>
+              <div id="transition-status-shell" class="status-select-shell status-select-shell-neutral">
+                <span id="transition-status-pill" class="status-select-pill status-select-pill-neutral">Status</span>
+                <select id="status" name="status" class="status-select status-select-native"></select>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="from_service">Unidade de Origem</label>
+              <input id="from_service" name="from_service" placeholder="Ex.: UBS Central">
+            </div>
+
+            <div class="field">
+              <label for="to_service">Unidade de Destino</label>
+              <input id="to_service" name="to_service" placeholder="Ex.: CADH">
+            </div>
+
+            <div class="field-full">
+              <label for="notes">Motivo clínico e observações</label>
+              <textarea id="notes" name="notes" placeholder="Descreva a transição"></textarea>
+            </div>
+
+            <p id="transition-specialty-hint" class="transition-field-hint field-full" hidden></p>
+          </div>
+        </section>
+
+        <div class="form-actions transition-form-actions">
           <a class="btn" href="/transitions/list.html" data-back-link data-fallback="/transitions/list.html">Cancelar</a>
-          <button class="btn btn-primary" type="submit">Salvar</button>
+          <button class="btn btn-primary" type="submit">Salvar transição</button>
         </div>
       </form>
     </section>

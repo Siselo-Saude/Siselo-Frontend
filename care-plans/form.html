@@ -17,46 +17,67 @@
   </header>
 
   <main class="container">
-    <section class="card">
+    <section class="card transition-card">
       <a class="btn" href="/care-plans/list.html" data-back-link data-fallback="/care-plans/list.html">&larr; Voltar</a>
       <h1 id="form-title" class="page-title" style="margin-top:14px;">Novo Plano de Cuidado</h1>
       <div id="page-alert" class="alert" hidden></div>
 
-      <form id="care-plan-form">
-        <div class="form-grid">
-          <div class="field-full">
-            <label for="patient_id">Paciente *</label>
-            <select id="patient_id" name="patient_id" required></select>
+      <form id="care-plan-form" class="transition-form-shell">
+        <section class="transition-panel transition-panel-patient">
+          <div class="transition-panel-header">
+            <h2 class="transition-panel-title">Dados do Usuário</h2>
           </div>
 
-          <div class="field">
-            <label for="start_date">Inicio</label>
-            <input id="start_date" name="start_date" type="date" placeholder="dd/mm/aaaa" required>
+          <div class="transition-panel-grid">
+            <div class="field-full">
+              <label for="patient-search-input">Usuário</label>
+              <select id="patient_id" name="patient_id" class="visually-hidden" tabindex="-1" aria-hidden="true"></select>
+              <div id="care-plan-user-search" class="transition-patient-search"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="transition-panel transition-panel-details">
+          <div class="transition-panel-header">
+            <h2 class="transition-panel-title">Dados do Plano</h2>
           </div>
 
-          <div class="field">
-            <label for="end_date">Fim</label>
-            <input id="end_date" name="end_date" type="date" placeholder="dd/mm/aaaa">
+          <div class="transition-panel-grid">
+            <div class="field">
+              <label for="start_date">Início</label>
+              <input id="start_date" name="start_date" type="date" placeholder="dd/mm/aaaa">
+            </div>
+
+            <div class="field">
+              <label for="end_date">Fim</label>
+              <input id="end_date" name="end_date" type="date" placeholder="dd/mm/aaaa">
+            </div>
+
+            <div class="field-full">
+              <label for="interventions">Condutas terapêuticas</label>
+              <textarea id="interventions" name="interventions" placeholder="Descreva as condutas do plano"></textarea>
+            </div>
+          </div>
+        </section>
+
+        <section class="transition-panel transition-panel-details">
+          <div class="transition-panel-header">
+            <h2 class="transition-panel-title">Itens Assistenciais</h2>
           </div>
 
-          <div class="field-full">
-            <label for="interventions">Intervencoes medicamentosas e nao medicamentosas</label>
-            <textarea id="interventions" name="interventions" placeholder="Intervencoes principais do plano"></textarea>
+          <div class="actions" style="margin-top:0;">
+            <button type="button" class="btn" data-add-item="alerta">+ Alerta</button>
+            <button type="button" class="btn" data-add-item="meta">+ Meta</button>
+            <button type="button" class="btn" data-add-item="dificuldade">+ Dificuldade</button>
+            <button type="button" class="btn" data-add-item="recomendacao">+ Recomendação</button>
           </div>
-        </div>
 
-        <div class="actions" style="margin-top:18px;">
-          <button type="button" class="btn" data-add-item="alerta">+ Alerta</button>
-          <button type="button" class="btn" data-add-item="meta">+ Meta</button>
-          <button type="button" class="btn" data-add-item="dificuldade">+ Dificuldade</button>
-          <button type="button" class="btn" data-add-item="recomendacao">+ Recomendacao</button>
-        </div>
+          <div id="items"></div>
+        </section>
 
-        <div id="items"></div>
-
-        <div class="form-actions">
+        <div class="form-actions transition-form-actions">
           <a class="btn" href="/care-plans/list.html" data-back-link data-fallback="/care-plans/list.html">Cancelar</a>
-          <button class="btn btn-primary" type="submit">Salvar</button>
+          <button class="btn btn-primary" type="submit">Salvar plano</button>
         </div>
       </form>
     </section>

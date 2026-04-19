@@ -25,12 +25,25 @@ async function setupAdminUsersListPage() {
   searchInput.value = query;
   newUserLink.hidden = !canCreateUser;
   const tbody = document.getElementById('users-table-body');
+
+  if (!canCreateUser) {
+    SISELO.showAlert('page-alert', 'Sem permissao: admin.manage', 'error');
+    searchInput.disabled = true;
+    const submitButton = searchForm.querySelector('button[type="submit"]');
+    if (submitButton) {
+      submitButton.disabled = true;
+    }
+    renderAdminUsersAccessDenied(tbody);
+    return;
+  }
+
   let rows = [];
 
   try {
     const data = await SISELO.apiRequest('/admin/users/list.php');
     rows = Array.isArray(data.rows) ? data.rows : [];
   } catch (error) {
+    SISELO.showAlert('page-alert', error.message || 'Não foi possível carregar os usuários.', 'error');
     rows = [];
   }
 
@@ -52,6 +65,14 @@ async function setupAdminUsersListPage() {
     event.preventDefault();
     applySearch(searchInput.value);
   });
+}
+
+function renderAdminUsersAccessDenied(tbody) {
+  tbody.innerHTML = SISELO.emptyTableRow(
+    6,
+    'Acesso restrito.',
+    'Seu usuario nao possui permissao para administrar usuarios.'
+  );
 }
 
 function renderAdminUsersTable(tbody, rows, query = '', canCreateUser = false) {
@@ -138,6 +159,14 @@ async function setupAdminUsersFormPage() {
   }
 
   SISELO.bindShell('admin');
+  const permissions = SISELO.getUiPermissions(user);
+
+  if (!permissions.has('admin.manage')) {
+    document.getElementById('form-title').textContent = 'Acesso restrito';
+    SISELO.showAlert('page-alert', 'Sem permissao: admin.manage', 'error');
+    disableAdminUserForm();
+    return;
+  }
 
   const id = SISELO.normalizeEntityId(SISELO.queryParam('id'));
   const endpoint = '/admin/users/form.php' + (id ? '?id=' + encodeURIComponent(id) : '');
@@ -155,6 +184,9 @@ async function setupAdminUsersFormPage() {
   try {
     data = await SISELO.apiRequest(endpoint || '/admin/users/form.php');
   } catch (error) {
+    SISELO.showAlert('page-alert', error.message || 'Não foi possível carregar o formulário.', 'error');
+    disableAdminUserForm();
+    return;
   }
 
   document.getElementById('form-title').textContent = data.editing ? 'Editar Usuario' : 'Novo Usuario';
@@ -200,5 +232,16 @@ async function setupAdminUsersFormPage() {
     } catch (error) {
       SISELO.showAlert('page-alert', error.message, 'error');
     }
+  });
+}
+
+function disableAdminUserForm() {
+  const form = document.getElementById('admin-user-form');
+  if (!form) {
+    return;
+  }
+
+  form.querySelectorAll('input, select, textarea, button').forEach((field) => {
+    field.disabled = true;
   });
 }

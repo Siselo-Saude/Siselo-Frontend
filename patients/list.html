@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Pacientes - SISELO</title>
+  <title>Usuários - SISELO</title>
   <link rel="stylesheet" href="/assets/app.css">
 </head>
 <body data-page="patients-list">
@@ -19,15 +19,14 @@
   <main class="container">
     <section class="card">
       <div class="page-heading">
-        <h1 class="page-title">Usuarios</h1>
+        <h1 class="page-title">Usuários</h1>
         <a class="btn" href="/cadh/index.html" data-back-link data-fallback="/cadh/index.html">&larr; Voltar</a>
       </div>
 
       <form id="search-form" class="toolbar search-toolbar">
-        <input id="search-input" name="q" placeholder="Buscar por nome/CPF/SES/telefone/email" aria-label="Buscar pacientes" autocomplete="off">
+        <input id="search-input" name="q" placeholder="Busca por NOME ou SES" aria-label="Buscar usuários" autocomplete="off">
         <div class="actions">
-          <button class="btn btn-primary" type="submit">Buscar</button>
-          <a id="new-patient-link" class="btn" href="/patients/form.html">+ Novo Usuario</a>
+          <a id="new-patient-link" class="btn" href="/patients/form.html">+ Novo usuário</a>
           <a id="trash-link" class="btn" href="/patients/trash.html">Lixeira</a>
         </div>
       </form>
@@ -36,13 +35,13 @@
         <table class="data-table patients-table">
           <thead>
             <tr>
-              <th>Usuario</th>
+              <th>Usuário</th>
               <th>CPF</th>
               <th>SES</th>
               <th>Contato</th>
               <th>Sangue</th>
               <th>Status</th>
-              <th>Acoes</th>
+              <th>Ações</th>
             </tr>
           </thead>
           <tbody id="patients-table-body"></tbody>
