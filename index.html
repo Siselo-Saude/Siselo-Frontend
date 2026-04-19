@@ -18,24 +18,26 @@
 
   <main class="container">
     <section class="card home-panel">
-      <h1 class="page-title">SISELO</h1>
+      <div class="home-panel-header">
+        <div>
+          <p class="home-kicker">Sistema Integrado de Saúde</p>
+          <h1 class="page-title">SISELO</h1>
+        </div>
+      </div>
 
       <div class="home-access-row">
         <a id="home-cadh-card" class="home-access-card" href="/cadh/index.html">
-          <span>Acesse o Ambiente do CADH</span>
+          <span>Acesse o ambiente do CADH</span>
         </a>
 
         <div class="home-flow-bridge" aria-hidden="true">
           <svg viewBox="0 0 220 72" focusable="false">
-            <path class="home-flow-line" d="M24 36h172"/>
-            <path class="home-flow-arrow" d="M184 24l14 12-14 12"/>
-            <rect x="16" y="20" width="30" height="34" rx="4"/>
-            <rect x="54" y="27" width="22" height="24" rx="3"/>
-            <rect x="145" y="27" width="22" height="24" rx="3"/>
-            <rect x="175" y="20" width="30" height="34" rx="4"/>
-            <circle cx="110" cy="36" r="15"/>
-            <path d="M104 36h12"/>
-            <path d="M110 30v12"/>
+            <path class="home-flow-line" d="M20 36h56"/>
+            <path class="home-flow-arrow" d="M68 28l8 8-8 8"/>
+            <circle class="home-flow-center" cx="110" cy="36" r="16"/>
+            <path class="home-flow-center-mark" d="M104 31h12M104 36h12M104 41h9"/>
+            <path class="home-flow-line" d="M144 36h56"/>
+            <path class="home-flow-arrow" d="M152 28l-8 8 8 8"/>
           </svg>
         </div>
 
@@ -46,50 +48,53 @@
 
       <div class="home-direction-grid">
         <article class="home-direction-card home-direction-active">
-          <span class="home-direction-icon home-direction-down" aria-hidden="true">
+          <span class="home-direction-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" focusable="false">
-              <path d="M12 4v13"/>
-              <path d="M7 12l5 5 5-5"/>
+              <path d="M7 7v10"/>
+              <path d="M7 17 3.5 13.5"/>
+              <path d="M7 17l3.5-3.5"/>
+              <path d="M11 7h8"/>
             </svg>
           </span>
           <div>
             <strong>Encaminhamentos</strong>
-            <span>UBS &rarr; CADH</span>
+            <span>UBS → CADH</span>
           </div>
-          <p id="home-ubs-cadh-count">0</p>
-          <a class="btn" href="/transitions/list.html">Ver todos usuarios</a>
+          <p id="home-total-users-count">00</p>
+          <a class="btn" href="/patients/list.html">Ver todos os usuários</a>
         </article>
 
         <article class="home-direction-card">
           <span class="home-direction-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" focusable="false">
-              <path d="M6 5h12"/>
-              <path d="M6 10h12"/>
-              <path d="M6 15h12"/>
-              <path d="M6 20h12"/>
+              <path d="M7 7h10"/>
+              <path d="M7 12h10"/>
+              <path d="M7 17h10"/>
             </svg>
           </span>
           <div>
             <strong>Em andamento no</strong>
             <span>CADH</span>
           </div>
-          <p id="home-cadh-progress-count">0</p>
-          <a class="btn" href="/patients/list.html">Ver todos usuarios</a>
+          <p id="home-active-users-count">00</p>
+          <a class="btn" href="/patients/list.html">Ver todos os usuários</a>
         </article>
 
         <article class="home-direction-card">
-          <span class="home-direction-icon home-direction-up" aria-hidden="true">
+          <span class="home-direction-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" focusable="false">
-              <path d="M12 20V7"/>
-              <path d="M7 12l5-5 5 5"/>
+              <path d="M17 7v10"/>
+              <path d="M17 7 13.5 10.5"/>
+              <path d="M17 7l3.5 3.5"/>
+              <path d="M5 17h8"/>
             </svg>
           </span>
           <div>
             <strong>Encaminhamentos</strong>
-            <span>CADH &rarr; UBS</span>
+            <span>CADH → UBS</span>
           </div>
-          <p id="home-cadh-ubs-count">0</p>
-          <a class="btn" href="/transitions/list.html">Ver todos usuarios</a>
+          <p id="home-inactive-users-count">00</p>
+          <a class="btn" href="/patients/list.html">Ver todos os usuários</a>
         </article>
       </div>
 
@@ -101,15 +106,15 @@
           <path class="home-ill-cloud" d="M250 125c5-28 31-45 58-36 12-24 49-29 67-6 29-7 56 15 56 44 0 27-22 49-49 49H294c-27 0-49-22-44-51Z"/>
           <path class="home-ill-cloud" d="M610 125c5-28 31-45 58-36 12-24 49-29 67-6 29-7 56 15 56 44 0 27-22 49-49 49H654c-27 0-49-22-44-51Z"/>
           <g class="home-ill-screen">
-            <rect x="80" y="110" width="150" height="82" rx="6"/>
+            <rect x="80" y="110" width="150" height="82" rx="12"/>
             <path d="M102 134h76M102 154h106M102 174h64"/>
           </g>
           <g class="home-ill-screen">
-            <rect x="440" y="110" width="150" height="82" rx="6"/>
+            <rect x="440" y="110" width="150" height="82" rx="12"/>
             <path d="M462 134h76M462 154h106M462 174h64"/>
           </g>
           <g class="home-ill-screen">
-            <rect x="800" y="110" width="150" height="82" rx="6"/>
+            <rect x="800" y="110" width="150" height="82" rx="12"/>
             <path d="M822 134h76M822 154h106M822 174h64"/>
           </g>
           <circle class="home-ill-lock" cx="339" cy="139" r="18"/>
@@ -118,6 +123,13 @@
       </div>
     </section>
   </main>
+
+  <footer class="site-endbar" aria-label="Final da página">
+    <div class="container">
+      <div class="site-endbar-line"></div>
+      <p class="site-endbar-text">Fim da página</p>
+    </div>
+  </footer>
 
   <script src="/assets/config.js"></script>
   <script src="/assets/app.js"></script>
@@ -135,23 +147,26 @@
         permissions.has('transitions.view')
       );
 
-      if (permissions.has('patients.view')) {
-        try {
-          const data = await SISELO.apiRequest('/patients/list.php');
-          document.getElementById('home-cadh-progress-count').textContent = String((data.rows || []).length).padStart(2, '0');
-        } catch (error) {
-        }
-      }
-
       if (permissions.has('transitions.view')) {
         try {
           const data = await SISELO.apiRequest('/transitions/list.php');
           const rows = Array.isArray(data.rows) ? data.rows : [];
-          const normalize = (value) => SISELO.normalizeSearchText(value);
-          const ubsToCadh = rows.filter((row) => normalize(row.from_service).includes('ubs') && normalize(row.to_service).includes('cadh')).length;
-          const cadhToUbs = rows.filter((row) => normalize(row.from_service).includes('cadh') && normalize(row.to_service).includes('ubs')).length;
-          document.getElementById('home-ubs-cadh-count').textContent = String(ubsToCadh).padStart(2, '0');
-          document.getElementById('home-cadh-ubs-count').textContent = String(cadhToUbs).padStart(2, '0');
+          const normalize = (value) => SISELO.normalizeSearchText(value || '');
+          const isCadhService = (value) => {
+            const normalized = normalize(value);
+            return normalized.includes('cadh');
+          };
+          const fromUbsToCadh = rows.filter((row) => {
+            return isCadhService(row.to_service) && !isCadhService(row.from_service);
+          }).length;
+          const inProgress = rows.filter((row) => normalize(row.status) === 'em_andamento').length;
+          const fromCadhToUbs = rows.filter((row) => {
+            return isCadhService(row.from_service) && !isCadhService(row.to_service);
+          }).length;
+
+          document.getElementById('home-total-users-count').textContent = String(fromUbsToCadh).padStart(2, '0');
+          document.getElementById('home-active-users-count').textContent = String(inProgress).padStart(2, '0');
+          document.getElementById('home-inactive-users-count').textContent = String(fromCadhToUbs).padStart(2, '0');
         } catch (error) {
         }
       }

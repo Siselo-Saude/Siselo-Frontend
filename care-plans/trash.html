@@ -20,9 +20,8 @@
     <section class="card">
       <h1 class="page-title">Lixeira: Planos de Cuidado</h1>
       <form id="search-form" class="toolbar search-toolbar">
-        <input id="search-input" name="q" placeholder="Buscar paciente (nome/CPF/SES)">
+        <input id="search-input" name="q" placeholder="Busca por NOME ou SES">
         <div class="actions">
-          <button class="btn btn-primary" type="submit">Buscar</button>
           <a class="btn" href="/care-plans/list.html" data-back-link data-fallback="/care-plans/list.html">Voltar</a>
         </div>
       </form>
@@ -32,11 +31,11 @@
           <thead>
             <tr>
               <th>ID</th>
-              <th>Paciente</th>
-              <th>Inicio</th>
+              <th>Usuário</th>
+              <th>Início</th>
               <th>Fim</th>
               <th>Apagado em</th>
-              <th>Acoes</th>
+              <th>Ações</th>
             </tr>
           </thead>
           <tbody id="care-plans-table-body"></tbody>
