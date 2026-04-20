@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>CADH</title>
+  <title>UBS</title>
   <link rel="stylesheet" href="/assets/app.css">
   <style>
     .cadh-page {
@@ -380,90 +380,6 @@
       background: #fff9e7;
     }
 
-    .cadh-card-transitions {
-      --cadh-accent: #7c5aa3;
-      border-color: rgba(124, 90, 163, 0.22);
-      background: #f7f0fb;
-    }
-
-    .cadh-specialty-card {
-      min-height: 110px;
-      align-items: flex-start;
-      text-align: left;
-      justify-content: flex-start;
-      gap: 14px;
-      font-size: 1rem;
-      font-weight: 800;
-      line-height: 1.32;
-      border-width: 1px;
-      border-color: rgba(15, 23, 42, 0.1);
-      color: #102236;
-    }
-
-    .cadh-specialty-card[aria-disabled="true"] {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    .cadh-specialty-endocrino {
-      --cadh-accent: #775e8c;
-      background: #d8c4e7;
-    }
-
-    .cadh-specialty-cardio {
-      --cadh-accent: #3f7191;
-      background: #82b8d8;
-    }
-
-    .cadh-specialty-psico {
-      --cadh-accent: #9d6658;
-      background: #f6b9a8;
-    }
-
-    .cadh-specialty-enf {
-      --cadh-accent: #5f8870;
-      background: #b8dcc9;
-    }
-
-    .cadh-specialty-nutri {
-      --cadh-accent: #9b8122;
-      background: #f7df80;
-    }
-
-    .cadh-specialty-fisio {
-      --cadh-accent: #5d789f;
-      background: #bfd2ef;
-    }
-
-    .cadh-specialty-farma {
-      --cadh-accent: #966943;
-      background: #f4c9a5;
-    }
-
-    .cadh-specialty-social {
-      --cadh-accent: #7d7351;
-      background: #d6caa8;
-    }
-
-    .cadh-specialty-oftalmo {
-      --cadh-accent: #5a8584;
-      background: #b4d9d8;
-    }
-
-    .cadh-specialty-nefro {
-      --cadh-accent: #8a6074;
-      background: #d3aabd;
-    }
-
-    .cadh-specialty-tecnico {
-      --cadh-accent: #607d88;
-      background: #b7d0da;
-    }
-
-    .cadh-specialty-gestor {
-      --cadh-accent: #708050;
-      background: #d0dcad;
-    }
 
     @media (max-width: 980px) {
       .cadh-layout {
@@ -490,7 +406,7 @@
 </head>
 <body data-page="cadh">
   <header class="topbar">
-    <div class="topbar-brand">Intranet CADH</div>
+    <div class="topbar-brand">Intranet UBS</div>
     <nav class="menu">
       <a id="nav-home" href="/index.html">Home</a>
       <a id="nav-cadh" href="/cadh/index.html">CADH</a>
@@ -535,7 +451,7 @@
         </symbol>
       </svg>
 
-      <h1 class="page-title">CADH</h1>
+      <h1 class="page-title">UBS</h1>
 
       <div class="cadh-layout">
         <form id="cadh-ses-search" class="cadh-ses-search">
@@ -570,30 +486,8 @@
               </span>
             </a>
 
-            <a id="cadh-transitions-card" class="cadh-module-card cadh-card-transitions is-locked" href="#" data-base-href="/transitions/list.html" data-requires-ses="true" data-module-key="transitions" aria-disabled="true">
-              <span class="cadh-module-icon"><svg><use href="#cadh-icon-transition"></use></svg></span>
-              <span class="cadh-module-head">
-                <span class="cadh-module-title">Transições do Cuidado</span>
-                <span class="cadh-module-badge" data-pending-badge title="Documentação pendente" aria-label="Documentação pendente" hidden></span>
-              </span>
-            </a>
           </div>
 
-          <h2 class="cadh-section-label">Módulos clínicos por especialidade</h2>
-          <div class="cadh-specialty-grid">
-            <div class="cadh-specialty-card cadh-specialty-endocrino"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-clipboard"></use></svg></span>Endocrinologia</div>
-            <div class="cadh-specialty-card cadh-specialty-cardio"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-clipboard"></use></svg></span>Cardiologia</div>
-            <div class="cadh-specialty-card cadh-specialty-psico"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-clipboard"></use></svg></span>Psicologia</div>
-            <div class="cadh-specialty-card cadh-specialty-enf"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-clipboard"></use></svg></span>Enfermagem</div>
-            <div class="cadh-specialty-card cadh-specialty-nutri"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-clipboard"></use></svg></span>Nutrição</div>
-            <div class="cadh-specialty-card cadh-specialty-fisio"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-clipboard"></use></svg></span>Fisioterapia</div>
-            <div class="cadh-specialty-card cadh-specialty-farma"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-clipboard"></use></svg></span>Farmácia Clínica</div>
-            <div class="cadh-specialty-card cadh-specialty-social"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-clipboard"></use></svg></span>Serviço Social</div>
-            <div class="cadh-specialty-card cadh-specialty-oftalmo"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-clipboard"></use></svg></span>Oftalmologia</div>
-            <div class="cadh-specialty-card cadh-specialty-nefro"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-clipboard"></use></svg></span>Nefrologia</div>
-            <div class="cadh-specialty-card cadh-specialty-tecnico"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-clipboard"></use></svg></span>Técnico de Enfermagem</div>
-            <div class="cadh-specialty-card cadh-specialty-gestor"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-clipboard"></use></svg></span>Gestão do Cuidado</div>
-          </div>
         </div>
       </div>
     </section>
