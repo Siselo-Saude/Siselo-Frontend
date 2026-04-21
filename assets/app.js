@@ -458,10 +458,26 @@
       }
 
       link.dataset.backLinkBound = 'true';
-      link.href = resolveBackTarget(link.dataset.fallback || link.getAttribute('href'));
+
       link.addEventListener('click', (event) => {
         event.preventDefault();
-        location.href = resolveBackTarget(link.dataset.fallback || link.getAttribute('href'));
+
+        const ref = document.referrer;
+
+        if (ref.includes('/ubs')) {
+          window.location.href = '/ubs/index.html';
+          return;
+        }
+
+        if (ref.includes('/cadh')) {
+          window.location.href = '/cadh/index.html';
+          return;
+        }
+
+        // fallback original do sistema
+        location.href = resolveBackTarget(
+          link.dataset.fallback || link.getAttribute('href')
+        );
       });
     });
   }
@@ -1029,7 +1045,7 @@
     const links = {
       home: '/index.html',
       cadh: '/cadh/index.html',
-      ubs: '#',
+      ubs: '/ubs/index.html',
     };
 
     Object.keys(links).forEach((key) => {
