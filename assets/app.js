@@ -253,11 +253,11 @@
       const matchesName = search.hasLetters
         ? matchesPersonNamePrefix(patient && patient.full_name, search)
         : true;
-      const matchesSes = search.hasDigits
-        ? digitsOnly(patient && patient.ses).includes(search.digits)
+      const matchesCPF = search.hasDigits
+        ? digitsOnly(patient && patient.cpf).includes(search.digits)
         : true;
 
-      return matchesName && matchesSes;
+      return matchesName && matchesCPF;
     });
   }
 
@@ -1148,7 +1148,7 @@
           </div>
           <div class="confirmation-modal-actions">
             <button type="button" class="btn confirmation-modal-cancel" data-confirm-cancel>Cancelar</button>
-            <button type="button" class="btn btn-danger confirmation-modal-confirm" data-confirm-ok>Apagar</button>
+            <button type="button" class="btn btn-danger confirmation-modal-confirm" data-confirm-ok>Inativar</button>
           </div>
         </div>
       `;
@@ -1267,10 +1267,10 @@
       : `este ${normalizedEntityName}`;
 
     return showConfirmationDialog({
-      title: 'Enviar registro para a lixeira',
-      message: `Deseja realmente mover ${target} para a lixeira?`,
+      title: 'Mover registro para aba de inativos',
+      message: `Deseja realmente inativar ${target}?`,
       description: 'O registro poderá ser restaurado posteriormente, se necessário.',
-      confirmLabel: 'Enviar para a lixeira',
+      confirmLabel: 'Inativar',
       cancelLabel: 'Cancelar',
     });
   }
@@ -2122,7 +2122,7 @@
     search: 'M10.5 4a6.5 6.5 0 1 0 4.3 11.4l4 4 1.4-1.4-4-4A6.5 6.5 0 0 0 10.5 4Zm0 2a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9Z',
     view: 'M12 5c5.1 0 8.8 4.2 10 7-1.2 2.8-4.9 7-10 7S3.2 14.8 2 12c1.2-2.8 4.9-7 10-7Zm0 2C8.4 7 5.6 9.6 4.3 12 5.6 14.4 8.4 17 12 17s6.4-2.6 7.7-5C18.4 9.6 15.6 7 12 7Zm0 2.2a2.8 2.8 0 1 1 0 5.6 2.8 2.8 0 0 1 0-5.6Z',
     edit: 'M4 17.3V20h2.7L18.9 7.8l-2.7-2.7L4 17.3ZM20.7 6a1 1 0 0 0 0-1.4l-1.3-1.3a1 1 0 0 0-1.4 0l-1 1 2.7 2.7 1-1Z',
-    delete: 'M9 3h6l1 2h4v2H4V5h4l1-2Zm-2 6h10l-.7 11H7.7L7 9Zm3 2v7h2v-7h-2Zm4 0v7h2v-7h-2Z',
+    delete: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2Zm0 18c-4.42 0-8-3.58-8-8 0-1.85.63-3.55 1.69-4.9L16.9 17.31C15.55 18.37 13.85 19 12 20Zm6.31-4.71L7.09 4.69C8.45 3.63 10.15 3 12 3c4.42 0 8 3.58 8 8 0 1.85-.63 3.55-1.69 4.9Z',
     restore: 'M12 5a7 7 0 1 1-6.3 4H3l4-4 4 4H8a5 5 0 1 0 4-2V5Zm-1 4h2v4.2l3 1.8-1 1.7-4-2.4V9Z',
     pdf: 'M6 2h8l4 4v16H6V2Zm7 1.8V7h3.2L13 3.8ZM8 12h8v2H8v-2Zm0 4h8v2H8v-2Zm0-8h4v2H8V8Z',
     toggle: 'M11 2h2v10h-2V2Zm5.7 3.3 1.4 1.4A8 8 0 1 1 5.9 6.7l1.4-1.4A6 6 0 1 0 16.7 5.3Z',
