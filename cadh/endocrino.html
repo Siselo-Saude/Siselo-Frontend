@@ -1,0 +1,769 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Endocrinologista</title>
+  <link rel="stylesheet" href="/assets/app.css">
+  <style>
+    .endocrino-page {
+      padding: 26px;
+      background:
+        radial-gradient(circle at top right, rgba(119, 94, 140, 0.08), transparent 28%),
+        linear-gradient(180deg, #f7f4fa, #eef3f5);
+    }
+
+    body[data-page="cadh-endocrino"] .container {
+      max-width: 1460px;
+    }
+
+    .endocrino-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .endocrino-title {
+      margin: 0;
+      color: #280747;
+      font-size: 1.45rem;
+      line-height: 1.25;
+    }
+
+    .endocrino-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .endocrino-table-shell {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid #dbe4ea;
+      border-radius: 10px;
+      background: #ffffff;
+      box-shadow: 0 18px 30px rgba(15, 37, 65, 0.06);
+    }
+
+    .endocrino-table {
+      width: 100%;
+      min-width: 1180px;
+      table-layout: fixed;
+      border: 0;
+    }
+
+    .endocrino-col-date {
+      width: 108px;
+    }
+
+    .endocrino-col-patient {
+      width: 168px;
+    }
+
+    .endocrino-col-consult {
+      width: 132px;
+    }
+
+    .endocrino-col-hba1c {
+      width: 104px;
+    }
+
+    .endocrino-col-target {
+      width: 126px;
+    }
+
+    .endocrino-col-complication {
+      width: 118px;
+    }
+
+    .endocrino-col-renal {
+      width: 150px;
+    }
+
+    .endocrino-col-actions {
+      width: 148px;
+    }
+
+    .endocrino-table th,
+    .endocrino-table td {
+      border-color: #e8edf2;
+      padding: 14px 12px;
+      color: #27063f;
+      font-size: 0.86rem;
+    }
+
+    .endocrino-table tbody tr {
+      background: #fff;
+    }
+
+    .endocrino-table-group th {
+      border-top: 0;
+      color: #27063f;
+      font-size: 1rem;
+      font-weight: 900;
+      text-align: center;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .endocrino-table-group .is-transition {
+      background: #c7b3d6;
+      color: #27063f;
+      text-align: left;
+    }
+
+    .endocrino-table-group .is-specialty {
+      background: #eee7f2;
+      color: #27063f;
+    }
+
+    .endocrino-table-group .is-actions {
+      background: #fbfcfd;
+      color: #405163;
+      border-left: 1px solid #dbe4ea;
+    }
+
+    .endocrino-table-fields th {
+      background: #eee7f2;
+      font-size: 0.92rem;
+      font-weight: 900;
+      text-align: left;
+    }
+
+    .endocrino-table-fields .is-actions-subhead {
+      background: #fbfcfd;
+      border-left: 1px solid #dbe4ea;
+      text-align: center;
+    }
+
+    .endocrino-table td:nth-child(1) {
+      white-space: nowrap;
+    }
+
+    .endocrino-table td:nth-child(2) {
+      font-weight: 800;
+      color: #13031f;
+    }
+
+    .endocrino-table th:last-child,
+    .endocrino-table td:last-child {
+      border-left: 1px solid #dbe4ea;
+      text-align: center;
+    }
+
+    .endocrino-table td:last-child {
+      padding: 10px 8px;
+      background: #fbfcfd;
+    }
+
+    .endocrino-table .table-actions {
+      justify-content: center;
+      flex-wrap: nowrap;
+      gap: 8px;
+      min-height: 40px;
+    }
+
+    .endocrino-table .icon-btn {
+      border: 1px solid #e3ebf0;
+      background: #f7fafb;
+      color: #718395;
+    }
+
+    .endocrino-table .icon-btn:hover,
+    .endocrino-table .icon-btn:focus-visible {
+      background: #eef8f6;
+      color: #0f766e;
+      box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.08);
+      transform: none;
+    }
+
+    .endocrino-empty {
+      min-height: 170px;
+      display: grid;
+      place-items: center;
+      gap: 12px;
+      padding: 32px;
+      color: #8a7a99;
+      text-align: center;
+    }
+
+    .endocrino-empty p {
+      margin: 0;
+      font-weight: 600;
+    }
+
+    .endocrino-modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1100;
+      display: grid;
+      place-items: start center;
+      overflow-y: auto;
+      padding: 12px 8px 28px;
+      background: rgba(9, 17, 25, 0.62);
+    }
+
+    .endocrino-modal-overlay[hidden] {
+      display: none;
+    }
+
+    .endocrino-modal {
+      width: min(660px, calc(100vw - 16px));
+      max-height: calc(100vh - 24px);
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      overflow: hidden;
+      border: 1px solid rgba(119, 94, 140, 0.22);
+      border-radius: 8px;
+      background: #ffffff;
+      box-shadow: 0 24px 60px rgba(3, 10, 18, 0.28);
+    }
+
+    .endocrino-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 20px 24px 12px;
+      border-bottom: 1px solid #eef2f6;
+    }
+
+    .endocrino-modal-title {
+      margin: 0;
+      color: #3a1554;
+      font-size: 1.12rem;
+      line-height: 1.3;
+    }
+
+    .endocrino-close {
+      width: 34px;
+      height: 34px;
+      display: inline-grid;
+      place-items: center;
+      flex: 0 0 auto;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: #4b5563;
+      font-size: 1.4rem;
+      line-height: 1;
+      padding: 0;
+    }
+
+    .endocrino-close:hover,
+    .endocrino-close:focus-visible {
+      outline: none;
+      background: #f5f1f8;
+      box-shadow: none;
+      color: #3a1554;
+    }
+
+    .endocrino-form-body {
+      min-height: 0;
+      overflow-y: auto;
+      padding: 0 24px 18px;
+    }
+
+    .endocrino-form-section {
+      display: grid;
+      gap: 14px;
+      padding-top: 18px;
+    }
+
+    .endocrino-section-title {
+      margin: 0;
+      padding-top: 2px;
+      border-top: 1px solid #e5e7eb;
+      color: #8b9ab6;
+      font-size: 0.78rem;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .endocrino-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .endocrino-grid .field label,
+    .endocrino-grid .field-full label {
+      color: #18324d;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .endocrino-age-guidance {
+      margin: 8px 0 0;
+      color: #53657a;
+      font-size: 0.82rem;
+      line-height: 1.45;
+    }
+
+    .endocrino-grid .field,
+    .endocrino-grid .field-full {
+      position: relative;
+    }
+
+    .endocrino-field-guidance {
+      display: none;
+    }
+
+    .endocrino-native-select-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .endocrino-select-proxy {
+      position: relative;
+    }
+
+    .endocrino-select-trigger {
+      width: 100%;
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      border: 1px solid #d8e1e8;
+      border-radius: 10px;
+      background: #ffffff;
+      color: #1f2937;
+      font: inherit;
+      line-height: 1.25;
+      padding: 12px 14px;
+      text-align: left;
+    }
+
+    .endocrino-select-trigger::after {
+      content: "";
+      width: 9px;
+      height: 9px;
+      border-right: 2px solid #111827;
+      border-bottom: 2px solid #111827;
+      transform: rotate(45deg);
+      margin-top: -4px;
+      flex: 0 0 auto;
+    }
+
+    .endocrino-select-trigger:hover,
+    .endocrino-select-trigger:focus-visible {
+      outline: none;
+      border-color: #9bc7c3;
+      box-shadow: 0 0 0 4px rgba(0, 121, 107, 0.13);
+    }
+
+    .endocrino-select-menu {
+      position: absolute;
+      z-index: 1400;
+      top: calc(100% + 6px);
+      left: 0;
+      right: 0;
+      display: grid;
+      gap: 8px;
+      max-height: 310px;
+      overflow: auto;
+      border: 1px solid #d8e1e8;
+      border-radius: 10px;
+      background: #ffffff;
+      padding: 8px;
+      box-shadow: 0 18px 38px rgba(15, 23, 42, 0.18);
+    }
+
+    .endocrino-select-menu[hidden] {
+      display: none;
+    }
+
+    .endocrino-tooltip {
+      position: fixed;
+      z-index: 1800;
+      max-width: min(320px, calc(100vw - 28px));
+      border: 1px solid #d8e1e8;
+      border-radius: 8px;
+      background: #ffffff;
+      color: #27364a;
+      font-size: 0.82rem;
+      line-height: 1.45;
+      padding: 10px 12px;
+      box-shadow: 0 16px 34px rgba(15, 23, 42, 0.18);
+      pointer-events: none;
+    }
+
+    .endocrino-tooltip[hidden] {
+      display: none;
+    }
+
+    .endocrino-select-option {
+      width: 100%;
+      border: 0;
+      border-radius: 8px;
+      background: transparent;
+      color: #1f2937;
+      font: inherit;
+      padding: 10px 12px;
+      text-align: left;
+    }
+
+    .endocrino-select-option:hover,
+    .endocrino-select-option:focus-visible,
+    .endocrino-select-option.is-selected {
+      outline: none;
+      background: #eee7f2;
+      color: #27063f;
+    }
+
+    .endocrino-form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      padding: 12px 24px 18px;
+      border-top: 1px solid #e5e7eb;
+      background: #ffffff;
+    }
+
+    .endocrino-save-icon {
+      width: 18px;
+      height: 18px;
+      margin-right: 8px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .endocrino-view-content {
+      display: grid;
+      gap: 18px;
+      padding-top: 18px;
+    }
+
+    .endocrino-view-section {
+      display: grid;
+      gap: 12px;
+    }
+
+    .endocrino-view-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .endocrino-view-item {
+      min-width: 0;
+      padding: 12px;
+      border: 1px solid #e5edf2;
+      border-radius: 8px;
+      background: #fbfcfd;
+    }
+
+    .endocrino-view-item.is-wide {
+      grid-column: 1 / -1;
+    }
+
+    .endocrino-view-label {
+      display: block;
+      margin-bottom: 5px;
+      color: #7a8a9b;
+      font-size: 0.74rem;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .endocrino-view-value {
+      color: #172b3f;
+      font-size: 0.94rem;
+      font-weight: 700;
+      line-height: 1.45;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    @media (max-width: 620px) {
+      .endocrino-page {
+        padding: 20px;
+      }
+
+      .endocrino-actions {
+        width: 100%;
+      }
+
+      .endocrino-actions .btn,
+      .endocrino-actions button {
+        flex: 1 1 160px;
+        justify-content: center;
+      }
+
+      .endocrino-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .endocrino-view-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .endocrino-modal-header,
+      .endocrino-form-body,
+      .endocrino-form-actions {
+        padding-left: 18px;
+        padding-right: 18px;
+      }
+
+      .endocrino-form-actions {
+        flex-direction: column-reverse;
+      }
+
+      .endocrino-form-actions .btn,
+      .endocrino-form-actions button {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body data-page="cadh-endocrino">
+  <header class="topbar">
+    <div class="topbar-brand">Intranet CADH</div>
+    <nav class="menu">
+      <a id="nav-home" href="/index.html">Home</a>
+      <a id="nav-cadh" href="/cadh/index.html">CADH</a>
+      <a id="nav-ubs" href="/ubs/index.html">UBS</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="card endocrino-page">
+      <svg aria-hidden="true" style="display:none">
+        <symbol id="endocrino-icon-save" viewBox="0 0 24 24">
+          <path d="M5 3h12l2 2v16H5V3Z"/>
+          <path d="M8 3v6h8V3"/>
+          <path d="M8 15h8v6H8v-6Z"/>
+        </symbol>
+      </svg>
+
+      <div class="endocrino-header">
+        <div>
+          <a class="btn" href="/cadh/index.html">← Voltar</a>
+          <h1 class="endocrino-title" style="margin-top:14px;">Endocrinologista</h1>
+        </div>
+        <div class="endocrino-actions">
+          <button type="button" id="endocrino-new" class="btn btn-primary">+ Novo registro</button>
+        </div>
+      </div>
+
+      <div class="endocrino-table-shell">
+        <table class="endocrino-table" aria-label="Registros de Endocrinologia">
+          <colgroup>
+            <col class="endocrino-col-date">
+            <col class="endocrino-col-patient">
+            <col class="endocrino-col-consult">
+            <col class="endocrino-col-hba1c">
+            <col class="endocrino-col-target">
+            <col class="endocrino-col-complication">
+            <col class="endocrino-col-complication">
+            <col class="endocrino-col-renal">
+            <col class="endocrino-col-actions">
+          </colgroup>
+          <thead>
+            <tr class="endocrino-table-group">
+              <th class="is-transition" colspan="3">Endocrinologista</th>
+              <th class="is-specialty" colspan="5">Dados clínicos</th>
+              <th class="is-actions">Ações</th>
+            </tr>
+            <tr class="endocrino-table-fields">
+              <th>Data</th>
+              <th>Paciente</th>
+              <th>Nº Consulta</th>
+              <th>HbA1c</th>
+              <th>Meta cumprida?</th>
+              <th>Neuropatia</th>
+              <th>Nefropatia</th>
+              <th>Função renal</th>
+              <th class="is-actions-subhead" aria-label="Ações"></th>
+            </tr>
+          </thead>
+          <tbody id="endocrino-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <div id="endocrino-modal" class="endocrino-modal-overlay" hidden>
+    <form id="endocrino-form" class="endocrino-modal" novalidate>
+      <div class="endocrino-modal-header">
+        <h2 class="endocrino-modal-title">Endocrinologista — Registro de Consulta</h2>
+        <button type="button" class="endocrino-close" data-endocrino-close aria-label="Fechar">×</button>
+      </div>
+
+      <div class="endocrino-form-body">
+        <div id="endocrino-alert" class="alert" hidden></div>
+        <input id="endocrino_record_id" name="record_id" type="hidden">
+
+        <section class="endocrino-form-section">
+          <div class="endocrino-grid">
+            <div class="field-full">
+              <label for="endocrino_patient_search_input">Paciente *</label>
+              <select id="endocrino_patient_id" name="patient_id" class="visually-hidden" tabindex="-1" aria-hidden="true"></select>
+              <div id="endocrino_patient_search" class="transition-patient-search"></div>
+              <p id="endocrino-age-guidance" class="endocrino-age-guidance" hidden></p>
+            </div>
+
+            <div class="field">
+              <label for="endocrino_consultation_date">Data da Consulta *</label>
+              <input id="endocrino_consultation_date" name="consultation_date" type="date" placeholder="dd/mm/aaaa" required>
+            </div>
+
+            <div class="field">
+              <label for="endocrino_consultation_number">Nº da Consulta</label>
+              <select id="endocrino_consultation_number" name="consultation_number">
+                <option value="1ª Consulta (inicial)">1ª Consulta (inicial)</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <section class="endocrino-form-section">
+          <h3 class="endocrino-section-title">Dados clínicos</h3>
+          <div class="endocrino-grid">
+            <div class="field">
+              <label for="endocrino_hba1c">Valor hemoglobina glicada</label>
+              <input id="endocrino_hba1c" name="hba1c" inputmode="decimal" autocomplete="off" placeholder="Conforme laudo">
+              <p class="endocrino-field-guidance">Preencha o valor informado no exame de hemoglobina glicada, sem texto ou unidade.</p>
+            </div>
+
+            <div class="field">
+              <label for="endocrino_fragility">Análise da fragilidade</label>
+              <select id="endocrino_fragility" name="fragility" class="endocrino-native-select-hidden" tabindex="-1" aria-hidden="true">
+                <option value="" hidden>Selecione...</option>
+                <option value="Bebê (0 a 23 meses)">Bebê (0 a 23 meses)</option>
+                <option value="Criança (2 a 9 anos)">Criança (2 a 9 anos)</option>
+                <option value="Adolescente (10 a 19 anos)">Adolescente (10 a 19 anos)</option>
+                <option value="Adulto (20 a 59 anos)">Adulto (20 a 59 anos)</option>
+                <option value="Pessoa idosa (60 anos ou mais)">Pessoa idosa (60 anos ou mais)</option>
+                <option value="Pessoa idosa frágil ou em fragilização">Pessoa idosa frágil ou em fragilização</option>
+                <option value="Gestante">Gestante</option>
+                <option value="Não se aplica">Não se aplica</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="endocrino_clinical_target">Meta de HbA1c do paciente</label>
+              <input id="endocrino_clinical_target" name="clinical_target" inputmode="decimal" autocomplete="off" placeholder="Ex: <7 ou 7">
+              <p class="endocrino-field-guidance">Aceita 7, &lt;7 ou &lt;7,5. O limite máximo é 20.</p>
+            </div>
+
+            <div class="field">
+              <label for="endocrino_transition_target">Meta de HbA1c para acompanhamento</label>
+              <input id="endocrino_transition_target" name="transition_target" inputmode="decimal" autocomplete="off" placeholder="Ex: <8 ou em branco para DM tipo I">
+              <p class="endocrino-field-guidance">Aceita 8, &lt;8 ou &lt;7,5. O limite máximo é 20.</p>
+            </div>
+
+            <div class="field">
+              <label for="endocrino_target_met">Cumprimento da meta terapêutica</label>
+              <select id="endocrino_target_met" name="target_met">
+                <option value="" hidden>Selecione...</option>
+                <option value="Sim">Sim</option>
+                <option value="Não">Não</option>
+                <option value="Exame não realizado">Exame não realizado</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="endocrino_neuropathy">Neuropatia</label>
+              <select id="endocrino_neuropathy" name="neuropathy">
+                <option value="" hidden>Selecione...</option>
+                <option value="Sim">Sim</option>
+                <option value="Não">Não</option>
+                <option value="Exame não realizado">Exame não realizado</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="endocrino_nephropathy">Nefropatia</label>
+              <select id="endocrino_nephropathy" name="nephropathy">
+                <option value="" hidden>Selecione...</option>
+                <option value="Sim">Sim</option>
+                <option value="Não">Não</option>
+                <option value="Exame não realizado">Exame não realizado</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="endocrino_renal_function">Função renal</label>
+              <select id="endocrino_renal_function" name="renal_function">
+                <option value="" hidden>Selecione...</option>
+                <option value="Sem complicações">Sem complicações</option>
+                <option value="Estágio DRC: 1">Estágio DRC: 1</option>
+                <option value="Estágio DRC: 2">Estágio DRC: 2</option>
+                <option value="Estágio DRC: 3A">Estágio DRC: 3A</option>
+                <option value="Estágio DRC: 3B">Estágio DRC: 3B</option>
+                <option value="Estágio DRC: 4">Estágio DRC: 4</option>
+                <option value="Estágio DRC: 5">Estágio DRC: 5</option>
+                <option value="Exame não realizado">Exame não realizado</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <section class="endocrino-form-section">
+          <h3 class="endocrino-section-title">Plano de cuidado</h3>
+          <div class="endocrino-grid">
+            <div class="field-full">
+              <label for="endocrino_interventions">Conduta</label>
+              <textarea id="endocrino_interventions" name="interventions" placeholder="Ex: ajustar medicação, orientar insulina, alimentação, atividade física e pedir exames."></textarea>
+            </div>
+
+            <div class="field-full">
+              <label for="endocrino_barriers">Dificuldades do paciente</label>
+              <textarea id="endocrino_barriers" name="barriers" placeholder="Ex: dificuldade para usar a medicação, medir glicemia, seguir dieta, hipoglicemia ou falta de insumos."></textarea>
+            </div>
+
+            <div class="field-full">
+              <label for="endocrino_recommendations">Orientação e retorno</label>
+              <textarea id="endocrino_recommendations" name="recommendations" placeholder="Ex: retornar com exames, manter acompanhamento, revisar sinais de alerta e combinar meta de HbA1c."></textarea>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="endocrino-form-actions">
+        <button type="button" class="btn" data-endocrino-close>Cancelar</button>
+        <button type="submit" class="btn btn-primary">
+          <svg class="endocrino-save-icon" aria-hidden="true"><use href="#endocrino-icon-save"></use></svg>
+          Salvar
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div id="endocrino-view-modal" class="endocrino-modal-overlay" hidden>
+    <article class="endocrino-modal" role="dialog" aria-modal="true" aria-labelledby="endocrino-view-title">
+      <div class="endocrino-modal-header">
+        <h2 id="endocrino-view-title" class="endocrino-modal-title">Guia preenchida do exame clínico</h2>
+        <button type="button" class="endocrino-close" data-endocrino-view-close aria-label="Fechar">×</button>
+      </div>
+
+      <div class="endocrino-form-body">
+        <div id="endocrino-view-content" class="endocrino-view-content"></div>
+      </div>
+
+      <div class="endocrino-form-actions">
+        <button type="button" class="btn" data-endocrino-view-close>Fechar</button>
+      </div>
+    </article>
+  </div>
+
+  <script src="/assets/config.js"></script>
+  <script src="/assets/app.js"></script>
+  <script src="/assets/cadh-endocrino.js"></script>
+</body>
+</html>
