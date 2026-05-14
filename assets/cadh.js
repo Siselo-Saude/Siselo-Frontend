@@ -4,7 +4,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (document.body.dataset.page !== 'cadh') {
     return;
   }
-
   setupCadhPage();
 });
 
@@ -19,7 +18,6 @@ async function setupCadhPage() {
   if (!await restoreCadhSesSearch(permissions)) {
     setCadhSesCardsUnlocked(false);
     syncCadhPendingIndicators([]);
-    renderCadhPatientMessage("Digite o SES para localizar o usuário.");
   }
 }
 
@@ -40,8 +38,8 @@ function applyCadhModulePermissions(permissions) {
 }
 
 function bindCadhSesSearch(permissions) {
-  const form = document.getElementById('cadh-ses-search');
-  const input = document.getElementById('cadh-ses-input');
+  const form = document.getElementById('cadh-cpf-search');
+  const input = document.getElementById('cadh-cpf-input');
   if (!form || !input) {
     return;
   }
@@ -60,7 +58,6 @@ function bindCadhSesSearch(permissions) {
   let currentPatients = [];
 
   input.addEventListener('input', () => {
-    input.value = SISELO.digitsOnly(input.value);
     const query = input.value.trim();
     clearCadhSearchState();
     setCadhSesCardPatient('');
@@ -72,7 +69,7 @@ function bindCadhSesSearch(permissions) {
     }
 
     if (query.length < 1) {
-      renderCadhPatientMessage('Digite o SES para localizar o usuário.');
+      renderCadhPatientMessage('Digite o NOME ou CPF para localizar o usuário.');
       return;
     }
 
@@ -93,18 +90,17 @@ function bindCadhSesSearch(permissions) {
     const result = document.getElementById('cadh-patient-result');
     if (!result) return;
 
-    const matching = currentPatients
-      .filter((patient) => SISELO.digitsOnly(patient.ses || '').startsWith(query))
-      .slice(0, 10);
+    const matching = SISELO.filterPatientsForSearch(currentPatients, query).slice(0, 10);
+    
     if (!matching.length) {
-      result.innerHTML = '<div class="cadh-patient-message is-error">Nenhum SES encontrado.</div>';
+      result.innerHTML = '<div class="cadh-patient-message is-error">Nenhum usuário encontrado.</div>';
       return;
     }
 
     result.innerHTML = matching.map(p => `
-      <button type="button" class="cadh-ses-option" data-patient-id="${p.id}" data-ses="${p.ses}">
+      <button type="button" class="cadh-ses-option" data-patient-id="${p.id}">
         <span class="cadh-ses-option-name">${SISELO.escapeHtml(p.full_name || 'Usuário sem nome')}</span>
-        <span class="cadh-ses-option-meta">SES: ${SISELO.escapeHtml(p.ses || '-')}</span>
+        <span class="cadh-ses-option-meta">CPF: ${SISELO.escapeHtml(p.cpf || '-')}</span>
       </button>
     `).join('');
 
@@ -113,10 +109,10 @@ function bindCadhSesSearch(permissions) {
         const patientId = btn.dataset.patientId;
         const patient = currentPatients.find(p => p.id == patientId);
         if (patient) {
-          saveCadhSearchState(patient, patient.ses);
+          saveCadhSearchState(patient, patient.cpf); 
           setCadhSesCardPatient(patient.id);
           setCadhSesCardsUnlocked(true);
-          input.value = patient.ses;
+          input.value = patient.full_name; 
           result.innerHTML = '';
           await renderCadhPatientFromContext(patient, permissions);
         }
@@ -129,14 +125,14 @@ async function restoreCadhSesSearch(permissions) {
   const state = readCadhSearchState();
   const patient = state && state.patient ? state.patient : null;
   const patientId = SISELO.normalizeEntityId(patient && patient.id);
-  const input = document.getElementById('cadh-ses-input');
+  const input = document.getElementById('cadh-cpf-input');
 
   if (!patientId || !input) {
     clearCadhSearchState();
     return false;
   }
 
-  input.value = state.ses || patient.ses || '';
+  input.value = patient.full_name || '';
   setCadhSesCardPatient(patientId);
   setCadhSesCardsUnlocked(true);
   await renderCadhPatientFromContext(patient, permissions);
@@ -151,7 +147,7 @@ function readCadhSearchState() {
   }
 }
 
-function saveCadhSearchState(patient, ses) {
+function saveCadhSearchState(patient, cpf) {
   const patientId = SISELO.normalizeEntityId(patient && patient.id);
   if (!patientId) {
     clearCadhSearchState();
@@ -159,7 +155,7 @@ function saveCadhSearchState(patient, ses) {
   }
 
   sessionStorage.setItem(CADH_SEARCH_KEY, JSON.stringify({
-    ses: String(ses || patient.ses || '').trim(),
+    cpf: String(cpf || patient.cpf || '').trim(),
     patient: {
       id: patientId,
       full_name: patient.full_name || '',
@@ -192,28 +188,6 @@ function setCadhSesCardPatient(patientId) {
   document.querySelectorAll('[data-requires-ses="true"]').forEach((card) => {
     card.dataset.patientId = patientId ? String(patientId) : '';
   });
-}
-
-function findCadhPatientBySes(rows, ses) {
-  const normalizedSes = normalizeCadhSes(ses);
-  return rows.find((row) => normalizeCadhSes(row.ses) === normalizedSes) || null;
-}
-
-function findCadhPatientByQuery(rows, query) {
-  const normalizedQuery = String(query || '').trim();
-  const sesMatch = findCadhPatientBySes(rows, normalizedQuery);
-  if (sesMatch) {
-    return sesMatch;
-  }
-
-  const search = SISELO.createSearchState(normalizedQuery);
-  const filtered = SISELO.filterPatientsForSearch(Array.isArray(rows) ? rows : [], search);
-  return filtered[0] || null;
-}
-
-function normalizeCadhSes(value) {
-  const digits = SISELO.digitsOnly(value);
-  return digits || String(value || '').trim().toLowerCase();
 }
 
 function renderCadhPatient(patient, careSummary = null) {
@@ -276,7 +250,7 @@ async function renderCadhPatientFromContext(patient, permissions) {
     const careSummary = buildCadhCareSummary(clinicalContext, permissions);
     syncCadhPendingIndicators(careSummary && Array.isArray(careSummary.missingModules) ? careSummary.missingModules : []);
     renderCadhPatient(contextPatient, careSummary);
-    saveCadhSearchState(contextPatient, patient && patient.ses);
+    saveCadhSearchState(contextPatient, patient && patient.cpf);
   } catch (error) {
     syncCadhPendingIndicators([]);
     renderCadhPatient(patient, null);

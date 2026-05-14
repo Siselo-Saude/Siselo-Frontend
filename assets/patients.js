@@ -325,7 +325,7 @@ function renderPatientsTable(targetId, rows, permissions, isTrash, query = "") {
         <div class="table-actions">
           ${SISELO.iconLink("view", `/patients/show.html?id=${row.id}&tab=planos`, "Usuário 360")}
           ${permissions.has("patients.update") ? SISELO.iconLink("edit", `/patients/form.html?id=${row.id}`, "Editar usuário") : ""}
-          ${!isTrash && permissions.has("patients.delete") ? SISELO.iconButton("delete", "Apagar usuário", { "data-delete-id": row.id, "data-delete-label": row.full_name || "" }) : ""}
+          ${!isTrash && permissions.has("patients.delete") ? SISELO.iconButton("delete", "Inativar usuário", { "data-delete-id": row.id, "data-delete-label": row.full_name || "" }) : ""}
         </div>
       </td>
     </tr>
@@ -347,7 +347,7 @@ function filterPatientRows(rows, query) {
       ? SISELO.matchesPersonNamePrefix(row.full_name, search)
       : true;
     const matchesDigits = search.hasDigits
-      ? SISELO.matchesSearchDigits(row.ses, search)
+      ? SISELO.matchesSearchDigits(row.cpf, search)
       : true;
 
     return matchesName && matchesDigits;
@@ -356,7 +356,7 @@ function filterPatientRows(rows, query) {
 
 function renderPatientsTrashTable(tbody, rows, permissions, query = "") {
   if (!Array.isArray(rows) || rows.length === 0) {
-    tbody.innerHTML = SISELO.emptyTableRow(5, "Nenhum usuário na lixeira.");
+    tbody.innerHTML = SISELO.emptyTableRow(5, "Nenhum usuário inativo encontrado.");
     return;
   }
 

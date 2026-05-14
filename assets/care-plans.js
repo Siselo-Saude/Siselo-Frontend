@@ -308,7 +308,7 @@ function renderCarePlansTable(
         <div class="table-actions">
           ${SISELO.iconLink("pdf", `${SISELO.getApiBaseUrl()}/care_plans/pdf.php?id=${row.id}`, "Gerar PDF", { target: "_blank", rel: "noreferrer" })}
           ${permissions.has("careplans.update") ? SISELO.iconLink("edit", `/care-plans/form.html?id=${encodeURIComponent(row.id)}${scopedPatientId ? `&patient_id=${encodeURIComponent(scopedPatientId)}` : ""}`, "Editar plano") : ""}
-          ${permissions.has("careplans.delete") ? SISELO.iconButton("delete", "Apagar plano", { "data-delete-id": row.id, "data-delete-label": row.full_name || `Plano ${row.id}` }) : ""}
+          ${permissions.has("careplans.delete") ? SISELO.iconButton("delete", "Inativar plano", { "data-delete-id": row.id, "data-delete-label": row.full_name || `Plano ${row.id}` }) : ""}
         </div>
       </td>
     </tr>
@@ -319,7 +319,7 @@ function renderCarePlansTable(
 
 function renderCarePlansTrashTable(tbody, rows, permissions, query = "") {
   if (!Array.isArray(rows) || rows.length === 0) {
-    tbody.innerHTML = SISELO.emptyTableRow(6, "Nenhum plano na lixeira.");
+    tbody.innerHTML = SISELO.emptyTableRow(6, "Nenhum plano inativo encontrado.");
     return;
   }
 
@@ -386,7 +386,7 @@ function filterCarePlanRows(rows, query) {
       ? SISELO.matchesPersonNamePrefix(row.full_name, search)
       : true;
     const matchesDigits = search.hasDigits
-      ? SISELO.matchesSearchDigits(row.ses, search)
+      ? SISELO.matchesSearchDigits(row.cpf, search)
       : true;
 
     return matchesName && matchesDigits;

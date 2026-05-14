@@ -265,7 +265,7 @@ function renderEncountersTable(
         <div class="table-actions">
           ${SISELO.iconLink("view", `/patients/show.html?id=${row.patient_id}&tab=atendimentos`, "Usuário 360")}
           ${permissions.has("encounters.update") ? SISELO.iconLink("edit", `/encounters/form.html?id=${encodeURIComponent(row.id)}${scopedPatientId ? `&patient_id=${encodeURIComponent(scopedPatientId)}` : ""}`, "Editar atendimento") : ""}
-          ${permissions.has("encounters.delete") ? SISELO.iconButton("delete", "Apagar atendimento", { "data-delete-id": row.id, "data-delete-label": row.full_name || "" }) : ""}
+          ${permissions.has("encounters.delete") ? SISELO.iconButton("delete", "Inativar atendimento", { "data-delete-id": row.id, "data-delete-label": row.full_name || "" }) : ""}
         </div>
       </td>
     </tr>
@@ -276,7 +276,7 @@ function renderEncountersTable(
 
 function renderEncountersTrashTable(tbody, rows, permissions, query = "") {
   if (!Array.isArray(rows) || rows.length === 0) {
-    tbody.innerHTML = SISELO.emptyTableRow(5, "Nenhum atendimento na lixeira.");
+    tbody.innerHTML = SISELO.emptyTableRow(5, "Nenhum atendimento inativo encontrado.");
     return;
   }
 
@@ -397,7 +397,7 @@ function filterEncounterRows(rows, query) {
       ? SISELO.matchesPersonNamePrefix(row.full_name, search)
       : true;
     const matchesDigits = search.hasDigits
-      ? SISELO.matchesSearchDigits(row.ses, search)
+      ? SISELO.matchesSearchDigits(row.cpf, search)
       : true;
 
     return matchesLetters && matchesDigits;

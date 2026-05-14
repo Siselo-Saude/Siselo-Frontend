@@ -371,7 +371,7 @@ function renderTransitionsTable(
 function renderTransitionsTrashTable(tbody, rows, permissions, query = "") {
   const safeRows = uniqueTransitionRows(rows);
   if (!Array.isArray(safeRows) || safeRows.length === 0) {
-    tbody.innerHTML = SISELO.emptyTableRow(8, "Nenhuma transição na lixeira.");
+    tbody.innerHTML = SISELO.emptyTableRow(8, "Nenhuma transição inativa encontrada.");
     return;
   }
 
@@ -543,7 +543,7 @@ function renderTransitionDeleteAction(row, permissions) {
     return "";
   }
 
-  return SISELO.iconButton("delete", "Apagar transição", {
+  return SISELO.iconButton("delete", "Inativar transição", {
     "data-delete-id": row.id,
     "data-delete-label": row.full_name || "",
   });
@@ -686,7 +686,7 @@ function filterTransitionRows(rows, query) {
       ? SISELO.matchesPersonNamePrefix(row.full_name, search)
       : true;
     const matchesDigits = search.hasDigits
-      ? SISELO.matchesSearchDigits(row.ses, search)
+      ? SISELO.matchesSearchDigits(row.cpf, search)
       : true;
 
     return matchesLetters && matchesDigits;
