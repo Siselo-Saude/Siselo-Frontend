@@ -39,6 +39,7 @@ async function setupCardiologiaPage() {
   bindCardiologiaLdlField();
   updateCardiologiaConsultationOptions("");
   updateCardiologiaInitialFields();
+  syncCardiologiaCoronaryClassification();
   syncCardiologiaRecentEventDetail();
 
   cardiologiaState.patients = await loadCardiologiaPatients();
@@ -54,7 +55,9 @@ async function setupCardiologiaPage() {
         : null;
       updateCardiologiaConsultationOptions(patient && patient.id, cardiologiaState.editingRecordId);
       updateCardiologiaPatientSummary(selectedPatient);
+      updateCardiologiaAgeGuidance(selectedPatient);
       updateCardiologiaInitialFields();
+      syncCardiologiaCoronaryClassification();
     },
   });
 
@@ -127,7 +130,22 @@ function bindCardiologiaClinicalRules() {
   if (consultationSelect instanceof HTMLSelectElement) {
     consultationSelect.addEventListener("change", () => {
       updateCardiologiaInitialFields();
+      syncCardiologiaCoronaryClassification();
       syncCardiologiaRecentEventDetail();
+    });
+  }
+
+  const coronarySelect = document.getElementById("cardiologia_coronary_disease");
+  if (coronarySelect instanceof HTMLSelectElement) {
+    coronarySelect.addEventListener("change", () => {
+      syncCardiologiaCoronaryClassification();
+    });
+  }
+
+  const coronaryClassificationSelect = document.getElementById("cardiologia_coronary_classification");
+  if (coronaryClassificationSelect instanceof HTMLSelectElement) {
+    coronaryClassificationSelect.addEventListener("change", () => {
+      syncCardiologiaCoronaryClassification();
     });
   }
 
@@ -267,6 +285,7 @@ function closeCardiologiaViewModal() {
 
 function fillCardiologiaForm(record = null) {
   const normalizedRecord = record ? normalizeCardiologiaRecord(record) : null;
+  const formRecord = normalizedRecord ? mergeCardiologiaUniqueAnswers(normalizedRecord) : null;
   cardiologiaState.editingRecordId = normalizedRecord ? normalizedRecord.id : "";
 
   const cachedState = readCadhSearchState();
@@ -290,31 +309,34 @@ function fillCardiologiaForm(record = null) {
     : cachedPatient;
 
   setCardiologiaField("cardiologia_record_id", normalizedRecord ? normalizedRecord.id : "");
-  setCardiologiaField("cardiologia_consultation_date", normalizedRecord ? normalizedRecord.consultation_date : "");
-  setCardiologiaField("cardiologia_ldl", normalizedRecord ? formatCardiologiaLdlInput(normalizedRecord.ldl) : "");
-  setCardiologiaField("cardiologia_mapa_target_met", normalizedRecord ? normalizedRecord.mapa_target_met : "");
-  setCardiologiaField("cardiologia_cerebrovascular", normalizedRecord ? normalizedRecord.cerebrovascular : "");
-  setCardiologiaField("cardiologia_coronary_disease", normalizedRecord ? normalizedRecord.coronary_disease : "");
-  setCardiologiaField("cardiologia_hf_reduced_ef", normalizedRecord ? normalizedRecord.hf_reduced_ef : "");
-  setCardiologiaField("cardiologia_peripheral_arterial_disease", normalizedRecord ? normalizedRecord.peripheral_arterial_disease : "");
-  setCardiologiaField("cardiologia_recent_event", normalizedRecord ? normalizedRecord.recent_event : "");
-  setCardiologiaField("cardiologia_recent_event_description", normalizedRecord ? normalizedRecord.recent_event_description : "");
-  setCardiologiaField("cardiologia_renal_function", normalizedRecord ? normalizedRecord.renal_function : "");
-  setCardiologiaField("cardiologia_interventions", normalizedRecord ? normalizedRecord.interventions : "");
-  setCardiologiaField("cardiologia_barriers", normalizedRecord ? normalizedRecord.barriers : "");
-  setCardiologiaField("cardiologia_recommendations", normalizedRecord ? normalizedRecord.recommendations : "");
+  setCardiologiaField("cardiologia_consultation_date", formRecord ? formRecord.consultation_date : "");
+  setCardiologiaField("cardiologia_ldl", formRecord ? formatCardiologiaLdlInput(formRecord.ldl) : "");
+  setCardiologiaField("cardiologia_mapa_target_met", formRecord ? formRecord.mapa_target_met : "");
+  setCardiologiaField("cardiologia_cerebrovascular", formRecord ? formRecord.cerebrovascular : "");
+  setCardiologiaField("cardiologia_coronary_disease", formRecord ? formRecord.coronary_disease : "");
+  setCardiologiaField("cardiologia_coronary_classification", formRecord ? formRecord.coronary_classification : "");
+  setCardiologiaField("cardiologia_hf_reduced_ef", formRecord ? formRecord.hf_reduced_ef : "");
+  setCardiologiaField("cardiologia_peripheral_arterial_disease", formRecord ? formRecord.peripheral_arterial_disease : "");
+  setCardiologiaField("cardiologia_recent_event", formRecord ? formRecord.recent_event : "");
+  setCardiologiaField("cardiologia_recent_event_description", formRecord ? formRecord.recent_event_description : "");
+  setCardiologiaField("cardiologia_renal_function", formRecord ? formRecord.renal_function : "");
+  setCardiologiaField("cardiologia_interventions", formRecord ? formRecord.interventions : "");
+  setCardiologiaField("cardiologia_barriers", formRecord ? formRecord.barriers : "");
+  setCardiologiaField("cardiologia_recommendations", formRecord ? formRecord.recommendations : "");
 
   if (cardiologiaState.patientPicker) {
     cardiologiaState.patientPicker.setValue(selectedPatient && selectedPatient.id ? selectedPatient : null);
   }
 
   updateCardiologiaPatientSummary(selectedPatient && selectedPatient.id ? selectedPatient : null);
+  updateCardiologiaAgeGuidance(selectedPatient && selectedPatient.id ? selectedPatient : null);
   updateCardiologiaConsultationOptions(
     selectedPatient && selectedPatient.id ? selectedPatient.id : "",
     cardiologiaState.editingRecordId,
     normalizedRecord ? normalizedRecord.consultation_number : "",
   );
   updateCardiologiaInitialFields();
+  syncCardiologiaCoronaryClassification();
   syncCardiologiaRecentEventDetail();
 
   const dateInput = document.getElementById("cardiologia_consultation_date");
@@ -482,29 +504,52 @@ function formatCardiologiaLdlOutput(value) {
 }
 
 function updateCardiologiaInitialFields() {
-  const select = document.getElementById("cardiologia_consultation_number");
-  const isInitial = isInitialCardiologiaConsultation(select && select.value);
   const initialSection = document.getElementById("cardiologia-initial-section");
   const careSection = document.getElementById("cardiologia-care-section");
 
   [initialSection, careSection].forEach((section) => {
     if (section) {
-      section.hidden = !isInitial;
+      section.hidden = false;
     }
   });
 
   document.querySelectorAll("[data-cardiologia-initial-field]").forEach((field) => {
-    field.disabled = !isInitial;
+    field.disabled = false;
   });
+}
+
+function syncCardiologiaCoronaryClassification() {
+  const select = document.getElementById("cardiologia_coronary_disease");
+  const detail = document.getElementById("cardiologia-coronary-detail");
+  const classification = document.getElementById("cardiologia_coronary_classification");
+  const instabilityHint = document.getElementById("cardiologia_coronary_instability_hint");
+  const shouldShow = select instanceof HTMLSelectElement && select.value === "Sim";
+
+  if (detail) {
+    detail.hidden = !shouldShow;
+  }
+
+  if (classification instanceof HTMLSelectElement) {
+    classification.disabled = !shouldShow;
+    if (!shouldShow) {
+      classification.value = "";
+    }
+  }
+
+  if (instabilityHint) {
+    instabilityHint.hidden = !(
+      shouldShow &&
+      classification instanceof HTMLSelectElement &&
+      classification.value === "Angina instável"
+    );
+  }
 }
 
 function syncCardiologiaRecentEventDetail() {
   const select = document.getElementById("cardiologia_recent_event");
   const detail = document.getElementById("cardiologia-event-detail");
   const input = document.getElementById("cardiologia_recent_event_description");
-  const consultationSelect = document.getElementById("cardiologia_consultation_number");
-  const isInitial = isInitialCardiologiaConsultation(consultationSelect && consultationSelect.value);
-  const shouldShow = isInitial && select instanceof HTMLSelectElement && select.value === "Sim";
+  const shouldShow = select instanceof HTMLSelectElement && select.value === "Sim";
 
   if (detail) {
     detail.hidden = !shouldShow;
@@ -570,6 +615,7 @@ function updateCardiologiaConsultationOptions(patientId, currentRecordId = "", p
   }
 
   updateCardiologiaInitialFields();
+  syncCardiologiaCoronaryClassification();
   syncCardiologiaRecentEventDetail();
 }
 
@@ -643,8 +689,16 @@ function saveCardiologiaRecord() {
     return;
   }
 
-  const isInitial = isInitialCardiologiaConsultation(payload.consultation_number);
-  if (isInitial && payload.recent_event === "Sim" && !String(payload.recent_event_description || "").trim()) {
+  if (payload.coronary_disease === "Sim" && !String(payload.coronary_classification || "").trim()) {
+    SISELO.showAlert("cardiologia-alert", "Informe a classificação da doença coronária.", "error");
+    const input = document.getElementById("cardiologia_coronary_classification");
+    if (input instanceof HTMLSelectElement) {
+      input.focus();
+    }
+    return;
+  }
+
+  if (payload.recent_event === "Sim" && !String(payload.recent_event_description || "").trim()) {
     SISELO.showAlert("cardiologia-alert", "Informe qual evento ocorreu nos últimos 6 meses.", "error");
     const input = document.getElementById("cardiologia_recent_event_description");
     if (input instanceof HTMLInputElement) {
@@ -668,16 +722,17 @@ function saveCardiologiaRecord() {
     consultation_number: payload.consultation_number || INITIAL_CONSULTATION_LABEL,
     ldl: formatCardiologiaLdlOutput(ldlValue),
     mapa_target_met: payload.mapa_target_met,
-    cerebrovascular: isInitial ? payload.cerebrovascular : "",
-    coronary_disease: isInitial ? payload.coronary_disease : "",
-    hf_reduced_ef: isInitial ? payload.hf_reduced_ef : "",
-    peripheral_arterial_disease: isInitial ? payload.peripheral_arterial_disease : "",
-    recent_event: isInitial ? payload.recent_event : "",
-    recent_event_description: isInitial && payload.recent_event === "Sim" ? payload.recent_event_description : "",
-    renal_function: isInitial ? payload.renal_function : "",
-    interventions: isInitial ? payload.interventions : "",
-    barriers: isInitial ? payload.barriers : "",
-    recommendations: isInitial ? payload.recommendations : "",
+    cerebrovascular: payload.cerebrovascular,
+    coronary_disease: payload.coronary_disease,
+    coronary_classification: payload.coronary_disease === "Sim" ? payload.coronary_classification : "",
+    hf_reduced_ef: payload.hf_reduced_ef,
+    peripheral_arterial_disease: payload.peripheral_arterial_disease,
+    recent_event: payload.recent_event,
+    recent_event_description: payload.recent_event === "Sim" ? payload.recent_event_description : "",
+    renal_function: payload.renal_function,
+    interventions: payload.interventions,
+    barriers: payload.barriers,
+    recommendations: payload.recommendations,
     updated_at: new Date().toISOString(),
   });
 
@@ -723,6 +778,48 @@ function findCardiologiaPatientById(patientId) {
   return cardiologiaState.patients.find((item) => item.id === normalizedId) || null;
 }
 
+function findInitialCardiologiaRecordByPatient(patientId, currentRecordId = "") {
+  const normalizedPatientId = SISELO.normalizeEntityId(patientId);
+  const normalizedCurrentId = String(currentRecordId || "").trim();
+
+  if (!normalizedPatientId) {
+    return null;
+  }
+
+  return cardiologiaState.records.find((record) => (
+    record.patient_id === normalizedPatientId &&
+    record.id !== normalizedCurrentId &&
+    isInitialCardiologiaConsultation(record.consultation_number)
+  )) || null;
+}
+
+function mergeCardiologiaUniqueAnswers(record) {
+  const item = record || {};
+  if (isInitialCardiologiaConsultation(item.consultation_number)) {
+    return item;
+  }
+
+  const initialRecord = findInitialCardiologiaRecordByPatient(item.patient_id, item.id);
+  if (!initialRecord) {
+    return item;
+  }
+
+  return {
+    ...item,
+    cerebrovascular: item.cerebrovascular || initialRecord.cerebrovascular,
+    coronary_disease: item.coronary_disease || initialRecord.coronary_disease,
+    coronary_classification: item.coronary_classification || initialRecord.coronary_classification,
+    hf_reduced_ef: item.hf_reduced_ef || initialRecord.hf_reduced_ef,
+    peripheral_arterial_disease: item.peripheral_arterial_disease || initialRecord.peripheral_arterial_disease,
+    recent_event: item.recent_event || initialRecord.recent_event,
+    recent_event_description: item.recent_event_description || initialRecord.recent_event_description,
+    renal_function: item.renal_function || initialRecord.renal_function,
+    interventions: item.interventions || initialRecord.interventions,
+    barriers: item.barriers || initialRecord.barriers,
+    recommendations: item.recommendations || initialRecord.recommendations,
+  };
+}
+
 function updateCardiologiaPatientSummary(patient) {
   const element = document.getElementById("cardiologia-patient-summary");
   if (!element) {
@@ -736,11 +833,13 @@ function updateCardiologiaPatientSummary(patient) {
   }
 
   const fullPatient = findCardiologiaPatientById(patient.id) || normalizeCardiologiaPatient(patient);
+  const ageYears = getCardiologiaAgeYears(fullPatient);
+  const ageLabel = fullPatient.age_label || (Number.isFinite(ageYears) ? `${ageYears} anos` : "-");
   element.innerHTML = [
     renderCardiologiaPatientSummaryItem("CPF", fullPatient.cpf || "-"),
     renderCardiologiaPatientSummaryItem("SES", fullPatient.ses || "-"),
     renderCardiologiaPatientSummaryItem("Cor/Raça", formatCardiologiaRace(fullPatient.race)),
-    renderCardiologiaPatientSummaryItem("Idade", fullPatient.age_label || "-"),
+    renderCardiologiaPatientSummaryItem("Idade", ageLabel),
     renderCardiologiaPatientSummaryItem("Nascimento", formatCardiologiaDate(fullPatient.birth_date)),
     renderCardiologiaPatientSummaryItem("1º atendimento CADH", formatCardiologiaDate(fullPatient.first_cadh_date)),
   ].join("");
@@ -756,9 +855,76 @@ function renderCardiologiaPatientSummaryItem(label, value) {
   `;
 }
 
+function updateCardiologiaAgeGuidance(patient) {
+  const element = document.getElementById("cardiologia-age-guidance");
+  if (!element) {
+    return;
+  }
+
+  if (!patient || !patient.id) {
+    element.hidden = true;
+    element.textContent = "";
+    return;
+  }
+
+  const fullPatient = findCardiologiaPatientById(patient.id) || normalizeCardiologiaPatient(patient);
+  const ageYears = getCardiologiaAgeYears(fullPatient);
+  const ageLabel = fullPatient.age_label || (Number.isFinite(ageYears) ? `${ageYears} anos` : "");
+  const guidance = getCardiologiaAgeGuidance(ageYears);
+
+  element.textContent = ageLabel
+    ? `Idade: ${ageLabel}. ${guidance}`
+    : `Idade não informada. ${guidance}`;
+  element.hidden = false;
+}
+
+function getCardiologiaAgeYears(patient) {
+  const fromLabel = String((patient && patient.age_label) || "").match(/\d+/);
+  if (fromLabel) {
+    return Number(fromLabel[0]);
+  }
+
+  const birthDate = SISELO.parseDateInputValue(patient && patient.birth_date);
+  if (!birthDate) {
+    return NaN;
+  }
+
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDiff = today.getMonth() - birthDate.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+    age -= 1;
+  }
+
+  return age;
+}
+
+function getCardiologiaAgeGuidance(ageYears) {
+  if (!Number.isFinite(ageYears)) {
+    return "Avalie risco cardiovascular, PA/MAPA, LDL, função renal e sinais de alerta.";
+  }
+
+  if (ageYears < 2) {
+    return "Use avaliação pediátrica, confirme responsável presente e registre sinais de alerta.";
+  }
+
+  if (ageYears < 10) {
+    return "Considere responsável presente, crescimento, PA adequada para idade e sintomas de alerta.";
+  }
+
+  if (ageYears < 20) {
+    return "Considere adesão, autonomia, apoio familiar e risco cardiometabólico.";
+  }
+
+  if (ageYears >= 60) {
+    return "Considere fragilidade, função renal, polifarmácia, quedas e risco de hipotensão.";
+  }
+
+  return "Avalie risco cardiovascular, adesão, PA/MAPA, LDL e sintomas de alerta.";
+}
+
 function renderCardiologiaViewRecord(record) {
-  const item = record || {};
-  const initial = isInitialCardiologiaConsultation(item.consultation_number);
+  const item = mergeCardiologiaUniqueAnswers(record || {});
 
   return `
     ${renderCardiologiaViewSection("Identificação", [
@@ -776,20 +942,21 @@ function renderCardiologiaViewRecord(record) {
       ["Valor colesterol LDL", item.ldl || "-"],
       ["Cumprimento da meta terapêutica MAPA", item.mapa_target_met || "-"],
     ])}
-    ${initial ? renderCardiologiaViewSection("Informações cardiovasculares", [
+    ${renderCardiologiaViewSection("Informações únicas", [
       ["Cerebrovascular", item.cerebrovascular || "-"],
       ["Doença da artéria coronária", item.coronary_disease || "-"],
-      ["IC com fração de ejeção reduzida", item.hf_reduced_ef || "-"],
+      ["Classificação da doença da artéria coronária", formatCardiologiaCoronaryClassification(item) || "-"],
+      ["Insuficiência cardíaca com fração de ejeção reduzida", item.hf_reduced_ef || "-"],
       ["Doença arterial periférica sintomática dos membros inferiores", item.peripheral_arterial_disease || "-"],
-      ["Evento nos últimos 6 meses", item.recent_event || "-"],
-      ["Qual evento", item.recent_event_description || "-"],
+      ["Teve evento nos últimos 6 meses", item.recent_event || "-"],
+      ["Se sim, qual evento", item.recent_event_description || "-"],
       ["Função renal", item.renal_function || "-"],
-    ]) : ""}
-    ${initial ? renderCardiologiaViewSection("Plano de cuidado", [
+    ])}
+    ${renderCardiologiaViewSection("Plano de cuidado", [
       ["Intervenções medicamentosas e não medicamentosas", item.interventions || "-", true],
       ["Fatores dificultadores", item.barriers || "-", true],
       ["Recomendações", item.recommendations || "-", true],
-    ]) : ""}
+    ])}
   `;
 }
 
@@ -811,6 +978,26 @@ function renderCardiologiaViewItem(label, value, wide = false) {
       <div class="cardiologia-view-value">${SISELO.escapeHtml(value || "-")}</div>
     </div>
   `;
+}
+
+function formatCardiologiaCoronaryClassification(record) {
+  const item = record || {};
+  return item.coronary_disease === "Sim" ? item.coronary_classification || "" : "";
+}
+
+function formatCardiologiaCoronarySummary(record) {
+  const item = record || {};
+  const classification = formatCardiologiaCoronaryClassification(item);
+
+  if (item.coronary_disease === "Sim") {
+    return classification ? `Sim - ${classification}` : "Sim - classificar";
+  }
+
+  if (item.coronary_disease === "Não") {
+    return "Não";
+  }
+
+  return classification || "-";
 }
 
 function renderCardiologiaTable() {
@@ -846,25 +1033,29 @@ function renderCardiologiaTable() {
     return;
   }
 
-  tbody.innerHTML = records.map((record) => `
-    <tr>
-      <td>${SISELO.escapeHtml(formatCardiologiaDate(record.consultation_date))}</td>
-      <td>${SISELO.escapeHtml(record.full_name || "-")}</td>
-      <td>${SISELO.escapeHtml(record.consultation_number || "-")}</td>
-      <td>${SISELO.escapeHtml(record.ldl || "-")}</td>
-      <td>${SISELO.escapeHtml(record.mapa_target_met || "-")}</td>
-      <td>${SISELO.escapeHtml(record.cerebrovascular || "-")}</td>
-      <td>${SISELO.escapeHtml(record.coronary_disease || "-")}</td>
-      <td>${SISELO.escapeHtml(record.renal_function || "-")}</td>
-      <td>
-        <div class="table-actions">
-          ${SISELO.iconButton("view", "Ver guia clínica", { "data-cardiologia-view": record.id })}
-          ${SISELO.iconButton("pdf", "Gerar PDF", { "data-cardiologia-pdf": record.id })}
-          ${SISELO.iconButton("edit", "Editar registro", { "data-cardiologia-edit": record.id })}
-        </div>
-      </td>
-    </tr>
-  `).join("");
+  tbody.innerHTML = records.map((record) => {
+    const clinicalRecord = mergeCardiologiaUniqueAnswers(record);
+
+    return `
+      <tr>
+        <td>${SISELO.escapeHtml(formatCardiologiaDate(record.consultation_date))}</td>
+        <td>${SISELO.escapeHtml(record.full_name || "-")}</td>
+        <td>${SISELO.escapeHtml(record.consultation_number || "-")}</td>
+        <td>${SISELO.escapeHtml(record.ldl || "-")}</td>
+        <td>${SISELO.escapeHtml(record.mapa_target_met || "-")}</td>
+        <td>${SISELO.escapeHtml(clinicalRecord.cerebrovascular || "-")}</td>
+        <td>${SISELO.escapeHtml(formatCardiologiaCoronarySummary(clinicalRecord))}</td>
+        <td>${SISELO.escapeHtml(clinicalRecord.renal_function || "-")}</td>
+        <td>
+          <div class="table-actions">
+            ${SISELO.iconButton("view", "Ver guia clínica", { "data-cardiologia-view": record.id })}
+            ${SISELO.iconButton("pdf", "Gerar PDF", { "data-cardiologia-pdf": record.id })}
+            ${SISELO.iconButton("edit", "Editar registro", { "data-cardiologia-edit": record.id })}
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join("");
 
   bindCardiologiaTableActions();
 }
@@ -931,6 +1122,14 @@ function normalizeCardiologiaRecord(record) {
     return null;
   }
 
+  const coronaryStatus = normalizeCardiologiaCoronaryDisease(
+    record && record.coronary_disease,
+    record && record.coronary_classification,
+  );
+  const coronaryClassification = normalizeCardiologiaCoronaryClassification(
+    (record && record.coronary_classification) || (record && record.coronary_disease),
+  );
+
   return {
     id,
     patient_id: SISELO.normalizeEntityId(record && record.patient_id),
@@ -945,13 +1144,14 @@ function normalizeCardiologiaRecord(record) {
     consultation_number: normalizeCardiologiaConsultationLabel(record && record.consultation_number) || INITIAL_CONSULTATION_LABEL,
     ldl: String((record && record.ldl) || "").trim(),
     mapa_target_met: normalizeCardiologiaYesNo(record && record.mapa_target_met),
-    cerebrovascular: String((record && record.cerebrovascular) || "").trim(),
-    coronary_disease: String((record && record.coronary_disease) || "").trim(),
+    cerebrovascular: normalizeCardiologiaCerebrovascular(record && record.cerebrovascular),
+    coronary_disease: coronaryStatus,
+    coronary_classification: coronaryStatus === "Sim" ? coronaryClassification : "",
     hf_reduced_ef: normalizeCardiologiaYesNo(record && record.hf_reduced_ef),
     peripheral_arterial_disease: normalizeCardiologiaYesNo(record && record.peripheral_arterial_disease),
     recent_event: normalizeCardiologiaYesNo(record && record.recent_event),
     recent_event_description: String((record && record.recent_event_description) || "").trim(),
-    renal_function: String((record && record.renal_function) || "").trim(),
+    renal_function: normalizeCardiologiaRenalFunction(record && record.renal_function),
     interventions: String((record && record.interventions) || "").trim(),
     barriers: String((record && record.barriers) || "").trim(),
     recommendations: String((record && record.recommendations) || "").trim(),
@@ -970,6 +1170,85 @@ function normalizeCardiologiaYesNo(value) {
   }
 
   return "";
+}
+
+function normalizeCardiologiaCerebrovascular(value) {
+  const original = String(value || "").trim();
+  const normalized = SISELO.normalizeSearchText(original);
+  const values = {
+    "sem complicacoes": "Sem complicações",
+    "sem alteracoes": "Sem complicações",
+    "ave isquemico": "AVE isquêmico",
+    "avc isquemico": "AVE isquêmico",
+    "avc ave isquemico": "AVE isquêmico",
+    "hemorragia cerebral": "Hemorragia cerebral",
+    "ataque isquemico transitorio": "Ataque isquêmico transitório",
+    ait: "Ataque isquêmico transitório",
+  };
+
+  return values[normalized] || original;
+}
+
+function normalizeCardiologiaCoronaryDisease(value, classification = "") {
+  const normalized = SISELO.normalizeSearchText(value);
+  const normalizedClassification = SISELO.normalizeSearchText(classification);
+
+  if (normalized === "nao" || normalized === "sem complicacoes" || normalized === "sem alteracoes") {
+    return "Não";
+  }
+
+  if (
+    normalized === "sim" ||
+    normalized === "angina" ||
+    normalized === "angina estavel ou instavel" ||
+    normalizedClassification
+  ) {
+    return "Sim";
+  }
+
+  if (normalizeCardiologiaCoronaryClassification(value)) {
+    return "Sim";
+  }
+
+  return "";
+}
+
+function normalizeCardiologiaCoronaryClassification(value) {
+  const original = String(value || "").trim();
+  const normalized = SISELO.normalizeSearchText(original);
+  const values = {
+    "angina estavel": "Angina estável",
+    "angina instavel": "Angina instável",
+    "infarto do miocardio": "Infarto do miocárdio",
+    infarto: "Infarto do miocárdio",
+    "revascularizacao do miocardio percutanea angioplastia ou cirurgica": "Revascularização do miocárdio: percutânea (angioplastia) ou cirúrgica",
+    "revascularizacao coronaria": "Revascularização do miocárdio: percutânea (angioplastia) ou cirúrgica",
+  };
+
+  return values[normalized] || "";
+}
+
+function normalizeCardiologiaRenalFunction(value) {
+  const original = String(value || "").trim();
+  const normalized = SISELO.normalizeSearchText(original);
+  const values = {
+    "sem complicacoes": "Sem complicações",
+    "sem alteracoes": "Sem complicações",
+    "estagio drc 1": "Estágio DRC: 1",
+    "estagio drc 2": "Estágio DRC: 2",
+    "estagio drc 3a": "Estágio DRC: 3A",
+    "estagio drc 3b": "Estágio DRC: 3B",
+    "estagio drc 4": "Estágio DRC: 4",
+    "estagio drc 5": "Estágio DRC: 5",
+    "drc 1": "Estágio DRC: 1",
+    "drc 2": "Estágio DRC: 2",
+    "drc 3a": "Estágio DRC: 3A",
+    "drc 3b": "Estágio DRC: 3B",
+    "drc 4": "Estágio DRC: 4",
+    "drc 5": "Estágio DRC: 5",
+  };
+
+  return values[normalized] || original;
 }
 
 function createCardiologiaRecordId() {

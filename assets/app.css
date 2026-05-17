@@ -126,6 +126,39 @@ a {
   padding: 0 14px;
 }
 
+body[data-page="home"] .container {
+  max-width: 1640px;
+}
+
+body[data-page="home"] .menu a {
+  padding: 9px 14px;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+body[data-page="home"] .topbar-logout,
+body[data-page="home"] .topbar-account {
+  min-height: 40px;
+  padding: 8px 16px;
+  font-size: 1rem;
+}
+
+body[data-page="cadh"] .menu a,
+body[data-page="cadh-cardiologia"] .menu a {
+  padding: 10px 16px;
+  font-size: 1.08rem;
+  font-weight: 800;
+}
+
+body[data-page="cadh"] .topbar-logout,
+body[data-page="cadh"] .topbar-account,
+body[data-page="cadh-cardiologia"] .topbar-logout,
+body[data-page="cadh-cardiologia"] .topbar-account {
+  min-height: 44px;
+  padding: 9px 18px;
+  font-size: 1.08rem;
+}
+
 body[data-page="patients-list"] .container,
 body[data-page="patients-trash"] .container,
 body[data-page="care-plans-list"] .container,
@@ -1536,6 +1569,7 @@ body[data-page="transitions-trash"] .transitions-table td:nth-child(8) {
 
 .home-panel {
   overflow: hidden;
+  padding: 22px;
   background:
     radial-gradient(circle at top right, rgba(122, 202, 196, 0.1), transparent 24%),
     linear-gradient(180deg, #f8fbfb, #fdfefe);
@@ -1548,10 +1582,14 @@ body[data-page="transitions-trash"] .transitions-table td:nth-child(8) {
 .home-kicker {
   margin: 0 0 8px;
   color: #0f766e;
-  font-size: 0.8rem;
+  font-size: 0.95rem;
   font-weight: 800;
   letter-spacing: 0.14em;
   text-transform: uppercase;
+}
+
+body[data-page="home"] .page-title {
+  font-size: 1.65rem;
 }
 
 .home-subtitle {
@@ -1567,7 +1605,7 @@ body[data-page="transitions-trash"] .transitions-table td:nth-child(8) {
 }
 
 .home-access-card {
-  min-height: 86px;
+  min-height: 104px;
   display: grid;
   place-items: center;
   border: 1px solid rgba(122, 149, 164, 0.18);
@@ -1576,6 +1614,7 @@ body[data-page="transitions-trash"] .transitions-table td:nth-child(8) {
   color: #0f2148;
   text-align: center;
   text-decoration: none;
+  font-size: 1.15rem;
   font-weight: 700;
   box-shadow: 0 12px 24px rgba(15, 37, 65, 0.05);
   transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
@@ -1652,14 +1691,14 @@ body[data-page="transitions-trash"] .transitions-table td:nth-child(8) {
 }
 
 .home-direction-card {
-  min-height: 170px;
+  min-height: 190px;
   display: grid;
   grid-template-columns: auto 1fr;
   gap: 12px 16px;
   align-items: center;
   border-radius: 26px;
   border: 1px solid rgba(122, 149, 164, 0.18);
-  padding: 20px;
+  padding: 24px;
   background: linear-gradient(180deg, #f0f6fa, #f9fbfd);
   box-shadow: 0 16px 26px rgba(15, 37, 65, 0.05);
   transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
@@ -1676,8 +1715,8 @@ body[data-page="transitions-trash"] .transitions-table td:nth-child(8) {
 }
 
 .home-direction-icon {
-  inline-size: 54px;
-  block-size: 54px;
+  inline-size: 62px;
+  block-size: 62px;
   display: grid;
   place-items: center;
   border-radius: 50%;
@@ -1695,8 +1734,8 @@ body[data-page="transitions-trash"] .transitions-table td:nth-child(8) {
 }
 
 .home-direction-icon svg {
-  inline-size: 30px;
-  block-size: 30px;
+  inline-size: 34px;
+  block-size: 34px;
   fill: none;
   stroke: currentColor;
   stroke-width: 2;
@@ -1711,13 +1750,13 @@ body[data-page="transitions-trash"] .transitions-table td:nth-child(8) {
 }
 
 .home-direction-card strong {
-  font-size: 1rem;
+  font-size: 1.16rem;
 }
 
 .home-direction-card span {
   margin-top: 4px;
   color: #4c6476;
-  font-size: 0.92rem;
+  font-size: 1.04rem;
   font-weight: 700;
 }
 
@@ -1726,7 +1765,7 @@ body[data-page="transitions-trash"] .transitions-table td:nth-child(8) {
   margin: 4px 0 0;
   color: #0f2148;
   text-align: center;
-  font-size: 2rem;
+  font-size: 2.45rem;
   font-weight: 800;
 }
 
@@ -1734,12 +1773,12 @@ body[data-page="transitions-trash"] .transitions-table td:nth-child(8) {
   grid-column: 1 / -1;
   justify-self: center;
   min-width: 220px;
-  min-height: 40px;
-  padding: 8px 14px;
+  min-height: 46px;
+  padding: 10px 18px;
   border-color: rgba(81, 114, 145, 0.24);
   background: linear-gradient(180deg, #ffffff, #f4f7fa);
   color: #0f2148;
-  font-size: 0.82rem;
+  font-size: 0.98rem;
   text-align: center;
 }
 
