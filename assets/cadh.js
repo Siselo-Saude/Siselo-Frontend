@@ -177,7 +177,9 @@ function setCadhSesCardsUnlocked(unlocked) {
   document.querySelectorAll('[data-requires-ses="true"]').forEach((card) => {
     const baseHref = card.dataset.baseHref || '#';
     const patientId = card.dataset.patientId || '';
-    card.href = unlocked && patientId ? `${baseHref}?patient_id=${encodeURIComponent(patientId)}` : '#';
+    if (card instanceof HTMLAnchorElement) {
+      card.href = unlocked && patientId ? `${baseHref}?patient_id=${encodeURIComponent(patientId)}` : '#';
+    }
     card.classList.toggle('is-locked', !unlocked);
     card.setAttribute('aria-disabled', unlocked ? 'false' : 'true');
     card.tabIndex = unlocked ? 0 : -1;

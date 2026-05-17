@@ -7,6 +7,7 @@ const cardiologiaState = {
   records: [],
   patients: [],
   patientPicker: null,
+  activePatientId: "",
   lastFocus: null,
   editingRecordId: "",
   lastTypingAlertAt: 0,
@@ -26,8 +27,8 @@ async function setupCardiologiaPage() {
 
   SISELO.bindShell("cadh");
 
+  cardiologiaState.activePatientId = getCardiologiaContextPatientId();
   cardiologiaState.records = readCardiologiaRecords();
-  renderCardiologiaTable();
   bindCardiologiaModal();
   bindCardiologiaViewModal();
   bindCardiologiaClinicalRules();
@@ -47,9 +48,21 @@ async function setupCardiologiaPage() {
     select: "cardiologia_patient_id",
     container: "cardiologia_patient_search",
     rows: cardiologiaState.patients,
-    currentValue: "",
+    currentValue: cardiologiaState.activePatientId,
     placeholder: "Selecione o paciente...",
     onChange: (patient) => {
+      if (cardiologiaState.activePatientId) {
+        const scopedPatient = getActiveCardiologiaPatient();
+        const pickedPatientId = SISELO.normalizeEntityId(patient && patient.id);
+        if (cardiologiaState.patientPicker && scopedPatient && pickedPatientId !== cardiologiaState.activePatientId) {
+          cardiologiaState.patientPicker.setValue(scopedPatient);
+        }
+        updateCardiologiaConsultationOptions(cardiologiaState.activePatientId, cardiologiaState.editingRecordId);
+        updateCardiologiaPatientSummary(scopedPatient);
+        updateCardiologiaAgeGuidance(scopedPatient);
+        return;
+      }
+
       const selectedPatient = patient && patient.id
         ? findCardiologiaPatientById(patient.id) || patient
         : null;
@@ -65,6 +78,10 @@ async function setupCardiologiaPage() {
   if (patientSearchInput instanceof HTMLInputElement) {
     patientSearchInput.id = "cardiologia_patient_search_input";
   }
+
+  applyCardiologiaPatientScope();
+  updateCardiologiaScopeControls();
+  renderCardiologiaTable();
 }
 
 function bindCardiologiaModal() {
@@ -179,6 +196,65 @@ function readCadhSearchState() {
   }
 }
 
+function getCardiologiaContextPatientId() {
+  const queryPatientId = SISELO.normalizeEntityId(new URLSearchParams(window.location.search).get("patient_id"));
+  if (queryPatientId) {
+    return queryPatientId;
+  }
+
+  const cachedState = readCadhSearchState();
+  return SISELO.normalizeEntityId(cachedState && cachedState.patient && cachedState.patient.id);
+}
+
+function getActiveCardiologiaPatient() {
+  const patientId = SISELO.normalizeEntityId(cardiologiaState.activePatientId);
+  if (!patientId) {
+    return null;
+  }
+
+  const patient = findCardiologiaPatientById(patientId);
+  if (patient) {
+    return patient;
+  }
+
+  const cachedState = readCadhSearchState();
+  const cachedPatient = cachedState && cachedState.patient
+    ? normalizeCardiologiaPatient(cachedState.patient)
+    : null;
+
+  return cachedPatient && cachedPatient.id === patientId ? cachedPatient : null;
+}
+
+function applyCardiologiaPatientScope() {
+  const scopedPatient = getActiveCardiologiaPatient();
+  if (!scopedPatient || !cardiologiaState.patientPicker) {
+    return;
+  }
+
+  cardiologiaState.patientPicker.setValue(scopedPatient);
+  updateCardiologiaConsultationOptions(scopedPatient.id, cardiologiaState.editingRecordId);
+  updateCardiologiaPatientSummary(scopedPatient);
+  updateCardiologiaAgeGuidance(scopedPatient);
+
+  const input = document.querySelector("#cardiologia_patient_search input");
+  if (input instanceof HTMLInputElement) {
+    input.readOnly = true;
+    input.setAttribute("aria-readonly", "true");
+    input.title = "Paciente definido pela busca do CADH";
+  }
+}
+
+function updateCardiologiaScopeControls() {
+  const hasActivePatient = Boolean(SISELO.normalizeEntityId(cardiologiaState.activePatientId));
+  const newButton = document.getElementById("cardiologia-new");
+  if (newButton instanceof HTMLButtonElement) {
+    newButton.disabled = !hasActivePatient;
+    newButton.title = hasActivePatient
+      ? ""
+      : "Selecione um usuário no CADH para liberar a Cardiologia.";
+  }
+}
+
 function mergeCardiologiaPatients(rows) {
   const merged = new Map();
 
@@ -214,6 +290,11 @@ function openCardiologiaModal(record = null) {
   const modal = document.getElementById("cardiologia-modal");
   const form = document.getElementById("cardiologia-form");
   if (!modal || !form) {
+    return;
+  }
+
+  if (!record && !SISELO.normalizeEntityId(cardiologiaState.activePatientId)) {
+    SISELO.showAlert("cardiologia-alert", "Selecione um usuário no CADH antes de criar um registro de Cardiologia.", "error");
     return;
   }
 
@@ -304,9 +385,10 @@ function fillCardiologiaForm(record = null) {
       race: normalizedRecord.race,
     })
     : null;
+  const scopedPatient = getActiveCardiologiaPatient();
   const selectedPatient = normalizedRecord
     ? findCardiologiaPatientById(normalizedRecord.patient_id) || recordPatient
-    : cachedPatient;
+    : scopedPatient || cachedPatient;
 
   setCardiologiaField("cardiologia_record_id", normalizedRecord ? normalizedRecord.id : "");
   setCardiologiaField("cardiologia_consultation_date", formRecord ? formRecord.consultation_date : "");
@@ -665,9 +747,9 @@ function saveCardiologiaRecord() {
     return;
   }
 
-  const patientId = cardiologiaState.patientPicker
+  const patientId = cardiologiaState.activePatientId || (cardiologiaState.patientPicker
     ? cardiologiaState.patientPicker.getValue()
-    : "";
+    : "");
 
   if (!patientId) {
     SISELO.showAlert("cardiologia-alert", "Selecione o paciente.", "error");
@@ -1006,8 +1088,9 @@ function renderCardiologiaTable() {
     return;
   }
 
+  const activePatientId = SISELO.normalizeEntityId(cardiologiaState.activePatientId);
   const records = cardiologiaState.records
-    .slice()
+    .filter((record) => activePatientId && record.patient_id === activePatientId)
     .sort((left, right) => {
       const consultationOrder = parseCardiologiaConsultationOrdinal(right.consultation_number) -
         parseCardiologiaConsultationOrdinal(left.consultation_number);
@@ -1019,12 +1102,15 @@ function renderCardiologiaTable() {
     });
 
   if (!records.length) {
+    const emptyMessage = activePatientId
+      ? "Nenhum registro de Cardiologia encontrado para este paciente."
+      : "Selecione um usuário no CADH para visualizar os registros de Cardiologia.";
     tbody.innerHTML = `
       <tr>
         <td colspan="9">
           <div class="cardiologia-empty">
-            <p>Nenhum registro de Cardiologia encontrado.</p>
-            <button type="button" class="btn btn-primary" data-cardiologia-empty-new>+ Novo registro</button>
+            <p>${SISELO.escapeHtml(emptyMessage)}</p>
+            ${activePatientId ? '<button type="button" class="btn btn-primary" data-cardiologia-empty-new>+ Novo registro</button>' : ""}
           </div>
         </td>
       </tr>
