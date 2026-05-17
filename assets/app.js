@@ -1631,6 +1631,7 @@
     window.addEventListener('resize', () => {
       if (activeDatePicker) {
         renderDatePicker(activeDatePicker);
+        positionDatePickerPopover(activeDatePicker);
       }
     });
   }
@@ -1717,6 +1718,32 @@
     }
   }
 
+  function positionDatePickerPopover(instance) {
+    if (!instance || !instance.popover || !instance.wrapper) {
+      return;
+    }
+
+    if (window.matchMedia('(max-width: 860px)').matches) {
+      instance.popover.style.left = '';
+      instance.popover.style.right = '';
+      instance.popover.style.width = '';
+      instance.popover.style.minWidth = '';
+      return;
+    }
+
+    const viewportPadding = 12;
+    const wrapperRect = instance.wrapper.getBoundingClientRect();
+    const width = Math.min(340, window.innerWidth - (viewportPadding * 2));
+    const minLeft = viewportPadding - wrapperRect.left;
+    const maxLeft = window.innerWidth - viewportPadding - width - wrapperRect.left;
+    const left = Math.max(minLeft, Math.min(0, maxLeft));
+
+    instance.popover.style.width = `${width}px`;
+    instance.popover.style.minWidth = `${Math.min(312, width)}px`;
+    instance.popover.style.left = `${left}px`;
+    instance.popover.style.right = 'auto';
+  }
+
   function openDatePicker(instance) {
     if (!instance) {
       return;
@@ -1734,6 +1761,7 @@
 
     renderDatePicker(instance);
     instance.popover.hidden = false;
+    positionDatePickerPopover(instance);
     instance.trigger.setAttribute('aria-expanded', 'true');
     instance.wrapper.classList.add('is-open');
 
