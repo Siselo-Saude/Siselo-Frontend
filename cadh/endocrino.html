@@ -7,14 +7,22 @@
   <link rel="stylesheet" href="/assets/app.css">
   <style>
     .endocrino-page {
-      padding: 26px;
+      --endocrino-accent: #775e8c;
+      --endocrino-title: #27063f;
+      --endocrino-band: #c7b3d6;
+      --endocrino-soft: #f1e9f6;
+      --endocrino-border: #dccfe7;
+      padding: 34px;
       background:
         radial-gradient(circle at top right, rgba(119, 94, 140, 0.08), transparent 28%),
         linear-gradient(180deg, #f7f4fa, #eef3f5);
     }
 
     body[data-page="cadh-endocrino"] .container {
-      max-width: 1460px;
+      width: min(1840px, calc(100vw - 32px));
+      max-width: none;
+      margin: 20px auto;
+      padding: 0;
     }
 
     .endocrino-header {
@@ -27,9 +35,9 @@
     }
 
     .endocrino-title {
-      margin: 0;
-      color: #280747;
-      font-size: 1.45rem;
+      margin: 14px 0 0;
+      color: var(--endocrino-title);
+      font-size: 2rem;
       line-height: 1.25;
     }
 
@@ -40,10 +48,20 @@
       flex-wrap: wrap;
     }
 
+    .endocrino-page .btn,
+    .endocrino-page button,
+    .endocrino-modal .btn,
+    .endocrino-modal button {
+      min-height: 46px;
+      padding: 11px 18px;
+      font-size: 1.08rem;
+      font-weight: 800;
+    }
+
     .endocrino-table-shell {
       width: 100%;
       overflow-x: auto;
-      border: 1px solid #dbe4ea;
+      border: 1px solid var(--endocrino-border);
       border-radius: 10px;
       background: #ffffff;
       box-shadow: 0 18px 30px rgba(15, 37, 65, 0.06);
@@ -51,49 +69,50 @@
 
     .endocrino-table {
       width: 100%;
-      min-width: 1180px;
+      min-width: 1590px;
       table-layout: fixed;
       border: 0;
     }
 
     .endocrino-col-date {
-      width: 108px;
+      width: 138px;
     }
 
     .endocrino-col-patient {
-      width: 168px;
+      width: 230px;
     }
 
     .endocrino-col-consult {
-      width: 132px;
+      width: 170px;
     }
 
     .endocrino-col-hba1c {
-      width: 104px;
-    }
-
-    .endocrino-col-target {
-      width: 126px;
-    }
-
-    .endocrino-col-complication {
-      width: 118px;
-    }
-
-    .endocrino-col-renal {
       width: 150px;
     }
 
+    .endocrino-col-target {
+      width: 180px;
+    }
+
+    .endocrino-col-complication {
+      width: 180px;
+    }
+
+    .endocrino-col-renal {
+      width: 180px;
+    }
+
     .endocrino-col-actions {
-      width: 148px;
+      width: 182px;
     }
 
     .endocrino-table th,
     .endocrino-table td {
       border-color: #e8edf2;
-      padding: 14px 12px;
-      color: #27063f;
-      font-size: 0.86rem;
+      padding: 20px 16px;
+      color: var(--endocrino-title);
+      font-size: 1.08rem;
+      line-height: 1.45;
     }
 
     .endocrino-table tbody tr {
@@ -102,8 +121,8 @@
 
     .endocrino-table-group th {
       border-top: 0;
-      color: #27063f;
-      font-size: 1rem;
+      color: var(--endocrino-title);
+      font-size: 1.18rem;
       font-weight: 900;
       text-align: center;
       letter-spacing: 0.02em;
@@ -111,32 +130,31 @@
     }
 
     .endocrino-table-group .is-transition {
-      background: #c7b3d6;
-      color: #27063f;
+      background: var(--endocrino-band);
+      color: var(--endocrino-title);
       text-align: left;
     }
 
-    .endocrino-table-group .is-specialty {
-      background: #eee7f2;
-      color: #27063f;
+    .endocrino-table-group .is-specialty,
+    .endocrino-table-fields th {
+      background: var(--endocrino-soft);
+      color: var(--endocrino-title);
     }
 
-    .endocrino-table-group .is-actions {
+    .endocrino-table-group .is-actions,
+    .endocrino-table-fields .is-actions-subhead {
       background: #fbfcfd;
       color: #405163;
-      border-left: 1px solid #dbe4ea;
+      border-left: 1px solid var(--endocrino-border);
     }
 
     .endocrino-table-fields th {
-      background: #eee7f2;
-      font-size: 0.92rem;
+      font-size: 1.08rem;
       font-weight: 900;
       text-align: left;
     }
 
     .endocrino-table-fields .is-actions-subhead {
-      background: #fbfcfd;
-      border-left: 1px solid #dbe4ea;
       text-align: center;
     }
 
@@ -151,33 +169,44 @@
 
     .endocrino-table th:last-child,
     .endocrino-table td:last-child {
-      border-left: 1px solid #dbe4ea;
+      border-left: 1px solid var(--endocrino-border);
       text-align: center;
     }
 
     .endocrino-table td:last-child {
-      padding: 10px 8px;
+      padding: 14px 10px;
       background: #fbfcfd;
     }
 
     .endocrino-table .table-actions {
       justify-content: center;
       flex-wrap: nowrap;
-      gap: 8px;
-      min-height: 40px;
+      gap: 10px;
+      min-height: 50px;
     }
 
     .endocrino-table .icon-btn {
+      inline-size: 42px;
+      block-size: 42px;
+      display: inline-grid;
+      place-items: center;
+      padding: 0;
       border: 1px solid #e3ebf0;
       background: #f7fafb;
       color: #718395;
     }
 
+    .endocrino-table .icon-btn svg {
+      inline-size: 20px;
+      block-size: 20px;
+      display: block;
+    }
+
     .endocrino-table .icon-btn:hover,
     .endocrino-table .icon-btn:focus-visible {
-      background: #eef8f6;
-      color: #0f766e;
-      box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.08);
+      background: #f5f0f8;
+      color: var(--endocrino-accent);
+      box-shadow: 0 0 0 3px rgba(119, 94, 140, 0.1);
       transform: none;
     }
 
@@ -212,46 +241,46 @@
     }
 
     .endocrino-modal {
-      width: min(660px, calc(100vw - 16px));
+      width: min(980px, calc(100vw - 28px));
       max-height: calc(100vh - 24px);
       display: grid;
       grid-template-rows: auto minmax(0, 1fr) auto;
       overflow: hidden;
       border: 1px solid rgba(119, 94, 140, 0.22);
-      border-radius: 8px;
+      border-radius: 16px;
       background: #ffffff;
-      box-shadow: 0 24px 60px rgba(3, 10, 18, 0.28);
+      box-shadow: 0 26px 70px rgba(43, 16, 65, 0.24);
     }
 
     .endocrino-modal-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
-      padding: 20px 24px 12px;
-      border-bottom: 1px solid #eef2f6;
+      gap: 16px;
+      padding: 18px 22px;
+      border-bottom: 1px solid #ece3f2;
+      background: linear-gradient(180deg, #faf7fc, #ffffff);
     }
 
     .endocrino-modal-title {
       margin: 0;
-      color: #3a1554;
-      font-size: 1.12rem;
+      color: var(--endocrino-title);
+      font-size: 1.4rem;
       line-height: 1.3;
     }
 
     .endocrino-close {
-      width: 34px;
-      height: 34px;
-      display: inline-grid;
+      inline-size: 38px;
+      block-size: 38px;
+      display: grid;
       place-items: center;
-      flex: 0 0 auto;
-      border: 0;
-      border-radius: 999px;
-      background: transparent;
-      color: #4b5563;
-      font-size: 1.4rem;
-      line-height: 1;
       padding: 0;
+      border: 1px solid var(--endocrino-border);
+      border-radius: 10px;
+      background: #fff;
+      color: var(--endocrino-title);
+      font-size: 1.35rem;
+      line-height: 1;
     }
 
     .endocrino-close:hover,
@@ -259,50 +288,71 @@
       outline: none;
       background: #f5f1f8;
       box-shadow: none;
-      color: #3a1554;
+      color: var(--endocrino-accent);
+      transform: none;
     }
 
     .endocrino-form-body {
       min-height: 0;
       overflow-y: auto;
-      padding: 0 24px 18px;
+      padding: 28px 32px 30px;
+      background: #fdfbfe;
     }
 
     .endocrino-form-section {
       display: grid;
-      gap: 14px;
-      padding-top: 18px;
+      gap: 16px;
+      margin-bottom: 20px;
     }
 
     .endocrino-section-title {
       margin: 0;
-      padding-top: 2px;
-      border-top: 1px solid #e5e7eb;
-      color: #8b9ab6;
-      font-size: 0.78rem;
+      color: var(--endocrino-title);
+      font-size: 1.08rem;
       font-weight: 900;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.04em;
       text-transform: uppercase;
     }
 
     .endocrino-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 16px;
+      gap: 22px;
+    }
+
+    .endocrino-grid .field,
+    .endocrino-grid .field-full {
+      min-width: 0;
+    }
+
+    .endocrino-grid .field-full {
+      grid-column: 1 / -1;
     }
 
     .endocrino-grid .field label,
     .endocrino-grid .field-full label {
       color: #18324d;
-      font-size: 0.82rem;
-      font-weight: 700;
+      font-size: 1.1rem;
+      font-weight: 800;
+    }
+
+    .endocrino-modal input,
+    .endocrino-modal select,
+    .endocrino-modal textarea {
+      min-height: 56px;
+      font-size: 1.12rem;
+      line-height: 1.45;
+    }
+
+    .endocrino-modal textarea {
+      min-height: 118px;
     }
 
     .endocrino-age-guidance {
       grid-column: 1 / -1;
       margin: 8px 0 0;
       color: #53657a;
-      font-size: 0.82rem;
+      font-size: 1rem;
       line-height: 1.45;
     }
 
@@ -310,9 +360,9 @@
       grid-column: 1 / -1;
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 10px;
-      padding: 12px;
-      border: 1px solid #dccfe7;
+      gap: 14px;
+      padding: 16px;
+      border: 1px solid var(--endocrino-border);
       border-radius: 12px;
       background: #f5f0f8;
     }
@@ -326,7 +376,7 @@
       gap: 2px;
       min-width: 0;
       color: #6f5e83;
-      font-size: 0.76rem;
+      font-size: 0.95rem;
       font-weight: 800;
       letter-spacing: 0.02em;
       text-transform: uppercase;
@@ -334,8 +384,8 @@
 
     .endocrino-patient-summary strong {
       overflow: hidden;
-      color: #27063f;
-      font-size: 0.9rem;
+      color: var(--endocrino-title);
+      font-size: 1.08rem;
       letter-spacing: 0;
       text-overflow: ellipsis;
       text-transform: none;
@@ -365,7 +415,7 @@
 
     .endocrino-select-trigger {
       width: 100%;
-      min-height: 48px;
+      min-height: 56px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -375,8 +425,9 @@
       background: #ffffff;
       color: #1f2937;
       font: inherit;
+      font-size: 1.12rem;
       line-height: 1.25;
-      padding: 12px 14px;
+      padding: 14px 16px;
       text-align: left;
     }
 
@@ -394,8 +445,8 @@
     .endocrino-select-trigger:hover,
     .endocrino-select-trigger:focus-visible {
       outline: none;
-      border-color: #9bc7c3;
-      box-shadow: 0 0 0 4px rgba(0, 121, 107, 0.13);
+      border-color: #bfaad1;
+      box-shadow: 0 0 0 4px rgba(119, 94, 140, 0.14);
     }
 
     .endocrino-select-menu {
@@ -427,7 +478,7 @@
       border-radius: 8px;
       background: #ffffff;
       color: #27364a;
-      font-size: 0.82rem;
+      font-size: 1rem;
       line-height: 1.45;
       padding: 10px 12px;
       box-shadow: 0 16px 34px rgba(15, 23, 42, 0.18);
@@ -445,7 +496,8 @@
       background: transparent;
       color: #1f2937;
       font: inherit;
-      padding: 10px 12px;
+      font-size: 1.08rem;
+      padding: 12px 14px;
       text-align: left;
     }
 
@@ -461,14 +513,20 @@
       display: flex;
       justify-content: flex-end;
       gap: 12px;
-      padding: 12px 24px 18px;
-      border-top: 1px solid #e5e7eb;
+      padding: 16px 22px;
+      border-top: 1px solid #ece3f2;
       background: #ffffff;
     }
 
+    .endocrino-form-actions .btn,
+    .endocrino-form-actions button {
+      min-width: 150px;
+      justify-content: center;
+    }
+
     .endocrino-save-icon {
-      width: 18px;
-      height: 18px;
+      inline-size: 18px;
+      block-size: 18px;
       margin-right: 8px;
       fill: none;
       stroke: currentColor;
@@ -479,27 +537,30 @@
 
     .endocrino-view-content {
       display: grid;
-      gap: 18px;
-      padding-top: 18px;
+      gap: 16px;
     }
 
     .endocrino-view-section {
       display: grid;
       gap: 12px;
+      padding: 14px;
+      border: 1px solid #eadff1;
+      border-radius: 12px;
+      background: #fff;
     }
 
     .endocrino-view-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
+      gap: 12px;
     }
 
     .endocrino-view-item {
       min-width: 0;
       padding: 12px;
-      border: 1px solid #e5edf2;
-      border-radius: 8px;
-      background: #fbfcfd;
+      border: 0;
+      border-radius: 10px;
+      background: #f8f4fb;
     }
 
     .endocrino-view-item.is-wide {
@@ -517,15 +578,15 @@
     }
 
     .endocrino-view-value {
-      color: #172b3f;
-      font-size: 0.94rem;
+      color: var(--endocrino-title);
+      font-size: 1rem;
       font-weight: 700;
       line-height: 1.45;
       white-space: pre-wrap;
       overflow-wrap: anywhere;
     }
 
-    @media (max-width: 620px) {
+    @media (max-width: 760px) {
       .endocrino-page {
         padding: 20px;
       }
@@ -591,7 +652,7 @@
       <div class="endocrino-header">
         <div>
           <a class="btn" href="/cadh/index.html">← Voltar</a>
-          <h1 class="endocrino-title" style="margin-top:14px;">Endocrinologista</h1>
+          <h1 class="endocrino-title">Endocrinologista</h1>
         </div>
         <div class="endocrino-actions">
           <button type="button" id="endocrino-new" class="btn btn-primary">+ Novo registro</button>

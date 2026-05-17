@@ -1,0 +1,786 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cardiologista</title>
+  <link rel="stylesheet" href="/assets/app.css">
+  <style>
+    .cardiologia-page {
+      --cardio-accent: #3f7191;
+      --cardio-title: #17364b;
+      --cardio-band: #82b8d8;
+      --cardio-soft: #e7f3fa;
+      --cardio-border: #d6e7f0;
+      padding: 34px;
+      background:
+        radial-gradient(circle at top right, rgba(63, 113, 145, 0.1), transparent 28%),
+        linear-gradient(180deg, #f3f9fc, #eef3f5);
+    }
+
+    body[data-page="cadh-cardiologia"] .container {
+      width: min(1840px, calc(100vw - 32px));
+      max-width: none;
+      margin: 20px auto;
+      padding: 0;
+    }
+
+    .cardiologia-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .cardiologia-title {
+      margin: 14px 0 0;
+      color: var(--cardio-title);
+      font-size: 2rem;
+      line-height: 1.25;
+    }
+
+    .cardiologia-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .cardiologia-page .btn,
+    .cardiologia-page button,
+    .cardiologia-modal .btn,
+    .cardiologia-modal button {
+      min-height: 46px;
+      padding: 11px 18px;
+      font-size: 1.08rem;
+      font-weight: 800;
+    }
+
+    .cardiologia-table-shell {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--cardio-border);
+      border-radius: 10px;
+      background: #ffffff;
+      box-shadow: 0 18px 30px rgba(15, 37, 65, 0.06);
+    }
+
+    .cardiologia-table {
+      width: 100%;
+      min-width: 1560px;
+      table-layout: fixed;
+      border: 0;
+    }
+
+    .cardiologia-col-date {
+      width: 138px;
+    }
+
+    .cardiologia-col-patient {
+      width: 230px;
+    }
+
+    .cardiologia-col-consult {
+      width: 170px;
+    }
+
+    .cardiologia-col-ldl {
+      width: 150px;
+    }
+
+    .cardiologia-col-mapa {
+      width: 160px;
+    }
+
+    .cardiologia-col-cerebro {
+      width: 190px;
+    }
+
+    .cardiologia-col-coronary {
+      width: 260px;
+    }
+
+    .cardiologia-col-renal {
+      width: 180px;
+    }
+
+    .cardiologia-col-actions {
+      width: 182px;
+    }
+
+    .cardiologia-table th,
+    .cardiologia-table td {
+      border-color: #e7eef3;
+      padding: 20px 16px;
+      color: var(--cardio-title);
+      font-size: 1.08rem;
+      line-height: 1.45;
+    }
+
+    .cardiologia-table tbody tr {
+      background: #fff;
+    }
+
+    .cardiologia-table-group th {
+      border-top: 0;
+      color: var(--cardio-title);
+      font-size: 1.18rem;
+      font-weight: 900;
+      text-align: center;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .cardiologia-table-group .is-transition {
+      background: var(--cardio-band);
+      color: #102a3c;
+      text-align: left;
+    }
+
+    .cardiologia-table-group .is-specialty,
+    .cardiologia-table-fields th {
+      background: var(--cardio-soft);
+      color: var(--cardio-title);
+    }
+
+    .cardiologia-table-group .is-actions,
+    .cardiologia-table-fields .is-actions-subhead {
+      background: #fbfcfd;
+      color: #405163;
+      border-left: 1px solid var(--cardio-border);
+    }
+
+    .cardiologia-table-fields th {
+      font-size: 1.08rem;
+      font-weight: 900;
+      text-align: left;
+    }
+
+    .cardiologia-table-fields .is-actions-subhead {
+      text-align: center;
+    }
+
+    .cardiologia-table td:nth-child(1) {
+      white-space: nowrap;
+    }
+
+    .cardiologia-table td:nth-child(2) {
+      font-weight: 800;
+      color: #0e2435;
+    }
+
+    .cardiologia-table th:last-child,
+    .cardiologia-table td:last-child {
+      border-left: 1px solid var(--cardio-border);
+      text-align: center;
+    }
+
+    .cardiologia-table td:last-child {
+      padding: 14px 10px;
+      background: #fbfcfd;
+    }
+
+    .cardiologia-table .table-actions {
+      justify-content: center;
+      flex-wrap: nowrap;
+      gap: 10px;
+      min-height: 50px;
+    }
+
+    .cardiologia-table .icon-btn {
+      inline-size: 42px;
+      block-size: 42px;
+      display: inline-grid;
+      place-items: center;
+      padding: 0;
+      border: 1px solid #e0ebf1;
+      background: #f7fafc;
+      color: #70899a;
+    }
+
+    .cardiologia-table .icon-btn svg {
+      inline-size: 20px;
+      block-size: 20px;
+      display: block;
+    }
+
+    .cardiologia-table .icon-btn:hover,
+    .cardiologia-table .icon-btn:focus-visible {
+      background: #eef7fb;
+      color: var(--cardio-accent);
+      box-shadow: 0 0 0 3px rgba(63, 113, 145, 0.1);
+      transform: none;
+    }
+
+    .cardiologia-empty {
+      min-height: 170px;
+      display: grid;
+      place-items: center;
+      gap: 12px;
+      padding: 32px;
+      color: #61798a;
+      text-align: center;
+    }
+
+    .cardiologia-empty p {
+      margin: 0;
+      font-weight: 600;
+    }
+
+    .cardiologia-modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1100;
+      display: grid;
+      place-items: start center;
+      overflow-y: auto;
+      padding: 12px 8px 28px;
+      background: rgba(9, 17, 25, 0.62);
+    }
+
+    .cardiologia-modal-overlay[hidden] {
+      display: none;
+    }
+
+    .cardiologia-modal {
+      width: min(980px, calc(100vw - 28px));
+      max-height: calc(100vh - 24px);
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      overflow: hidden;
+      border: 1px solid rgba(63, 113, 145, 0.22);
+      border-radius: 16px;
+      background: #fff;
+      box-shadow: 0 26px 70px rgba(15, 37, 65, 0.24);
+    }
+
+    .cardiologia-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 18px 22px;
+      border-bottom: 1px solid #e6eef4;
+      background: linear-gradient(180deg, #f5fbfe, #ffffff);
+    }
+
+    .cardiologia-modal-title {
+      margin: 0;
+      color: var(--cardio-title);
+      font-size: 1.4rem;
+      line-height: 1.3;
+    }
+
+    .cardiologia-close {
+      inline-size: 38px;
+      block-size: 38px;
+      padding: 0;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      border: 1px solid #d7e7ef;
+      background: #fff;
+      color: var(--cardio-title);
+      font-size: 1.35rem;
+      line-height: 1;
+    }
+
+    .cardiologia-close:hover,
+    .cardiologia-close:focus-visible {
+      background: #eef7fb;
+      color: var(--cardio-accent);
+      box-shadow: none;
+      transform: none;
+    }
+
+    .cardiologia-form-body {
+      overflow-y: auto;
+      padding: 28px 32px 30px;
+      background: #fbfdfe;
+    }
+
+    .cardiologia-form-section {
+      margin-bottom: 20px;
+    }
+
+    .cardiologia-form-section[hidden],
+    .cardiologia-event-detail[hidden] {
+      display: none;
+    }
+
+    .cardiologia-section-title {
+      margin: 0 0 14px;
+      color: var(--cardio-title);
+      font-size: 1.08rem;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .cardiologia-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 22px;
+    }
+
+    .cardiologia-grid .field,
+    .cardiologia-grid .field-full {
+      min-width: 0;
+    }
+
+    .cardiologia-grid .field-full {
+      grid-column: 1 / -1;
+    }
+
+    .cardiologia-grid .field label,
+    .cardiologia-grid .field-full label {
+      color: #33556b;
+      font-size: 1.1rem;
+      font-weight: 800;
+    }
+
+    .cardiologia-modal input,
+    .cardiologia-modal select,
+    .cardiologia-modal textarea {
+      min-height: 56px;
+      font-size: 1.12rem;
+      line-height: 1.45;
+    }
+
+    .cardiologia-modal textarea {
+      min-height: 118px;
+    }
+
+    .cardiologia-coronary-detail {
+      grid-column: 1 / -1;
+    }
+
+    .cardiologia-field-guidance {
+      margin: 6px 0 0;
+      color: #64798a;
+      font-size: 1rem;
+      line-height: 1.45;
+    }
+
+    .cardiologia-coronary-instability-hint {
+      margin-top: 12px;
+      padding: 18px 20px;
+      border: 2px solid #f0c95c;
+      border-left: 8px solid #b48716;
+      border-radius: 12px;
+      background: #fff8df;
+      color: #563b08;
+      font-size: 1.18rem;
+      font-weight: 800;
+      line-height: 1.5;
+    }
+
+    .cardiologia-age-guidance {
+      grid-column: 1 / -1;
+      margin: 8px 0 0;
+      color: #536b7a;
+      font-size: 1rem;
+      line-height: 1.45;
+    }
+
+    .cardiologia-patient-summary {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      padding: 16px;
+      border: 1px solid #c9dfeb;
+      border-radius: 12px;
+      background: #eef7fb;
+    }
+
+    .cardiologia-patient-summary[hidden] {
+      display: none;
+    }
+
+    .cardiologia-patient-summary span {
+      display: grid;
+      gap: 2px;
+      min-width: 0;
+      color: #456f87;
+      font-size: 0.95rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .cardiologia-patient-summary strong {
+      overflow: hidden;
+      color: var(--cardio-title);
+      font-size: 1.08rem;
+      letter-spacing: 0;
+      text-overflow: ellipsis;
+      text-transform: none;
+      white-space: nowrap;
+    }
+
+    .cardiologia-form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      padding: 16px 22px;
+      border-top: 1px solid #e6eef4;
+      background: #fff;
+    }
+
+    .cardiologia-form-actions .btn,
+    .cardiologia-form-actions button {
+      min-width: 150px;
+      justify-content: center;
+    }
+
+    .cardiologia-save-icon {
+      inline-size: 18px;
+      block-size: 18px;
+      margin-right: 8px;
+      fill: currentColor;
+      vertical-align: -3px;
+    }
+
+    .cardiologia-view-content {
+      display: grid;
+      gap: 16px;
+    }
+
+    .cardiologia-view-section {
+      padding: 14px;
+      border: 1px solid #dce9f1;
+      border-radius: 12px;
+      background: #fff;
+    }
+
+    .cardiologia-view-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .cardiologia-view-item {
+      min-width: 0;
+      padding: 12px;
+      border-radius: 10px;
+      background: #f6fafc;
+    }
+
+    .cardiologia-view-item.is-wide {
+      grid-column: 1 / -1;
+    }
+
+    .cardiologia-view-label {
+      display: block;
+      margin-bottom: 5px;
+      color: #64798a;
+      font-size: 0.74rem;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .cardiologia-view-value {
+      color: var(--cardio-title);
+      font-weight: 700;
+      line-height: 1.45;
+      white-space: pre-wrap;
+    }
+
+    @media (max-width: 760px) {
+      .cardiologia-page {
+        padding: 20px;
+      }
+
+      .cardiologia-actions {
+        width: 100%;
+      }
+
+      .cardiologia-actions .btn,
+      .cardiologia-actions button {
+        flex: 1 1 180px;
+      }
+
+      .cardiologia-grid,
+      .cardiologia-view-grid,
+      .cardiologia-patient-summary {
+        grid-template-columns: 1fr;
+      }
+
+      .cardiologia-modal-header,
+      .cardiologia-form-body,
+      .cardiologia-form-actions {
+        padding-inline: 16px;
+      }
+
+      .cardiologia-form-actions {
+        flex-direction: column-reverse;
+      }
+
+      .cardiologia-form-actions .btn,
+      .cardiologia-form-actions button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body data-page="cadh-cardiologia">
+  <header class="topbar">
+    <div class="topbar-brand">Intranet CADH</div>
+    <nav class="menu">
+      <a id="nav-home" href="/index.html">Home</a>
+      <a id="nav-cadh" href="/cadh/index.html">CADH</a>
+      <a id="nav-ubs" href="/ubs/index.html">UBS</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="card cardiologia-page">
+      <svg aria-hidden="true" style="display:none">
+        <symbol id="cardiologia-icon-save" viewBox="0 0 24 24">
+          <path d="M5 3h12l2 2v16H5V3Zm2 2v14h10V7.8L15.2 5H15v6H8V5H7Zm3 0v4h3V5h-3Zm-1 10h6v2H9v-2Z"/>
+        </symbol>
+      </svg>
+
+      <div class="cardiologia-header">
+        <div>
+          <a class="btn" href="/cadh/index.html">&larr; Voltar</a>
+          <h1 class="cardiologia-title">Cardiologista</h1>
+        </div>
+        <div class="cardiologia-actions">
+          <button type="button" id="cardiologia-new" class="btn btn-primary">+ Novo registro</button>
+        </div>
+      </div>
+
+      <div class="cardiologia-table-shell">
+        <table class="cardiologia-table" aria-label="Registros de Cardiologia">
+          <colgroup>
+            <col class="cardiologia-col-date">
+            <col class="cardiologia-col-patient">
+            <col class="cardiologia-col-consult">
+            <col class="cardiologia-col-ldl">
+            <col class="cardiologia-col-mapa">
+            <col class="cardiologia-col-cerebro">
+            <col class="cardiologia-col-coronary">
+            <col class="cardiologia-col-renal">
+            <col class="cardiologia-col-actions">
+          </colgroup>
+          <thead>
+            <tr class="cardiologia-table-group">
+              <th class="is-transition" colspan="3">Cardiologista</th>
+              <th class="is-specialty" colspan="5">Dados clínicos</th>
+              <th class="is-actions">Ações</th>
+            </tr>
+            <tr class="cardiologia-table-fields">
+              <th>Data</th>
+              <th>Paciente</th>
+              <th>Consulta</th>
+              <th>LDL</th>
+              <th>Meta MAPA</th>
+              <th>Cerebrovascular</th>
+              <th>Doença da artéria coronária</th>
+              <th>Função renal</th>
+              <th class="is-actions-subhead" aria-label="Ações"></th>
+            </tr>
+          </thead>
+          <tbody id="cardiologia-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <div id="cardiologia-modal" class="cardiologia-modal-overlay" hidden>
+    <form id="cardiologia-form" class="cardiologia-modal" novalidate>
+      <div class="cardiologia-modal-header">
+        <h2 class="cardiologia-modal-title">Cardiologista - Registro de Consulta</h2>
+        <button type="button" class="cardiologia-close" data-cardiologia-close aria-label="Fechar">&times;</button>
+      </div>
+
+      <div class="cardiologia-form-body">
+        <div id="cardiologia-alert" class="alert" hidden></div>
+        <input id="cardiologia_record_id" name="record_id" type="hidden">
+
+        <section class="cardiologia-form-section">
+          <div class="cardiologia-grid">
+            <div class="field-full">
+              <label for="cardiologia_patient_search_input">Paciente *</label>
+              <select id="cardiologia_patient_id" name="patient_id" class="visually-hidden" tabindex="-1" aria-hidden="true"></select>
+              <div id="cardiologia_patient_search" class="transition-patient-search"></div>
+            </div>
+
+            <div id="cardiologia-patient-summary" class="cardiologia-patient-summary" hidden></div>
+            <p id="cardiologia-age-guidance" class="cardiologia-age-guidance" hidden></p>
+
+            <div class="field">
+              <label for="cardiologia_consultation_date">Data da consulta *</label>
+              <input id="cardiologia_consultation_date" name="consultation_date" type="date" placeholder="dd/mm/aaaa" required>
+            </div>
+
+            <div class="field">
+              <label for="cardiologia_consultation_number">Nº da consulta</label>
+              <select id="cardiologia_consultation_number" name="consultation_number">
+                <option value="1ª Consulta (inicial)">1ª Consulta (inicial)</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <section class="cardiologia-form-section">
+          <h3 class="cardiologia-section-title">Acompanhamento cardiovascular</h3>
+          <div class="cardiologia-grid">
+            <div class="field">
+              <label for="cardiologia_ldl">Valor colesterol LDL mg/dl</label>
+              <input id="cardiologia_ldl" name="ldl" inputmode="decimal" autocomplete="off" placeholder="Conforme laudo">
+              <p class="cardiologia-field-guidance">Preencha apenas o número do LDL em mg/dl, conforme o exame.</p>
+            </div>
+
+            <div class="field">
+              <label for="cardiologia_mapa_target_met">Cumprimento da meta terapêutica MAPA</label>
+              <select id="cardiologia_mapa_target_met" name="mapa_target_met">
+                <option value="" hidden>Selecione...</option>
+                <option>Sim</option>
+                <option>Não</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <section id="cardiologia-initial-section" class="cardiologia-form-section">
+          <h3 class="cardiologia-section-title">Informações únicas</h3>
+          <div class="cardiologia-grid">
+            <div class="field">
+              <label for="cardiologia_cerebrovascular">Cerebrovascular</label>
+              <select id="cardiologia_cerebrovascular" name="cerebrovascular" data-cardiologia-initial-field>
+                <option value="" hidden>Selecione...</option>
+                <option>Sem complicações</option>
+                <option>AVE isquêmico</option>
+                <option>Hemorragia cerebral</option>
+                <option>Ataque isquêmico transitório</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="cardiologia_coronary_disease">Doença da artéria coronária</label>
+              <select id="cardiologia_coronary_disease" name="coronary_disease" data-cardiologia-initial-field>
+                <option value="" hidden>Selecione...</option>
+                <option>Sim</option>
+                <option>Não</option>
+              </select>
+            </div>
+
+            <div class="field cardiologia-coronary-detail" id="cardiologia-coronary-detail">
+              <label for="cardiologia_coronary_classification">Classificação da doença da artéria coronária</label>
+              <select id="cardiologia_coronary_classification" name="coronary_classification" data-cardiologia-initial-field aria-describedby="cardiologia_coronary_instability_hint">
+                <option value="" hidden>Selecione...</option>
+                <option>Angina estável</option>
+                <option>Angina instável</option>
+                <option>Infarto do miocárdio</option>
+                <option>Revascularização do miocárdio: percutânea (angioplastia) ou cirúrgica</option>
+              </select>
+              <p id="cardiologia_coronary_instability_hint" class="cardiologia-field-guidance cardiologia-coronary-instability-hint" hidden><strong>Angina instável:</strong> descreva a instabilidade nas recomendações ou no plano de cuidado.</p>
+            </div>
+
+            <div class="field">
+              <label for="cardiologia_hf_reduced_ef">Insuficiência cardíaca com fração de ejeção reduzida</label>
+              <select id="cardiologia_hf_reduced_ef" name="hf_reduced_ef" data-cardiologia-initial-field>
+                <option value="" hidden>Selecione...</option>
+                <option>Sim</option>
+                <option>Não</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="cardiologia_peripheral_arterial_disease">Doença arterial periférica sintomática dos membros inferiores</label>
+              <select id="cardiologia_peripheral_arterial_disease" name="peripheral_arterial_disease" data-cardiologia-initial-field>
+                <option value="" hidden>Selecione...</option>
+                <option>Sim</option>
+                <option>Não</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="cardiologia_recent_event">Teve evento nos últimos 6 meses</label>
+              <select id="cardiologia_recent_event" name="recent_event" data-cardiologia-initial-field>
+                <option value="" hidden>Selecione...</option>
+                <option>Sim</option>
+                <option>Não</option>
+              </select>
+            </div>
+
+            <div class="field cardiologia-event-detail" id="cardiologia-event-detail">
+              <label for="cardiologia_recent_event_description">Se sim, qual evento</label>
+              <input id="cardiologia_recent_event_description" name="recent_event_description" autocomplete="off" data-cardiologia-initial-field>
+            </div>
+
+            <div class="field">
+              <label for="cardiologia_renal_function">Função renal</label>
+              <select id="cardiologia_renal_function" name="renal_function" data-cardiologia-initial-field>
+                <option value="" hidden>Selecione...</option>
+                <option>Sem complicações</option>
+                <option>Estágio DRC: 1</option>
+                <option>Estágio DRC: 2</option>
+                <option>Estágio DRC: 3A</option>
+                <option>Estágio DRC: 3B</option>
+                <option>Estágio DRC: 4</option>
+                <option>Estágio DRC: 5</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <section id="cardiologia-care-section" class="cardiologia-form-section">
+          <h3 class="cardiologia-section-title">Plano de cuidado</h3>
+          <div class="cardiologia-grid">
+            <div class="field-full">
+              <label for="cardiologia_interventions">Intervenções medicamentosas e não medicamentosas</label>
+              <textarea id="cardiologia_interventions" name="interventions" data-cardiologia-initial-field placeholder="Ex: ajustar anti-hipertensivos, orientar adesão, solicitar exames, revisar estatina e risco cardiovascular."></textarea>
+            </div>
+
+            <div class="field-full">
+              <label for="cardiologia_barriers">Fatores dificultadores</label>
+              <textarea id="cardiologia_barriers" name="barriers" data-cardiologia-initial-field placeholder="Ex: dispneia, dor torácica, adesão irregular, PA elevada, dificuldade de acesso aos exames ou medicamentos."></textarea>
+            </div>
+
+            <div class="field-full">
+              <label for="cardiologia_recommendations">Recomendações</label>
+              <textarea id="cardiologia_recommendations" name="recommendations" data-cardiologia-initial-field placeholder="Ex: retorno com exames, monitorar PA, sinais de alerta, seguimento na UBS ou reavaliação cardiológica."></textarea>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="cardiologia-form-actions">
+        <button type="button" class="btn" data-cardiologia-close>Cancelar</button>
+        <button type="submit" class="btn btn-primary">
+          <svg class="cardiologia-save-icon" aria-hidden="true"><use href="#cardiologia-icon-save"></use></svg>
+          Salvar registro
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div id="cardiologia-view-modal" class="cardiologia-modal-overlay" hidden>
+    <article class="cardiologia-modal" role="dialog" aria-modal="true" aria-labelledby="cardiologia-view-title">
+      <div class="cardiologia-modal-header">
+        <h2 id="cardiologia-view-title" class="cardiologia-modal-title">Guia preenchida de Cardiologia</h2>
+        <button type="button" class="cardiologia-close" data-cardiologia-view-close aria-label="Fechar">&times;</button>
+      </div>
+
+      <div class="cardiologia-form-body">
+        <div id="cardiologia-view-content" class="cardiologia-view-content"></div>
+      </div>
+
+      <div class="cardiologia-form-actions">
+        <button type="button" class="btn" data-cardiologia-view-close>Fechar</button>
+      </div>
+    </article>
+  </div>
+
+  <script src="/assets/config.js"></script>
+  <script src="/assets/app.js"></script>
+  <script src="/assets/cadh-cardiologia.js"></script>
+</body>
+</html>

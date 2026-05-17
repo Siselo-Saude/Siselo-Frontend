@@ -18,6 +18,7 @@ const endocrinoState = {
   records: [],
   patients: [],
   patientPicker: null,
+  activePatientId: "",
   lastFocus: null,
   editingRecordId: "",
   lastTypingAlertAt: 0,
@@ -37,8 +38,8 @@ async function setupEndocrinoPage() {
 
   SISELO.bindShell("cadh");
 
+  endocrinoState.activePatientId = getEndocrinoContextPatientId();
   endocrinoState.records = readEndocrinoRecords();
-  renderEndocrinoTable();
   bindEndocrinoModal();
   bindEndocrinoViewModal();
 
@@ -56,9 +57,22 @@ async function setupEndocrinoPage() {
     select: "endocrino_patient_id",
     container: "endocrino_patient_search",
     rows: endocrinoState.patients,
-    currentValue: "",
+    currentValue: endocrinoState.activePatientId,
     placeholder: "Selecione o paciente...",
     onChange: (patient) => {
+      if (endocrinoState.activePatientId) {
+        const scopedPatient = getActiveEndocrinoPatient();
+        const pickedPatientId = SISELO.normalizeEntityId(patient && patient.id);
+        if (endocrinoState.patientPicker && scopedPatient && pickedPatientId !== endocrinoState.activePatientId) {
+          endocrinoState.patientPicker.setValue(scopedPatient);
+        }
+        updateEndocrinoConsultationOptions(endocrinoState.activePatientId, endocrinoState.editingRecordId);
+        updateEndocrinoPatientSummary(scopedPatient);
+        updateEndocrinoAgeGuidance(scopedPatient);
+        suggestEndocrinoFragilityFromPatient(scopedPatient);
+        return;
+      }
+
       const selectedPatient = patient && patient.id
         ? findEndocrinoPatientById(patient.id) || patient
         : null;
@@ -73,6 +87,10 @@ async function setupEndocrinoPage() {
   if (patientSearchInput instanceof HTMLInputElement) {
     patientSearchInput.id = "endocrino_patient_search_input";
   }
+
+  applyEndocrinoPatientScope();
+  updateEndocrinoScopeControls();
+  renderEndocrinoTable();
 }
 
 function bindEndocrinoModal() {
@@ -155,6 +173,66 @@ function readCadhSearchState() {
   }
 }
 
+function getEndocrinoContextPatientId() {
+  const queryPatientId = SISELO.normalizeEntityId(new URLSearchParams(window.location.search).get("patient_id"));
+  if (queryPatientId) {
+    return queryPatientId;
+  }
+
+  const cachedState = readCadhSearchState();
+  return SISELO.normalizeEntityId(cachedState && cachedState.patient && cachedState.patient.id);
+}
+
+function getActiveEndocrinoPatient() {
+  const patientId = SISELO.normalizeEntityId(endocrinoState.activePatientId);
+  if (!patientId) {
+    return null;
+  }
+
+  const patient = findEndocrinoPatientById(patientId);
+  if (patient) {
+    return patient;
+  }
+
+  const cachedState = readCadhSearchState();
+  const cachedPatient = cachedState && cachedState.patient
+    ? normalizeEndocrinoPatient(cachedState.patient)
+    : null;
+
+  return cachedPatient && cachedPatient.id === patientId ? cachedPatient : null;
+}
+
+function applyEndocrinoPatientScope() {
+  const scopedPatient = getActiveEndocrinoPatient();
+  if (!scopedPatient || !endocrinoState.patientPicker) {
+    return;
+  }
+
+  endocrinoState.patientPicker.setValue(scopedPatient);
+  updateEndocrinoConsultationOptions(scopedPatient.id, endocrinoState.editingRecordId);
+  updateEndocrinoPatientSummary(scopedPatient);
+  updateEndocrinoAgeGuidance(scopedPatient);
+  suggestEndocrinoFragilityFromPatient(scopedPatient);
+
+  const input = document.querySelector("#endocrino_patient_search input");
+  if (input instanceof HTMLInputElement) {
+    input.readOnly = true;
+    input.setAttribute("aria-readonly", "true");
+    input.title = "Paciente definido pela busca do CADH";
+  }
+}
+
+function updateEndocrinoScopeControls() {
+  const hasActivePatient = Boolean(SISELO.normalizeEntityId(endocrinoState.activePatientId));
+  const newButton = document.getElementById("endocrino-new");
+  if (newButton instanceof HTMLButtonElement) {
+    newButton.disabled = !hasActivePatient;
+    newButton.title = hasActivePatient
+      ? ""
+      : "Selecione um usuario no CADH para liberar a Endocrinologia.";
+  }
+}
+
 function mergeEndocrinoPatients(rows) {
   const merged = new Map();
 
@@ -191,6 +269,11 @@ function openEndocrinoModal(record = null) {
   const modal = document.getElementById("endocrino-modal");
   const form = document.getElementById("endocrino-form");
   if (!modal || !form) {
+    return;
+  }
+
+  if (!record && !SISELO.normalizeEntityId(endocrinoState.activePatientId)) {
+    SISELO.showAlert("endocrino-alert", "Selecione um usuario no CADH antes de criar um registro de Endocrinologia.", "error");
     return;
   }
 
@@ -281,7 +364,7 @@ function fillEndocrinoForm(record = null) {
     : null;
   const selectedPatient = normalizedRecord
     ? findEndocrinoPatientById(normalizedRecord.patient_id) || recordPatient
-    : cachedPatient;
+    : getActiveEndocrinoPatient() || cachedPatient;
 
   setEndocrinoField("endocrino_record_id", normalizedRecord ? normalizedRecord.id : "");
   setEndocrinoField("endocrino_consultation_date", normalizedRecord ? normalizedRecord.consultation_date : "");
@@ -305,7 +388,7 @@ function fillEndocrinoForm(record = null) {
   suggestEndocrinoFragilityFromPatient(selectedPatient && selectedPatient.id ? selectedPatient : null);
 
   updateEndocrinoConsultationOptions(
-    selectedPatient && selectedPatient.id,
+    selectedPatient && selectedPatient.id ? selectedPatient.id : "",
     endocrinoState.editingRecordId,
     normalizedRecord ? normalizedRecord.consultation_number : "",
   );
@@ -995,9 +1078,9 @@ function saveEndocrinoRecord() {
     return;
   }
 
-  const patientId = endocrinoState.patientPicker
+  const patientId = endocrinoState.activePatientId || (endocrinoState.patientPicker
     ? endocrinoState.patientPicker.getValue()
-    : "";
+    : "");
 
   if (!patientId) {
     SISELO.showAlert("endocrino-alert", "Selecione o paciente.", "error");
@@ -1275,7 +1358,9 @@ function renderEndocrinoTable() {
     return;
   }
 
+  const activePatientId = SISELO.normalizeEntityId(endocrinoState.activePatientId);
   const records = endocrinoState.records
+    .filter((record) => activePatientId && record.patient_id === activePatientId)
     .slice()
     .sort((left, right) => {
       const consultationOrder = parseEndocrinoConsultationOrdinal(right.consultation_number) -
@@ -1288,12 +1373,15 @@ function renderEndocrinoTable() {
     });
 
   if (!records.length) {
+    const emptyMessage = activePatientId
+      ? "Nenhum registro de Endocrinologia encontrado para este paciente."
+      : "Selecione um usuario no CADH para visualizar os registros de Endocrinologia.";
     tbody.innerHTML = `
       <tr>
         <td colspan="9">
           <div class="endocrino-empty">
-            <p>Nenhum registro de Endocrinologia encontrado.</p>
-            <button type="button" class="btn btn-primary" data-endocrino-empty-new>+ Novo registro</button>
+            <p>${SISELO.escapeHtml(emptyMessage)}</p>
+            ${activePatientId ? '<button type="button" class="btn btn-primary" data-endocrino-empty-new>+ Novo registro</button>' : ""}
           </div>
         </td>
       </tr>
