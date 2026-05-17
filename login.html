@@ -8,27 +8,77 @@
 </head>
 <body data-page="login">
   <main class="auth-shell">
-    <section class="card auth-card">
-      <h1 class="hero-title">Login - SISELO</h1>
-      <p class="hero-subtitle">Entre com o mesmo usuario do backend atual.</p>
+    <section class="card auth-card auth-card-centered">
+      <div class="auth-mark" aria-hidden="true"></div>
+      <h1 id="auth-title" class="auth-title">Entrar no SISELO</h1>
+      <p id="auth-subtitle" class="auth-subtitle">Acesse com seu e-mail cadastrado.</p>
+
+      <div class="auth-tabs" role="tablist" aria-label="Acesso ao SISELO">
+        <button id="auth-login-tab" class="auth-tab is-active" type="button" data-auth-mode="login" role="tab" aria-controls="login-form" aria-selected="true">Login</button>
+        <button id="auth-register-tab" class="auth-tab" type="button" data-auth-mode="register" role="tab" aria-controls="register-form" aria-selected="false">Cadastro</button>
+      </div>
 
       <div id="page-alert" class="alert" hidden></div>
 
-      <form id="login-form" class="form-grid" style="grid-template-columns:1fr;">
+      <form id="login-form" class="auth-form form-grid" style="grid-template-columns:1fr;" data-auth-form="login">
         <div class="field-full">
-          <label for="email">Email</label>
-          <input id="email" name="email" type="email" required>
+          <label for="login-email">E-mail</label>
+          <input id="login-email" name="email" type="email" autocomplete="email" required>
+          <p class="auth-field-hint">Utilize o mesmo e-mail cadastrado na Coopere.</p>
         </div>
 
         <div class="field-full">
-          <label for="password">Senha</label>
-          <input id="password" name="password" type="password" required>
+          <label for="login-password">Senha</label>
+          <input id="login-password" name="password" type="password" autocomplete="current-password" required>
         </div>
 
         <div class="actions">
-          <button class="btn btn-primary" type="submit">Entrar</button>
+          <button class="btn btn-primary auth-submit" type="submit">Entrar</button>
         </div>
       </form>
+
+      <form id="register-form" class="auth-form form-grid" style="grid-template-columns:1fr;" data-auth-form="register" hidden>
+        <div class="field-full">
+          <label for="register-name">Nome completo</label>
+          <input id="register-name" name="name" autocomplete="name" required>
+        </div>
+
+        <div class="field-full">
+          <label for="register-email">E-mail</label>
+          <input id="register-email" name="email" type="email" autocomplete="email" required>
+          <p class="auth-field-hint">Utilize o mesmo e-mail cadastrado na Coopere.</p>
+        </div>
+
+        <div class="field-full">
+          <label for="register-password">Senha</label>
+          <input id="register-password" name="password" type="password" autocomplete="new-password" required>
+        </div>
+
+        <fieldset class="auth-choice-group field-full">
+          <legend>Tipo de usuário</legend>
+          <label class="auth-choice">
+            <input name="user_type" type="radio" value="CADH" required>
+            <span>CADH</span>
+          </label>
+          <label class="auth-choice">
+            <input name="user_type" type="radio" value="UBS" required>
+            <span>UBS</span>
+          </label>
+        </fieldset>
+
+        <div class="field-full auth-specialty-field" hidden>
+          <label for="register-specialty">Especialidade</label>
+          <select id="register-specialty" name="specialty">
+            <option value="">Selecione a especialidade</option>
+          </select>
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-primary auth-submit" type="submit">Criar conta</button>
+        </div>
+      </form>
+
+      <p class="auth-switch" data-auth-switch-text>Ainda não possui uma conta? <button type="button" data-auth-switch>Cadastre-se</button></p>
     </section>
   </main>
 
