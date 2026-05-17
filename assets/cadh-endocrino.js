@@ -63,6 +63,7 @@ async function setupEndocrinoPage() {
         ? findEndocrinoPatientById(patient.id) || patient
         : null;
       updateEndocrinoConsultationOptions(patient && patient.id, endocrinoState.editingRecordId);
+      updateEndocrinoPatientSummary(selectedPatient);
       updateEndocrinoAgeGuidance(selectedPatient);
       suggestEndocrinoFragilityFromPatient(selectedPatient);
     },
@@ -179,7 +180,9 @@ function normalizeEndocrinoPatient(patient) {
     cpf: String((patient && patient.cpf) || "").trim(),
     ses: String((patient && patient.ses) || "").trim(),
     birth_date: String((patient && patient.birth_date) || "").trim(),
+    first_cadh_date: String((patient && patient.first_cadh_date) || "").trim(),
     age_label: String((patient && patient.age_label) || "").trim(),
+    race: String((patient && (patient.race || patient.race_label || patient.color_race)) || "").trim(),
     gender_label: String((patient && patient.gender_label) || "").trim(),
   };
 }
@@ -264,13 +267,20 @@ function fillEndocrinoForm(record = null) {
   const cachedPatient = cachedState && cachedState.patient
     ? normalizeEndocrinoPatient(cachedState.patient)
     : null;
+  const recordPatient = normalizedRecord
+    ? normalizeEndocrinoPatient({
+      id: normalizedRecord.patient_id,
+      full_name: normalizedRecord.full_name,
+      cpf: normalizedRecord.cpf,
+      ses: normalizedRecord.ses,
+      birth_date: normalizedRecord.birth_date,
+      first_cadh_date: normalizedRecord.first_cadh_date,
+      age_label: normalizedRecord.age_label,
+      race: normalizedRecord.race,
+    })
+    : null;
   const selectedPatient = normalizedRecord
-    ? {
-        id: normalizedRecord.patient_id,
-        full_name: normalizedRecord.full_name,
-        cpf: normalizedRecord.cpf,
-        ses: normalizedRecord.ses,
-      }
+    ? findEndocrinoPatientById(normalizedRecord.patient_id) || recordPatient
     : cachedPatient;
 
   setEndocrinoField("endocrino_record_id", normalizedRecord ? normalizedRecord.id : "");
@@ -290,6 +300,7 @@ function fillEndocrinoForm(record = null) {
   if (endocrinoState.patientPicker) {
     endocrinoState.patientPicker.setValue(selectedPatient && selectedPatient.id ? selectedPatient : null);
   }
+  updateEndocrinoPatientSummary(selectedPatient && selectedPatient.id ? selectedPatient : null);
   updateEndocrinoAgeGuidance(selectedPatient && selectedPatient.id ? selectedPatient : null);
   suggestEndocrinoFragilityFromPatient(selectedPatient && selectedPatient.id ? selectedPatient : null);
 
@@ -1016,6 +1027,10 @@ function saveEndocrinoRecord() {
     full_name: patient.full_name || "",
     cpf: patient.cpf || "",
     ses: patient.ses || "",
+    birth_date: patient.birth_date || "",
+    first_cadh_date: patient.first_cadh_date || "",
+    age_label: patient.age_label || "",
+    race: patient.race || "",
     consultation_date: payload.consultation_date,
     consultation_number: payload.consultation_number || INITIAL_CONSULTATION_LABEL,
     hba1c: numericValues.hba1c ? `${numericValues.hba1c}%` : "",
@@ -1066,12 +1081,47 @@ function resolveEndocrinoPatient(patientId) {
     return cachedPatient;
   }
 
-  return { id: normalizedId, full_name: "", cpf: "", ses: "" };
+  return { id: normalizedId, full_name: "", cpf: "", ses: "", birth_date: "", first_cadh_date: "", age_label: "", race: "" };
 }
 
 function findEndocrinoPatientById(patientId) {
   const normalizedId = SISELO.normalizeEntityId(patientId);
   return endocrinoState.patients.find((item) => item.id === normalizedId) || null;
+}
+
+function updateEndocrinoPatientSummary(patient) {
+  const element = document.getElementById("endocrino-patient-summary");
+  if (!element) {
+    return;
+  }
+
+  if (!patient || !patient.id) {
+    element.hidden = true;
+    element.innerHTML = "";
+    return;
+  }
+
+  const fullPatient = findEndocrinoPatientById(patient.id) || normalizeEndocrinoPatient(patient);
+  const ageYears = getEndocrinoAgeYears(fullPatient);
+  const ageLabel = fullPatient.age_label || (Number.isFinite(ageYears) ? `${ageYears} anos` : "-");
+  element.innerHTML = [
+    renderEndocrinoPatientSummaryItem("CPF", fullPatient.cpf || "-"),
+    renderEndocrinoPatientSummaryItem("SES", fullPatient.ses || "-"),
+    renderEndocrinoPatientSummaryItem("Cor/Raça", formatEndocrinoRace(fullPatient.race)),
+    renderEndocrinoPatientSummaryItem("Idade", ageLabel),
+    renderEndocrinoPatientSummaryItem("Nascimento", formatEndocrinoDate(fullPatient.birth_date)),
+    renderEndocrinoPatientSummaryItem("1º atendimento CADH", formatEndocrinoDate(fullPatient.first_cadh_date)),
+  ].join("");
+  element.hidden = false;
+}
+
+function renderEndocrinoPatientSummaryItem(label, value) {
+  return `
+    <span>
+      ${SISELO.escapeHtml(label)}
+      <strong>${SISELO.escapeHtml(value || "-")}</strong>
+    </span>
+  `;
 }
 
 function updateEndocrinoAgeGuidance(patient) {
@@ -1172,6 +1222,12 @@ function renderEndocrinoViewRecord(record) {
   return `
     ${renderEndocrinoViewSection("Identificação da consulta", [
       ["Paciente", item.full_name || "-"],
+      ["CPF", item.cpf || "-"],
+      ["SES", item.ses || "-"],
+      ["Cor/Raça", formatEndocrinoRace(item.race)],
+      ["Data de nascimento", formatEndocrinoDate(item.birth_date)],
+      ["Idade", item.age_label || "-"],
+      ["Primeiro atendimento CADH", formatEndocrinoDate(item.first_cadh_date)],
       ["Data da consulta", formatEndocrinoDate(item.consultation_date)],
       ["Nº da consulta", item.consultation_number || "-"],
     ])}
@@ -1337,6 +1393,10 @@ function normalizeEndocrinoRecord(record) {
     full_name: String((record && record.full_name) || "").trim(),
     cpf: String((record && record.cpf) || "").trim(),
     ses: String((record && record.ses) || "").trim(),
+    birth_date: String((record && record.birth_date) || "").trim(),
+    first_cadh_date: String((record && record.first_cadh_date) || "").trim(),
+    age_label: String((record && record.age_label) || "").trim(),
+    race: String((record && record.race) || "").trim(),
     consultation_date: String((record && record.consultation_date) || "").trim(),
     consultation_number: normalizeEndocrinoConsultationLabel(record && record.consultation_number) || INITIAL_CONSULTATION_LABEL,
     hba1c: String((record && record.hba1c) || "").trim(),
@@ -1388,4 +1448,26 @@ function formatEndocrinoDate(value) {
   }
 
   return new Intl.DateTimeFormat("pt-BR").format(date);
+}
+
+function formatEndocrinoRace(value) {
+  const raw = String(value || "").trim();
+  if (!raw) {
+    return "-";
+  }
+
+  const normalized = SISELO.normalizeSearchText(raw);
+  const raceMap = {
+    branca: "Branca",
+    branco: "Branca",
+    preta: "Preta",
+    preto: "Preta",
+    parda: "Parda",
+    pardo: "Parda",
+    amarela: "Amarela",
+    amarelo: "Amarela",
+    indigena: "Indígena",
+  };
+
+  return raceMap[normalized] || raw;
 }

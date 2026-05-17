@@ -299,10 +299,47 @@
     }
 
     .endocrino-age-guidance {
+      grid-column: 1 / -1;
       margin: 8px 0 0;
       color: #53657a;
       font-size: 0.82rem;
       line-height: 1.45;
+    }
+
+    .endocrino-patient-summary {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      padding: 12px;
+      border: 1px solid #dccfe7;
+      border-radius: 12px;
+      background: #f5f0f8;
+    }
+
+    .endocrino-patient-summary[hidden] {
+      display: none;
+    }
+
+    .endocrino-patient-summary span {
+      display: grid;
+      gap: 2px;
+      min-width: 0;
+      color: #6f5e83;
+      font-size: 0.76rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .endocrino-patient-summary strong {
+      overflow: hidden;
+      color: #27063f;
+      font-size: 0.9rem;
+      letter-spacing: 0;
+      text-overflow: ellipsis;
+      text-transform: none;
+      white-space: nowrap;
     }
 
     .endocrino-grid .field,
@@ -507,7 +544,8 @@
         grid-template-columns: 1fr;
       }
 
-      .endocrino-view-grid {
+      .endocrino-view-grid,
+      .endocrino-patient-summary {
         grid-template-columns: 1fr;
       }
 
@@ -614,8 +652,10 @@
               <label for="endocrino_patient_search_input">Paciente *</label>
               <select id="endocrino_patient_id" name="patient_id" class="visually-hidden" tabindex="-1" aria-hidden="true"></select>
               <div id="endocrino_patient_search" class="transition-patient-search"></div>
-              <p id="endocrino-age-guidance" class="endocrino-age-guidance" hidden></p>
             </div>
+
+            <div id="endocrino-patient-summary" class="endocrino-patient-summary" hidden></div>
+            <p id="endocrino-age-guidance" class="endocrino-age-guidance" hidden></p>
 
             <div class="field">
               <label for="endocrino_consultation_date">Data da Consulta *</label>
