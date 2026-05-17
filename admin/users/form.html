@@ -34,7 +34,23 @@
           <input id="email" name="email" type="email" placeholder="email@instituicao.com" required>
         </div>
 
-        <div class="field-full">
+        <div class="field">
+          <label for="user_type">Tipo de usuário</label>
+          <select id="user_type" name="user_type">
+            <option value="">Não informado</option>
+            <option value="CADH">CADH</option>
+            <option value="UBS">UBS</option>
+          </select>
+        </div>
+
+        <div id="specialty-field" class="field" hidden>
+          <label for="specialty">Especialidade</label>
+          <select id="specialty" name="specialty">
+            <option value="">Selecione a especialidade</option>
+          </select>
+        </div>
+
+        <div id="active-field" class="field-full">
           <label style="display:flex; align-items:center; gap:8px;">
             <input id="is_active" name="is_active" type="checkbox" style="width:auto; min-height:auto;">
             Ativo
@@ -46,7 +62,7 @@
           <input id="temp_password" name="temp_password" placeholder="Ex: Temporaria@123">
         </div>
 
-        <div class="field-full">
+        <div id="roles-field" class="field-full">
           <label>Roles</label>
           <div id="roles-container"></div>
         </div>

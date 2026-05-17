@@ -1028,11 +1028,13 @@
       topbar.appendChild(accountLink);
     }
 
-    accountLink.href = permissions.has('admin.manage') ? '/admin/users/list.html' : '#';
-    accountLink.textContent = user && user.name ? user.name : 'Admin';
-    accountLink.title = 'Admin';
-    accountLink.setAttribute('aria-label', 'Admin');
-    accountLink.hidden = !permissions.has('admin.manage');
+    accountLink.href = permissions.has('admin.manage')
+      ? '/admin/users/list.html'
+      : '/admin/users/list.html?self=1';
+    accountLink.textContent = user && user.name ? user.name : 'Meu perfil';
+    accountLink.title = permissions.has('admin.manage') ? 'Admin' : 'Meu perfil';
+    accountLink.setAttribute('aria-label', permissions.has('admin.manage') ? 'Admin' : 'Meu perfil');
+    accountLink.hidden = !user;
   }
 
   function bindShell(activeKey) {

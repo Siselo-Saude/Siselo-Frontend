@@ -9,6 +9,21 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+const ADMIN_USER_SPECIALTIES = [
+  'Endocrinologia',
+  'Cardiologia',
+  'Psicologia',
+  'Enfermagem',
+  'Nutrição',
+  'Fisioterapia',
+  'Farmácia Clínica',
+  'Serviço Social',
+  'Oftalmologia',
+  'Nefrologia',
+  'Técnico de Enfermagem',
+  'Gestão do Cuidado',
+];
+
 async function setupAdminUsersListPage() {
   const user = await SISELO.requireSession();
   if (!user) {
@@ -27,13 +42,7 @@ async function setupAdminUsersListPage() {
   const tbody = document.getElementById('users-table-body');
 
   if (!canCreateUser) {
-    SISELO.showAlert('page-alert', 'Sem permissao: admin.manage', 'error');
-    searchInput.disabled = true;
-    const submitButton = searchForm.querySelector('button[type="submit"]');
-    if (submitButton) {
-      submitButton.disabled = true;
-    }
-    renderAdminUsersAccessDenied(tbody);
+    renderSelfProfilePage(user, tbody, searchForm);
     return;
   }
 
@@ -67,9 +76,34 @@ async function setupAdminUsersListPage() {
   });
 }
 
+function renderSelfProfilePage(user, tbody, searchForm) {
+  const title = document.querySelector('.page-title');
+  if (title) {
+    title.textContent = `Bem vindo, ao seu perfil ${user && user.name ? user.name : ''}`.trim();
+  }
+
+  if (searchForm) {
+    searchForm.hidden = true;
+  }
+
+  renderAdminUsersTable(tbody, [normalizeSelfProfileRow(user)], '', false);
+}
+
+function normalizeSelfProfileRow(user) {
+  return {
+    id: user && user.id ? user.id : '',
+    name: user && user.name ? user.name : '-',
+    email: user && user.email ? user.email : '-',
+    user_type: user && user.user_type ? user.user_type : '',
+    specialty: user && user.specialty ? user.specialty : '',
+    roles: user && Array.isArray(user.roles) ? user.roles : [],
+    is_active: user && Number(user.is_active) === 1 ? 1 : 0,
+  };
+}
+
 function renderAdminUsersAccessDenied(tbody) {
   tbody.innerHTML = SISELO.emptyTableRow(
-    6,
+    8,
     'Acesso restrito.',
     'Seu usuario nao possui permissao para administrar usuarios.'
   );
@@ -78,7 +112,7 @@ function renderAdminUsersAccessDenied(tbody) {
 function renderAdminUsersTable(tbody, rows, query = '', canCreateUser = false) {
   if (!Array.isArray(rows) || rows.length === 0) {
     tbody.innerHTML = SISELO.emptyTableRow(
-      6,
+      8,
       'Nenhum usuario encontrado.',
       canCreateUser
         ? { label: '+ Novo usuario', href: '/admin/users/form.html' }
@@ -92,17 +126,34 @@ function renderAdminUsersTable(tbody, rows, query = '', canCreateUser = false) {
       <td>${row.id}</td>
       <td>${SISELO.highlightPersonName(row.name, query, SISELO.escapeHtml(row.name || '-'))}</td>
       <td>${SISELO.escapeHtml(row.email)}</td>
+      <td>${SISELO.escapeHtml(formatAdminUserType(row.user_type))}</td>
+      <td>${SISELO.escapeHtml(row.specialty || '-')}</td>
       <td>${SISELO.escapeHtml((row.roles || []).join(', '))}</td>
       <td>${Number(row.is_active) === 1 ? 'Ativo' : 'Inativo'}</td>
       <td>
         <div class="table-actions">
-          ${SISELO.iconLink('edit', `/admin/users/form.html?id=${row.id}`, 'Editar usuario')}
-          ${SISELO.iconButton('toggle', Number(row.is_active) === 1 ? 'Desativar usuario' : 'Ativar usuario', { 'data-toggle-id': row.id })}
-          ${SISELO.iconButton('reset', 'Resetar senha', { 'data-reset-id': row.id })}
+          ${renderAdminUserActions(row, canCreateUser)}
         </div>
       </td>
     </tr>
   `).join('');
+}
+
+function renderAdminUserActions(row, canManageUsers) {
+  if (!canManageUsers) {
+    return SISELO.iconLink('edit', '/admin/users/form.html?self=1', 'Editar meu perfil');
+  }
+
+  return `
+    ${SISELO.iconLink('edit', `/admin/users/form.html?id=${row.id}`, 'Editar usuario')}
+    ${SISELO.iconButton('toggle', Number(row.is_active) === 1 ? 'Desativar usuario' : 'Ativar usuario', { 'data-toggle-id': row.id })}
+    ${SISELO.iconButton('reset', 'Resetar senha', { 'data-reset-id': row.id })}
+  `;
+}
+
+function formatAdminUserType(value) {
+  const normalizedValue = String(value || '').trim().toUpperCase();
+  return normalizedValue || '-';
 }
 
 function bindAdminUserActions(tbody) {
@@ -141,6 +192,8 @@ function filterAdminUserRows(rows, query) {
     const matchesLetters = search.hasLetters
       ? SISELO.matchesPersonNamePrefix(row.name, search) ||
         SISELO.matchesSearchText(row.email, search) ||
+        SISELO.matchesSearchText(row.user_type, search) ||
+        SISELO.matchesSearchText(row.specialty, search) ||
         SISELO.matchesSearchText((row.roles || []).join(' '), search)
       : true;
     const matchesDigits = search.hasDigits
@@ -160,15 +213,19 @@ async function setupAdminUsersFormPage() {
 
   SISELO.bindShell('admin');
   const permissions = SISELO.getUiPermissions(user);
+  const canManageUsers = permissions.has('admin.manage');
+  const selfProfileRequested = SISELO.queryParam('self') === '1';
+  const requestedId = SISELO.normalizeEntityId(SISELO.queryParam('id'));
+  const id = selfProfileRequested ? SISELO.normalizeEntityId(user.id) : requestedId;
+  const isSelfProfile = selfProfileRequested || (Boolean(id) && String(user.id) === String(id));
 
-  if (!permissions.has('admin.manage')) {
+  if (!canManageUsers && !isSelfProfile) {
     document.getElementById('form-title').textContent = 'Acesso restrito';
     SISELO.showAlert('page-alert', 'Sem permissao: admin.manage', 'error');
     disableAdminUserForm();
     return;
   }
 
-  const id = SISELO.normalizeEntityId(SISELO.queryParam('id'));
   const endpoint = '/admin/users/form.php' + (id ? '?id=' + encodeURIComponent(id) : '');
   let data = {
     editing: Boolean(id),
@@ -176,6 +233,8 @@ async function setupAdminUsersFormPage() {
       name: '',
       email: '',
       is_active: 1,
+      user_type: '',
+      specialty: '',
       role_ids: [],
     },
     roles: [],
@@ -183,18 +242,40 @@ async function setupAdminUsersFormPage() {
 
   try {
     data = await SISELO.apiRequest(endpoint || '/admin/users/form.php');
+    data = await hydrateAdminUserProfileFromList(data, id);
   } catch (error) {
     SISELO.showAlert('page-alert', error.message || 'Não foi possível carregar o formulário.', 'error');
     disableAdminUserForm();
     return;
   }
 
-  document.getElementById('form-title').textContent = data.editing ? 'Editar Usuario' : 'Novo Usuario';
+  document.getElementById('form-title').textContent = !canManageUsers && isSelfProfile
+    ? 'Meu perfil'
+    : (data.editing ? 'Editar Usuario' : 'Novo Usuario');
+
+  if (!canManageUsers) {
+    document.querySelectorAll('[data-back-link]').forEach((link) => {
+      link.href = '/index.html';
+      link.dataset.fallback = '/index.html';
+    });
+  }
 
   const userData = data.user || {};
   document.getElementById('name').value = userData.name || '';
   document.getElementById('email').value = userData.email || '';
   document.getElementById('is_active').checked = Number(userData.is_active || 0) === 1;
+  setupAdminUserProfileFields(userData);
+
+  const activeField = document.getElementById('active-field');
+  const rolesField = document.getElementById('roles-field');
+  if (!canManageUsers) {
+    if (activeField) {
+      activeField.hidden = true;
+    }
+    if (rolesField) {
+      rolesField.hidden = true;
+    }
+  }
 
   const rolesContainer = document.getElementById('roles-container');
   rolesContainer.innerHTML = (data.roles || []).map((role) => `
@@ -205,7 +286,7 @@ async function setupAdminUsersFormPage() {
   `).join('');
 
   const tempPasswordField = document.getElementById('temp-password-field');
-  if (data.editing) {
+  if (data.editing || !canManageUsers) {
     tempPasswordField.hidden = true;
   }
 
@@ -223,16 +304,89 @@ async function setupAdminUsersFormPage() {
           name: formData.get('name'),
           email: formData.get('email'),
           is_active: formData.get('is_active') ? 1 : 0,
+          user_type: formData.get('user_type'),
+          specialty: formData.get('specialty'),
           temp_password: formData.get('temp_password'),
           role_ids: roleIds,
         },
       });
 
-      location.href = '/admin/users/list.html';
+      if (canManageUsers) {
+        location.href = '/admin/users/list.html';
+        return;
+      }
+
+      await SISELO.apiRequest('/auth/me.php');
+      SISELO.setFlashAlert('Perfil atualizado com sucesso.', 'success');
+      location.href = '/index.html';
     } catch (error) {
       SISELO.showAlert('page-alert', error.message, 'error');
     }
   });
+}
+
+async function hydrateAdminUserProfileFromList(data, id) {
+  if (!id || !data || !data.user || hasCompleteAdminUserProfile(data.user)) {
+    return data;
+  }
+
+  try {
+    const listData = await SISELO.apiRequest('/admin/users/list.php');
+    const rows = Array.isArray(listData.rows) ? listData.rows : [];
+    const row = rows.find((item) => String(item.id) === String(id));
+    if (!row) {
+      return data;
+    }
+
+    return {
+      ...data,
+      user: {
+        ...data.user,
+        user_type: data.user.user_type || row.user_type || '',
+        specialty: data.user.specialty || row.specialty || '',
+      },
+    };
+  } catch (error) {
+    return data;
+  }
+}
+
+function hasCompleteAdminUserProfile(user) {
+  const userType = String(user && user.user_type || '').toUpperCase();
+  if (!userType) {
+    return false;
+  }
+
+  return userType !== 'CADH' || Boolean(user && user.specialty);
+}
+
+function setupAdminUserProfileFields(userData) {
+  const userTypeSelect = document.getElementById('user_type');
+  const specialtyField = document.getElementById('specialty-field');
+  const specialtySelect = document.getElementById('specialty');
+
+  if (!userTypeSelect || !specialtyField || !specialtySelect) {
+    return;
+  }
+
+  specialtySelect.innerHTML = '<option value="">Selecione a especialidade</option>' + ADMIN_USER_SPECIALTIES.map((specialty) => (
+    `<option value="${SISELO.escapeHtml(specialty)}">${SISELO.escapeHtml(specialty)}</option>`
+  )).join('');
+
+  userTypeSelect.value = String(userData.user_type || '').toUpperCase();
+  specialtySelect.value = userData.specialty || '';
+
+  const sync = () => {
+    const isCadh = userTypeSelect.value === 'CADH';
+    specialtyField.hidden = !isCadh;
+    specialtySelect.required = isCadh;
+    if (!isCadh) {
+      specialtySelect.value = '';
+    }
+  };
+
+  userTypeSelect.addEventListener('change', sync);
+  sync();
 }
 
 function disableAdminUserForm() {
