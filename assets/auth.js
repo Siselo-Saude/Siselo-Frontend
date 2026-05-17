@@ -28,11 +28,6 @@ function setupLoginPage() {
         },
       });
 
-      if (data.user && Number(data.user.must_change_password) === 1) {
-        location.href = '/change_password.html';
-        return;
-      }
-
       location.href = '/index.html';
     } catch (error) {
       SISELO.showAlert(alertId, error.message, 'error');
