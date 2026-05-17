@@ -255,8 +255,8 @@ async function setupAdminUsersFormPage() {
 
   if (!canManageUsers) {
     document.querySelectorAll('[data-back-link]').forEach((link) => {
-      link.href = '/index.html';
-      link.dataset.fallback = '/index.html';
+      link.href = '/admin/users/list.html?self=1';
+      link.dataset.fallback = '/admin/users/list.html?self=1';
     });
   }
 
@@ -318,7 +318,7 @@ async function setupAdminUsersFormPage() {
 
       await SISELO.apiRequest('/auth/me.php');
       SISELO.setFlashAlert('Perfil atualizado com sucesso.', 'success');
-      location.href = '/index.html';
+      location.href = '/admin/users/list.html?self=1';
     } catch (error) {
       SISELO.showAlert('page-alert', error.message, 'error');
     }
