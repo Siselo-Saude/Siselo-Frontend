@@ -423,8 +423,8 @@ function syncEnfermagemConsultationSections() {
       return;
     }
 
-    section.hidden = !isInitial;
-    setEnfermagemSectionDisabled(section, !isInitial);
+    section.hidden = false;
+    setEnfermagemSectionDisabled(section, false);
   });
 
   if (subsequentSection) {
@@ -583,25 +583,25 @@ function saveEnfermagemRecord() {
     race: patient.race || "",
     consultation_date: payload.consultation_date,
     consultation_number: consultationNumber,
-    dm_diagnosis_time: isInitial ? payload.dm_diagnosis_time : "",
-    has_diagnosis_time: isInitial ? payload.has_diagnosis_time : "",
-    family_history: isInitial ? payload.family_history : "",
-    sedentary: isInitial ? payload.sedentary : "",
-    medication_treatment: isInitial ? payload.medication_treatment : "",
-    smoking: isInitial ? payload.smoking : "",
-    alcohol_use: isInitial ? payload.alcohol_use : "",
-    foot_psp: isInitial ? payload.foot_psp : "",
-    foot_deformity: isInitial ? payload.foot_deformity : "",
-    foot_polyneuropathy: isInitial ? payload.foot_polyneuropathy : "",
-    foot_neuropathic_pain: isInitial ? payload.foot_neuropathic_pain : "",
-    amputation: isInitial ? payload.amputation : "",
-    active_ulcer: isInitial ? payload.active_ulcer : "",
-    previous_ulcer: isInitial ? payload.previous_ulcer : "",
-    risk_classification: isInitial ? payload.risk_classification : "",
-    orthosis_referral: isInitial ? payload.orthosis_referral : "",
-    oral_health_need: isInitial ? payload.oral_health_need : "",
-    barriers_plan: isInitial ? payload.barriers_plan : "",
-    recommendations_plan: isInitial ? payload.recommendations_plan : "",
+    dm_diagnosis_time: payload.dm_diagnosis_time,
+    has_diagnosis_time: payload.has_diagnosis_time,
+    family_history: payload.family_history,
+    sedentary: payload.sedentary,
+    medication_treatment: payload.medication_treatment,
+    smoking: payload.smoking,
+    alcohol_use: payload.alcohol_use,
+    foot_psp: payload.foot_psp,
+    foot_deformity: payload.foot_deformity,
+    foot_polyneuropathy: payload.foot_polyneuropathy,
+    foot_neuropathic_pain: payload.foot_neuropathic_pain,
+    amputation: payload.amputation,
+    active_ulcer: payload.active_ulcer,
+    previous_ulcer: payload.previous_ulcer,
+    risk_classification: payload.risk_classification,
+    orthosis_referral: payload.orthosis_referral,
+    oral_health_need: payload.oral_health_need,
+    barriers_plan: payload.barriers_plan,
+    recommendations_plan: payload.recommendations_plan,
     followed_previous_guidance: isInitial ? "" : payload.followed_previous_guidance,
     updated_at: new Date().toISOString(),
   });
@@ -651,7 +651,11 @@ function validateEnfermagemRequiredFields(payload, isInitial) {
     ["followed_previous_guidance", "Usuário seguiu as orientações prévias"],
   ];
 
-  return (isInitial ? initialFields : subsequentFields)
+  const requiredFields = isInitial
+    ? initialFields
+    : initialFields.concat(subsequentFields.filter(([field]) => field !== "consultation_date"));
+
+  return requiredFields
     .filter(([field]) => !String((payload && payload[field]) || "").trim())
     .map(([, label]) => label);
 }
@@ -836,8 +840,9 @@ function renderEnfermagemViewRecord(record) {
     ${renderEnfermagemViewSection("Consulta", [
       ["Data da consulta", formatEnfermagemDate(item.consultation_date)],
       ["Nº da consulta", item.consultation_number || "-"],
+      ...(!isInitial ? [["Usuário seguiu as orientações prévias?", item.followed_previous_guidance || "-"]] : []),
     ])}
-    ${isInitial ? renderEnfermagemViewSection("Primeira consulta", [
+    ${renderEnfermagemViewSection("Informações clínicas", [
       ["Tempo de diagnóstico para DM (desde de...)", item.dm_diagnosis_time || "-"],
       ["Tempo de diagnóstico para HAS (desde de...)", item.has_diagnosis_time || "-"],
       ["Antecedentes familiares", item.family_history || "-"],
@@ -845,10 +850,8 @@ function renderEnfermagemViewRecord(record) {
       ["Tratamento medicamentoso", item.medication_treatment || "-"],
       ["Tabagismo", item.smoking || "-"],
       ["Consumo de bebidas alcoolicas", item.alcohol_use || "-"],
-    ]) : renderEnfermagemViewSection("Consulta subsequente", [
-      ["Usuário seguiu as orientações prévias?", item.followed_previous_guidance || "-"],
     ])}
-    ${isInitial ? renderEnfermagemViewSection("Avaliação dos pés", [
+    ${renderEnfermagemViewSection("Avaliação dos pés", [
       ["Perda de Sensação Protetora (PSP)", item.foot_psp || "-"],
       ["Deforminade", item.foot_deformity || "-"],
       ["Polineuropatia diabética", item.foot_polyneuropathy || "-"],
@@ -859,11 +862,11 @@ function renderEnfermagemViewRecord(record) {
       ["Classificação de risco e seguimento", item.risk_classification || "-"],
       ["Encaminhamento para Oficina de Órtese e Prótese da SES", item.orthosis_referral || "-"],
       ["Necessidade de cuidados de saúde bucal?", item.oral_health_need || "-"],
-    ]) : ""}
-    ${isInitial ? renderEnfermagemViewSection("Plano de cuidado", [
+    ])}
+    ${renderEnfermagemViewSection("Plano de cuidado", [
       ["Fatores dificultadores - Ficha Plano de Cuidado", item.barriers_plan || "-", true],
-      ["Recomendações- Ficha Plano de Cuidado", item.recommendations_plan || "-", true],
-    ]) : ""}
+      ["Recomendações - Ficha Plano de Cuidado", item.recommendations_plan || "-", true],
+    ])}
   `;
 }
 
@@ -984,7 +987,14 @@ function bindEnfermagemTableActions() {
 
 function getEnfermagemDiagnosisSummary(record) {
   if (!isInitialEnfermagemConsultation(record.consultation_number)) {
-    return record.followed_previous_guidance ? `Orientações: ${record.followed_previous_guidance}` : "-";
+    const parts = [];
+    if (record.dm_diagnosis_time) {
+      parts.push(`DM: ${record.dm_diagnosis_time}`);
+    }
+    if (record.has_diagnosis_time) {
+      parts.push(`HAS: ${record.has_diagnosis_time}`);
+    }
+    return parts.join(" | ") || "-";
   }
 
   const parts = [];
@@ -998,10 +1008,6 @@ function getEnfermagemDiagnosisSummary(record) {
 }
 
 function getEnfermagemFootSummary(record) {
-  if (!isInitialEnfermagemConsultation(record.consultation_number)) {
-    return "-";
-  }
-
   const positives = [
     ["PSP", record.foot_psp],
     ["Deformidade", record.foot_deformity],
@@ -1021,11 +1027,7 @@ function getEnfermagemFootSummary(record) {
 }
 
 function getEnfermagemPlanSummary(record) {
-  if (!isInitialEnfermagemConsultation(record.consultation_number)) {
-    return record.followed_previous_guidance || "-";
-  }
-
-  return record.recommendations_plan || record.barriers_plan || "-";
+  return record.recommendations_plan || record.barriers_plan || record.followed_previous_guidance || "-";
 }
 
 function readEnfermagemRecords() {
@@ -1071,7 +1073,7 @@ function normalizeEnfermagemRecord(record) {
     has_diagnosis_time: String((record && record.has_diagnosis_time) || "").trim(),
     family_history: String((record && record.family_history) || "").trim(),
     sedentary: String((record && record.sedentary) || "").trim(),
-    medication_treatment: String((record && record.medication_treatment) || "").trim(),
+    medication_treatment: normalizeEnfermagemMedicationTreatment(record && record.medication_treatment),
     smoking: String((record && record.smoking) || "").trim(),
     alcohol_use: String((record && record.alcohol_use) || "").trim(),
     foot_psp: String((record && record.foot_psp) || "").trim(),
@@ -1089,6 +1091,29 @@ function normalizeEnfermagemRecord(record) {
     followed_previous_guidance: String((record && record.followed_previous_guidance) || "").trim(),
     updated_at: String((record && record.updated_at) || "").trim(),
   };
+}
+
+function normalizeEnfermagemMedicationTreatment(value) {
+  const normalized = String(value || "").trim();
+  const simple = normalized.toLowerCase();
+
+  if (!normalized) {
+    return "";
+  }
+
+  if (simple === "1 a 5 medicamentos") {
+    return "1 a 5 medicamentos de uso contínuo";
+  }
+
+  if (simple === "6 a 10 medicamentos") {
+    return "6 a 10 medicamentos (polifarmácia)";
+  }
+
+  if (simple === "> 10 medicamentos" || simple === "acima de 10 medicamentos") {
+    return "Acima de 10 medicamentos (polifarmácia excessiva)";
+  }
+
+  return normalized;
 }
 
 function createEnfermagemRecordId() {

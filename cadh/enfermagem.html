@@ -332,9 +332,24 @@
 
     .enfermagem-grid .field label,
     .enfermagem-grid .field-full label {
+      display: block;
       color: #335f47;
       font-size: 1.1rem;
       font-weight: 800;
+      line-height: 1.3;
+    }
+
+    #enfermagem-foot-section .enfermagem-grid .field {
+      display: grid;
+      grid-template-rows: minmax(48px, auto) auto;
+      align-content: start;
+      gap: 8px;
+    }
+
+    #enfermagem-foot-section .enfermagem-grid .field label {
+      display: flex;
+      align-items: flex-end;
+      min-height: 48px;
     }
 
     .enfermagem-modal input,
@@ -606,8 +621,23 @@
           </div>
         </section>
 
+        <section id="enfermagem-subsequent-section" class="enfermagem-form-section">
+          <h3 class="enfermagem-section-title">Consulta subsequente</h3>
+          <div class="enfermagem-grid">
+            <div class="field">
+              <label for="enfermagem_followed_previous_guidance">Usuário seguiu as orientações prévias?</label>
+              <select id="enfermagem_followed_previous_guidance" name="followed_previous_guidance">
+                <option value="" hidden>Selecione...</option>
+                <option value="Sim">Sim</option>
+                <option value="Parcialmente">Parcialmente</option>
+                <option value="Não">Não</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
         <section id="enfermagem-initial-section" class="enfermagem-form-section">
-          <h3 class="enfermagem-section-title">Primeira consulta</h3>
+          <h3 class="enfermagem-section-title">Informações clínicas</h3>
           <div class="enfermagem-grid">
             <div class="field">
               <label for="enfermagem_dm_diagnosis_time">Tempo de diagnóstico para DM (desde de...)</label>
@@ -641,9 +671,9 @@
               <label for="enfermagem_medication_treatment">Tratamento medicamentoso</label>
               <select id="enfermagem_medication_treatment" name="medication_treatment">
                 <option value="" hidden>Selecione...</option>
-                <option value="1 a 5 medicamentos">1 a 5 medicamentos</option>
-                <option value="6 a 10 medicamentos">6 a 10 medicamentos</option>
-                <option value="> 10 medicamentos">&gt; 10 medicamentos</option>
+                <option value="1 a 5 medicamentos de uso contínuo">1 a 5 medicamentos de uso contínuo</option>
+                <option value="6 a 10 medicamentos (polifarmácia)">6 a 10 medicamentos (polifarmácia)</option>
+                <option value="Acima de 10 medicamentos (polifarmácia excessiva)">Acima de 10 medicamentos (polifarmácia excessiva)</option>
               </select>
             </div>
 
@@ -777,27 +807,13 @@
             </div>
 
             <div class="field-full">
-              <label for="enfermagem_recommendations_plan">Recomendações- Ficha Plano de Cuidado</label>
+              <label for="enfermagem_recommendations_plan">Recomendações - Ficha Plano de Cuidado</label>
               <textarea id="enfermagem_recommendations_plan" name="recommendations_plan" placeholder="Descreva monitoramento, orientações de medicação, pés, saúde bucal, encaminhamentos e retorno."></textarea>
               <p class="enfermagem-field-guidance">Registre condutas pactuadas: cuidados com os pés, uso correto das medicações, rodízio de aplicação, prevenção de hipoglicemia e encaminhamentos necessários.</p>
             </div>
           </div>
         </section>
 
-        <section id="enfermagem-subsequent-section" class="enfermagem-form-section" hidden>
-          <h3 class="enfermagem-section-title">Consulta subsequente</h3>
-          <div class="enfermagem-grid">
-            <div class="field">
-              <label for="enfermagem_followed_previous_guidance">Usuário seguiu as orientações prévias?</label>
-              <select id="enfermagem_followed_previous_guidance" name="followed_previous_guidance">
-                <option value="" hidden>Selecione...</option>
-                <option value="Sim">Sim</option>
-                <option value="Parcialmente">Parcialmente</option>
-                <option value="Não">Não</option>
-              </select>
-            </div>
-          </div>
-        </section>
       </div>
 
       <div class="enfermagem-form-actions">

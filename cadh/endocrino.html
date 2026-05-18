@@ -325,15 +325,30 @@
       min-width: 0;
     }
 
+    .endocrino-grid .field {
+      display: grid;
+      grid-template-rows: minmax(48px, auto) auto;
+      align-content: start;
+      gap: 8px;
+    }
+
     .endocrino-grid .field-full {
       grid-column: 1 / -1;
     }
 
     .endocrino-grid .field label,
     .endocrino-grid .field-full label {
+      display: block;
       color: #18324d;
       font-size: 1.1rem;
       font-weight: 800;
+      line-height: 1.3;
+    }
+
+    .endocrino-grid .field label {
+      display: flex;
+      align-items: flex-end;
+      min-height: 48px;
     }
 
     .endocrino-modal input,
