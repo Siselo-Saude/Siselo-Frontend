@@ -1,0 +1,725 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Psicólogo</title>
+  <link rel="stylesheet" href="/assets/app.css">
+  <style>
+    .psicologia-page {
+      --psico-accent: #9d6658;
+      --psico-title: #3b211d;
+      --psico-band: #f6b9a8;
+      --psico-soft: #fff0eb;
+      --psico-border: #f0c7bc;
+      padding: 28px;
+      background:
+        radial-gradient(circle at top right, rgba(157, 102, 88, 0.11), transparent 28%),
+        linear-gradient(180deg, #fff8f5, #eef3f5);
+    }
+
+    body[data-page="cadh-psicologia"] .container {
+      width: min(1840px, calc(100vw - 32px));
+      max-width: none;
+      margin: 20px auto;
+      padding: 0;
+    }
+
+    .psicologia-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .psicologia-title {
+      margin: 14px 0 0;
+      color: var(--psico-title);
+      font-size: 1.85rem;
+      line-height: 1.25;
+    }
+
+    .psicologia-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .psicologia-page .btn,
+    .psicologia-page button,
+    .psicologia-modal .btn,
+    .psicologia-modal button {
+      min-height: 46px;
+      padding: 11px 18px;
+      font-size: 1.08rem;
+      font-weight: 800;
+    }
+
+    .psicologia-table-shell {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--psico-border);
+      border-radius: 10px;
+      background: #ffffff;
+      box-shadow: 0 18px 30px rgba(15, 37, 65, 0.06);
+    }
+
+    .psicologia-table {
+      width: 100%;
+      min-width: 1320px;
+      table-layout: fixed;
+      border: 0;
+    }
+
+    .psicologia-col-date { width: 112px; }
+    .psicologia-col-patient { width: 190px; }
+    .psicologia-col-consult { width: 140px; }
+    .psicologia-col-literacy { width: 170px; }
+    .psicologia-col-adherence { width: 200px; }
+    .psicologia-col-stage { width: 170px; }
+    .psicologia-col-selfcare { width: 150px; }
+    .psicologia-col-plan { width: 230px; }
+    .psicologia-col-actions { width: 150px; }
+
+    .psicologia-table th,
+    .psicologia-table td {
+      border-color: #efe4df;
+      padding: 14px 12px;
+      color: var(--psico-title);
+      font-size: 1rem;
+      line-height: 1.35;
+    }
+
+    .psicologia-table tbody tr {
+      background: #fff;
+    }
+
+    .psicologia-table-group th {
+      border-top: 0;
+      color: var(--psico-title);
+      font-size: 1.05rem;
+      font-weight: 900;
+      text-align: center;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .psicologia-table-group .is-transition {
+      background: var(--psico-band);
+      color: var(--psico-title);
+      text-align: left;
+    }
+
+    .psicologia-table-group .is-specialty,
+    .psicologia-table-fields th {
+      background: var(--psico-soft);
+      color: var(--psico-title);
+    }
+
+    .psicologia-table-group .is-actions,
+    .psicologia-table-fields .is-actions-subhead {
+      background: #fbfcfd;
+      color: #405163;
+      border-left: 1px solid var(--psico-border);
+    }
+
+    .psicologia-table-fields th {
+      font-size: 1rem;
+      font-weight: 900;
+      text-align: left;
+    }
+
+    .psicologia-table-fields .is-actions-subhead {
+      text-align: center;
+    }
+
+    .psicologia-table td:nth-child(1) {
+      white-space: nowrap;
+    }
+
+    .psicologia-table td:nth-child(2) {
+      font-weight: 800;
+      color: #26120e;
+    }
+
+    .psicologia-table th:last-child,
+    .psicologia-table td:last-child {
+      border-left: 1px solid var(--psico-border);
+      text-align: center;
+    }
+
+    .psicologia-table td:last-child {
+      padding: 10px 8px;
+      background: #fbfcfd;
+    }
+
+    .psicologia-table .table-actions {
+      justify-content: center;
+      flex-wrap: nowrap;
+      gap: 8px;
+      min-height: 44px;
+    }
+
+    .psicologia-table .icon-btn {
+      inline-size: 38px;
+      block-size: 38px;
+      display: inline-grid;
+      place-items: center;
+      padding: 0;
+      border: 1px solid #eadbd5;
+      background: #fffaf8;
+      color: #8b6e65;
+    }
+
+    .psicologia-table .icon-btn svg {
+      inline-size: 18px;
+      block-size: 18px;
+      display: block;
+    }
+
+    .psicologia-table .icon-btn:hover,
+    .psicologia-table .icon-btn:focus-visible {
+      background: #fff0eb;
+      color: var(--psico-accent);
+      box-shadow: 0 0 0 3px rgba(157, 102, 88, 0.12);
+      transform: none;
+    }
+
+    .psicologia-empty {
+      min-height: 126px;
+      display: grid;
+      place-items: center;
+      gap: 12px;
+      padding: 24px;
+      color: #846a62;
+      text-align: center;
+    }
+
+    .psicologia-empty p {
+      margin: 0;
+      font-weight: 600;
+    }
+
+    .psicologia-modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1100;
+      display: grid;
+      place-items: start center;
+      overflow-y: auto;
+      padding: 12px 8px 28px;
+      background: rgba(9, 17, 25, 0.62);
+    }
+
+    .psicologia-modal-overlay[hidden] {
+      display: none;
+    }
+
+    .psicologia-modal {
+      width: min(980px, calc(100vw - 28px));
+      max-height: calc(100vh - 24px);
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      overflow: hidden;
+      border: 1px solid rgba(157, 102, 88, 0.24);
+      border-radius: 16px;
+      background: #fff;
+      box-shadow: 0 26px 70px rgba(58, 26, 18, 0.24);
+    }
+
+    .psicologia-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 18px 22px;
+      border-bottom: 1px solid #f0dfd9;
+      background: linear-gradient(180deg, #fff7f4, #ffffff);
+    }
+
+    .psicologia-modal-title {
+      margin: 0;
+      color: var(--psico-title);
+      font-size: 1.4rem;
+      line-height: 1.3;
+    }
+
+    .psicologia-close {
+      --clinical-close-border: var(--psico-border);
+      --clinical-close-color: var(--psico-title);
+      --clinical-close-hover-bg: #fff0eb;
+      --clinical-close-hover-color: var(--psico-accent);
+    }
+
+    .psicologia-form-body {
+      overflow-y: auto;
+      padding: 28px 32px 30px;
+      background: #fffdfc;
+    }
+
+    .psicologia-form-section {
+      margin-bottom: 20px;
+    }
+
+    .psicologia-form-section[hidden] {
+      display: none;
+    }
+
+    .psicologia-section-title {
+      margin: 0 0 14px;
+      color: var(--psico-title);
+      font-size: 1.08rem;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .psicologia-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 22px;
+    }
+
+    .psicologia-grid .field,
+    .psicologia-grid .field-full {
+      min-width: 0;
+    }
+
+    .psicologia-grid .field-full {
+      grid-column: 1 / -1;
+    }
+
+    .psicologia-grid .field label,
+    .psicologia-grid .field-full label {
+      color: #6a453b;
+      font-size: 1.1rem;
+      font-weight: 800;
+    }
+
+    .psicologia-modal input,
+    .psicologia-modal select,
+    .psicologia-modal textarea {
+      min-height: 56px;
+      font-size: 1.12rem;
+      line-height: 1.45;
+    }
+
+    .psicologia-modal textarea {
+      min-height: 118px;
+    }
+
+    .psicologia-field-guidance,
+    .psicologia-age-guidance {
+      margin: 6px 0 0;
+      color: #7a625b;
+      font-size: 1rem;
+      line-height: 1.45;
+    }
+
+    .psicologia-age-guidance {
+      grid-column: 1 / -1;
+      margin-top: 8px;
+    }
+
+    .psicologia-patient-summary {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      padding: 16px;
+      border: 1px solid var(--psico-border);
+      border-radius: 12px;
+      background: #fff0eb;
+    }
+
+    .psicologia-patient-summary[hidden] {
+      display: none;
+    }
+
+    .psicologia-patient-summary span {
+      display: grid;
+      gap: 2px;
+      min-width: 0;
+      color: #7a554c;
+      font-size: 0.95rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .psicologia-patient-summary strong {
+      overflow: hidden;
+      color: var(--psico-title);
+      font-size: 1.08rem;
+      letter-spacing: 0;
+      text-overflow: ellipsis;
+      text-transform: none;
+      white-space: nowrap;
+    }
+
+    .psicologia-form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      padding: 16px 22px;
+      border-top: 1px solid #f0dfd9;
+      background: #fff;
+    }
+
+    .psicologia-form-actions .btn,
+    .psicologia-form-actions button {
+      min-width: 150px;
+      justify-content: center;
+    }
+
+    .psicologia-save-icon {
+      inline-size: 18px;
+      block-size: 18px;
+      margin-right: 8px;
+      fill: currentColor;
+      vertical-align: -3px;
+    }
+
+    .psicologia-view-content {
+      display: grid;
+      gap: 16px;
+    }
+
+    .psicologia-view-section {
+      padding: 14px;
+      border: 1px solid #f0dfd9;
+      border-radius: 12px;
+      background: #fff;
+    }
+
+    .psicologia-view-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .psicologia-view-item {
+      min-width: 0;
+      padding: 12px;
+      border-radius: 10px;
+      background: #fff7f4;
+    }
+
+    .psicologia-view-item.is-wide {
+      grid-column: 1 / -1;
+    }
+
+    .psicologia-view-label {
+      display: block;
+      margin-bottom: 5px;
+      color: #7a625b;
+      font-size: 0.74rem;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .psicologia-view-value {
+      color: var(--psico-title);
+      font-weight: 700;
+      line-height: 1.45;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    @media (max-width: 760px) {
+      .psicologia-page {
+        padding: 20px;
+      }
+
+      .psicologia-actions {
+        width: 100%;
+      }
+
+      .psicologia-actions .btn,
+      .psicologia-actions button {
+        flex: 1 1 180px;
+      }
+
+      .psicologia-grid,
+      .psicologia-view-grid,
+      .psicologia-patient-summary {
+        grid-template-columns: 1fr;
+      }
+
+      .psicologia-modal-header,
+      .psicologia-form-body,
+      .psicologia-form-actions {
+        padding-inline: 16px;
+      }
+
+      .psicologia-form-actions {
+        flex-direction: column-reverse;
+      }
+
+      .psicologia-form-actions .btn,
+      .psicologia-form-actions button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body data-page="cadh-psicologia">
+  <header class="topbar">
+    <div class="topbar-brand">Intranet CADH</div>
+    <nav class="menu">
+      <a id="nav-home" href="/index.html">Home</a>
+      <a id="nav-cadh" href="/cadh/index.html">CADH</a>
+      <a id="nav-ubs" href="/ubs/index.html">UBS</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="card psicologia-page">
+      <svg aria-hidden="true" style="display:none">
+        <symbol id="psicologia-icon-save" viewBox="0 0 24 24">
+          <path d="M5 3h12l2 2v16H5V3Zm2 2v14h10V7.8L15.2 5H15v6H8V5H7Zm3 0v4h3V5h-3Zm-1 10h6v2H9v-2Z"/>
+        </symbol>
+      </svg>
+
+      <div class="psicologia-header">
+        <div>
+          <a class="btn" href="/cadh/index.html">&larr; Voltar</a>
+          <h1 class="psicologia-title">Psicólogo</h1>
+        </div>
+        <div class="psicologia-actions">
+          <button type="button" id="psicologia-new" class="btn btn-primary">+ Novo registro</button>
+        </div>
+      </div>
+
+      <div class="psicologia-table-shell">
+        <table class="psicologia-table" aria-label="Registros de Psicologia">
+          <colgroup>
+            <col class="psicologia-col-date">
+            <col class="psicologia-col-patient">
+            <col class="psicologia-col-consult">
+            <col class="psicologia-col-literacy">
+            <col class="psicologia-col-adherence">
+            <col class="psicologia-col-stage">
+            <col class="psicologia-col-selfcare">
+            <col class="psicologia-col-plan">
+            <col class="psicologia-col-actions">
+          </colgroup>
+          <thead>
+            <tr class="psicologia-table-group">
+              <th class="is-transition" colspan="3">Psicólogo</th>
+              <th class="is-specialty" colspan="5">Dados clínicos</th>
+              <th class="is-actions">Ações</th>
+            </tr>
+            <tr class="psicologia-table-fields">
+              <th>Data</th>
+              <th>Paciente</th>
+              <th>Consulta</th>
+              <th>Letramento funcional</th>
+              <th>Adesão terapêutica</th>
+              <th>Estágio motivacional</th>
+              <th>Autocuidado</th>
+              <th>Metas / recomendações</th>
+              <th class="is-actions-subhead" aria-label="Ações"></th>
+            </tr>
+          </thead>
+          <tbody id="psicologia-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <div id="psicologia-modal" class="psicologia-modal-overlay" hidden>
+    <form id="psicologia-form" class="psicologia-modal" novalidate>
+      <div class="psicologia-modal-header">
+        <h2 class="psicologia-modal-title">Psicólogo - Registro de Consulta</h2>
+        <button type="button" class="clinical-modal-close psicologia-close" data-psicologia-close aria-label="Fechar">Fechar</button>
+      </div>
+
+      <div class="psicologia-form-body">
+        <div id="psicologia-alert" class="alert" hidden></div>
+        <input id="psicologia_record_id" name="record_id" type="hidden">
+
+        <section class="psicologia-form-section">
+          <div class="psicologia-grid">
+            <div class="field-full">
+              <label for="psicologia_patient_search_input">Paciente *</label>
+              <select id="psicologia_patient_id" name="patient_id" class="visually-hidden" tabindex="-1" aria-hidden="true"></select>
+              <div id="psicologia_patient_search" class="transition-patient-search"></div>
+            </div>
+
+            <div id="psicologia-patient-summary" class="psicologia-patient-summary" hidden></div>
+            <p id="psicologia-age-guidance" class="psicologia-age-guidance" hidden></p>
+
+            <div class="field">
+              <label for="psicologia_consultation_date">Data da consulta *</label>
+              <input id="psicologia_consultation_date" name="consultation_date" type="date" placeholder="dd/mm/aaaa" required>
+            </div>
+
+            <div class="field">
+              <label for="psicologia_consultation_number">Nº da consulta</label>
+              <select id="psicologia_consultation_number" name="consultation_number">
+                <option value="1ª Consulta (inicial)">1ª Consulta (inicial)</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <section id="psicologia-initial-section" class="psicologia-form-section">
+          <h3 class="psicologia-section-title">Primeira consulta</h3>
+          <div class="psicologia-grid">
+            <div class="field">
+              <label for="psicologia_literacy">Letramento funcional em saúde</label>
+              <select id="psicologia_literacy" name="literacy">
+                <option value="" hidden>Selecione...</option>
+                <option value="Básico/funcional">Básico/funcional</option>
+                <option value="Comunicativo/Interativo">Comunicativo/Interativo</option>
+                <option value="Insuficiente">Insuficiente</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="psicologia_family_support">Suporte familiar</label>
+              <select id="psicologia_family_support" name="family_support">
+                <option value="" hidden>Selecione...</option>
+                <option value="Suficiente">Suficiente</option>
+                <option value="Insuficiente">Insuficiente</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="psicologia_self_care_capacity">Capacidade de autocuidado</label>
+              <select id="psicologia_self_care_capacity" name="self_care_capacity">
+                <option value="" hidden>Selecione...</option>
+                <option value="Suficiente">Suficiente</option>
+                <option value="Insuficiente">Insuficiente</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="psicologia_adherence">Adesão terapêutica</label>
+              <select id="psicologia_adherence" name="adherence">
+                <option value="" hidden>Selecione...</option>
+                <option value="Aderente">Aderente</option>
+                <option value="Pouco aderente-intencional">Pouco aderente-intencional</option>
+                <option value="Pouco aderente - não intencional">Pouco aderente - não intencional</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="psicologia_motivational_stage">Estágio motivacional para a mudança</label>
+              <select id="psicologia_motivational_stage" name="motivational_stage">
+                <option value="" hidden>Selecione...</option>
+                <option value="Pré contemplação">Pré contemplação</option>
+                <option value="Contemplação">Contemplação</option>
+                <option value="Preparação">Preparação</option>
+                <option value="Ação">Ação</option>
+                <option value="Manutenção">Manutenção</option>
+                <option value="Recaída">Recaída</option>
+              </select>
+            </div>
+
+            <div class="field-full">
+              <label for="psicologia_barriers_plan">Fatores dificultadores - Ficha Plano de Cuidado</label>
+              <textarea id="psicologia_barriers_plan" name="barriers_plan" placeholder="Descreva barreiras emocionais, familiares, sociais, cognitivas ou de adesão que dificultam o cuidado."></textarea>
+              <p class="psicologia-field-guidance">Registre o que interfere no cuidado: compreensão da doença, vínculo familiar, sofrimento psíquico, rotina, acesso ou motivação.</p>
+            </div>
+
+            <div class="field-full">
+              <label for="psicologia_recommendations_plan">Recomendações- Ficha Plano de Cuidado</label>
+              <textarea id="psicologia_recommendations_plan" name="recommendations_plan" placeholder="Descreva psicoeducação, encaminhamentos, retorno e pactuações iniciais."></textarea>
+              <p class="psicologia-field-guidance">Registre a conduta combinada: psicoeducação, estratégias de adesão, encaminhamentos, rede de apoio, retorno e metas possíveis.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="psicologia-subsequent-section" class="psicologia-form-section" hidden>
+          <h3 class="psicologia-section-title">Consulta subsequente</h3>
+          <div class="psicologia-grid">
+            <div class="field">
+              <label for="psicologia_followup_adherence">Adesão terapêutica</label>
+              <select id="psicologia_followup_adherence" name="followup_adherence">
+                <option value="" hidden>Selecione...</option>
+                <option value="Aderente">Aderente</option>
+                <option value="Pouco aderente-intencional">Pouco aderente-intencional</option>
+                <option value="Pouco aderente - não intencional">Pouco aderente - não intencional</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="psicologia_followup_motivational_stage">Estágio motivacional para a mudança</label>
+              <select id="psicologia_followup_motivational_stage" name="followup_motivational_stage">
+                <option value="" hidden>Selecione...</option>
+                <option value="Pré contemplação">Pré contemplação</option>
+                <option value="Contemplação">Contemplação</option>
+                <option value="Preparação">Preparação</option>
+                <option value="Ação">Ação</option>
+                <option value="Manutenção">Manutenção</option>
+                <option value="Recaída">Recaída</option>
+              </select>
+            </div>
+
+            <div class="field-full">
+              <label for="psicologia_self_care_score">Pontuação declarada do autocuidado</label>
+              <input id="psicologia_self_care_score" name="self_care_score" autocomplete="off" placeholder="Ex: nota 0 a 10 ou relato breve do paciente">
+              <p class="psicologia-field-guidance">Use a pontuação quando o paciente quantificar; se não, registre a percepção declarada.</p>
+            </div>
+
+            <div class="field-full">
+              <label for="psicologia_lifestyle_changes">Fez mudanças no estilo de vida?</label>
+              <textarea id="psicologia_lifestyle_changes" name="lifestyle_changes" placeholder="Descreva se houve mudança e quais hábitos foram modificados."></textarea>
+            </div>
+
+            <div class="field-full">
+              <label for="psicologia_previous_goals">Cumpriu metas pactuadas na sessão passada?</label>
+              <textarea id="psicologia_previous_goals" name="previous_goals" placeholder="Registre cumprimento, cumprimento parcial ou não cumprimento, com motivo clínico quando houver."></textarea>
+            </div>
+
+            <div class="field-full">
+              <label for="psicologia_current_barriers">Dificultadores atuais</label>
+              <textarea id="psicologia_current_barriers" name="current_barriers" placeholder="Descreva barreiras atuais para adesão, autocuidado, motivação ou rotina."></textarea>
+            </div>
+
+            <div class="field-full">
+              <label for="psicologia_goals_today">Metas pactuadas hoje</label>
+              <textarea id="psicologia_goals_today" name="goals_today" placeholder="Registre metas possíveis, objetivas e combinadas com o paciente."></textarea>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="psicologia-form-actions">
+        <button type="button" class="btn" data-psicologia-close>Cancelar</button>
+        <button type="submit" class="btn btn-primary">
+          <svg class="psicologia-save-icon" aria-hidden="true"><use href="#psicologia-icon-save"></use></svg>
+          Salvar registro
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div id="psicologia-view-modal" class="psicologia-modal-overlay" hidden>
+    <article class="psicologia-modal" role="dialog" aria-modal="true" aria-labelledby="psicologia-view-title">
+      <div class="psicologia-modal-header">
+        <h2 id="psicologia-view-title" class="psicologia-modal-title">Guia preenchida de Psicologia</h2>
+        <button type="button" class="clinical-modal-close psicologia-close" data-psicologia-view-close aria-label="Fechar">Fechar</button>
+      </div>
+
+      <div class="psicologia-form-body">
+        <div id="psicologia-view-content" class="psicologia-view-content"></div>
+      </div>
+
+      <div class="psicologia-form-actions">
+        <button type="button" class="btn" data-psicologia-view-close>Fechar</button>
+      </div>
+    </article>
+  </div>
+
+  <script src="/assets/config.js"></script>
+  <script src="/assets/app.js"></script>
+  <script src="/assets/cadh-psicologia.js"></script>
+</body>
+</html>
