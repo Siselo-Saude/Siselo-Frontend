@@ -1097,6 +1097,13 @@ function saveEndocrinoRecord() {
   }
   const targetMet = calculateEndocrinoTargetMet(numericValues.hba1c, numericValues.clinical_target);
 
+  const missingFields = validateEndocrinoRequiredFields(payload, numericValues, targetMet);
+  if (missingFields.length) {
+    SISELO.showAlert("endocrino-alert", `Preencha: ${missingFields.join(", ")}.`, "error");
+    focusFirstMissingEndocrinoField(missingFields[0]);
+    return;
+  }
+
   if (hasDuplicateInitialConsultation(patientId, payload.record_id || "", payload.consultation_number)) {
     SISELO.showAlert("endocrino-alert", "Este paciente já tem 1ª consulta. Escolha consulta subsequente.", "error");
     updateEndocrinoConsultationOptions(patientId, payload.record_id || "");
@@ -1145,6 +1152,64 @@ function saveEndocrinoRecord() {
   writeEndocrinoRecords(endocrinoState.records);
   renderEndocrinoTable();
   closeEndocrinoModal();
+}
+
+function validateEndocrinoRequiredFields(payload, numericValues, targetMet) {
+  const fields = [
+    ["consultation_date", "Data da consulta"],
+    ["hba1c", "Valor hemoglobina glicada"],
+    ["fragility", "Análise da fragilidade"],
+    ["clinical_target", "Meta de HbA1c do paciente"],
+    ["neuropathy", "Neuropatia"],
+    ["nephropathy", "Nefropatia"],
+    ["renal_function", "Função renal"],
+    ["interventions", "Conduta"],
+    ["barriers", "Dificuldades do paciente"],
+    ["recommendations", "Orientação e retorno"],
+  ];
+  const fieldValues = {
+    ...(payload || {}),
+    hba1c: numericValues ? numericValues.hba1c : "",
+    clinical_target: numericValues ? numericValues.clinical_target : "",
+  };
+  const missingFields = fields
+    .filter(([field]) => !String(fieldValues[field] || "").trim())
+    .map(([, label]) => label);
+
+  if (!String(targetMet || (payload && payload.target_met) || "").trim()) {
+    missingFields.push("Cumprimento da meta terapêutica");
+  }
+
+  return missingFields;
+}
+
+function focusFirstMissingEndocrinoField(label) {
+  const fieldMap = {
+    "Data da consulta": "endocrino_consultation_date",
+    "Valor hemoglobina glicada": "endocrino_hba1c",
+    "Análise da fragilidade": "endocrino_fragility",
+    "Meta de HbA1c do paciente": "endocrino_clinical_target",
+    "Cumprimento da meta terapêutica": "endocrino_target_met",
+    Neuropatia: "endocrino_neuropathy",
+    Nefropatia: "endocrino_nephropathy",
+    "Função renal": "endocrino_renal_function",
+    Conduta: "endocrino_interventions",
+    "Dificuldades do paciente": "endocrino_barriers",
+    "Orientação e retorno": "endocrino_recommendations",
+  };
+  const field = document.getElementById(fieldMap[label] || "");
+
+  if (field instanceof HTMLSelectElement && field.id === "endocrino_fragility") {
+    const proxyTrigger = document.querySelector("[data-endocrino-fragility-proxy='true'] .endocrino-select-trigger");
+    if (proxyTrigger instanceof HTMLElement) {
+      proxyTrigger.focus();
+      return;
+    }
+  }
+
+  if (field instanceof HTMLElement) {
+    field.focus();
+  }
 }
 
 function resolveEndocrinoPatient(patientId) {

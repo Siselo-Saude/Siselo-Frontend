@@ -765,6 +765,13 @@ function saveCardiologiaRecord() {
     return;
   }
 
+  const missingFields = validateCardiologiaRequiredFields(payload);
+  if (missingFields.length) {
+    SISELO.showAlert("cardiologia-alert", `Preencha: ${missingFields.join(", ")}.`, "error");
+    focusFirstMissingCardiologiaField(missingFields[0]);
+    return;
+  }
+
   if (hasDuplicateInitialCardiologiaConsultation(patientId, payload.record_id || "", payload.consultation_number)) {
     SISELO.showAlert("cardiologia-alert", "Este paciente já tem 1ª consulta. Escolha consulta subsequente.", "error");
     updateCardiologiaConsultationOptions(patientId, payload.record_id || "");
@@ -833,6 +840,63 @@ function saveCardiologiaRecord() {
   writeCardiologiaRecords(cardiologiaState.records);
   renderCardiologiaTable();
   closeCardiologiaModal();
+}
+
+function validateCardiologiaRequiredFields(payload) {
+  const fields = [
+    ["consultation_date", "Data da consulta"],
+    ["ldl", "LDL"],
+    ["mapa_target_met", "Meta MAPA atingida"],
+    ["cerebrovascular", "Cerebrovascular"],
+    ["coronary_disease", "Doença da artéria coronária"],
+    ["hf_reduced_ef", "IC com fração reduzida"],
+    ["peripheral_arterial_disease", "Doença arterial periférica"],
+    ["recent_event", "Evento nos últimos 6 meses"],
+    ["renal_function", "Função renal"],
+    ["interventions", "Intervenções medicamentosas e não medicamentosas"],
+    ["barriers", "Fatores dificultadores"],
+    ["recommendations", "Recomendações"],
+  ];
+  const missingFields = fields
+    .filter(([field]) => !String((payload && payload[field]) || "").trim())
+    .map(([, label]) => label);
+
+  if (payload && payload.coronary_disease === "Sim" && !String(payload.coronary_classification || "").trim()) {
+    missingFields.push("Classificação coronária");
+  }
+
+  if (payload && payload.recent_event === "Sim" && !String(payload.recent_event_description || "").trim()) {
+    missingFields.push("Qual evento");
+  }
+
+  return missingFields;
+}
+
+function focusFirstMissingCardiologiaField(label) {
+  const fieldMap = {
+    "Data da consulta": "cardiologia_consultation_date",
+    LDL: "cardiologia_ldl",
+    "Meta MAPA atingida": "cardiologia_mapa_target_met",
+    Cerebrovascular: "cardiologia_cerebrovascular",
+    "Doença da artéria coronária": "cardiologia_coronary_disease",
+    "Classificação coronária": "cardiologia_coronary_classification",
+    "IC com fração reduzida": "cardiologia_hf_reduced_ef",
+    "Doença arterial periférica": "cardiologia_peripheral_arterial_disease",
+    "Evento nos últimos 6 meses": "cardiologia_recent_event",
+    "Qual evento": "cardiologia_recent_event_description",
+    "Função renal": "cardiologia_renal_function",
+    "Intervenções medicamentosas e não medicamentosas": "cardiologia_interventions",
+    "Fatores dificultadores": "cardiologia_barriers",
+    Recomendações: "cardiologia_recommendations",
+  };
+
+  syncCardiologiaCoronaryClassification();
+  syncCardiologiaRecentEventDetail();
+
+  const field = document.getElementById(fieldMap[label] || "");
+  if (field instanceof HTMLElement) {
+    field.focus();
+  }
 }
 
 function resolveCardiologiaPatient(patientId) {
