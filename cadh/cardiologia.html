@@ -274,25 +274,10 @@
     }
 
     .cardiologia-close {
-      inline-size: 38px;
-      block-size: 38px;
-      padding: 0;
-      display: grid;
-      place-items: center;
-      border-radius: 10px;
-      border: 1px solid #d7e7ef;
-      background: #fff;
-      color: var(--cardio-title);
-      font-size: 1.35rem;
-      line-height: 1;
-    }
-
-    .cardiologia-close:hover,
-    .cardiologia-close:focus-visible {
-      background: #eef7fb;
-      color: var(--cardio-accent);
-      box-shadow: none;
-      transform: none;
+      --clinical-close-border: #d7e7ef;
+      --clinical-close-color: var(--cardio-title);
+      --clinical-close-hover-bg: #eef7fb;
+      --clinical-close-hover-color: var(--cardio-accent);
     }
 
     .cardiologia-form-body {
@@ -611,7 +596,7 @@
     <form id="cardiologia-form" class="cardiologia-modal" novalidate>
       <div class="cardiologia-modal-header">
         <h2 class="cardiologia-modal-title">Cardiologista - Registro de Consulta</h2>
-        <button type="button" class="cardiologia-close" data-cardiologia-close aria-label="Fechar">&times;</button>
+        <button type="button" class="clinical-modal-close cardiologia-close" data-cardiologia-close aria-label="Fechar">Fechar</button>
       </div>
 
       <div class="cardiologia-form-body">
@@ -781,7 +766,7 @@
     <article class="cardiologia-modal" role="dialog" aria-modal="true" aria-labelledby="cardiologia-view-title">
       <div class="cardiologia-modal-header">
         <h2 id="cardiologia-view-title" class="cardiologia-modal-title">Guia preenchida de Cardiologia</h2>
-        <button type="button" class="cardiologia-close" data-cardiologia-view-close aria-label="Fechar">&times;</button>
+        <button type="button" class="clinical-modal-close cardiologia-close" data-cardiologia-view-close aria-label="Fechar">Fechar</button>
       </div>
 
       <div class="cardiologia-form-body">

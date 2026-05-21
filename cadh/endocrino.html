@@ -270,26 +270,10 @@
     }
 
     .endocrino-close {
-      inline-size: 38px;
-      block-size: 38px;
-      display: grid;
-      place-items: center;
-      padding: 0;
-      border: 1px solid var(--endocrino-border);
-      border-radius: 10px;
-      background: #fff;
-      color: var(--endocrino-title);
-      font-size: 1.35rem;
-      line-height: 1;
-    }
-
-    .endocrino-close:hover,
-    .endocrino-close:focus-visible {
-      outline: none;
-      background: #f5f1f8;
-      box-shadow: none;
-      color: var(--endocrino-accent);
-      transform: none;
+      --clinical-close-border: var(--endocrino-border);
+      --clinical-close-color: var(--endocrino-title);
+      --clinical-close-hover-bg: #f5f1f8;
+      --clinical-close-hover-color: var(--endocrino-accent);
     }
 
     .endocrino-form-body {
@@ -715,7 +699,7 @@
     <form id="endocrino-form" class="endocrino-modal" novalidate>
       <div class="endocrino-modal-header">
         <h2 class="endocrino-modal-title">Endocrinologista — Registro de Consulta</h2>
-        <button type="button" class="endocrino-close" data-endocrino-close aria-label="Fechar">×</button>
+        <button type="button" class="clinical-modal-close endocrino-close" data-endocrino-close aria-label="Fechar">Fechar</button>
       </div>
 
       <div class="endocrino-form-body">
@@ -865,7 +849,7 @@
     <article class="endocrino-modal" role="dialog" aria-modal="true" aria-labelledby="endocrino-view-title">
       <div class="endocrino-modal-header">
         <h2 id="endocrino-view-title" class="endocrino-modal-title">Guia preenchida do exame clínico</h2>
-        <button type="button" class="endocrino-close" data-endocrino-view-close aria-label="Fechar">×</button>
+        <button type="button" class="clinical-modal-close endocrino-close" data-endocrino-view-close aria-label="Fechar">Fechar</button>
       </div>
 
       <div class="endocrino-form-body">

@@ -150,6 +150,7 @@ body[data-page="home"] .topbar-account {
 body[data-page="cadh"] .menu a,
 body[data-page="cadh-cardiologia"] .menu a,
 body[data-page="cadh-endocrino"] .menu a,
+body[data-page="cadh-psicologia"] .menu a,
 body[data-page="cadh-enfermagem"] .menu a {
   padding: 10px 16px;
   font-size: 1.08rem;
@@ -162,6 +163,8 @@ body[data-page="cadh-cardiologia"] .topbar-logout,
 body[data-page="cadh-cardiologia"] .topbar-account,
 body[data-page="cadh-endocrino"] .topbar-logout,
 body[data-page="cadh-endocrino"] .topbar-account,
+body[data-page="cadh-psicologia"] .topbar-logout,
+body[data-page="cadh-psicologia"] .topbar-account,
 body[data-page="cadh-enfermagem"] .topbar-logout,
 body[data-page="cadh-enfermagem"] .topbar-account {
   min-height: 44px;
@@ -381,6 +384,58 @@ button:hover {
 
 .btn-danger:hover {
   background: var(--danger-dark);
+}
+
+.clinical-modal-close {
+  --clinical-close-size: 42px;
+  --clinical-close-border: var(--border);
+  --clinical-close-bg: #ffffff;
+  --clinical-close-color: var(--text);
+  --clinical-close-hover-bg: #f8fafc;
+  --clinical-close-hover-color: var(--clinical-close-color);
+  inline-size: var(--clinical-close-size) !important;
+  block-size: var(--clinical-close-size) !important;
+  min-inline-size: var(--clinical-close-size);
+  min-block-size: var(--clinical-close-size) !important;
+  display: inline-grid !important;
+  place-items: center;
+  flex: 0 0 var(--clinical-close-size);
+  position: relative;
+  padding: 0 !important;
+  border: 1px solid var(--clinical-close-border);
+  border-radius: 10px;
+  background: var(--clinical-close-bg);
+  color: var(--clinical-close-color);
+  font-size: 0 !important;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.clinical-modal-close::before,
+.clinical-modal-close::after {
+  content: "";
+  position: absolute;
+  inline-size: 17px;
+  block-size: 2.5px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.clinical-modal-close::before {
+  transform: rotate(45deg);
+}
+
+.clinical-modal-close::after {
+  transform: rotate(-45deg);
+}
+
+.clinical-modal-close:hover,
+.clinical-modal-close:focus-visible {
+  outline: none;
+  background: var(--clinical-close-hover-bg);
+  color: var(--clinical-close-hover-color);
+  box-shadow: none;
+  transform: none;
 }
 
 .btn-link {
