@@ -1,0 +1,850 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Enfermagem</title>
+  <link rel="stylesheet" href="/assets/app.css">
+  <style>
+    .enfermagem-page {
+      --enf-accent: #5f8870;
+      --enf-title: #18362a;
+      --enf-band: #b8dcc9;
+      --enf-soft: #edf8f2;
+      --enf-border: #c7e3d3;
+      padding: 28px;
+      background:
+        radial-gradient(circle at top right, rgba(95, 136, 112, 0.11), transparent 28%),
+        linear-gradient(180deg, #f5fbf7, #eef3f5);
+    }
+
+    body[data-page="cadh-enfermagem"] .container {
+      width: min(1840px, calc(100vw - 32px));
+      max-width: none;
+      margin: 20px auto;
+      padding: 0;
+    }
+
+    .enfermagem-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .enfermagem-title {
+      margin: 14px 0 0;
+      color: var(--enf-title);
+      font-size: 1.9rem;
+      line-height: 1.25;
+    }
+
+    .enfermagem-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .enfermagem-page .btn,
+    .enfermagem-page button,
+    .enfermagem-modal .btn,
+    .enfermagem-modal button {
+      min-height: 46px;
+      padding: 11px 18px;
+      font-size: 1.08rem;
+      font-weight: 800;
+    }
+
+    .enfermagem-table-shell {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--enf-border);
+      border-radius: 10px;
+      background: #fff;
+      box-shadow: 0 18px 30px rgba(15, 37, 65, 0.06);
+    }
+
+    .enfermagem-table {
+      width: 100%;
+      min-width: 1320px;
+      table-layout: fixed;
+      border: 0;
+    }
+
+    .enfermagem-col-date { width: 118px; }
+    .enfermagem-col-patient { width: 220px; }
+    .enfermagem-col-consult { width: 145px; }
+    .enfermagem-col-diagnosis { width: 170px; }
+    .enfermagem-col-treatment { width: 210px; }
+    .enfermagem-col-foot { width: 210px; }
+    .enfermagem-col-risk { width: 150px; }
+    .enfermagem-col-plan { width: 240px; }
+    .enfermagem-col-actions { width: 150px; }
+
+    .enfermagem-table th,
+    .enfermagem-table td {
+      border-color: #e3efe8;
+      padding: 14px 12px;
+      color: var(--enf-title);
+      font-size: 1rem;
+      line-height: 1.35;
+      vertical-align: middle;
+    }
+
+    .enfermagem-table tbody tr {
+      background: #fff;
+    }
+
+    .enfermagem-table-group th {
+      border-top: 0;
+      color: var(--enf-title);
+      font-size: 1.05rem;
+      font-weight: 900;
+      text-align: center;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .enfermagem-table-group .is-transition {
+      background: var(--enf-band);
+      color: var(--enf-title);
+      text-align: left;
+    }
+
+    .enfermagem-table-group .is-specialty,
+    .enfermagem-table-fields th {
+      background: var(--enf-soft);
+      color: var(--enf-title);
+    }
+
+    .enfermagem-table-group .is-actions,
+    .enfermagem-table-fields .is-actions-subhead {
+      background: #fbfcfd;
+      color: #405163;
+      border-left: 1px solid var(--enf-border);
+    }
+
+    .enfermagem-table-fields th {
+      font-size: 1rem;
+      font-weight: 900;
+      text-align: left;
+    }
+
+    .enfermagem-table-fields .is-actions-subhead {
+      text-align: center;
+    }
+
+    .enfermagem-table td:nth-child(1) {
+      white-space: nowrap;
+    }
+
+    .enfermagem-table td:nth-child(2) {
+      font-weight: 800;
+      color: #102a20;
+    }
+
+    .enfermagem-table th:last-child,
+    .enfermagem-table td:last-child {
+      border-left: 1px solid var(--enf-border);
+      text-align: center;
+    }
+
+    .enfermagem-table td:last-child {
+      padding: 10px 8px;
+      background: #fbfcfd;
+    }
+
+    .enfermagem-table .table-actions {
+      justify-content: center;
+      flex-wrap: nowrap;
+      gap: 8px;
+      min-height: 44px;
+    }
+
+    .enfermagem-table .icon-btn {
+      inline-size: 38px;
+      block-size: 38px;
+      display: inline-grid;
+      place-items: center;
+      padding: 0;
+      border: 1px solid #d9e9e0;
+      background: #f8fcfa;
+      color: #6e8b7a;
+    }
+
+    .enfermagem-table .icon-btn svg {
+      inline-size: 18px;
+      block-size: 18px;
+      display: block;
+    }
+
+    .enfermagem-table .icon-btn:hover,
+    .enfermagem-table .icon-btn:focus-visible {
+      background: #edf8f2;
+      color: var(--enf-accent);
+      box-shadow: 0 0 0 3px rgba(95, 136, 112, 0.12);
+      transform: none;
+    }
+
+    .enfermagem-empty {
+      min-height: 126px;
+      display: grid;
+      place-items: center;
+      gap: 12px;
+      padding: 24px;
+      color: #557061;
+      text-align: center;
+    }
+
+    .enfermagem-empty p {
+      margin: 0;
+      font-weight: 600;
+    }
+
+    .enfermagem-modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1100;
+      display: grid;
+      place-items: start center;
+      overflow-y: auto;
+      padding: 12px 8px 28px;
+      background: rgba(9, 17, 25, 0.62);
+    }
+
+    .enfermagem-modal-overlay[hidden] {
+      display: none;
+    }
+
+    .enfermagem-modal {
+      width: min(980px, calc(100vw - 28px));
+      max-height: calc(100vh - 24px);
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      overflow: hidden;
+      border: 1px solid rgba(95, 136, 112, 0.24);
+      border-radius: 16px;
+      background: #fff;
+      box-shadow: 0 26px 70px rgba(20, 55, 38, 0.22);
+    }
+
+    .enfermagem-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 18px 22px;
+      border-bottom: 1px solid #dcece3;
+      background: linear-gradient(180deg, #f4fbf7, #fff);
+    }
+
+    .enfermagem-modal-title {
+      margin: 0;
+      color: var(--enf-title);
+      font-size: 1.4rem;
+      line-height: 1.3;
+    }
+
+    .enfermagem-close {
+      inline-size: 42px;
+      block-size: 42px;
+      min-block-size: 42px !important;
+      display: inline-grid !important;
+      place-items: center;
+      position: relative;
+      padding: 0 !important;
+      border: 1px solid var(--enf-border);
+      border-radius: 10px;
+      background: #fff;
+      color: var(--enf-title);
+      font-size: 0 !important;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .enfermagem-close::before,
+    .enfermagem-close::after {
+      content: "";
+      position: absolute;
+      inline-size: 17px;
+      block-size: 2.5px;
+      border-radius: 999px;
+      background: currentColor;
+    }
+
+    .enfermagem-close::before {
+      transform: rotate(45deg);
+    }
+
+    .enfermagem-close::after {
+      transform: rotate(-45deg);
+    }
+
+    .enfermagem-close:hover,
+    .enfermagem-close:focus-visible {
+      outline: none;
+      background: #edf8f2;
+      color: var(--enf-accent);
+      box-shadow: none;
+      transform: none;
+    }
+
+    .enfermagem-form-body {
+      overflow-y: auto;
+      padding: 28px 32px 30px;
+      background: #fcfefd;
+    }
+
+    .enfermagem-form-section {
+      margin-bottom: 20px;
+    }
+
+    .enfermagem-form-section[hidden] {
+      display: none;
+    }
+
+    .enfermagem-section-title {
+      margin: 0 0 14px;
+      color: var(--enf-title);
+      font-size: 1.08rem;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .enfermagem-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 22px;
+    }
+
+    .enfermagem-grid .field,
+    .enfermagem-grid .field-full {
+      min-width: 0;
+    }
+
+    .enfermagem-grid .field-full {
+      grid-column: 1 / -1;
+    }
+
+    .enfermagem-grid .field label,
+    .enfermagem-grid .field-full label {
+      display: block;
+      color: #335f47;
+      font-size: 1.1rem;
+      font-weight: 800;
+      line-height: 1.3;
+    }
+
+    #enfermagem-foot-section .enfermagem-grid .field {
+      display: grid;
+      grid-template-rows: minmax(48px, auto) auto;
+      align-content: start;
+      gap: 8px;
+    }
+
+    #enfermagem-foot-section .enfermagem-grid .field label {
+      display: flex;
+      align-items: flex-end;
+      min-height: 48px;
+    }
+
+    .enfermagem-modal input,
+    .enfermagem-modal select,
+    .enfermagem-modal textarea {
+      min-height: 56px;
+      font-size: 1.12rem;
+      line-height: 1.45;
+    }
+
+    .enfermagem-modal textarea {
+      min-height: 118px;
+    }
+
+    .enfermagem-field-guidance,
+    .enfermagem-age-guidance {
+      margin: 6px 0 0;
+      color: #557061;
+      font-size: 1rem;
+      line-height: 1.45;
+    }
+
+    .enfermagem-age-guidance {
+      grid-column: 1 / -1;
+      margin-top: 8px;
+    }
+
+    .enfermagem-patient-summary {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      padding: 16px;
+      border: 1px solid var(--enf-border);
+      border-radius: 12px;
+      background: #edf8f2;
+    }
+
+    .enfermagem-patient-summary[hidden] {
+      display: none;
+    }
+
+    .enfermagem-patient-summary span {
+      display: grid;
+      gap: 2px;
+      min-width: 0;
+      color: #557061;
+      font-size: 0.95rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .enfermagem-patient-summary strong {
+      overflow: hidden;
+      color: var(--enf-title);
+      font-size: 1.08rem;
+      letter-spacing: 0;
+      text-overflow: ellipsis;
+      text-transform: none;
+      white-space: nowrap;
+    }
+
+    .enfermagem-form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      padding: 16px 22px;
+      border-top: 1px solid #dcece3;
+      background: #fff;
+    }
+
+    .enfermagem-form-actions .btn,
+    .enfermagem-form-actions button {
+      min-width: 150px;
+      justify-content: center;
+    }
+
+    .enfermagem-save-icon {
+      inline-size: 18px;
+      block-size: 18px;
+      margin-right: 8px;
+      fill: currentColor;
+      vertical-align: -3px;
+    }
+
+    .enfermagem-view-content {
+      display: grid;
+      gap: 16px;
+    }
+
+    .enfermagem-view-section {
+      padding: 14px;
+      border: 1px solid #dcece3;
+      border-radius: 12px;
+      background: #fff;
+    }
+
+    .enfermagem-view-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .enfermagem-view-item {
+      min-width: 0;
+      padding: 12px;
+      border-radius: 10px;
+      background: #f5fbf7;
+    }
+
+    .enfermagem-view-item.is-wide {
+      grid-column: 1 / -1;
+    }
+
+    .enfermagem-view-label {
+      display: block;
+      margin-bottom: 5px;
+      color: #557061;
+      font-size: 0.74rem;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .enfermagem-view-value {
+      color: var(--enf-title);
+      font-weight: 700;
+      line-height: 1.45;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    @media (max-width: 760px) {
+      .enfermagem-page {
+        padding: 20px;
+      }
+
+      .enfermagem-actions {
+        width: 100%;
+      }
+
+      .enfermagem-actions .btn,
+      .enfermagem-actions button {
+        flex: 1 1 180px;
+      }
+
+      .enfermagem-grid,
+      .enfermagem-view-grid,
+      .enfermagem-patient-summary {
+        grid-template-columns: 1fr;
+      }
+
+      .enfermagem-modal-header,
+      .enfermagem-form-body,
+      .enfermagem-form-actions {
+        padding-inline: 16px;
+      }
+
+      .enfermagem-form-actions {
+        flex-direction: column-reverse;
+      }
+
+      .enfermagem-form-actions .btn,
+      .enfermagem-form-actions button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body data-page="cadh-enfermagem">
+  <header class="topbar">
+    <div class="topbar-brand">Intranet CADH</div>
+    <nav class="menu">
+      <a id="nav-home" href="/index.html">Home</a>
+      <a id="nav-cadh" href="/cadh/index.html">CADH</a>
+      <a id="nav-ubs" href="/ubs/index.html">UBS</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="card enfermagem-page">
+      <svg aria-hidden="true" style="display:none">
+        <symbol id="enfermagem-icon-save" viewBox="0 0 24 24">
+          <path d="M5 3h12l2 2v16H5V3Zm2 2v14h10V7.8L15.2 5H15v6H8V5H7Zm3 0v4h3V5h-3Zm-1 10h6v2H9v-2Z"/>
+        </symbol>
+      </svg>
+
+      <div class="enfermagem-header">
+        <div>
+          <a class="btn" href="/cadh/index.html">&larr; Voltar</a>
+          <h1 class="enfermagem-title">Enfermagem</h1>
+        </div>
+        <div class="enfermagem-actions">
+          <button type="button" id="enfermagem-new" class="btn btn-primary">+ Novo registro</button>
+        </div>
+      </div>
+
+      <div class="enfermagem-table-shell">
+        <table class="enfermagem-table" aria-label="Registros de Enfermagem">
+          <colgroup>
+            <col class="enfermagem-col-date">
+            <col class="enfermagem-col-patient">
+            <col class="enfermagem-col-consult">
+            <col class="enfermagem-col-diagnosis">
+            <col class="enfermagem-col-treatment">
+            <col class="enfermagem-col-foot">
+            <col class="enfermagem-col-risk">
+            <col class="enfermagem-col-plan">
+            <col class="enfermagem-col-actions">
+          </colgroup>
+          <thead>
+            <tr class="enfermagem-table-group">
+              <th class="is-transition" colspan="3">Enfermagem</th>
+              <th class="is-specialty" colspan="5">Dados clínicos</th>
+              <th class="is-actions">Ações</th>
+            </tr>
+            <tr class="enfermagem-table-fields">
+              <th>Data</th>
+              <th>Paciente</th>
+              <th>Consulta</th>
+              <th>DM / HAS</th>
+              <th>Tratamento</th>
+              <th>Avaliação dos pés</th>
+              <th>Risco</th>
+              <th>Recomendações</th>
+              <th class="is-actions-subhead" aria-label="Ações"></th>
+            </tr>
+          </thead>
+          <tbody id="enfermagem-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <div id="enfermagem-modal" class="enfermagem-modal-overlay" hidden>
+    <form id="enfermagem-form" class="enfermagem-modal" novalidate>
+      <div class="enfermagem-modal-header">
+        <h2 class="enfermagem-modal-title">Enfermagem - Registro de Consulta</h2>
+        <button type="button" class="enfermagem-close" data-enfermagem-close aria-label="Fechar">Fechar</button>
+      </div>
+
+      <div class="enfermagem-form-body">
+        <div id="enfermagem-alert" class="alert" hidden></div>
+        <input id="enfermagem_record_id" name="record_id" type="hidden">
+
+        <section class="enfermagem-form-section">
+          <div class="enfermagem-grid">
+            <div class="field-full">
+              <label for="enfermagem_patient_search_input">Paciente *</label>
+              <select id="enfermagem_patient_id" name="patient_id" class="visually-hidden" tabindex="-1" aria-hidden="true"></select>
+              <div id="enfermagem_patient_search" class="transition-patient-search"></div>
+            </div>
+
+            <div id="enfermagem-patient-summary" class="enfermagem-patient-summary" hidden></div>
+            <p id="enfermagem-age-guidance" class="enfermagem-age-guidance" hidden></p>
+
+            <div class="field">
+              <label for="enfermagem_consultation_date">Data da consulta *</label>
+              <input id="enfermagem_consultation_date" name="consultation_date" type="date" placeholder="dd/mm/aaaa" required>
+            </div>
+
+            <div class="field">
+              <label for="enfermagem_consultation_number">Nº da consulta</label>
+              <select id="enfermagem_consultation_number" name="consultation_number">
+                <option value="1ª Consulta (inicial)">1ª Consulta (inicial)</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <section id="enfermagem-subsequent-section" class="enfermagem-form-section">
+          <h3 class="enfermagem-section-title">Consulta subsequente</h3>
+          <div class="enfermagem-grid">
+            <div class="field">
+              <label for="enfermagem_followed_previous_guidance">Usuário seguiu as orientações prévias?</label>
+              <select id="enfermagem_followed_previous_guidance" name="followed_previous_guidance">
+                <option value="" hidden>Selecione...</option>
+                <option value="Sim">Sim</option>
+                <option value="Parcialmente">Parcialmente</option>
+                <option value="Não">Não</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <section id="enfermagem-initial-section" class="enfermagem-form-section">
+          <h3 class="enfermagem-section-title">Informações clínicas</h3>
+          <div class="enfermagem-grid">
+            <div class="field">
+              <label for="enfermagem_dm_diagnosis_time">Tempo de diagnóstico para DM (desde de...)</label>
+              <input id="enfermagem_dm_diagnosis_time" name="dm_diagnosis_time" autocomplete="off" placeholder="Ex: 2014 ou tempo estimado">
+            </div>
+
+            <div class="field">
+              <label for="enfermagem_has_diagnosis_time">Tempo de diagnóstico para HAS (desde de...)</label>
+              <input id="enfermagem_has_diagnosis_time" name="has_diagnosis_time" autocomplete="off" placeholder="Ex: 2014 ou tempo estimado">
+            </div>
+
+            <div class="field">
+              <label for="enfermagem_family_history">Antecedentes familiares</label>
+              <select id="enfermagem_family_history" name="family_history">
+                <option value="" hidden>Selecione...</option>
+                <option value="Sim">Sim</option>
+                <option value="Não">Não</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="enfermagem_sedentary">Sedentarismo</label>
+              <select id="enfermagem_sedentary" name="sedentary">
+                <option value="" hidden>Selecione...</option>
+                <option value="Sim">Sim</option>
+                <option value="Não">Não</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="enfermagem_medication_treatment">Tratamento medicamentoso</label>
+              <select id="enfermagem_medication_treatment" name="medication_treatment">
+                <option value="" hidden>Selecione...</option>
+                <option value="1 a 5 medicamentos de uso contínuo">1 a 5 medicamentos de uso contínuo</option>
+                <option value="6 a 10 medicamentos (polifarmácia)">6 a 10 medicamentos (polifarmácia)</option>
+                <option value="Acima de 10 medicamentos (polifarmácia excessiva)">Acima de 10 medicamentos (polifarmácia excessiva)</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="enfermagem_smoking">Tabagismo</label>
+              <select id="enfermagem_smoking" name="smoking">
+                <option value="" hidden>Selecione...</option>
+                <option value="Sim">Sim</option>
+                <option value="Não">Não</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="enfermagem_alcohol_use">Consumo de bebidas alcoolicas</label>
+              <select id="enfermagem_alcohol_use" name="alcohol_use">
+                <option value="" hidden>Selecione...</option>
+                <option value="Não">Não</option>
+                <option value="Casualmente">Casualmente</option>
+                <option value="Sim">Sim</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <section id="enfermagem-foot-section" class="enfermagem-form-section">
+          <h3 class="enfermagem-section-title">Avaliação dos pés</h3>
+          <div class="enfermagem-grid">
+            <div class="field">
+              <label for="enfermagem_foot_psp">Avaliação do pé- Perda de Sensação Protetora (PSP)</label>
+              <select id="enfermagem_foot_psp" name="foot_psp">
+                <option value="" hidden>Selecione...</option>
+                <option value="Sim">Sim</option>
+                <option value="Não">Não</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="enfermagem_foot_deformity">Avaliação do pé- Deforminade</label>
+              <select id="enfermagem_foot_deformity" name="foot_deformity">
+                <option value="" hidden>Selecione...</option>
+                <option value="Sim">Sim</option>
+                <option value="Não">Não</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="enfermagem_foot_polyneuropathy">Avaliação do pé- Polineuropatia diabética</label>
+              <select id="enfermagem_foot_polyneuropathy" name="foot_polyneuropathy">
+                <option value="" hidden>Selecione...</option>
+                <option value="Sim">Sim</option>
+                <option value="Não">Não</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="enfermagem_foot_neuropathic_pain">Avaliação do pé- Dor neuropática</label>
+              <select id="enfermagem_foot_neuropathic_pain" name="foot_neuropathic_pain">
+                <option value="" hidden>Selecione...</option>
+                <option value="Sim">Sim</option>
+                <option value="Não">Não</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="enfermagem_amputation">Amputação</label>
+              <select id="enfermagem_amputation" name="amputation">
+                <option value="" hidden>Selecione...</option>
+                <option value="Não">Não</option>
+                <option value="Sim">Sim</option>
+                <option value="acima do tornozelo">acima do tornozelo</option>
+                <option value="abaixo do tornozelo">abaixo do tornozelo</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="enfermagem_active_ulcer">Úlcera ativa</label>
+              <select id="enfermagem_active_ulcer" name="active_ulcer">
+                <option value="" hidden>Selecione...</option>
+                <option value="Sim">Sim</option>
+                <option value="Não">Não</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="enfermagem_previous_ulcer">Úlcera prévia</label>
+              <select id="enfermagem_previous_ulcer" name="previous_ulcer">
+                <option value="" hidden>Selecione...</option>
+                <option value="Sim">Sim</option>
+                <option value="Não">Não</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="enfermagem_risk_classification">Classificação de risco e seguimento</label>
+              <select id="enfermagem_risk_classification" name="risk_classification">
+                <option value="" hidden>Selecione...</option>
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="enfermagem_orthosis_referral">Encaminhamento para Oficina de Órtese e Prótese da SES</label>
+              <select id="enfermagem_orthosis_referral" name="orthosis_referral">
+                <option value="" hidden>Selecione...</option>
+                <option value="Sim">Sim</option>
+                <option value="Não">Não</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="enfermagem_oral_health_need">Necessidade de cuidados de saúde bucal?</label>
+              <select id="enfermagem_oral_health_need" name="oral_health_need">
+                <option value="" hidden>Selecione...</option>
+                <option value="Sim">Sim</option>
+                <option value="Não">Não</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <section id="enfermagem-care-section" class="enfermagem-form-section">
+          <h3 class="enfermagem-section-title">Plano de cuidado</h3>
+          <div class="enfermagem-grid">
+            <div class="field-full">
+              <label for="enfermagem_barriers_plan">Fatores dificultadores - Ficha Plano de Cuidado</label>
+              <textarea id="enfermagem_barriers_plan" name="barriers_plan" placeholder="Descreva barreiras de adesão, autocuidado, uso de medicação, cuidado com os pés, saúde bucal ou acesso."></textarea>
+              <p class="enfermagem-field-guidance">Registre achados que dificultam o cuidado: uso incorreto de insulina, hipoglicemia, cuidado insuficiente com os pés, hábitos, visão, audição ou rede de apoio.</p>
+            </div>
+
+            <div class="field-full">
+              <label for="enfermagem_recommendations_plan">Recomendações - Ficha Plano de Cuidado</label>
+              <textarea id="enfermagem_recommendations_plan" name="recommendations_plan" placeholder="Descreva monitoramento, orientações de medicação, pés, saúde bucal, encaminhamentos e retorno."></textarea>
+              <p class="enfermagem-field-guidance">Registre condutas pactuadas: cuidados com os pés, uso correto das medicações, rodízio de aplicação, prevenção de hipoglicemia e encaminhamentos necessários.</p>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <div class="enfermagem-form-actions">
+        <button type="button" class="btn" data-enfermagem-close>Cancelar</button>
+        <button type="submit" class="btn btn-primary">
+          <svg class="enfermagem-save-icon" aria-hidden="true"><use href="#enfermagem-icon-save"></use></svg>
+          Salvar registro
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div id="enfermagem-view-modal" class="enfermagem-modal-overlay" hidden>
+    <article class="enfermagem-modal" role="dialog" aria-modal="true" aria-labelledby="enfermagem-view-title">
+      <div class="enfermagem-modal-header">
+        <h2 id="enfermagem-view-title" class="enfermagem-modal-title">Guia preenchida de Enfermagem</h2>
+        <button type="button" class="enfermagem-close" data-enfermagem-view-close aria-label="Fechar">Fechar</button>
+      </div>
+
+      <div class="enfermagem-form-body">
+        <div id="enfermagem-view-content" class="enfermagem-view-content"></div>
+      </div>
+
+      <div class="enfermagem-form-actions">
+        <button type="button" class="btn" data-enfermagem-view-close>Fechar</button>
+      </div>
+    </article>
+  </div>
+
+  <script src="/assets/config.js"></script>
+  <script src="/assets/app.js"></script>
+  <script src="/assets/cadh-enfermagem.js"></script>
+</body>
+</html>
