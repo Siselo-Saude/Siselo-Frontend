@@ -98,24 +98,25 @@ function normalizeSelfProfileRow(user) {
     specialty: user && user.specialty ? user.specialty : '',
     roles: user && Array.isArray(user.roles) ? user.roles : [],
     is_active: user && Number(user.is_active) === 1 ? 1 : 0,
+    is_approved: user && Number(user.is_approved) === 1 ? 1 : 0,
   };
 }
 
 function renderAdminUsersAccessDenied(tbody) {
   tbody.innerHTML = SISELO.emptyTableRow(
-    8,
+    9,
     'Acesso restrito.',
-    'Seu usuario nao possui permissao para administrar usuarios.'
+    'Seu usu\u00e1rio n\u00e3o possui permiss\u00e3o para administrar usu\u00e1rios.'
   );
 }
 
 function renderAdminUsersTable(tbody, rows, query = '', canCreateUser = false) {
   if (!Array.isArray(rows) || rows.length === 0) {
     tbody.innerHTML = SISELO.emptyTableRow(
-      8,
-      'Nenhum usuario encontrado.',
+      9,
+      'Nenhum usu\u00e1rio encontrado.',
       canCreateUser
-        ? { label: '+ Novo usuario', href: '/admin/users/form.html' }
+        ? { label: '+ Novo usu\u00e1rio', href: '/admin/users/form.html' }
         : null
     );
     return;
@@ -129,7 +130,8 @@ function renderAdminUsersTable(tbody, rows, query = '', canCreateUser = false) {
       <td>${SISELO.escapeHtml(formatAdminUserType(row.user_type))}</td>
       <td>${SISELO.escapeHtml(row.specialty || '-')}</td>
       <td>${SISELO.escapeHtml((row.roles || []).join(', '))}</td>
-      <td>${Number(row.is_active) === 1 ? 'Ativo' : 'Inativo'}</td>
+      <td>${formatAdminApprovalStatus(row)}</td>
+      <td>${formatAdminActiveStatus(row)}</td>
       <td>
         <div class="table-actions">
           ${renderAdminUserActions(row, canCreateUser)}
@@ -145,9 +147,11 @@ function renderAdminUserActions(row, canManageUsers) {
   }
 
   return `
-    ${SISELO.iconLink('edit', `/admin/users/form.html?id=${row.id}`, 'Editar usuario')}
-    ${SISELO.iconButton('toggle', Number(row.is_active) === 1 ? 'Desativar usuario' : 'Ativar usuario', { 'data-toggle-id': row.id })}
+    ${SISELO.iconLink('edit', `/admin/users/form.html?id=${row.id}`, 'Editar usu\u00e1rio')}
+    ${Number(row.is_approved) === 1 ? '' : SISELO.iconButton('restore', 'Aprovar usu\u00e1rio', { 'data-approve-id': row.id })}
+    ${SISELO.iconButton('toggle', Number(row.is_active) === 1 ? 'Desativar usu\u00e1rio' : 'Ativar usu\u00e1rio', { 'data-toggle-id': row.id })}
     ${SISELO.iconButton('reset', 'Resetar senha', { 'data-reset-id': row.id })}
+    ${SISELO.iconButton('delete', 'Excluir usu\u00e1rio', { 'data-delete-id': row.id, 'data-delete-label': row.name || '' })}
   `;
 }
 
@@ -156,7 +160,25 @@ function formatAdminUserType(value) {
   return normalizedValue || '-';
 }
 
+function formatAdminApprovalStatus(row) {
+  return Number(row && row.is_approved) === 1 ? 'Aprovado' : 'Pendente';
+}
+
+function formatAdminActiveStatus(row) {
+  return Number(row && row.is_active) === 1 ? 'Ativo' : 'Inativo';
+}
+
 function bindAdminUserActions(tbody) {
+  tbody.querySelectorAll('[data-approve-id]').forEach((button) => {
+    button.addEventListener('click', async () => {
+      await SISELO.apiRequest('/admin/users/approve.php', {
+        method: 'POST',
+        body: { id: Number(button.dataset.approveId) },
+      });
+      location.reload();
+    });
+  });
+
   tbody.querySelectorAll('[data-toggle-id]').forEach((button) => {
     button.addEventListener('click', async () => {
       await SISELO.apiRequest('/admin/users/toggle_active.php', {
@@ -180,6 +202,26 @@ function bindAdminUserActions(tbody) {
       location.reload();
     });
   });
+
+  tbody.querySelectorAll('[data-delete-id]').forEach((button) => {
+    button.addEventListener('click', async () => {
+      const label = String(button.dataset.deleteLabel || '').trim();
+      const target = label ? ` o usu\u00e1rio "${label}"` : ' este usu\u00e1rio';
+      if (!window.confirm(`Excluir${target}? O cadastro sair\u00e1 da lista de usu\u00e1rios.`)) {
+        return;
+      }
+
+      try {
+        await SISELO.apiRequest('/admin/users/soft_delete.php', {
+          method: 'POST',
+          body: { id: Number(button.dataset.deleteId) },
+        });
+        location.reload();
+      } catch (error) {
+        SISELO.showAlert('page-alert', error.message || 'N\u00e3o foi poss\u00edvel excluir o usu\u00e1rio.', 'error');
+      }
+    });
+  });
 }
 
 function filterAdminUserRows(rows, query) {
@@ -194,7 +236,9 @@ function filterAdminUserRows(rows, query) {
         SISELO.matchesSearchText(row.email, search) ||
         SISELO.matchesSearchText(row.user_type, search) ||
         SISELO.matchesSearchText(row.specialty, search) ||
-        SISELO.matchesSearchText((row.roles || []).join(' '), search)
+        SISELO.matchesSearchText((row.roles || []).join(' '), search) ||
+        SISELO.matchesSearchText(formatAdminApprovalStatus(row), search) ||
+        SISELO.matchesSearchText(formatAdminActiveStatus(row), search)
       : true;
     const matchesDigits = search.hasDigits
       ? SISELO.matchesSearchDigits(row.id, search) ||
@@ -251,7 +295,7 @@ async function setupAdminUsersFormPage() {
 
   document.getElementById('form-title').textContent = !canManageUsers && isSelfProfile
     ? 'Meu perfil'
-    : (data.editing ? 'Editar Usuario' : 'Novo Usuario');
+    : (data.editing ? 'Editar Usu\u00e1rio' : 'Novo Usu\u00e1rio');
 
   if (!canManageUsers) {
     document.querySelectorAll('[data-back-link]').forEach((link) => {
