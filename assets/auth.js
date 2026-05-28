@@ -14,14 +14,14 @@ const AUTH_SPECIALTIES = [
   'Cardiologia',
   'Psicologia',
   'Enfermagem',
-  'Nutrição',
+  'Nutri\u00e7\u00e3o',
   'Fisioterapia',
-  'Farmácia Clínica',
-  'Serviço Social',
+  'Farm\u00e1cia Cl\u00ednica',
+  'Servi\u00e7o Social',
   'Oftalmologia',
   'Nefrologia',
-  'Técnico de Enfermagem',
-  'Gestão do Cuidado',
+  'T\u00e9cnico de Enfermagem',
+  'Gest\u00e3o do Cuidado',
 ];
 
 function setupLoginPage() {
@@ -36,8 +36,11 @@ function setupLoginPage() {
   let mode = 'login';
 
   const syncRegisterSpecialty = setupAuthSpecialtyControls(registerForm);
+ feat-nutri
   SISELO.enhanceChoiceSelects(document);
   syncRegisterSpecialty();
+
+ main
 
   const setMode = (nextMode) => {
     mode = nextMode === 'register' ? 'register' : 'login';
@@ -47,9 +50,17 @@ function setupLoginPage() {
     registerForm.hidden = !isRegister;
     title.textContent = isRegister ? 'Criar uma conta' : 'Entrar no SISELO';
     subtitle.textContent = isRegister
+ feat-nutri
       ? 'Preencha os dados e aguarde a aprovação do administrador.'
       : 'Acesse com seu e-mail cadastrado.';
     switchText.firstChild.textContent = isRegister ? 'Já possui uma conta? ' : 'Ainda não possui uma conta? ';
+
+      ? 'Preencha os dados e aguarde a aprova\u00e7\u00e3o do administrador.'
+      : 'Acesse com seu e-mail cadastrado.';
+    switchText.firstChild.textContent = isRegister
+      ? 'J\u00e1 possui uma conta? '
+      : 'Ainda n\u00e3o possui uma conta? ';
+ main
     switchButton.textContent = isRegister ? 'Fazer login' : 'Cadastre-se';
 
     tabs.forEach((tab) => {
@@ -118,7 +129,11 @@ function setupLoginPage() {
         alertId,
         data && data.message
           ? data.message
+ feat-nutri
           : 'Cadastro recebido com sucesso. Aguarde a aprovação do administrador.',
+
+          : 'Cadastro recebido com sucesso. Aguarde a aprova\u00e7\u00e3o do administrador.',
+ main
         'success'
       );
     } catch (error) {
