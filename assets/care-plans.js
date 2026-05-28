@@ -494,6 +494,7 @@ function addCarePlanItem(item) {
     .querySelector("[data-remove-item]")
     .addEventListener("click", () => wrapper.remove());
   itemsContainer.appendChild(wrapper);
+  SISELO.enhanceChoiceSelects(wrapper);
 }
 
 function fillPatientSelect(id, patients, currentValue) {

@@ -14,6 +14,7 @@
   --control-height: 48px;
   --control-radius: 12px;
   --control-padding-x: 12px;
+  --app-shell-max: 1320px;
 }
 
 * {
@@ -72,11 +73,18 @@ a {
 }
 
 .menu a {
+  min-width: 74px;
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   color: #fff;
   text-decoration: none;
   background: rgba(255, 255, 255, 0.15);
-  padding: 6px 10px;
+  padding: 8px 14px;
   border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 800;
   transition: background 0.18s ease, transform 0.18s ease;
 }
 
@@ -125,19 +133,14 @@ a {
 }
 
 .container {
-  max-width: 1320px;
+  width: min(var(--app-shell-max), calc(100vw - 32px));
+  max-width: var(--app-shell-max);
   margin: 18px auto;
-  padding: 0 14px;
+  padding: 0;
 }
 
 body[data-page="home"] .container {
-  max-width: 1640px;
-}
-
-body[data-page="home"] .menu a {
-  padding: 9px 14px;
-  font-size: 1rem;
-  font-weight: 700;
+  max-width: var(--app-shell-max);
 }
 
 body[data-page="home"] .topbar-logout,
@@ -147,22 +150,14 @@ body[data-page="home"] .topbar-account {
   font-size: 1rem;
 }
 
-body[data-page="cadh"] .menu a,
-body[data-page="cadh-cardiologia"] .menu a,
-body[data-page="cadh-endocrino"] .menu a,
-body[data-page="cadh-psicologia"] .menu a,
-body[data-page="cadh-enfermagem"] .menu a {
-  padding: 10px 16px;
-  font-size: 1.08rem;
-  font-weight: 800;
-}
-
 body[data-page="cadh"] .topbar-logout,
 body[data-page="cadh"] .topbar-account,
 body[data-page="cadh-cardiologia"] .topbar-logout,
 body[data-page="cadh-cardiologia"] .topbar-account,
 body[data-page="cadh-endocrino"] .topbar-logout,
 body[data-page="cadh-endocrino"] .topbar-account,
+body[data-page="cadh-nutricao"] .topbar-logout,
+body[data-page="cadh-nutricao"] .topbar-account,
 body[data-page="cadh-psicologia"] .topbar-logout,
 body[data-page="cadh-psicologia"] .topbar-account,
 body[data-page="cadh-enfermagem"] .topbar-logout,
@@ -180,7 +175,7 @@ body[data-page="encounters-list"] .container,
 body[data-page="encounters-trash"] .container,
 body[data-page="transitions-list"] .container,
 body[data-page="transitions-trash"] .container {
-  max-width: 1460px;
+  max-width: var(--app-shell-max);
 }
 
 .card {
@@ -249,10 +244,338 @@ body[data-page="transitions-trash"] .container {
   flex: 1 1 360px;
 }
 
-.cadh-ses-search .search-input-shell {
+.cadh-patient-search .search-input-shell {
   flex: 0 0 auto;
   width: 100%;
   align-self: stretch;
+}
+
+.team-badge {
+  --team-color: #64748b;
+  --team-border: #cbd5e1;
+  --team-bg: #f8fafc;
+  --team-text: #334155;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 28px;
+  width: fit-content;
+  max-width: 100%;
+  padding: 5px 10px;
+  border: 1px solid var(--team-border);
+  border-radius: 999px;
+  background: var(--team-bg);
+  color: var(--team-text);
+  font-size: 0.83rem;
+  font-weight: 800;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.team-badge::before {
+  content: "";
+  inline-size: 9px;
+  block-size: 9px;
+  border-radius: 999px;
+  background: var(--team-color);
+}
+
+.team-badge-safira {
+  --team-color: #2f6fec;
+  --team-border: #c7dafc;
+  --team-bg: #f0f6ff;
+  --team-text: #2357c6;
+}
+
+.team-badge-ametista {
+  --team-color: #c850d8;
+  --team-border: #edcef7;
+  --team-bg: #fdf5ff;
+  --team-text: #9c27b0;
+}
+
+.team-badge-esmeralda {
+  --team-color: #0f9f75;
+  --team-border: #bdebd4;
+  --team-bg: #effcf6;
+  --team-text: #08785a;
+}
+
+.team-badge-diamante {
+  --team-color: #1f2937;
+  --team-border: #cbd5e1;
+  --team-bg: #f4f7fa;
+  --team-text: #111827;
+}
+
+.team-badge-sem-equipe {
+  --team-color: #94a3b8;
+  --team-border: #d7dee8;
+  --team-bg: #f4f6f8;
+  --team-text: #667085;
+}
+
+.team-picker {
+  position: relative;
+  width: 100%;
+}
+
+.patient-status-field,
+.patient-status-field .choice-select {
+  width: min(100%, 320px);
+}
+
+.team-picker-trigger,
+.status-dropdown {
+  min-height: var(--control-height);
+  border: 1px solid var(--border);
+  border-radius: var(--control-radius);
+  background: #fff;
+  color: var(--text);
+}
+
+.team-picker-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  border-color: var(--team-border, var(--border));
+  background: linear-gradient(180deg, #fff, var(--team-bg, #fff));
+  text-align: left;
+}
+
+.team-picker-trigger:hover,
+.team-picker-trigger:focus-visible,
+.team-picker.is-open .team-picker-trigger {
+  outline: none;
+  border-color: var(--team-color, rgba(15, 118, 110, 0.36));
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--team-color, #0f766e) 12%, transparent);
+  transform: none;
+}
+
+.team-picker-trigger::after {
+  content: "";
+  inline-size: 9px;
+  block-size: 9px;
+  flex: 0 0 auto;
+  border-right: 2px solid #64748b;
+  border-bottom: 2px solid #64748b;
+  transform: translateY(-2px) rotate(45deg);
+}
+
+.team-picker.is-open .team-picker-trigger::after {
+  transform: translateY(2px) rotate(225deg);
+}
+
+.team-picker-menu {
+  position: absolute;
+  inset: calc(100% + 8px) 0 auto 0;
+  z-index: 2200;
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid rgba(15, 118, 110, 0.14);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 18px 34px rgba(15, 37, 65, 0.14);
+}
+
+.team-picker-menu[hidden] {
+  display: none !important;
+}
+
+.team-picker-option {
+  --team-color: #64748b;
+  --team-border: #cbd5e1;
+  --team-bg: #f8fafc;
+  --team-text: #334155;
+  min-width: 0;
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border-color: var(--team-border);
+  border-radius: 12px;
+  background: var(--team-bg);
+  color: var(--team-text);
+  font-size: 0.94rem;
+  font-weight: 800;
+  text-align: left;
+  box-shadow: none;
+}
+
+.team-picker-option:hover,
+.team-picker-option:focus-visible {
+  outline: none;
+  border-color: var(--team-color);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--team-color) 12%, transparent);
+  transform: none;
+}
+
+.team-picker-option.is-selected {
+  border-color: var(--team-color);
+  background: linear-gradient(180deg, #ffffff, var(--team-bg));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--team-color) 20%, transparent);
+}
+
+.team-picker-swatch {
+  inline-size: 12px;
+  block-size: 12px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: var(--team-color);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--team-color) 14%, transparent);
+}
+
+.team-picker-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.team-field-display {
+  min-height: var(--control-height);
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  border: 1px solid #d8e2e8;
+  border-radius: var(--control-radius);
+  background: #fff;
+}
+
+.team-field-display.is-empty {
+  color: #728399;
+  font-weight: 650;
+}
+
+.choice-select {
+  position: relative;
+  width: 100%;
+}
+
+.choice-select-native {
+  position: absolute !important;
+  inline-size: 1px !important;
+  block-size: 1px !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.choice-select-trigger {
+  width: 100%;
+  min-height: var(--control-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 14px;
+  border: 1px solid #d8e2e8;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #ffffff, #fbfefe);
+  color: #102236;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: left;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  transition: border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.choice-select-trigger::after {
+  content: "";
+  inline-size: 9px;
+  block-size: 9px;
+  flex: 0 0 auto;
+  border-right: 2px solid #607585;
+  border-bottom: 2px solid #607585;
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform 0.16s ease;
+}
+
+.choice-select-trigger:hover,
+.choice-select-trigger:focus-visible {
+  outline: none;
+  border-color: rgba(15, 118, 110, 0.36);
+  box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.1);
+  transform: none;
+}
+
+.choice-select.is-open .choice-select-trigger {
+  border-color: #cfe1e4;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+
+.choice-select.is-open .choice-select-trigger::after {
+  transform: translateY(2px) rotate(225deg);
+}
+
+.choice-select-value {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.choice-select-value.is-placeholder {
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.choice-select-menu {
+  position: absolute;
+  inset: calc(100% + 8px) 0 auto 0;
+  z-index: 1900;
+  display: grid;
+  gap: 6px;
+  max-height: min(260px, 42vh);
+  overflow-y: auto;
+  padding: 8px;
+  border: 1px solid rgba(15, 118, 110, 0.16);
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at top right, rgba(15, 118, 110, 0.08), transparent 36%),
+    #fff;
+  box-shadow: 0 18px 34px rgba(15, 37, 65, 0.14);
+}
+
+.choice-select-menu[hidden] {
+  display: none !important;
+}
+
+.choice-select-option {
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 9px 12px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: #24364a;
+  font-size: 0.95rem;
+  font-weight: 650;
+  text-align: left;
+  box-shadow: none;
+  transition: background-color 0.14s ease, border-color 0.14s ease, color 0.14s ease;
+}
+
+.choice-select-option:hover,
+.choice-select-option:focus-visible {
+  outline: none;
+  border-color: rgba(15, 118, 110, 0.13);
+  background: #eef8f6;
+  color: #0b5c56;
+  transform: none;
+  box-shadow: none;
+}
+
+.choice-select-option.is-selected {
+  color: #0b5c56;
+  font-weight: 800;
 }
 
 .search-input-shell {
@@ -463,6 +786,30 @@ button:hover {
 }
 
 .field-help {
+  display: none !important;
+}
+
+[class*="-field-guidance"] {
+  display: none !important;
+}
+
+.clinical-floating-tip {
+  position: fixed;
+  z-index: 3000;
+  max-width: min(460px, calc(100vw - 24px));
+  padding: 14px 16px;
+  border: 1px solid rgba(15, 118, 110, 0.22);
+  border-radius: 16px;
+  background: #fff;
+  color: #26384d;
+  box-shadow: 0 20px 40px rgba(15, 37, 65, 0.2);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.5;
+  pointer-events: none;
+}
+
+.clinical-floating-tip[hidden] {
   display: none !important;
 }
 
@@ -709,12 +1056,16 @@ textarea {
 
 .date-picker-day {
   min-height: 38px;
+  display: grid;
+  place-items: center;
   padding: 0;
   border: 0;
   border-radius: 10px;
   background: transparent;
   color: #203243;
   font-weight: 600;
+  line-height: 1;
+  text-align: center;
 }
 
 .date-picker-day:hover:not(:disabled),
@@ -837,6 +1188,21 @@ textarea {
 .field-error {
   color: var(--danger);
   font-size: 0.9rem;
+}
+
+.field-error:not(:empty) {
+  margin-top: 6px;
+  font-weight: 700;
+}
+
+input.is-invalid,
+textarea.is-invalid,
+select.is-invalid,
+.choice-select.is-invalid .choice-select-trigger,
+.team-picker.is-invalid .team-picker-trigger,
+.date-picker.is-invalid .date-picker-trigger {
+  border-color: #fca5a5 !important;
+  box-shadow: 0 0 0 4px rgba(185, 28, 28, 0.12) !important;
 }
 
 .alert {
@@ -1500,6 +1866,158 @@ body[data-page="transitions-trash"] .transitions-table th:nth-child(8),
 body[data-page="transitions-trash"] .transitions-table td:nth-child(8) {
   width: 8%;
   white-space: nowrap;
+}
+
+body[data-page="cadh-cardiologia"],
+body[data-page="cadh-endocrino"],
+body[data-page="cadh-nutricao"],
+body[data-page="cadh-psicologia"],
+body[data-page="cadh-enfermagem"] {
+  overflow-x: hidden;
+}
+
+body[data-page="cadh-cardiologia"] {
+  --clinical-table-min-width: 0;
+}
+
+body[data-page="cadh-endocrino"] {
+  --clinical-table-min-width: 0;
+}
+
+body[data-page="cadh-nutricao"] {
+  --clinical-table-min-width: 0;
+}
+
+body[data-page="cadh-psicologia"],
+body[data-page="cadh-enfermagem"] {
+  --clinical-table-min-width: 0;
+}
+
+body[data-page="cadh-cardiologia"] .cardiologia-page,
+body[data-page="cadh-endocrino"] .endocrino-page,
+body[data-page="cadh-nutricao"] .nutricao-page,
+body[data-page="cadh-psicologia"] .psicologia-page,
+body[data-page="cadh-enfermagem"] .enfermagem-page {
+  overflow-x: visible;
+}
+
+body[data-page="cadh-cardiologia"] .cardiologia-table-shell,
+body[data-page="cadh-endocrino"] .endocrino-table-shell,
+body[data-page="cadh-nutricao"] .nutricao-table-shell,
+body[data-page="cadh-psicologia"] .psicologia-table-shell,
+body[data-page="cadh-enfermagem"] .enfermagem-table-shell {
+  overflow-x: hidden !important;
+  overflow-y: hidden;
+}
+
+body[data-page="cadh-cardiologia"] .cardiologia-table,
+body[data-page="cadh-endocrino"] .endocrino-table,
+body[data-page="cadh-nutricao"] .nutricao-table,
+body[data-page="cadh-psicologia"] .psicologia-table,
+body[data-page="cadh-enfermagem"] .enfermagem-table {
+  min-width: var(--clinical-table-min-width, 1280px) !important;
+  width: 100%;
+  table-layout: fixed;
+}
+
+body[data-page="cadh-cardiologia"] .cardiologia-table col,
+body[data-page="cadh-endocrino"] .endocrino-table col,
+body[data-page="cadh-nutricao"] .nutricao-table col,
+body[data-page="cadh-psicologia"] .psicologia-table col,
+body[data-page="cadh-enfermagem"] .enfermagem-table col {
+  width: auto !important;
+}
+
+body[data-page="cadh-cardiologia"] .cardiologia-col-date,
+body[data-page="cadh-endocrino"] .endocrino-col-date,
+body[data-page="cadh-nutricao"] .nutricao-col-date,
+body[data-page="cadh-psicologia"] .psicologia-col-date,
+body[data-page="cadh-enfermagem"] .enfermagem-col-date {
+  width: 8% !important;
+}
+
+body[data-page="cadh-cardiologia"] .cardiologia-col-patient,
+body[data-page="cadh-endocrino"] .endocrino-col-patient,
+body[data-page="cadh-nutricao"] .nutricao-col-patient,
+body[data-page="cadh-psicologia"] .psicologia-col-patient,
+body[data-page="cadh-enfermagem"] .enfermagem-col-patient {
+  width: 13% !important;
+}
+
+body[data-page="cadh-cardiologia"] .cardiologia-col-consult,
+body[data-page="cadh-endocrino"] .endocrino-col-consult,
+body[data-page="cadh-nutricao"] .nutricao-col-consult,
+body[data-page="cadh-psicologia"] .psicologia-col-consult,
+body[data-page="cadh-enfermagem"] .enfermagem-col-consult {
+  width: 10% !important;
+}
+
+body[data-page="cadh-cardiologia"] .cardiologia-col-actions,
+body[data-page="cadh-endocrino"] .endocrino-col-actions,
+body[data-page="cadh-nutricao"] .nutricao-col-actions,
+body[data-page="cadh-psicologia"] .psicologia-col-actions,
+body[data-page="cadh-enfermagem"] .enfermagem-col-actions {
+  width: 142px !important;
+}
+
+body[data-page="cadh-cardiologia"] .cardiologia-table th:last-child,
+body[data-page="cadh-cardiologia"] .cardiologia-table td:last-child,
+body[data-page="cadh-endocrino"] .endocrino-table th:last-child,
+body[data-page="cadh-endocrino"] .endocrino-table td:last-child,
+body[data-page="cadh-nutricao"] .nutricao-table th:last-child,
+body[data-page="cadh-nutricao"] .nutricao-table td:last-child,
+body[data-page="cadh-psicologia"] .psicologia-table th:last-child,
+body[data-page="cadh-psicologia"] .psicologia-table td:last-child,
+body[data-page="cadh-enfermagem"] .enfermagem-table th:last-child,
+body[data-page="cadh-enfermagem"] .enfermagem-table td:last-child {
+  width: 142px !important;
+}
+
+body[data-page="cadh-cardiologia"] .cardiologia-table th,
+body[data-page="cadh-cardiologia"] .cardiologia-table td,
+body[data-page="cadh-endocrino"] .endocrino-table th,
+body[data-page="cadh-endocrino"] .endocrino-table td,
+body[data-page="cadh-nutricao"] .nutricao-table th,
+body[data-page="cadh-nutricao"] .nutricao-table td,
+body[data-page="cadh-psicologia"] .psicologia-table th,
+body[data-page="cadh-psicologia"] .psicologia-table td,
+body[data-page="cadh-enfermagem"] .enfermagem-table th,
+body[data-page="cadh-enfermagem"] .enfermagem-table td {
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: auto;
+  padding: 12px 9px !important;
+  font-size: 0.92rem !important;
+  line-height: 1.34 !important;
+  vertical-align: middle;
+}
+
+body[data-page="cadh-cardiologia"] .cardiologia-empty,
+body[data-page="cadh-endocrino"] .endocrino-empty,
+body[data-page="cadh-nutricao"] .nutricao-empty,
+body[data-page="cadh-psicologia"] .psicologia-empty,
+body[data-page="cadh-enfermagem"] .enfermagem-empty {
+  min-height: 120px !important;
+  font-size: 1rem;
+}
+
+body[data-page="cadh-cardiologia"] .cardiologia-table .table-actions,
+body[data-page="cadh-endocrino"] .endocrino-table .table-actions,
+body[data-page="cadh-nutricao"] .nutricao-table .table-actions,
+body[data-page="cadh-psicologia"] .psicologia-table .table-actions,
+body[data-page="cadh-enfermagem"] .enfermagem-table .table-actions {
+  justify-content: center;
+  flex-wrap: nowrap !important;
+  gap: 8px !important;
+}
+
+body[data-page="cadh-cardiologia"] .cardiologia-table .icon-btn,
+body[data-page="cadh-endocrino"] .endocrino-table .icon-btn,
+body[data-page="cadh-nutricao"] .nutricao-table .icon-btn,
+body[data-page="cadh-psicologia"] .psicologia-table .icon-btn,
+body[data-page="cadh-enfermagem"] .enfermagem-table .icon-btn {
+  inline-size: 34px !important;
+  block-size: 34px !important;
 }
 
 .icon-btn {
@@ -2426,6 +2944,34 @@ body[data-page="home"] .page-title {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+body[data-page="patients-form"] .patient-assistance-panel .transition-panel-grid {
+  align-items: start;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+body[data-page="patients-form"] .patient-assistance-panel .patient-status-field {
+  grid-column: 1 / -1;
+  max-width: 320px;
+}
+
+body[data-page="patients-form"] .patient-assistance-panel .patient-status-field .choice-select {
+  width: 100%;
+}
+
+body[data-page="patients-form"] .patient-assistance-panel .patient-clinical-notes-field textarea {
+  min-height: 132px;
+}
+
+@media (max-width: 860px) {
+  body[data-page="patients-form"] .patient-assistance-panel .transition-panel-grid {
+    grid-template-columns: 1fr;
+  }
+
+  body[data-page="patients-form"] .patient-assistance-panel .patient-status-field {
+    max-width: none;
+  }
+}
+
 .transition-patient-search {
   position: relative;
 }
@@ -2638,6 +3184,12 @@ body[data-page="home"] .page-title {
 }
 
 @media (max-width: 860px) {
+  .container {
+    width: min(100% - 20px, var(--app-shell-max));
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+
   .toolbar {
     align-items: stretch;
   }
@@ -2729,5 +3281,45 @@ body[data-page="home"] .page-title {
 
   .date-picker-footer-actions {
     justify-content: space-between;
+  }
+
+  body[data-page="cadh-cardiologia"] .cardiologia-page,
+  body[data-page="cadh-endocrino"] .endocrino-page,
+  body[data-page="cadh-nutricao"] .nutricao-page,
+  body[data-page="cadh-psicologia"] .psicologia-page,
+  body[data-page="cadh-enfermagem"] .enfermagem-page {
+    padding: 20px !important;
+  }
+
+  body[data-page="cadh-cardiologia"] .cardiologia-title,
+  body[data-page="cadh-endocrino"] .endocrino-title,
+  body[data-page="cadh-nutricao"] .nutricao-title,
+  body[data-page="cadh-psicologia"] .psicologia-title,
+  body[data-page="cadh-enfermagem"] .enfermagem-title {
+    font-size: 1.45rem !important;
+  }
+
+  body[data-page="cadh-cardiologia"] .cardiologia-table th,
+  body[data-page="cadh-cardiologia"] .cardiologia-table td,
+  body[data-page="cadh-endocrino"] .endocrino-table th,
+  body[data-page="cadh-endocrino"] .endocrino-table td,
+  body[data-page="cadh-nutricao"] .nutricao-table th,
+  body[data-page="cadh-nutricao"] .nutricao-table td,
+  body[data-page="cadh-psicologia"] .psicologia-table th,
+  body[data-page="cadh-psicologia"] .psicologia-table td,
+  body[data-page="cadh-enfermagem"] .enfermagem-table th,
+  body[data-page="cadh-enfermagem"] .enfermagem-table td {
+    padding: 12px 10px !important;
+    font-size: 0.9rem !important;
+    line-height: 1.35 !important;
+  }
+
+  body[data-page="cadh-cardiologia"] .cardiologia-modal,
+  body[data-page="cadh-endocrino"] .endocrino-modal,
+  body[data-page="cadh-nutricao"] .nutricao-modal,
+  body[data-page="cadh-psicologia"] .psicologia-modal,
+  body[data-page="cadh-enfermagem"] .enfermagem-modal {
+    width: min(100%, calc(100vw - 16px)) !important;
+    max-height: calc(100vh - 16px) !important;
   }
 }

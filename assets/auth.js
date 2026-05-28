@@ -36,6 +36,11 @@ function setupLoginPage() {
   let mode = 'login';
 
   const syncRegisterSpecialty = setupAuthSpecialtyControls(registerForm);
+ feat-nutri
+  SISELO.enhanceChoiceSelects(document);
+  syncRegisterSpecialty();
+
+ main
 
   const setMode = (nextMode) => {
     mode = nextMode === 'register' ? 'register' : 'login';
@@ -45,11 +50,17 @@ function setupLoginPage() {
     registerForm.hidden = !isRegister;
     title.textContent = isRegister ? 'Criar uma conta' : 'Entrar no SISELO';
     subtitle.textContent = isRegister
+ feat-nutri
+      ? 'Preencha os dados e aguarde a aprovação do administrador.'
+      : 'Acesse com seu e-mail cadastrado.';
+    switchText.firstChild.textContent = isRegister ? 'Já possui uma conta? ' : 'Ainda não possui uma conta? ';
+
       ? 'Preencha os dados e aguarde a aprova\u00e7\u00e3o do administrador.'
       : 'Acesse com seu e-mail cadastrado.';
     switchText.firstChild.textContent = isRegister
       ? 'J\u00e1 possui uma conta? '
       : 'Ainda n\u00e3o possui uma conta? ';
+ main
     switchButton.textContent = isRegister ? 'Fazer login' : 'Cadastre-se';
 
     tabs.forEach((tab) => {
@@ -57,6 +68,8 @@ function setupLoginPage() {
       tab.classList.toggle('is-active', isActive);
       tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
     });
+
+    syncRegisterSpecialty();
 
     SISELO.showAlert(alertId, '', 'info');
   };
@@ -116,7 +129,11 @@ function setupLoginPage() {
         alertId,
         data && data.message
           ? data.message
+ feat-nutri
+          : 'Cadastro recebido com sucesso. Aguarde a aprovação do administrador.',
+
           : 'Cadastro recebido com sucesso. Aguarde a aprova\u00e7\u00e3o do administrador.',
+ main
         'success'
       );
     } catch (error) {
@@ -145,11 +162,16 @@ function setupAuthSpecialtyControls(form) {
   const sync = () => {
     const selectedType = userTypeInputs.find((input) => input.checked);
     const isCadh = selectedType && selectedType.value === 'CADH';
+    const previousValue = select.value;
 
     field.hidden = !isCadh;
     select.required = Boolean(isCadh);
     if (!isCadh) {
       select.value = '';
+    }
+
+    if (select.value !== previousValue) {
+      select.dispatchEvent(new Event('change', { bubbles: true }));
     }
   };
 

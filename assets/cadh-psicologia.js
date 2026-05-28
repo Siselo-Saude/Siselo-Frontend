@@ -30,6 +30,7 @@ async function setupPsicologiaPage() {
   bindPsicologiaModal();
   bindPsicologiaViewModal();
   bindPsicologiaClinicalRules();
+  SISELO.bindFieldGuidanceTooltips();
 
   SISELO.enhanceDateInput("psicologia_consultation_date", {
     min: "1900-01-01",
@@ -247,7 +248,7 @@ function normalizePsicologiaPatient(patient) {
     id: SISELO.normalizeEntityId(patient && patient.id),
     full_name: String((patient && patient.full_name) || "").trim(),
     cpf: String((patient && patient.cpf) || "").trim(),
-    ses: String((patient && patient.ses) || "").trim(),
+    team_ref: String((patient && patient.team_ref) || "").trim(),
     birth_date: String((patient && patient.birth_date) || "").trim(),
     first_cadh_date: String((patient && patient.first_cadh_date) || "").trim(),
     age_label: String((patient && patient.age_label) || "").trim(),
@@ -346,7 +347,7 @@ function fillPsicologiaForm(record = null) {
       id: normalizedRecord.patient_id,
       full_name: normalizedRecord.full_name,
       cpf: normalizedRecord.cpf,
-      ses: normalizedRecord.ses,
+      team_ref: normalizedRecord.team_ref,
       birth_date: normalizedRecord.birth_date,
       first_cadh_date: normalizedRecord.first_cadh_date,
       age_label: normalizedRecord.age_label,
@@ -555,7 +556,7 @@ function savePsicologiaRecord() {
     patient_id: patientId,
     full_name: patient.full_name || "",
     cpf: patient.cpf || "",
-    ses: patient.ses || "",
+    team_ref: patient.team_ref || "",
     birth_date: patient.birth_date || "",
     first_cadh_date: patient.first_cadh_date || "",
     age_label: patient.age_label || "",
@@ -613,7 +614,7 @@ function resolvePsicologiaPatient(patientId) {
     return cachedPatient;
   }
 
-  return { id: normalizedId, full_name: "", cpf: "", ses: "", birth_date: "", first_cadh_date: "", age_label: "", race: "" };
+  return { id: normalizedId, full_name: "", cpf: "", team_ref: "", birth_date: "", first_cadh_date: "", age_label: "", race: "" };
 }
 
 function findPsicologiaPatientById(patientId) {
@@ -638,7 +639,7 @@ function updatePsicologiaPatientSummary(patient) {
   const ageLabel = fullPatient.age_label || (Number.isFinite(ageYears) ? `${ageYears} anos` : "-");
   element.innerHTML = [
     renderPsicologiaPatientSummaryItem("CPF", fullPatient.cpf || "-"),
-    renderPsicologiaPatientSummaryItem("SES", fullPatient.ses || "-"),
+    renderPsicologiaPatientSummaryItem("Equipe", SISELO.formatTeamName(fullPatient.team_ref)),
     renderPsicologiaPatientSummaryItem("Cor/Raça", formatPsicologiaRace(fullPatient.race)),
     renderPsicologiaPatientSummaryItem("Idade", ageLabel),
     renderPsicologiaPatientSummaryItem("Nascimento", formatPsicologiaDate(fullPatient.birth_date)),
@@ -732,7 +733,7 @@ function renderPsicologiaViewRecord(record) {
     ${renderPsicologiaViewSection("Identificação", [
       ["Paciente", item.full_name || "-"],
       ["CPF", item.cpf || "-"],
-      ["SES", item.ses || "-"],
+      ["Equipe", SISELO.formatTeamName(item.team_ref)],
       ["Cor/Raça", formatPsicologiaRace(item.race)],
       ["Data de nascimento", formatPsicologiaDate(item.birth_date)],
       ["Idade", item.age_label || "-"],
@@ -810,7 +811,6 @@ function renderPsicologiaTable() {
         <td colspan="9">
           <div class="psicologia-empty">
             <p>${SISELO.escapeHtml(emptyMessage)}</p>
-            ${activePatientId ? '<button type="button" class="btn btn-primary" data-psicologia-empty-new>+ Novo registro</button>' : ""}
           </div>
         </td>
       </tr>
@@ -847,10 +847,6 @@ function bindPsicologiaTableActions() {
   if (!tbody) {
     return;
   }
-
-  tbody.querySelectorAll("[data-psicologia-empty-new]").forEach((button) => {
-    button.addEventListener("click", () => openPsicologiaModal());
-  });
 
   tbody.querySelectorAll("[data-psicologia-edit]").forEach((button) => {
     button.addEventListener("click", () => {
@@ -933,7 +929,7 @@ function normalizePsicologiaRecord(record) {
     patient_id: SISELO.normalizeEntityId(record && record.patient_id),
     full_name: String((record && record.full_name) || "").trim(),
     cpf: String((record && record.cpf) || "").trim(),
-    ses: String((record && record.ses) || "").trim(),
+    team_ref: String((record && record.team_ref) || "").trim(),
     birth_date: String((record && record.birth_date) || "").trim(),
     first_cadh_date: String((record && record.first_cadh_date) || "").trim(),
     age_label: String((record && record.age_label) || "").trim(),

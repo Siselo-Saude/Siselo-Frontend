@@ -19,8 +19,8 @@
     }
 
     body[data-page="cadh-cardiologia"] .container {
-      width: min(1840px, calc(100vw - 32px));
-      max-width: none;
+      width: min(var(--app-shell-max), calc(100vw - 32px));
+      max-width: var(--app-shell-max);
       margin: 20px auto;
       padding: 0;
     }
@@ -60,7 +60,7 @@
 
     .cardiologia-table-shell {
       width: 100%;
-      overflow-x: auto;
+      overflow-x: hidden;
       border: 1px solid var(--cardio-border);
       border-radius: 10px;
       background: #ffffff;
@@ -69,7 +69,7 @@
 
     .cardiologia-table {
       width: 100%;
-      min-width: 1560px;
+      min-width: 0;
       table-layout: fixed;
       border: 0;
     }
@@ -737,16 +737,19 @@
             <div class="field-full">
               <label for="cardiologia_interventions">Intervenções medicamentosas e não medicamentosas</label>
               <textarea id="cardiologia_interventions" name="interventions" data-cardiologia-initial-field placeholder="Ex: ajustar anti-hipertensivos, orientar adesão, solicitar exames, revisar estatina e risco cardiovascular."></textarea>
+              <p class="cardiologia-field-guidance">Descreva a conduta cardiológica com clareza: medicações, exames, sinais de alerta, meta pressórica e seguimento.</p>
             </div>
 
             <div class="field-full">
               <label for="cardiologia_barriers">Fatores dificultadores</label>
               <textarea id="cardiologia_barriers" name="barriers" data-cardiologia-initial-field placeholder="Ex: dispneia, dor torácica, adesão irregular, PA elevada, dificuldade de acesso aos exames ou medicamentos."></textarea>
+              <p class="cardiologia-field-guidance">Registre fatores que dificultam o cuidado: sintomas, adesão, acesso a exames, uso de medicamentos ou risco cardiovascular persistente.</p>
             </div>
 
             <div class="field-full">
               <label for="cardiologia_recommendations">Recomendações</label>
               <textarea id="cardiologia_recommendations" name="recommendations" data-cardiologia-initial-field placeholder="Ex: retorno com exames, monitorar PA, sinais de alerta, seguimento na UBS ou reavaliação cardiológica."></textarea>
+              <p class="cardiologia-field-guidance">Registre conduta, orientações pactuadas, sinais de alerta, seguimento recomendado e prazo de retorno.</p>
             </div>
           </div>
         </section>

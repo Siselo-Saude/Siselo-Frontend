@@ -19,8 +19,8 @@
     }
 
     body[data-page="cadh-psicologia"] .container {
-      width: min(1840px, calc(100vw - 32px));
-      max-width: none;
+      width: min(var(--app-shell-max), calc(100vw - 32px));
+      max-width: var(--app-shell-max);
       margin: 20px auto;
       padding: 0;
     }
@@ -60,7 +60,7 @@
 
     .psicologia-table-shell {
       width: 100%;
-      overflow-x: auto;
+      overflow-x: hidden;
       border: 1px solid var(--psico-border);
       border-radius: 10px;
       background: #ffffff;
@@ -69,7 +69,7 @@
 
     .psicologia-table {
       width: 100%;
-      min-width: 1320px;
+      min-width: 0;
       table-layout: fixed;
       border: 0;
     }
@@ -671,21 +671,25 @@
             <div class="field-full">
               <label for="psicologia_lifestyle_changes">Fez mudanças no estilo de vida?</label>
               <textarea id="psicologia_lifestyle_changes" name="lifestyle_changes" placeholder="Descreva se houve mudança e quais hábitos foram modificados."></textarea>
+              <p class="psicologia-field-guidance">Registre mudanças percebidas pelo paciente, evitando julgamento; descreva hábito, frequência e contexto.</p>
             </div>
 
             <div class="field-full">
               <label for="psicologia_previous_goals">Cumpriu metas pactuadas na sessão passada?</label>
               <textarea id="psicologia_previous_goals" name="previous_goals" placeholder="Registre cumprimento, cumprimento parcial ou não cumprimento, com motivo clínico quando houver."></textarea>
+              <p class="psicologia-field-guidance">Informe se a meta foi cumprida, parcialmente cumprida ou não cumprida, com o motivo relatado.</p>
             </div>
 
             <div class="field-full">
               <label for="psicologia_current_barriers">Dificultadores atuais</label>
               <textarea id="psicologia_current_barriers" name="current_barriers" placeholder="Descreva barreiras atuais para adesão, autocuidado, motivação ou rotina."></textarea>
+              <p class="psicologia-field-guidance">Descreva barreiras emocionais, familiares, sociais, cognitivas ou de rotina que impactam o cuidado.</p>
             </div>
 
             <div class="field-full">
               <label for="psicologia_goals_today">Metas pactuadas hoje</label>
               <textarea id="psicologia_goals_today" name="goals_today" placeholder="Registre metas possíveis, objetivas e combinadas com o paciente."></textarea>
+              <p class="psicologia-field-guidance">Registre metas simples, possíveis e combinadas com o paciente, com prazo ou próximo passo quando houver.</p>
             </div>
           </div>
         </section>

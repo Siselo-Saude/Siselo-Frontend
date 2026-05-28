@@ -19,8 +19,8 @@
     }
 
     body[data-page="cadh-endocrino"] .container {
-      width: min(1840px, calc(100vw - 32px));
-      max-width: none;
+      width: min(var(--app-shell-max), calc(100vw - 32px));
+      max-width: var(--app-shell-max);
       margin: 20px auto;
       padding: 0;
     }
@@ -60,7 +60,7 @@
 
     .endocrino-table-shell {
       width: 100%;
-      overflow-x: auto;
+      overflow-x: hidden;
       border: 1px solid var(--endocrino-border);
       border-radius: 10px;
       background: #ffffff;
@@ -69,7 +69,7 @@
 
     .endocrino-table {
       width: 100%;
-      min-width: 1590px;
+      min-width: 0;
       table-layout: fixed;
       border: 0;
     }
@@ -820,16 +820,19 @@
             <div class="field-full">
               <label for="endocrino_interventions">Conduta</label>
               <textarea id="endocrino_interventions" name="interventions" placeholder="Ex: ajustar medicação, orientar insulina, alimentação, atividade física e pedir exames."></textarea>
+              <p class="endocrino-field-guidance">Descreva a conduta clínica de forma objetiva: ajuste terapêutico, exames, educação em saúde e orientação de autocuidado.</p>
             </div>
 
             <div class="field-full">
               <label for="endocrino_barriers">Dificuldades do paciente</label>
               <textarea id="endocrino_barriers" name="barriers" placeholder="Ex: dificuldade para usar a medicação, medir glicemia, seguir dieta, hipoglicemia ou falta de insumos."></textarea>
+              <p class="endocrino-field-guidance">Registre barreiras que interferem no controle glicêmico, adesão, acesso a insumos, alimentação ou uso correto das medicações.</p>
             </div>
 
             <div class="field-full">
               <label for="endocrino_recommendations">Orientação e retorno</label>
               <textarea id="endocrino_recommendations" name="recommendations" placeholder="Ex: retornar com exames, manter acompanhamento, revisar sinais de alerta e combinar meta de HbA1c."></textarea>
+              <p class="endocrino-field-guidance">Registre conduta, orientações pactuadas, exames solicitados, sinais de alerta e prazo de retorno.</p>
             </div>
           </div>
         </section>

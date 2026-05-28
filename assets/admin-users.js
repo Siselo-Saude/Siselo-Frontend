@@ -431,6 +431,7 @@ function setupAdminUserProfileFields(userData) {
 
   userTypeSelect.addEventListener('change', sync);
   sync();
+  SISELO.enhanceChoiceSelects(document);
 }
 
 function disableAdminUserForm() {

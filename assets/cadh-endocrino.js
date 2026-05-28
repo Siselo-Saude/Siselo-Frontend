@@ -256,7 +256,7 @@ function normalizeEndocrinoPatient(patient) {
     id: SISELO.normalizeEntityId(patient && patient.id),
     full_name: String((patient && patient.full_name) || "").trim(),
     cpf: String((patient && patient.cpf) || "").trim(),
-    ses: String((patient && patient.ses) || "").trim(),
+    team_ref: String((patient && patient.team_ref) || "").trim(),
     birth_date: String((patient && patient.birth_date) || "").trim(),
     first_cadh_date: String((patient && patient.first_cadh_date) || "").trim(),
     age_label: String((patient && patient.age_label) || "").trim(),
@@ -355,7 +355,7 @@ function fillEndocrinoForm(record = null) {
       id: normalizedRecord.patient_id,
       full_name: normalizedRecord.full_name,
       cpf: normalizedRecord.cpf,
-      ses: normalizedRecord.ses,
+      team_ref: normalizedRecord.team_ref,
       birth_date: normalizedRecord.birth_date,
       first_cadh_date: normalizedRecord.first_cadh_date,
       age_label: normalizedRecord.age_label,
@@ -480,6 +480,9 @@ function showEndocrinoTypingAlert(message = ENDOCRINO_NUMERIC_HINT) {
 }
 
 function bindEndocrinoFloatingGuidance() {
+  SISELO.bindFieldGuidanceTooltips();
+  return;
+
   if (document.body.dataset.endocrinoTooltipBound !== "true") {
     document.body.dataset.endocrinoTooltipBound = "true";
     window.addEventListener("resize", hideEndocrinoFloatingTip);
@@ -1116,7 +1119,7 @@ function saveEndocrinoRecord() {
     patient_id: patientId,
     full_name: patient.full_name || "",
     cpf: patient.cpf || "",
-    ses: patient.ses || "",
+    team_ref: patient.team_ref || "",
     birth_date: patient.birth_date || "",
     first_cadh_date: patient.first_cadh_date || "",
     age_label: patient.age_label || "",
@@ -1229,7 +1232,7 @@ function resolveEndocrinoPatient(patientId) {
     return cachedPatient;
   }
 
-  return { id: normalizedId, full_name: "", cpf: "", ses: "", birth_date: "", first_cadh_date: "", age_label: "", race: "" };
+  return { id: normalizedId, full_name: "", cpf: "", team_ref: "", birth_date: "", first_cadh_date: "", age_label: "", race: "" };
 }
 
 function findEndocrinoPatientById(patientId) {
@@ -1254,7 +1257,7 @@ function updateEndocrinoPatientSummary(patient) {
   const ageLabel = fullPatient.age_label || (Number.isFinite(ageYears) ? `${ageYears} anos` : "-");
   element.innerHTML = [
     renderEndocrinoPatientSummaryItem("CPF", fullPatient.cpf || "-"),
-    renderEndocrinoPatientSummaryItem("SES", fullPatient.ses || "-"),
+    renderEndocrinoPatientSummaryItem("Equipe", SISELO.formatTeamName(fullPatient.team_ref)),
     renderEndocrinoPatientSummaryItem("Cor/Raça", formatEndocrinoRace(fullPatient.race)),
     renderEndocrinoPatientSummaryItem("Idade", ageLabel),
     renderEndocrinoPatientSummaryItem("Nascimento", formatEndocrinoDate(fullPatient.birth_date)),
@@ -1371,7 +1374,7 @@ function renderEndocrinoViewRecord(record) {
     ${renderEndocrinoViewSection("Identificação da consulta", [
       ["Paciente", item.full_name || "-"],
       ["CPF", item.cpf || "-"],
-      ["SES", item.ses || "-"],
+      ["Equipe", SISELO.formatTeamName(item.team_ref)],
       ["Cor/Raça", formatEndocrinoRace(item.race)],
       ["Data de nascimento", formatEndocrinoDate(item.birth_date)],
       ["Idade", item.age_label || "-"],
@@ -1446,7 +1449,6 @@ function renderEndocrinoTable() {
         <td colspan="9">
           <div class="endocrino-empty">
             <p>${SISELO.escapeHtml(emptyMessage)}</p>
-            ${activePatientId ? '<button type="button" class="btn btn-primary" data-endocrino-empty-new>+ Novo registro</button>' : ""}
           </div>
         </td>
       </tr>
@@ -1483,10 +1485,6 @@ function bindEndocrinoTableActions() {
   if (!tbody) {
     return;
   }
-
-  tbody.querySelectorAll("[data-endocrino-empty-new]").forEach((button) => {
-    button.addEventListener("click", () => openEndocrinoModal());
-  });
 
   tbody.querySelectorAll("[data-endocrino-edit]").forEach((button) => {
     button.addEventListener("click", () => {
@@ -1545,7 +1543,7 @@ function normalizeEndocrinoRecord(record) {
     patient_id: SISELO.normalizeEntityId(record && record.patient_id),
     full_name: String((record && record.full_name) || "").trim(),
     cpf: String((record && record.cpf) || "").trim(),
-    ses: String((record && record.ses) || "").trim(),
+    team_ref: String((record && record.team_ref) || "").trim(),
     birth_date: String((record && record.birth_date) || "").trim(),
     first_cadh_date: String((record && record.first_cadh_date) || "").trim(),
     age_label: String((record && record.age_label) || "").trim(),
