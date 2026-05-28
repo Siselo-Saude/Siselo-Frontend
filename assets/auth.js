@@ -35,8 +35,11 @@ function setupLoginPage() {
   const alertId = 'page-alert';
   let mode = 'login';
 
-  setupAuthSpecialtyControls(registerForm);
+  const syncRegisterSpecialty = setupAuthSpecialtyControls(registerForm);
   SISELO.enhanceChoiceSelects(document);
+  if (typeof syncRegisterSpecialty === 'function') {
+    syncRegisterSpecialty();
+  }
 
   const setMode = (nextMode) => {
     mode = nextMode === 'register' ? 'register' : 'login';
@@ -54,6 +57,10 @@ function setupLoginPage() {
       tab.classList.toggle('is-active', isActive);
       tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
     });
+
+    if (typeof syncRegisterSpecialty === 'function') {
+      syncRegisterSpecialty();
+    }
 
     SISELO.showAlert(alertId, '', 'info');
   };
@@ -114,7 +121,7 @@ function setupLoginPage() {
 
 function setupAuthSpecialtyControls(form) {
   if (!form) {
-    return;
+    return null;
   }
 
   const field = form.querySelector('.auth-specialty-field');
@@ -122,7 +129,7 @@ function setupAuthSpecialtyControls(form) {
   const userTypeInputs = Array.from(form.querySelectorAll('input[name="user_type"]'));
 
   if (!field || !select || userTypeInputs.length === 0) {
-    return;
+    return null;
   }
 
   select.innerHTML = '<option value="">Selecione a especialidade</option>' + AUTH_SPECIALTIES.map((specialty) => (
@@ -132,11 +139,16 @@ function setupAuthSpecialtyControls(form) {
   const sync = () => {
     const selectedType = userTypeInputs.find((input) => input.checked);
     const isCadh = selectedType && selectedType.value === 'CADH';
+    const previousValue = select.value;
 
     field.hidden = !isCadh;
     select.required = Boolean(isCadh);
     if (!isCadh) {
       select.value = '';
+    }
+
+    if (select.value !== previousValue) {
+      select.dispatchEvent(new Event('change', { bubbles: true }));
     }
   };
 
@@ -145,6 +157,7 @@ function setupAuthSpecialtyControls(form) {
   });
 
   sync();
+  return sync;
 }
 
 async function setupChangePasswordPage() {
