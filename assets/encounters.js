@@ -118,6 +118,18 @@ async function setupEncounterFormPage() {
   document.getElementById("form-title").textContent = data.editing
     ? "Editar Atendimento"
     : "Novo Atendimento";
+  const syncEncounterTeamDisplay = (patient) => {
+    const display = document.getElementById("encounter-team-display");
+    if (!(display instanceof HTMLElement)) {
+      return;
+    }
+
+    const teamValue = patient && patient.team_ref ? patient.team_ref : "";
+    display.classList.toggle("is-empty", !teamValue);
+    display.innerHTML = teamValue
+      ? SISELO.renderTeamBadge(teamValue)
+      : "Selecione um usuário para ver a equipe";
+  };
   const patientPicker = SISELO.setupPatientFieldPicker({
     select: "patient_id",
     container: "encounter-user-search",
@@ -125,7 +137,9 @@ async function setupEncounterFormPage() {
     currentValue: row.patient_id,
     locked: Boolean(patientId),
     placeholder: "Digite o nome do usuário cadastrado...",
+    onChange: syncEncounterTeamDisplay,
   });
+  syncEncounterTeamDisplay(patientOptions.find((patient) => String(patient.id) === String(row.patient_id)) || null);
   document.getElementById("encounter_date").value = row.encounter_date || "";
   document.getElementById("specialty").value = row.specialty || "";
   document.getElementById("summary").value = row.summary || "";
@@ -315,8 +329,8 @@ function renderEncounterIdentityCell(row, query = "") {
           <span class="table-identity-value">${SISELO.escapeHtml(row.cpf)}</span>
         </span>
         <span class="table-identity-line">
-          <span class="table-identity-label">SES</span>
-          <span class="table-identity-value">${SISELO.escapeHtml(row.ses)}</span>
+          <span class="table-identity-label">Equipe</span>
+          <span class="table-identity-value table-identity-team">${SISELO.renderTeamBadge(row.team_ref)}</span>
         </span>
       </div>
     </div>

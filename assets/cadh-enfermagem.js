@@ -30,6 +30,7 @@ async function setupEnfermagemPage() {
   bindEnfermagemModal();
   bindEnfermagemViewModal();
   bindEnfermagemClinicalRules();
+  SISELO.bindFieldGuidanceTooltips();
 
   SISELO.enhanceDateInput("enfermagem_consultation_date", {
     min: "1900-01-01",
@@ -247,7 +248,7 @@ function normalizeEnfermagemPatient(patient) {
     id: SISELO.normalizeEntityId(patient && patient.id),
     full_name: String((patient && patient.full_name) || "").trim(),
     cpf: String((patient && patient.cpf) || "").trim(),
-    ses: String((patient && patient.ses) || "").trim(),
+    team_ref: String((patient && patient.team_ref) || "").trim(),
     birth_date: String((patient && patient.birth_date) || "").trim(),
     first_cadh_date: String((patient && patient.first_cadh_date) || "").trim(),
     age_label: String((patient && patient.age_label) || "").trim(),
@@ -346,7 +347,7 @@ function fillEnfermagemForm(record = null) {
       id: normalizedRecord.patient_id,
       full_name: normalizedRecord.full_name,
       cpf: normalizedRecord.cpf,
-      ses: normalizedRecord.ses,
+      team_ref: normalizedRecord.team_ref,
       birth_date: normalizedRecord.birth_date,
       first_cadh_date: normalizedRecord.first_cadh_date,
       age_label: normalizedRecord.age_label,
@@ -576,7 +577,7 @@ function saveEnfermagemRecord() {
     patient_id: patientId,
     full_name: patient.full_name || "",
     cpf: patient.cpf || "",
-    ses: patient.ses || "",
+    team_ref: patient.team_ref || "",
     birth_date: patient.birth_date || "",
     first_cadh_date: patient.first_cadh_date || "",
     age_label: patient.age_label || "",
@@ -712,7 +713,7 @@ function resolveEnfermagemPatient(patientId) {
     return cachedPatient;
   }
 
-  return { id: normalizedId, full_name: "", cpf: "", ses: "", birth_date: "", first_cadh_date: "", age_label: "", race: "" };
+  return { id: normalizedId, full_name: "", cpf: "", team_ref: "", birth_date: "", first_cadh_date: "", age_label: "", race: "" };
 }
 
 function findEnfermagemPatientById(patientId) {
@@ -737,7 +738,7 @@ function updateEnfermagemPatientSummary(patient) {
   const ageLabel = fullPatient.age_label || (Number.isFinite(ageYears) ? `${ageYears} anos` : "-");
   element.innerHTML = [
     renderEnfermagemPatientSummaryItem("CPF", fullPatient.cpf || "-"),
-    renderEnfermagemPatientSummaryItem("SES", fullPatient.ses || "-"),
+    renderEnfermagemPatientSummaryItem("Equipe", SISELO.formatTeamName(fullPatient.team_ref)),
     renderEnfermagemPatientSummaryItem("Cor/Raça", formatEnfermagemRace(fullPatient.race)),
     renderEnfermagemPatientSummaryItem("Idade", ageLabel),
     renderEnfermagemPatientSummaryItem("Nascimento", formatEnfermagemDate(fullPatient.birth_date)),
@@ -831,7 +832,7 @@ function renderEnfermagemViewRecord(record) {
     ${renderEnfermagemViewSection("Identificação", [
       ["Paciente", item.full_name || "-"],
       ["CPF", item.cpf || "-"],
-      ["SES", item.ses || "-"],
+      ["Equipe", SISELO.formatTeamName(item.team_ref)],
       ["Cor/Raça", formatEnfermagemRace(item.race)],
       ["Data de nascimento", formatEnfermagemDate(item.birth_date)],
       ["Idade", item.age_label || "-"],
@@ -860,7 +861,7 @@ function renderEnfermagemViewRecord(record) {
       ["Úlcera ativa", item.active_ulcer || "-"],
       ["Úlcera prévia", item.previous_ulcer || "-"],
       ["Classificação de risco e seguimento", item.risk_classification || "-"],
-      ["Encaminhamento para Oficina de Órtese e Prótese da SES", item.orthosis_referral || "-"],
+      ["Encaminhamento para Oficina de Órtese e Prótese", item.orthosis_referral || "-"],
       ["Necessidade de cuidados de saúde bucal?", item.oral_health_need || "-"],
     ])}
     ${renderEnfermagemViewSection("Plano de cuidado", [
@@ -918,7 +919,6 @@ function renderEnfermagemTable() {
         <td colspan="9">
           <div class="enfermagem-empty">
             <p>${SISELO.escapeHtml(emptyMessage)}</p>
-            ${activePatientId ? '<button type="button" class="btn btn-primary" data-enfermagem-empty-new>+ Novo registro</button>' : ""}
           </div>
         </td>
       </tr>
@@ -955,10 +955,6 @@ function bindEnfermagemTableActions() {
   if (!tbody) {
     return;
   }
-
-  tbody.querySelectorAll("[data-enfermagem-empty-new]").forEach((button) => {
-    button.addEventListener("click", () => openEnfermagemModal());
-  });
 
   tbody.querySelectorAll("[data-enfermagem-edit]").forEach((button) => {
     button.addEventListener("click", () => {
@@ -1062,7 +1058,7 @@ function normalizeEnfermagemRecord(record) {
     patient_id: SISELO.normalizeEntityId(record && record.patient_id),
     full_name: String((record && record.full_name) || "").trim(),
     cpf: String((record && record.cpf) || "").trim(),
-    ses: String((record && record.ses) || "").trim(),
+    team_ref: String((record && record.team_ref) || "").trim(),
     birth_date: String((record && record.birth_date) || "").trim(),
     first_cadh_date: String((record && record.first_cadh_date) || "").trim(),
     age_label: String((record && record.age_label) || "").trim(),

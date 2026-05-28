@@ -14,9 +14,9 @@ async function setupCadhPage() {
   const permissions = SISELO.getUiPermissions(user);
   SISELO.bindShell('cadh');
   applyCadhModulePermissions(permissions);
-  bindCadhSesSearch(permissions);
-  if (!await restoreCadhSesSearch(permissions)) {
-    setCadhSesCardsUnlocked(false);
+  bindCadhPatientSearch(permissions);
+  if (!await restoreCadhPatientSearch(permissions)) {
+    setCadhPatientCardsUnlocked(false);
     syncCadhPendingIndicators([]);
   }
 }
@@ -37,14 +37,14 @@ function applyCadhModulePermissions(permissions) {
   });
 }
 
-function bindCadhSesSearch(permissions) {
+function bindCadhPatientSearch(permissions) {
   const form = document.getElementById('cadh-cpf-search');
   const input = document.getElementById('cadh-cpf-input');
   if (!form || !input) {
     return;
   }
 
-  document.querySelectorAll('[data-requires-ses="true"]').forEach((card) => {
+  document.querySelectorAll('[data-requires-patient="true"]').forEach((card) => {
     card.addEventListener('click', (event) => {
       if (card.getAttribute('aria-disabled') === 'true') {
         event.preventDefault();
@@ -60,8 +60,8 @@ function bindCadhSesSearch(permissions) {
   input.addEventListener('input', () => {
     const query = input.value.trim();
     clearCadhSearchState();
-    setCadhSesCardPatient('');
-    setCadhSesCardsUnlocked(false);
+    setCadhPatientCardPatient('');
+    setCadhPatientCardsUnlocked(false);
     syncCadhPendingIndicators([]);
     const result = document.getElementById('cadh-patient-result');
     if (result) {
@@ -78,15 +78,15 @@ function bindCadhSesSearch(permissions) {
       try {
         const data = await SISELO.apiRequest('/patients/list.php?q=' + encodeURIComponent(query));
         currentPatients = Array.isArray(data.rows) ? data.rows : [];
-        renderSesSuggestions(query);
+        renderPatientSuggestions(query);
       } catch (error) {
         currentPatients = [];
-        renderSesSuggestions(query);
+        renderPatientSuggestions(query);
       }
     }, 300);
   });
 
-  function renderSesSuggestions(query) {
+  function renderPatientSuggestions(query) {
     const result = document.getElementById('cadh-patient-result');
     if (!result) return;
 
@@ -98,20 +98,20 @@ function bindCadhSesSearch(permissions) {
     }
 
     result.innerHTML = matching.map(p => `
-      <button type="button" class="cadh-ses-option" data-patient-id="${p.id}">
-        <span class="cadh-ses-option-name">${SISELO.escapeHtml(p.full_name || 'Usuário sem nome')}</span>
-        <span class="cadh-ses-option-meta">CPF: ${SISELO.escapeHtml(p.cpf || '-')}</span>
+      <button type="button" class="cadh-patient-option" data-patient-id="${p.id}">
+        <span class="cadh-patient-option-name">${SISELO.escapeHtml(p.full_name || 'Usuário sem nome')}</span>
+        <span class="cadh-patient-option-meta">CPF: ${SISELO.escapeHtml(p.cpf || '-')} | Equipe: ${SISELO.escapeHtml(formatCadhTeamName(p.team_ref))}</span>
       </button>
     `).join('');
 
-    result.querySelectorAll('.cadh-ses-option').forEach(btn => {
+    result.querySelectorAll('.cadh-patient-option').forEach(btn => {
       btn.addEventListener('click', async () => {
         const patientId = btn.dataset.patientId;
         const patient = currentPatients.find(p => p.id == patientId);
         if (patient) {
           saveCadhSearchState(patient, patient.cpf); 
-          setCadhSesCardPatient(patient.id);
-          setCadhSesCardsUnlocked(true);
+          setCadhPatientCardPatient(patient.id);
+          setCadhPatientCardsUnlocked(true);
           input.value = patient.full_name; 
           result.innerHTML = '';
           await renderCadhPatientFromContext(patient, permissions);
@@ -121,7 +121,7 @@ function bindCadhSesSearch(permissions) {
   }
 }
 
-async function restoreCadhSesSearch(permissions) {
+async function restoreCadhPatientSearch(permissions) {
   const state = readCadhSearchState();
   const patient = state && state.patient ? state.patient : null;
   const patientId = SISELO.normalizeEntityId(patient && patient.id);
@@ -133,8 +133,8 @@ async function restoreCadhSesSearch(permissions) {
   }
 
   input.value = patient.full_name || '';
-  setCadhSesCardPatient(patientId);
-  setCadhSesCardsUnlocked(true);
+  setCadhPatientCardPatient(patientId);
+  setCadhPatientCardsUnlocked(true);
   await renderCadhPatientFromContext(patient, permissions);
   return true;
 }
@@ -160,7 +160,7 @@ function saveCadhSearchState(patient, cpf) {
       id: patientId,
       full_name: patient.full_name || '',
       cpf: patient.cpf || '',
-      ses: patient.ses || '',
+      team_ref: patient.team_ref || '',
       birth_date: patient.birth_date || '',
       first_cadh_date: patient.first_cadh_date || '',
       age_label: patient.age_label || '',
@@ -173,8 +173,8 @@ function clearCadhSearchState() {
   sessionStorage.removeItem(CADH_SEARCH_KEY);
 }
 
-function setCadhSesCardsUnlocked(unlocked) {
-  document.querySelectorAll('[data-requires-ses="true"]').forEach((card) => {
+function setCadhPatientCardsUnlocked(unlocked) {
+  document.querySelectorAll('[data-requires-patient="true"]').forEach((card) => {
     const baseHref = card.dataset.baseHref || '#';
     const patientId = card.dataset.patientId || '';
     if (card instanceof HTMLAnchorElement) {
@@ -186,8 +186,8 @@ function setCadhSesCardsUnlocked(unlocked) {
   });
 }
 
-function setCadhSesCardPatient(patientId) {
-  document.querySelectorAll('[data-requires-ses="true"]').forEach((card) => {
+function setCadhPatientCardPatient(patientId) {
+  document.querySelectorAll('[data-requires-patient="true"]').forEach((card) => {
     card.dataset.patientId = patientId ? String(patientId) : '';
   });
 }
@@ -226,7 +226,7 @@ function renderCadhPatient(patient, careSummary = null) {
       </div>
       <div class="cadh-patient-info">
         <div class="cadh-patient-pill"><span class="cadh-patient-pill-label">CPF</span><strong>${SISELO.escapeHtml(patient.cpf || '-')}</strong></div>
-        <div class="cadh-patient-pill"><span class="cadh-patient-pill-label">SES</span><strong>${SISELO.escapeHtml(patient.ses || '-')}</strong></div>
+        <div class="cadh-patient-pill"><span class="cadh-patient-pill-label">Equipe</span><strong>${renderCadhTeamBadge(patient.team_ref)}</strong></div>
         <div class="cadh-patient-pill"><span class="cadh-patient-pill-label">Nascimento</span><strong>${SISELO.escapeHtml(formatCadhDate(patient.birth_date))}</strong></div>
         <div class="cadh-patient-pill"><span class="cadh-patient-pill-label">Idade</span><strong>${SISELO.escapeHtml(patient.age_label || '-')}</strong></div>
         <div class="cadh-patient-pill"><span class="cadh-patient-pill-label">Raça/Cor</span><strong>${SISELO.escapeHtml(formatCadhRace(patient.race))}</strong></div>
@@ -352,4 +352,12 @@ function formatCadhRace(value) {
   };
   const key = String(value || '').trim().toLowerCase();
   return labels[key] || value || '-';
+}
+
+function formatCadhTeamName(value) {
+  return SISELO.formatTeamName(value);
+}
+
+function renderCadhTeamBadge(value) {
+  return SISELO.renderTeamBadge(value);
 }

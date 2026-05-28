@@ -1,0 +1,792 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nutricionista</title>
+  <link rel="stylesheet" href="/assets/app.css">
+  <style>
+    .nutricao-page {
+      --nutricao-accent: #9b8122;
+      --nutricao-title: #3a2b05;
+      --nutricao-band: #f7df80;
+      --nutricao-soft: #fff6d5;
+      --nutricao-border: #eadb9a;
+      padding: 26px;
+      background:
+        radial-gradient(circle at top right, rgba(155, 129, 34, 0.12), transparent 28%),
+        linear-gradient(180deg, #fffaf0, #eef5f3);
+    }
+
+    body[data-page="cadh-nutricao"] .container {
+      width: min(var(--app-shell-max), calc(100vw - 32px));
+      max-width: var(--app-shell-max);
+      margin: 20px auto;
+      padding: 0;
+    }
+
+    .nutricao-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .nutricao-title {
+      margin: 14px 0 0;
+      color: var(--nutricao-title);
+      font-size: 1.65rem;
+      line-height: 1.25;
+    }
+
+    .nutricao-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .nutricao-page .btn,
+    .nutricao-page button,
+    .nutricao-modal .btn,
+    .nutricao-modal button {
+      min-height: 46px;
+      padding: 11px 18px;
+      font-size: 0.96rem;
+      font-weight: 800;
+    }
+
+    .nutricao-table-shell {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--nutricao-border);
+      border-radius: 10px;
+      background: #ffffff;
+      box-shadow: 0 18px 30px rgba(15, 37, 65, 0.06);
+    }
+
+    .nutricao-table {
+      width: 100%;
+      min-width: 0;
+      table-layout: fixed;
+      border: 0;
+    }
+
+    .nutricao-col-date { width: 138px; }
+    .nutricao-col-patient { width: 230px; }
+    .nutricao-col-consult { width: 170px; }
+    .nutricao-col-modality { width: 260px; }
+    .nutricao-col-duration { width: 230px; }
+    .nutricao-col-frequency { width: 180px; }
+    .nutricao-col-consumption { width: 165px; }
+    .nutricao-col-routine { width: 190px; }
+    .nutricao-col-actions { width: 182px; }
+
+    .nutricao-table th,
+    .nutricao-table td {
+      border-color: #e8edf2;
+      padding: 14px 12px;
+      color: var(--nutricao-title);
+      font-size: 0.96rem;
+      line-height: 1.35;
+      vertical-align: middle;
+    }
+
+    .nutricao-table tbody tr {
+      background: #fff;
+    }
+
+    .nutricao-table-group th {
+      border-top: 0;
+      color: var(--nutricao-title);
+      font-size: 1rem;
+      font-weight: 900;
+      text-align: center;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .nutricao-table-group .is-specialist {
+      background: var(--nutricao-band);
+      color: var(--nutricao-title);
+      text-align: left;
+    }
+
+    .nutricao-table-group .is-activity {
+      background: #f5e9b0;
+    }
+
+    .nutricao-table-group .is-food,
+    .nutricao-table-fields th {
+      background: var(--nutricao-soft);
+      color: var(--nutricao-title);
+    }
+
+    .nutricao-table-group .is-routine {
+      background: #f8f0c2;
+    }
+
+    .nutricao-table-group .is-actions,
+    .nutricao-table-fields .is-actions-subhead {
+      background: #fbfcfd;
+      color: #405163;
+      border-left: 1px solid var(--nutricao-border);
+    }
+
+    .nutricao-table-fields th {
+      font-size: 0.94rem;
+      font-weight: 900;
+      text-align: left;
+    }
+
+    .nutricao-table-fields .is-actions-subhead {
+      text-align: center;
+    }
+
+    .nutricao-table td:nth-child(1) {
+      white-space: nowrap;
+    }
+
+    .nutricao-table td:nth-child(2) {
+      font-weight: 800;
+      color: #1c1503;
+    }
+
+    .nutricao-table th:last-child,
+    .nutricao-table td:last-child {
+      border-left: 1px solid var(--nutricao-border);
+      text-align: center;
+    }
+
+    .nutricao-table td:last-child {
+      padding: 14px 10px;
+      background: #fbfcfd;
+    }
+
+    .nutricao-table .table-actions {
+      justify-content: center;
+      flex-wrap: nowrap;
+      gap: 6px;
+      min-height: 42px;
+    }
+
+    .nutricao-table .icon-btn {
+      inline-size: 36px;
+      block-size: 36px;
+      display: inline-grid;
+      place-items: center;
+      padding: 0;
+      border: 1px solid #e3ebf0;
+      background: #f8faf8;
+      color: #738293;
+    }
+
+    .nutricao-table .icon-btn svg {
+      inline-size: 18px;
+      block-size: 18px;
+      display: block;
+    }
+
+    .nutricao-table .icon-btn:hover,
+    .nutricao-table .icon-btn:focus-visible {
+      background: #fff8df;
+      color: var(--nutricao-accent);
+      box-shadow: 0 0 0 3px rgba(155, 129, 34, 0.12);
+      transform: none;
+    }
+
+    .nutricao-empty {
+      min-height: 170px;
+      display: grid;
+      place-items: center;
+      gap: 12px;
+      padding: 32px;
+      color: #8a7d57;
+      text-align: center;
+    }
+
+    .nutricao-empty p {
+      margin: 0;
+      font-weight: 600;
+    }
+
+    .nutricao-modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1100;
+      display: grid;
+      place-items: start center;
+      overflow-y: auto;
+      padding: 12px 8px 28px;
+      background: rgba(9, 17, 25, 0.62);
+    }
+
+    .nutricao-modal-overlay[hidden] {
+      display: none;
+    }
+
+    .nutricao-modal {
+      width: min(980px, calc(100vw - 28px));
+      max-height: calc(100vh - 24px);
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      overflow: hidden;
+      border: 1px solid rgba(155, 129, 34, 0.24);
+      border-radius: 16px;
+      background: #ffffff;
+      box-shadow: 0 26px 70px rgba(58, 43, 5, 0.22);
+    }
+
+    .nutricao-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 16px 20px;
+      border-bottom: 1px solid #eee2aa;
+      background: linear-gradient(180deg, #fffbef, #ffffff);
+    }
+
+    .nutricao-modal-title {
+      margin: 0;
+      color: var(--nutricao-title);
+      font-size: 1.22rem;
+      line-height: 1.3;
+    }
+
+    .nutricao-close {
+      --clinical-close-border: var(--nutricao-border);
+      --clinical-close-color: var(--nutricao-title);
+      --clinical-close-hover-bg: #fff8df;
+      --clinical-close-hover-color: var(--nutricao-accent);
+    }
+
+    .nutricao-form-body {
+      min-height: 0;
+      overflow-y: auto;
+      padding: 22px 24px 26px;
+      background: #fffdf7;
+    }
+
+    .nutricao-form-section {
+      display: grid;
+      gap: 16px;
+      margin-bottom: 22px;
+      padding-top: 2px;
+      border-top: 1px solid #eadfbc;
+    }
+
+    .nutricao-form-section:first-of-type {
+      border-top: 0;
+    }
+
+    .nutricao-section-title {
+      margin: 0;
+      color: var(--nutricao-title);
+      font-size: 1.08rem;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .nutricao-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .nutricao-grid .field,
+    .nutricao-grid .field-full {
+      position: relative;
+      min-width: 0;
+    }
+
+    .nutricao-grid .field {
+      display: grid;
+      grid-template-rows: minmax(40px, auto) auto;
+      align-content: start;
+      gap: 8px;
+    }
+
+    .nutricao-grid .field-full {
+      grid-column: 1 / -1;
+    }
+
+    .nutricao-grid .field label,
+    .nutricao-grid .field-full label {
+      display: block;
+      color: #18324d;
+      font-size: 0.96rem;
+      font-weight: 800;
+      line-height: 1.3;
+    }
+
+    .nutricao-grid .field label {
+      display: flex;
+      align-items: flex-end;
+      min-height: 40px;
+    }
+
+    .nutricao-modal input,
+    .nutricao-modal select,
+    .nutricao-modal textarea {
+      min-height: 48px;
+      font-size: 1rem;
+      line-height: 1.45;
+    }
+
+    .nutricao-modal textarea {
+      min-height: 124px;
+      resize: none;
+    }
+
+    .nutricao-field-guidance {
+      display: none;
+    }
+
+    .nutricao-tooltip {
+      position: fixed;
+      z-index: 1800;
+      max-width: min(360px, calc(100vw - 28px));
+      border: 1px solid #eadb9a;
+      border-radius: 8px;
+      background: #fffdf7;
+      color: #49370a;
+      font-size: 1rem;
+      line-height: 1.45;
+      padding: 10px 12px;
+      box-shadow: 0 16px 34px rgba(15, 23, 42, 0.16);
+      pointer-events: none;
+    }
+
+    .nutricao-tooltip[hidden] {
+      display: none;
+    }
+
+    .nutricao-age-guidance {
+      grid-column: 1 / -1;
+      margin: 8px 0 0;
+      color: #53657a;
+      font-size: 1rem;
+      line-height: 1.45;
+    }
+
+    .nutricao-patient-summary {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      padding: 16px;
+      border: 1px solid var(--nutricao-border);
+      border-radius: 12px;
+      background: #fff8df;
+    }
+
+    .nutricao-patient-summary[hidden] {
+      display: none;
+    }
+
+    .nutricao-patient-summary span {
+      display: grid;
+      gap: 2px;
+      min-width: 0;
+      color: #7f6d35;
+      font-size: 0.95rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .nutricao-patient-summary strong {
+      overflow: hidden;
+      color: var(--nutricao-title);
+      font-size: 0.98rem;
+      letter-spacing: 0;
+      text-overflow: ellipsis;
+      text-transform: none;
+      white-space: nowrap;
+    }
+
+    .nutricao-form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      padding: 16px 22px;
+      border-top: 1px solid #eee2aa;
+      background: #ffffff;
+    }
+
+    .nutricao-form-actions .btn,
+    .nutricao-form-actions button {
+      min-width: 150px;
+      justify-content: center;
+    }
+
+    .nutricao-save-icon {
+      inline-size: 18px;
+      block-size: 18px;
+      margin-right: 8px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .nutricao-view-content {
+      display: grid;
+      gap: 16px;
+    }
+
+    .nutricao-view-section {
+      display: grid;
+      gap: 12px;
+      padding: 14px;
+      border: 1px solid #eee2aa;
+      border-radius: 12px;
+      background: #fff;
+    }
+
+    .nutricao-view-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .nutricao-view-item {
+      min-width: 0;
+      padding: 12px;
+      border: 0;
+      border-radius: 10px;
+      background: #fff8df;
+    }
+
+    .nutricao-view-item.is-wide {
+      grid-column: 1 / -1;
+    }
+
+    .nutricao-view-label {
+      display: block;
+      margin-bottom: 5px;
+      color: #7a8a9b;
+      font-size: 0.74rem;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .nutricao-view-value {
+      color: var(--nutricao-title);
+      font-size: 1rem;
+      font-weight: 700;
+      line-height: 1.45;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    @media (max-width: 760px) {
+      .nutricao-page {
+        padding: 20px;
+      }
+
+      .nutricao-actions {
+        width: 100%;
+      }
+
+      .nutricao-actions .btn,
+      .nutricao-actions button {
+        flex: 1 1 160px;
+        justify-content: center;
+      }
+
+      .nutricao-grid,
+      .nutricao-view-grid,
+      .nutricao-patient-summary {
+        grid-template-columns: 1fr;
+      }
+
+      .nutricao-modal-header,
+      .nutricao-form-body,
+      .nutricao-form-actions {
+        padding-left: 18px;
+        padding-right: 18px;
+      }
+
+      .nutricao-form-actions {
+        flex-direction: column-reverse;
+      }
+
+      .nutricao-form-actions .btn,
+      .nutricao-form-actions button {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body data-page="cadh-nutricao">
+  <header class="topbar">
+    <div class="topbar-brand">Intranet CADH</div>
+    <nav class="menu">
+      <a id="nav-home" href="/index.html">Home</a>
+      <a id="nav-cadh" href="/cadh/index.html">CADH</a>
+      <a id="nav-ubs" href="/ubs/index.html">UBS</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="card nutricao-page">
+      <svg aria-hidden="true" style="display:none">
+        <symbol id="nutricao-icon-save" viewBox="0 0 24 24">
+          <path d="M5 3h12l2 2v16H5V3Z"/>
+          <path d="M8 3v6h8V3"/>
+          <path d="M8 15h8v6H8v-6Z"/>
+        </symbol>
+      </svg>
+
+      <div class="nutricao-header">
+        <div>
+          <a class="btn" href="/cadh/index.html">← Voltar</a>
+          <h1 class="nutricao-title">Nutricionista</h1>
+        </div>
+        <div class="nutricao-actions">
+          <button type="button" id="nutricao-new" class="btn btn-primary">+ Novo registro</button>
+        </div>
+      </div>
+
+      <div class="nutricao-table-shell">
+        <table class="nutricao-table" aria-label="Registros de Nutrição">
+          <colgroup>
+            <col class="nutricao-col-date">
+            <col class="nutricao-col-patient">
+            <col class="nutricao-col-consult">
+            <col class="nutricao-col-modality">
+            <col class="nutricao-col-duration">
+            <col class="nutricao-col-frequency">
+            <col class="nutricao-col-consumption">
+            <col class="nutricao-col-consumption">
+            <col class="nutricao-col-consumption">
+            <col class="nutricao-col-routine">
+            <col class="nutricao-col-routine">
+            <col class="nutricao-col-actions">
+          </colgroup>
+          <thead>
+            <tr class="nutricao-table-group">
+              <th class="is-specialist" colspan="3">Nutricionista</th>
+              <th class="is-activity" colspan="3">Atividade física</th>
+              <th class="is-food" colspan="3">Consumo alimentar</th>
+              <th class="is-routine" colspan="2">Rotina clínica</th>
+              <th class="is-actions">Ações</th>
+            </tr>
+            <tr class="nutricao-table-fields">
+              <th>Data</th>
+              <th>Paciente</th>
+              <th>Nº Consulta</th>
+              <th>Modalidade</th>
+              <th>Duração</th>
+              <th>Frequência</th>
+              <th>Ultraprocessados</th>
+              <th>Processados</th>
+              <th>In natura</th>
+              <th>Funcionalidade intestinal</th>
+              <th>Ingestão hídrica</th>
+              <th class="is-actions-subhead" aria-label="Ações"></th>
+            </tr>
+          </thead>
+          <tbody id="nutricao-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <div id="nutricao-modal" class="nutricao-modal-overlay" hidden>
+    <form id="nutricao-form" class="nutricao-modal" novalidate>
+      <div class="nutricao-modal-header">
+        <h2 class="nutricao-modal-title">Nutricionista — Registro de Consulta</h2>
+        <button type="button" class="clinical-modal-close nutricao-close" data-nutricao-close aria-label="Fechar">Fechar</button>
+      </div>
+
+      <div class="nutricao-form-body">
+        <div id="nutricao-alert" class="alert" hidden></div>
+        <input id="nutricao_record_id" name="record_id" type="hidden">
+
+        <section class="nutricao-form-section">
+          <div class="nutricao-grid">
+            <div class="field-full">
+              <label for="nutricao_patient_search_input">Paciente *</label>
+              <select id="nutricao_patient_id" name="patient_id" class="visually-hidden" tabindex="-1" aria-hidden="true"></select>
+              <div id="nutricao_patient_search" class="transition-patient-search"></div>
+            </div>
+
+            <div id="nutricao-patient-summary" class="nutricao-patient-summary" hidden></div>
+            <p id="nutricao-age-guidance" class="nutricao-age-guidance" hidden></p>
+
+            <div class="field">
+              <label for="nutricao_consultation_date">Data da Consulta *</label>
+              <input id="nutricao_consultation_date" name="consultation_date" type="date" placeholder="dd/mm/aaaa" required>
+            </div>
+
+            <div class="field">
+              <label for="nutricao_consultation_number">Nº da Consulta</label>
+              <select id="nutricao_consultation_number" name="consultation_number">
+                <option value="1ª Consulta (inicial)">1ª Consulta (inicial)</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <section class="nutricao-form-section">
+          <h3 class="nutricao-section-title">Atividade física</h3>
+          <div class="nutricao-grid">
+            <div class="field">
+              <label for="nutricao_activity_modality">Modalidade</label>
+              <select id="nutricao_activity_modality" name="activity_modality">
+                <option value="" hidden>Selecione...</option>
+                <option value="Tempo livre ou lazer">Tempo livre ou lazer</option>
+                <option value="Atividade ocupacional">Atividade ocupacional</option>
+                <option value="Deslocamento">Deslocamento</option>
+                <option value="Âmbito das atividades domésticas">Âmbito das atividades domésticas</option>
+                <option value="Exercício físico">Exercício físico</option>
+              </select>
+              <p class="nutricao-field-guidance">Registre o principal contexto da atividade feita pelo paciente na rotina.</p>
+            </div>
+
+            <div class="field">
+              <label for="nutricao_activity_duration">Duração</label>
+              <select id="nutricao_activity_duration" name="activity_duration">
+                <option value="" hidden>Selecione...</option>
+                <option value="Menos de 30 minutos por dia">Menos de 30 minutos por dia</option>
+                <option value="Mais de 30 minutos por dia">Mais de 30 minutos por dia</option>
+              </select>
+              <p class="nutricao-field-guidance">Use a média relatada pelo paciente, sem tentar calcular uma meta automática.</p>
+            </div>
+
+            <div class="field">
+              <label for="nutricao_activity_frequency">Frequência</label>
+              <select id="nutricao_activity_frequency" name="activity_frequency">
+                <option value="" hidden>Selecione...</option>
+                <option value="1-2 dias/semana">1-2 dias/semana</option>
+                <option value="3-5 dias/semana">3-5 dias/semana</option>
+                <option value="Mais de 5 dias/semana">Mais de 5 dias/semana</option>
+              </select>
+              <p class="nutricao-field-guidance">Registre quantos dias por semana o paciente costuma realizar essa atividade.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="nutricao-form-section">
+          <h3 class="nutricao-section-title">Consumo alimentar</h3>
+          <div class="nutricao-grid">
+            <div class="field">
+              <label for="nutricao_ultraprocessed">Ultraprocessados</label>
+              <select id="nutricao_ultraprocessed" name="ultraprocessed">
+                <option value="" hidden>Selecione...</option>
+                <option value="Baixo consumo">Baixo consumo</option>
+                <option value="Médio consumo">Médio consumo</option>
+                <option value="Alto consumo">Alto consumo</option>
+              </select>
+              <p class="nutricao-field-guidance">Considere alimentos como refrigerantes, biscoitos recheados, salgadinhos, macarrão instantâneo e produtos prontos.</p>
+            </div>
+
+            <div class="field">
+              <label for="nutricao_processed">Processados</label>
+              <select id="nutricao_processed" name="processed">
+                <option value="" hidden>Selecione...</option>
+                <option value="Baixo consumo">Baixo consumo</option>
+                <option value="Médio consumo">Médio consumo</option>
+                <option value="Alto consumo">Alto consumo</option>
+              </select>
+              <p class="nutricao-field-guidance">Considere alimentos preservados por sal, açúcar, óleo ou outro processamento simples.</p>
+            </div>
+
+            <div class="field">
+              <label for="nutricao_in_natura">In natura</label>
+              <select id="nutricao_in_natura" name="in_natura">
+                <option value="" hidden>Selecione...</option>
+                <option value="Baixo consumo">Baixo consumo</option>
+                <option value="Médio consumo">Médio consumo</option>
+                <option value="Alto consumo">Alto consumo</option>
+              </select>
+              <p class="nutricao-field-guidance">Considere comida de verdade: frutas, verduras, legumes, arroz, feijão, leite, ovos, carnes e preparações caseiras.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="nutricao-form-section">
+          <h3 class="nutricao-section-title">Rotina clínica</h3>
+          <div class="nutricao-grid">
+            <div class="field">
+              <label for="nutricao_bowel_function">Funcionalidade intestinal</label>
+              <select id="nutricao_bowel_function" name="bowel_function">
+                <option value="" hidden>Selecione...</option>
+                <option value="Regular">Regular</option>
+                <option value="Constipação">Constipação</option>
+                <option value="Diarreia">Diarreia</option>
+              </select>
+              <p class="nutricao-field-guidance">Registre o padrão predominante informado na consulta.</p>
+            </div>
+
+            <div class="field">
+              <label for="nutricao_water_intake">Ingestão hídrica</label>
+              <select id="nutricao_water_intake" name="water_intake">
+                <option value="" hidden>Selecione...</option>
+                <option value="Suficiente">Suficiente</option>
+                <option value="Insuficiente">Insuficiente</option>
+              </select>
+              <p class="nutricao-field-guidance">Considere o relato do paciente, rotina, clima, atividade física, restrições clínicas e orientação profissional.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="nutricao-form-section">
+          <h3 class="nutricao-section-title">Plano de cuidado</h3>
+          <div class="nutricao-grid">
+            <div class="field-full">
+              <label for="nutricao_barriers">Fatores dificultadores</label>
+              <textarea id="nutricao_barriers" name="barriers" placeholder="Ex: baixo consumo de frutas, verduras e fibras; excesso de bebidas açucaradas; refeições irregulares; dificuldade de acesso ou preparo dos alimentos."></textarea>
+              <p class="nutricao-field-guidance">Descreva de forma simples o que dificulta a alimentação adequada e o autocuidado.</p>
+            </div>
+
+            <div class="field-full">
+              <label for="nutricao_recommendations">Recomendações</label>
+              <textarea id="nutricao_recommendations" name="recommendations" placeholder="Ex: incluir fibras diariamente, reduzir ultraprocessados, organizar refeições, reforçar hidratação e pactuar retorno com diário alimentar."></textarea>
+              <p class="nutricao-field-guidance">Registre a orientação pactuada com o paciente, com linguagem clara para a equipe dar continuidade.</p>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="nutricao-form-actions">
+        <button type="button" class="btn" data-nutricao-close>Cancelar</button>
+        <button type="submit" class="btn btn-primary">
+          <svg class="nutricao-save-icon" aria-hidden="true"><use href="#nutricao-icon-save"></use></svg>
+          Salvar
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div id="nutricao-view-modal" class="nutricao-modal-overlay" hidden>
+    <article class="nutricao-modal" role="dialog" aria-modal="true" aria-labelledby="nutricao-view-title">
+      <div class="nutricao-modal-header">
+        <h2 id="nutricao-view-title" class="nutricao-modal-title">Guia preenchida da consulta nutricional</h2>
+        <button type="button" class="clinical-modal-close nutricao-close" data-nutricao-view-close aria-label="Fechar">Fechar</button>
+      </div>
+
+      <div class="nutricao-form-body">
+        <div id="nutricao-view-content" class="nutricao-view-content"></div>
+      </div>
+
+      <div class="nutricao-form-actions">
+        <button type="button" class="btn" data-nutricao-view-close>Fechar</button>
+      </div>
+    </article>
+  </div>
+
+  <script src="/assets/config.js"></script>
+  <script src="/assets/app.js"></script>
+  <script src="/assets/cadh-nutricao.js"></script>
+</body>
+</html>

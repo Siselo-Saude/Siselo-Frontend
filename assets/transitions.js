@@ -351,7 +351,7 @@ function renderTransitionsTable(
     <tr>
       <td>${renderTransitionCellDate(row.transition_date)}</td>
       <td><span class="patient-name">${SISELO.highlightPersonName(row.full_name, query)}</span></td>
-      <td>${renderTransitionCellValue(row.ses)}</td>
+      <td>${SISELO.renderTeamBadge(row.team_ref)}</td>
       <td>${renderTransitionCellValue(row.cpf)}</td>
       <td>${renderTransitionRoute(row)}</td>
       <td>${renderTransitionStatusBadge(row.status)}</td>
@@ -382,7 +382,7 @@ function renderTransitionsTrashTable(tbody, rows, permissions, query = "") {
       <td>${renderTransitionCellDateTime(row.deleted_at)}</td>
       <td>${renderTransitionCellDate(row.transition_date)}</td>
       <td><span class="patient-name">${SISELO.highlightPersonName(row.full_name, query)}</span></td>
-      <td>${renderTransitionCellValue(row.ses)}</td>
+      <td>${SISELO.renderTeamBadge(row.team_ref)}</td>
       <td>${renderTransitionCellValue(row.cpf)}</td>
       <td>${renderTransitionRoute(row)}</td>
       <td>${renderTransitionStatusBadge(row.status)}</td>
@@ -764,6 +764,7 @@ function fillTransitionStatusSelect(statuses, currentValue) {
     .join("");
 
   syncTransitionStatusAppearance(select);
+  SISELO.enhanceChoiceSelects(document);
   if (select.dataset.statusAppearanceBound !== "true") {
     select.dataset.statusAppearanceBound = "true";
     select.addEventListener("change", () => syncTransitionStatusAppearance(select));
@@ -1081,7 +1082,7 @@ function createTransitionPatientPicker(options = {}) {
         data-patient-option="${patient.id}"
       >
         <span class="transition-patient-option-name">${SISELO.highlightPersonName(patient.full_name, trimmedQuery, SISELO.escapeHtml(patient.full_name || "-"))}</span>
-        <span class="transition-patient-option-meta">CPF: ${SISELO.escapeHtml(patient.cpf || "-")} | SES: ${SISELO.escapeHtml(patient.ses || "-")}</span>
+        <span class="transition-patient-option-meta">CPF: ${SISELO.escapeHtml(patient.cpf || "-")} | Equipe: ${SISELO.escapeHtml(SISELO.formatTeamName(patient.team_ref))}</span>
       </button>
     `,
       )
@@ -1259,11 +1260,11 @@ function filterTransitionPatients(patients, query) {
 
   return (Array.isArray(patients) ? patients : []).filter((patient) => {
     const matchesLetters = search.hasLetters
-      ? SISELO.matchesPersonNamePrefix(patient.full_name, search)
+      ? SISELO.matchesPersonNamePrefix(patient.full_name, search) ||
+        SISELO.matchesSearchText(patient.team_ref, search)
       : true;
     const matchesDigits = search.hasDigits
-      ? SISELO.matchesSearchDigits(patient.cpf, search) ||
-        SISELO.matchesSearchDigits(patient.ses, search)
+      ? SISELO.matchesSearchDigits(patient.cpf, search)
       : true;
 
     return matchesLetters && matchesDigits;
@@ -1300,7 +1301,7 @@ function normalizeTransitionPatient(patient) {
     id: SISELO.normalizeEntityId(patient && patient.id),
     full_name: String((patient && patient.full_name) || "").trim(),
     cpf: String((patient && patient.cpf) || "").trim(),
-    ses: String((patient && patient.ses) || "").trim(),
+    team_ref: String((patient && patient.team_ref) || "").trim(),
     birth_date: String((patient && patient.birth_date) || "").trim(),
     first_cadh_date: String((patient && patient.first_cadh_date) || "").trim(),
   };
@@ -1351,7 +1352,10 @@ async function loadTransitionPatientDetails(patientId) {
 function renderTransitionPatientSnapshot(patient) {
   const snapshot = normalizeTransitionPatient(patient);
 
-  document.getElementById("patient_ses").value = snapshot.ses || "";
+  const teamField = document.getElementById("patient_team_ref");
+  if (teamField) {
+    teamField.value = SISELO.formatTeamName(snapshot.team_ref);
+  }
   document.getElementById("patient_cpf").value = snapshot.cpf || "";
   document.getElementById("patient_birth_date").value =
     formatTransitionDisplayDate(snapshot.birth_date);

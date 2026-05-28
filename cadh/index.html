@@ -7,15 +7,15 @@
   <link rel="stylesheet" href="/assets/app.css">
   <style>
     .cadh-page {
-      padding: 36px;
+      padding: 26px;
       background:
         radial-gradient(circle at top right, rgba(15, 118, 110, 0.05), transparent 26%),
         linear-gradient(180deg, #f4f7f8, #eef3f5);
     }
 
     body[data-page="cadh"] .container {
-      width: min(1720px, calc(100vw - 32px));
-      max-width: none;
+      width: min(var(--app-shell-max), calc(100vw - 32px));
+      max-width: var(--app-shell-max);
       margin: 20px auto;
       padding: 0;
     }
@@ -23,7 +23,7 @@
     .cadh-section-label {
       margin: 0 0 14px;
       color: #6b7f8d;
-      font-size: 1rem;
+      font-size: 0.78rem;
       font-weight: 800;
       letter-spacing: 0.16em;
       text-transform: uppercase;
@@ -31,15 +31,15 @@
 
     .cadh-layout {
       display: grid;
-      grid-template-columns: minmax(340px, 430px) minmax(0, 1fr);
-      gap: 30px;
+      grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
+      gap: 22px;
       align-items: start;
     }
 
-    .cadh-ses-search {
+    .cadh-patient-search {
       display: grid;
-      gap: 16px;
-      padding: 24px;
+      gap: 12px;
+      padding: 18px;
       border: 1px solid rgba(15, 118, 110, 0.12);
       border-radius: 24px;
       background:
@@ -48,9 +48,9 @@
       box-shadow: 0 18px 34px rgba(15, 37, 65, 0.08);
     }
 
-    .cadh-ses-search label {
+    .cadh-patient-search label {
       color: #102236;
-      font-size: 1.15rem;
+      font-size: 0.9rem;
       font-weight: 800;
     }
 
@@ -59,7 +59,7 @@
       gap: 10px;
     }
 
-    .cadh-ses-option {
+    .cadh-patient-option {
       display: grid;
       gap: 4px;
       padding: 12px 14px;
@@ -72,23 +72,23 @@
       transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
     }
 
-    .cadh-ses-option:hover,
-    .cadh-ses-option:focus-visible {
+    .cadh-patient-option:hover,
+    .cadh-patient-option:focus-visible {
       outline: none;
       transform: translateY(-1px);
       border-color: rgba(15, 118, 110, 0.24);
       box-shadow: 0 14px 24px rgba(15, 37, 65, 0.09);
     }
 
-    .cadh-ses-option-name {
-      font-size: 1.18rem;
+    .cadh-patient-option-name {
+      font-size: 1rem;
       font-weight: 800;
       line-height: 1.3;
     }
 
-    .cadh-ses-option-meta {
+    .cadh-patient-option-meta {
       color: #5f7688;
-      font-size: 1rem;
+      font-size: 0.84rem;
       line-height: 1.4;
     }
 
@@ -99,7 +99,7 @@
       border: 1px solid rgba(148, 163, 184, 0.18);
       background: linear-gradient(180deg, #f7fafb, #ffffff);
       color: #5e7283;
-      font-size: 1.06rem;
+      font-size: 0.88rem;
       line-height: 1.5;
     }
 
@@ -110,8 +110,8 @@
 
     .cadh-patient-card {
       display: grid;
-      gap: 18px;
-      padding: 22px;
+      gap: 14px;
+      padding: 16px;
       border: 1px solid rgba(15, 118, 110, 0.12);
       border-radius: 22px;
       background: linear-gradient(180deg, #fafdfe, #ffffff);
@@ -128,7 +128,7 @@
     .cadh-patient-card-kicker {
       margin: 0;
       color: #0f766e;
-      font-size: 0.98rem;
+      font-size: 0.74rem;
       font-weight: 800;
       letter-spacing: 0.12em;
       text-transform: uppercase;
@@ -137,7 +137,7 @@
     .cadh-patient-card-name {
       margin: 0;
       color: #102236;
-      font-size: 1.75rem;
+      font-size: 1.3rem;
       line-height: 1.28;
     }
 
@@ -148,8 +148,8 @@
 
     .cadh-patient-pill {
       display: grid;
-      gap: 6px;
-      padding: 16px 18px;
+      gap: 4px;
+      padding: 12px 14px;
       border: 1px solid rgba(148, 163, 184, 0.16);
       border-radius: 16px;
       background: #eef7fb;
@@ -158,13 +158,13 @@
     }
 
     .cadh-patient-pill strong {
-      font-size: 1.25rem;
+      font-size: 0.98rem;
       line-height: 1.35;
     }
 
     .cadh-patient-pill-label {
       color: #61798b;
-      font-size: 0.95rem;
+      font-size: 0.72rem;
       font-weight: 800;
       letter-spacing: 0.1em;
       text-transform: uppercase;
@@ -172,9 +172,9 @@
 
     .cadh-clinical-note {
       display: grid;
-      gap: 14px;
+      gap: 12px;
       margin-top: 2px;
-      padding: 18px;
+      padding: 14px;
       border: 1px solid rgba(180, 135, 22, 0.22);
       border-radius: 18px;
       background: linear-gradient(180deg, #fffbeb, #fff7dd);
@@ -204,13 +204,13 @@
 
     .cadh-clinical-note-title {
       margin: 0 0 4px;
-      font-size: 1.18rem;
+      font-size: 0.94rem;
       font-weight: 800;
     }
 
     .cadh-clinical-note-text {
       margin: 0;
-      font-size: 1rem;
+      font-size: 0.83rem;
       line-height: 1.5;
     }
 
@@ -224,11 +224,11 @@
       align-items: center;
       gap: 8px;
       min-height: 34px;
-      padding: 8px 14px;
+      padding: 6px 12px;
       border-radius: 999px;
       background: rgba(180, 135, 22, 0.12);
       color: #8a5a0a;
-      font-size: 1rem;
+      font-size: 0.82rem;
       font-weight: 700;
     }
 
@@ -257,7 +257,7 @@
     .cadh-module-grid,
     .cadh-specialty-grid {
       display: grid;
-      gap: 20px;
+      gap: 14px;
     }
 
     .cadh-module-grid {
@@ -265,7 +265,7 @@
     }
 
     .cadh-specialty-grid {
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     }
 
     .cadh-module-card,
@@ -273,10 +273,10 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
-      min-height: 152px;
+      min-height: 124px;
       border: 1px solid #d8e2ea;
       border-radius: 22px;
-      padding: 26px;
+      padding: 20px;
       text-decoration: none;
       color: #1f2937;
       background: #fff;
@@ -347,7 +347,7 @@
 
     .cadh-module-title {
       font-weight: 800;
-      font-size: 1.35rem;
+      font-size: 1.04rem;
       line-height: 1.28;
     }
 
@@ -395,12 +395,12 @@
     }
 
     .cadh-specialty-card {
-      min-height: 150px;
+      min-height: 124px;
       align-items: flex-start;
       text-align: left;
       justify-content: flex-start;
       gap: 14px;
-      font-size: 1.35rem;
+      font-size: 1.04rem;
       font-weight: 800;
       line-height: 1.32;
       border-width: 1px;
@@ -546,7 +546,7 @@
       <h1 class="page-title">CADH</h1>
 
       <div class="cadh-layout">
-        <form id="cadh-cpf-search" class="cadh-ses-search"> 
+        <form id="cadh-cpf-search" class="cadh-patient-search"> 
           <label for="cadh-cpf-input">Buscar por NOME ou CPF</label>
           <input id="cadh-cpf-input" name="cpf" placeholder="Busca por NOME ou CPF" autocomplete="off">
           <div id="cadh-patient-result" class="cadh-patient-result"></div>
@@ -562,7 +562,7 @@
               </span>
             </a>
 
-            <a id="cadh-careplans-card" class="cadh-module-card cadh-card-plans is-locked" href="#" data-base-href="/care-plans/list.html" data-requires-ses="true" data-module-key="careplans" aria-disabled="true">
+            <a id="cadh-careplans-card" class="cadh-module-card cadh-card-plans is-locked" href="#" data-base-href="/care-plans/list.html" data-requires-patient="true" data-module-key="careplans" aria-disabled="true">
               <span class="cadh-module-icon"><svg><use href="#cadh-icon-file"></use></svg></span>
               <span class="cadh-module-head">
                 <span class="cadh-module-title">Planos de Cuidado</span>
@@ -570,7 +570,7 @@
               </span>
             </a>
 
-            <a id="cadh-encounters-card" class="cadh-module-card cadh-card-encounters is-locked" href="#" data-base-href="/encounters/list.html" data-requires-ses="true" data-module-key="encounters" aria-disabled="true">
+            <a id="cadh-encounters-card" class="cadh-module-card cadh-card-encounters is-locked" href="#" data-base-href="/encounters/list.html" data-requires-patient="true" data-module-key="encounters" aria-disabled="true">
               <span class="cadh-module-icon"><svg><use href="#cadh-icon-care"></use></svg></span>
               <span class="cadh-module-head">
                 <span class="cadh-module-title">Atendimentos</span>
@@ -578,7 +578,7 @@
               </span>
             </a>
 
-            <a id="cadh-transitions-card" class="cadh-module-card cadh-card-transitions is-locked" href="#" data-base-href="/transitions/list.html" data-requires-ses="true" data-module-key="transitions" aria-disabled="true">
+            <a id="cadh-transitions-card" class="cadh-module-card cadh-card-transitions is-locked" href="#" data-base-href="/transitions/list.html" data-requires-patient="true" data-module-key="transitions" aria-disabled="true">
               <span class="cadh-module-icon"><svg><use href="#cadh-icon-transition"></use></svg></span>
               <span class="cadh-module-head">
                 <span class="cadh-module-title">Transições do Cuidado</span>
@@ -589,18 +589,18 @@
 
           <h2 class="cadh-section-label">Módulos clínicos por especialidade</h2>
           <div class="cadh-specialty-grid">
-            <a class="cadh-specialty-card cadh-specialty-endocrino is-locked" href="#" data-base-href="/cadh/endocrino.html" data-requires-ses="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-clipboard"></use></svg></span>Endocrinologia</a>
-            <a class="cadh-specialty-card cadh-specialty-cardio is-locked" href="#" data-base-href="/cadh/cardiologia.html" data-requires-ses="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-clipboard"></use></svg></span>Cardiologia</a>
-            <a class="cadh-specialty-card cadh-specialty-psico is-locked" href="#" data-base-href="/cadh/psicologia.html" data-requires-ses="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-clipboard"></use></svg></span>Psicologia</a>
-            <a class="cadh-specialty-card cadh-specialty-enf is-locked" href="#" data-base-href="/cadh/enfermagem.html" data-requires-ses="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-clipboard"></use></svg></span>Enfermagem</a>
-            <div class="cadh-specialty-card cadh-specialty-nutri is-locked" data-requires-ses="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-clipboard"></use></svg></span>Nutrição</div>
-            <div class="cadh-specialty-card cadh-specialty-fisio is-locked" data-requires-ses="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-clipboard"></use></svg></span>Fisioterapia</div>
-            <div class="cadh-specialty-card cadh-specialty-farma is-locked" data-requires-ses="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-clipboard"></use></svg></span>Farmácia Clínica</div>
-            <div class="cadh-specialty-card cadh-specialty-social is-locked" data-requires-ses="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-clipboard"></use></svg></span>Serviço Social</div>
-            <div class="cadh-specialty-card cadh-specialty-oftalmo is-locked" data-requires-ses="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-clipboard"></use></svg></span>Oftalmologia</div>
-            <div class="cadh-specialty-card cadh-specialty-nefro is-locked" data-requires-ses="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-clipboard"></use></svg></span>Nefrologia</div>
-            <div class="cadh-specialty-card cadh-specialty-tecnico is-locked" data-requires-ses="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-clipboard"></use></svg></span>Técnico de Enfermagem</div>
-            <div class="cadh-specialty-card cadh-specialty-gestor is-locked" data-requires-ses="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-clipboard"></use></svg></span>Gestão do Cuidado</div>
+            <a class="cadh-specialty-card cadh-specialty-endocrino is-locked" href="#" data-base-href="/cadh/endocrino.html" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-clipboard"></use></svg></span>Endocrinologia</a>
+            <a class="cadh-specialty-card cadh-specialty-cardio is-locked" href="#" data-base-href="/cadh/cardiologia.html" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-clipboard"></use></svg></span>Cardiologia</a>
+            <a class="cadh-specialty-card cadh-specialty-psico is-locked" href="#" data-base-href="/cadh/psicologia.html" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-clipboard"></use></svg></span>Psicologia</a>
+            <a class="cadh-specialty-card cadh-specialty-enf is-locked" href="#" data-base-href="/cadh/enfermagem.html" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-clipboard"></use></svg></span>Enfermagem</a>
+            <a class="cadh-specialty-card cadh-specialty-nutri is-locked" href="#" data-base-href="/cadh/nutricao.html" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-clipboard"></use></svg></span>Nutrição</a>
+            <div class="cadh-specialty-card cadh-specialty-fisio is-locked" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-clipboard"></use></svg></span>Fisioterapia</div>
+            <div class="cadh-specialty-card cadh-specialty-farma is-locked" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-clipboard"></use></svg></span>Farmácia Clínica</div>
+            <div class="cadh-specialty-card cadh-specialty-social is-locked" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-clipboard"></use></svg></span>Serviço Social</div>
+            <div class="cadh-specialty-card cadh-specialty-oftalmo is-locked" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-clipboard"></use></svg></span>Oftalmologia</div>
+            <div class="cadh-specialty-card cadh-specialty-nefro is-locked" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-clipboard"></use></svg></span>Nefrologia</div>
+            <div class="cadh-specialty-card cadh-specialty-tecnico is-locked" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-clipboard"></use></svg></span>Técnico de Enfermagem</div>
+            <div class="cadh-specialty-card cadh-specialty-gestor is-locked" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-clipboard"></use></svg></span>Gestão do Cuidado</div>
           </div>
         </div>
       </div>

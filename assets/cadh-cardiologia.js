@@ -32,6 +32,7 @@ async function setupCardiologiaPage() {
   bindCardiologiaModal();
   bindCardiologiaViewModal();
   bindCardiologiaClinicalRules();
+  SISELO.bindFieldGuidanceTooltips();
 
   SISELO.enhanceDateInput("cardiologia_consultation_date", {
     min: "1900-01-01",
@@ -278,7 +279,7 @@ function normalizeCardiologiaPatient(patient) {
     id: SISELO.normalizeEntityId(patient && patient.id),
     full_name: String((patient && patient.full_name) || "").trim(),
     cpf: String((patient && patient.cpf) || "").trim(),
-    ses: String((patient && patient.ses) || "").trim(),
+    team_ref: String((patient && patient.team_ref) || "").trim(),
     birth_date: String((patient && patient.birth_date) || "").trim(),
     first_cadh_date: String((patient && patient.first_cadh_date) || "").trim(),
     age_label: String((patient && patient.age_label) || "").trim(),
@@ -378,7 +379,7 @@ function fillCardiologiaForm(record = null) {
       id: normalizedRecord.patient_id,
       full_name: normalizedRecord.full_name,
       cpf: normalizedRecord.cpf,
-      ses: normalizedRecord.ses,
+      team_ref: normalizedRecord.team_ref,
       birth_date: normalizedRecord.birth_date,
       first_cadh_date: normalizedRecord.first_cadh_date,
       age_label: normalizedRecord.age_label,
@@ -802,7 +803,7 @@ function saveCardiologiaRecord() {
     patient_id: patientId,
     full_name: patient.full_name || "",
     cpf: patient.cpf || "",
-    ses: patient.ses || "",
+    team_ref: patient.team_ref || "",
     birth_date: patient.birth_date || "",
     first_cadh_date: patient.first_cadh_date || "",
     age_label: patient.age_label || "",
@@ -916,7 +917,7 @@ function resolveCardiologiaPatient(patientId) {
     return cachedPatient;
   }
 
-  return { id: normalizedId, full_name: "", cpf: "", ses: "", birth_date: "", first_cadh_date: "", age_label: "", race: "" };
+  return { id: normalizedId, full_name: "", cpf: "", team_ref: "", birth_date: "", first_cadh_date: "", age_label: "", race: "" };
 }
 
 function findCardiologiaPatientById(patientId) {
@@ -983,7 +984,7 @@ function updateCardiologiaPatientSummary(patient) {
   const ageLabel = fullPatient.age_label || (Number.isFinite(ageYears) ? `${ageYears} anos` : "-");
   element.innerHTML = [
     renderCardiologiaPatientSummaryItem("CPF", fullPatient.cpf || "-"),
-    renderCardiologiaPatientSummaryItem("SES", fullPatient.ses || "-"),
+    renderCardiologiaPatientSummaryItem("Equipe", SISELO.formatTeamName(fullPatient.team_ref)),
     renderCardiologiaPatientSummaryItem("Cor/Raça", formatCardiologiaRace(fullPatient.race)),
     renderCardiologiaPatientSummaryItem("Idade", ageLabel),
     renderCardiologiaPatientSummaryItem("Nascimento", formatCardiologiaDate(fullPatient.birth_date)),
@@ -1076,7 +1077,7 @@ function renderCardiologiaViewRecord(record) {
     ${renderCardiologiaViewSection("Identificação", [
       ["Paciente", item.full_name || "-"],
       ["CPF", item.cpf || "-"],
-      ["SES", item.ses || "-"],
+      ["Equipe", SISELO.formatTeamName(item.team_ref)],
       ["Cor/Raça", formatCardiologiaRace(item.race)],
       ["Data de nascimento", formatCardiologiaDate(item.birth_date)],
       ["Idade", item.age_label || "-"],
@@ -1174,7 +1175,6 @@ function renderCardiologiaTable() {
         <td colspan="9">
           <div class="cardiologia-empty">
             <p>${SISELO.escapeHtml(emptyMessage)}</p>
-            ${activePatientId ? '<button type="button" class="btn btn-primary" data-cardiologia-empty-new>+ Novo registro</button>' : ""}
           </div>
         </td>
       </tr>
@@ -1215,10 +1215,6 @@ function bindCardiologiaTableActions() {
   if (!tbody) {
     return;
   }
-
-  tbody.querySelectorAll("[data-cardiologia-empty-new]").forEach((button) => {
-    button.addEventListener("click", () => openCardiologiaModal());
-  });
 
   tbody.querySelectorAll("[data-cardiologia-edit]").forEach((button) => {
     button.addEventListener("click", () => {
@@ -1285,7 +1281,7 @@ function normalizeCardiologiaRecord(record) {
     patient_id: SISELO.normalizeEntityId(record && record.patient_id),
     full_name: String((record && record.full_name) || "").trim(),
     cpf: String((record && record.cpf) || "").trim(),
-    ses: String((record && record.ses) || "").trim(),
+    team_ref: String((record && record.team_ref) || "").trim(),
     birth_date: String((record && record.birth_date) || "").trim(),
     first_cadh_date: String((record && record.first_cadh_date) || "").trim(),
     age_label: String((record && record.age_label) || "").trim(),

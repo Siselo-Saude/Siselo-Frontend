@@ -36,6 +36,7 @@ function setupLoginPage() {
   let mode = 'login';
 
   setupAuthSpecialtyControls(registerForm);
+  SISELO.enhanceChoiceSelects(document);
 
   const setMode = (nextMode) => {
     mode = nextMode === 'register' ? 'register' : 'login';

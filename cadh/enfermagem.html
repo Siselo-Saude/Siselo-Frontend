@@ -19,8 +19,8 @@
     }
 
     body[data-page="cadh-enfermagem"] .container {
-      width: min(1840px, calc(100vw - 32px));
-      max-width: none;
+      width: min(var(--app-shell-max), calc(100vw - 32px));
+      max-width: var(--app-shell-max);
       margin: 20px auto;
       padding: 0;
     }
@@ -60,7 +60,7 @@
 
     .enfermagem-table-shell {
       width: 100%;
-      overflow-x: auto;
+      overflow-x: hidden;
       border: 1px solid var(--enf-border);
       border-radius: 10px;
       background: #fff;
@@ -69,7 +69,7 @@
 
     .enfermagem-table {
       width: 100%;
-      min-width: 1320px;
+      min-width: 0;
       table-layout: fixed;
       border: 0;
     }
@@ -778,7 +778,7 @@
             </div>
 
             <div class="field">
-              <label for="enfermagem_orthosis_referral">Encaminhamento para Oficina de Órtese e Prótese da SES</label>
+              <label for="enfermagem_orthosis_referral">Encaminhamento para Oficina de Órtese e Prótese</label>
               <select id="enfermagem_orthosis_referral" name="orthosis_referral">
                 <option value="" hidden>Selecione...</option>
                 <option value="Sim">Sim</option>

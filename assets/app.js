@@ -5,6 +5,30 @@
   const NAVIGATION_KEY = 'siselo_navigation';
   const CADH_SEARCH_KEY = 'siselo_cadh_search';
   const FLASH_ALERT_KEY = 'siselo_flash_alert';
+  const TEAM_LABELS = {
+    safira: 'Safira',
+    ametista: 'Ametista',
+    esmeralda: 'Esmeralda',
+    diamante: 'Diamante',
+    sem_equipe: 'Sem equipe',
+    'sem equipe': 'Sem equipe',
+  };
+  const TEAM_THEMES = {
+    safira: { color: '#2f6fec', border: '#c7dafc', bg: '#f0f6ff', text: '#2357c6', className: 'team-badge-safira' },
+    ametista: { color: '#c850d8', border: '#edcef7', bg: '#fdf5ff', text: '#9c27b0', className: 'team-badge-ametista' },
+    esmeralda: { color: '#0f9f75', border: '#bdebd4', bg: '#effcf6', text: '#08785a', className: 'team-badge-esmeralda' },
+    diamante: { color: '#1f2937', border: '#cbd5e1', bg: '#f4f7fa', text: '#111827', className: 'team-badge-diamante' },
+    sem_equipe: { color: '#94a3b8', border: '#d7dee8', bg: '#f4f6f8', text: '#667085', className: 'team-badge-sem-equipe' },
+    'sem equipe': { color: '#94a3b8', border: '#d7dee8', bg: '#f4f6f8', text: '#667085', className: 'team-badge-sem-equipe' },
+  };
+  const TEAM_FALLBACK_THEMES = [
+    { color: '#0f766e', border: '#99f6e4', bg: '#ecfdfa', text: '#0f766e' },
+    { color: '#b45309', border: '#fde68a', bg: '#fffbeb', text: '#92400e' },
+    { color: '#be123c', border: '#fecdd3', bg: '#fff1f2', text: '#9f1239' },
+    { color: '#0369a1', border: '#bae6fd', bg: '#f0f9ff', text: '#075985' },
+    { color: '#4d7c0f', border: '#d9f99d', bg: '#f7fee7', text: '#3f6212' },
+  ];
+
   function escapeHtml(value) {
     return String(value ?? '')
       .replace(/&/g, '&amp;')
@@ -265,7 +289,8 @@
     return {
       id: normalizeEntityId(patient && patient.id),
       full_name: String((patient && patient.full_name) || '').trim(),
-      ses: String((patient && patient.ses) || '').trim(),
+      cpf: String((patient && patient.cpf) || '').trim(),
+      team_ref: String((patient && patient.team_ref) || '').trim(),
     };
   }
 
@@ -278,8 +303,8 @@
         return;
       }
 
-      const sesKey = digitsOnly(normalizedRow.ses);
-      const identityKey = sesKey ? `ses:${sesKey}` : `id:${normalizedRow.id}`;
+      const cpfKey = digitsOnly(normalizedRow.cpf);
+      const identityKey = cpfKey ? `cpf:${cpfKey}` : `id:${normalizedRow.id}`;
       merged.set(identityKey, {
         ...(merged.get(identityKey) || {}),
         ...normalizedRow,
@@ -513,7 +538,7 @@
     const scope = root instanceof Document || root instanceof Element ? root : document;
     const selector = [
       '.search-toolbar input:not([type="hidden"])',
-      '.cadh-ses-search input:not([type="hidden"])',
+      '.cadh-patient-search input:not([type="hidden"])',
       'input[data-search-input="true"]:not([type="hidden"])',
     ].join(', ');
 
@@ -553,7 +578,7 @@
       };
     const getInputValue = typeof options.getInputValue === 'function'
       ? options.getInputValue
-      : (patient) => patient.full_name || patient.ses || input.value;
+      : (patient) => patient.full_name || input.value;
     const renderName = typeof options.renderName === 'function'
       ? options.renderName
       : (patient, query) => highlightPersonName(
@@ -563,7 +588,12 @@
       );
     const renderMeta = typeof options.renderMeta === 'function'
       ? options.renderMeta
-      : (patient, query) => `SES: ${highlightSearchDigits(patient.ses, query, escapeHtml(patient.ses || '-'))}`;
+      : (patient, query) => {
+        const cpf = patient.cpf
+          ? `CPF: ${highlightSearchDigits(patient.cpf, query, escapeHtml(patient.cpf))}`
+          : 'CPF: -';
+        return `${cpf} | Equipe: ${escapeHtml(formatTeamName(patient.team_ref))}`;
+      };
     const filterRows = typeof options.filterRows === 'function'
       ? options.filterRows
       : (rows, search) => filterPatientsForSearch(rows, search);
@@ -580,10 +610,11 @@
       mergePatientSearchRows((Array.isArray(rows) ? rows : []).map((row) => ({
         id: (row && row.patient_id) || (row && row.id),
         full_name: row && row.full_name,
-        ses: row && row.ses,
+        cpf: row && row.cpf,
+        team_ref: row && row.team_ref,
       }))).forEach((patient) => {
-        const sesKey = digitsOnly(patient.ses);
-        const identityKey = sesKey ? `ses:${sesKey}` : `id:${patient.id}`;
+        const cpfKey = digitsOnly(patient.cpf);
+        const identityKey = cpfKey ? `cpf:${cpfKey}` : `id:${patient.id}`;
         seenPatients.set(identityKey, patient);
       });
     };
@@ -783,7 +814,7 @@
     const syncOptions = () => {
       select.innerHTML = '<option value=""></option>' + patients.map((patient) => `
         <option value="${escapeHtml(patient.id)}" ${patient.id === selectedId ? 'selected' : ''}>
-          ${escapeHtml(patient.full_name || patient.ses || patient.id)}
+          ${escapeHtml(patient.full_name || patient.id)}
         </option>
       `).join('');
     };
@@ -858,6 +889,362 @@
     };
   }
 
+  function getTeamKey(value) {
+    const raw = String(value || '').trim();
+    if (!raw) {
+      return 'sem_equipe';
+    }
+
+    return normalizeSearchText(raw).replace(/\s+/g, '_');
+  }
+
+  function getTeamTheme(value) {
+    const key = getTeamKey(formatTeamName(value));
+    if (TEAM_THEMES[key]) {
+      return TEAM_THEMES[key];
+    }
+
+    const hash = Array.from(key).reduce((total, character) => {
+      return total + character.charCodeAt(0);
+    }, 0);
+
+    return TEAM_FALLBACK_THEMES[hash % TEAM_FALLBACK_THEMES.length];
+  }
+
+  function getTeamStyle(value) {
+    const theme = getTeamTheme(value);
+    return [
+      `--team-color: ${theme.color}`,
+      `--team-border: ${theme.border}`,
+      `--team-bg: ${theme.bg}`,
+      `--team-text: ${theme.text}`,
+    ].join('; ');
+  }
+
+  function applyTeamTheme(element, value) {
+    if (!(element instanceof HTMLElement)) {
+      return;
+    }
+
+    const theme = getTeamTheme(value);
+    element.style.setProperty('--team-color', theme.color);
+    element.style.setProperty('--team-border', theme.border);
+    element.style.setProperty('--team-bg', theme.bg);
+    element.style.setProperty('--team-text', theme.text);
+  }
+
+  function setupTeamFieldPicker(options = {}) {
+    const select = options.select instanceof HTMLSelectElement
+      ? options.select
+      : document.getElementById(String(options.select || ''));
+
+    if (!(select instanceof HTMLSelectElement)) {
+      return null;
+    }
+
+    let container = options.container instanceof HTMLElement
+      ? options.container
+      : document.getElementById(String(options.container || ''));
+
+    if (!(container instanceof HTMLElement)) {
+      container = document.createElement('div');
+      select.insertAdjacentElement('afterend', container);
+    }
+
+    container.className = [container.className, 'team-picker'].filter(Boolean).join(' ');
+
+    select.classList.add('visually-hidden');
+    select.setAttribute('tabindex', '-1');
+    select.setAttribute('aria-hidden', 'true');
+
+    container.innerHTML = `
+      <button type="button" class="team-picker-trigger" aria-haspopup="listbox" aria-expanded="false"></button>
+      <div class="team-picker-menu" role="listbox" hidden></div>
+    `;
+
+    const trigger = container.querySelector('.team-picker-trigger');
+    const menu = container.querySelector('.team-picker-menu');
+
+    if (!(trigger instanceof HTMLButtonElement) || !(menu instanceof HTMLElement)) {
+      return null;
+    }
+
+    const getOptions = () => Array.from(select.options)
+      .map((option) => ({
+        value: option.value,
+        label: option.textContent || formatTeamName(option.value),
+      }))
+      .filter((option) => option.value !== '');
+
+    const defaultOption = getOptions().find((option) => option.value === 'sem_equipe') || getOptions()[0];
+    if (!select.value && defaultOption) {
+      select.value = defaultOption.value;
+    }
+
+    const close = () => {
+      container.classList.remove('is-open');
+      trigger.setAttribute('aria-expanded', 'false');
+      menu.hidden = true;
+    };
+
+    const open = () => {
+      container.classList.add('is-open');
+      trigger.setAttribute('aria-expanded', 'true');
+      menu.hidden = false;
+      const selected = menu.querySelector('.team-picker-option.is-selected');
+      const first = menu.querySelector('.team-picker-option');
+      const target = selected || first;
+      if (target instanceof HTMLElement) {
+        target.focus();
+      }
+    };
+
+    const sync = () => {
+      const selectedOption = getOptions().find((option) => option.value === select.value) || getOptions()[0];
+      const selectedLabel = selectedOption
+        ? formatTeamName(selectedOption.label || selectedOption.value)
+        : 'Sem equipe';
+      const triggerLabel = selectedLabel === 'Sem equipe'
+        ? 'Sem equipe'
+        : `Equipe: ${selectedLabel}`;
+
+      applyTeamTheme(trigger, selectedOption ? selectedOption.value : selectedLabel);
+      trigger.innerHTML = `<span class="team-badge" style="${escapeHtml(getTeamStyle(selectedLabel))}">${escapeHtml(triggerLabel)}</span>`;
+
+      menu.querySelectorAll('.team-picker-option').forEach((button) => {
+        const selected = button.getAttribute('data-team-value') === select.value;
+        button.classList.toggle('is-selected', selected);
+        button.setAttribute('aria-selected', selected ? 'true' : 'false');
+      });
+    };
+
+    const render = () => {
+      menu.innerHTML = getOptions().map((option) => {
+        const label = formatTeamName(option.label || option.value);
+        const displayLabel = label === 'Sem equipe' ? label : `Equipe: ${label}`;
+        return `
+          <button type="button" class="team-picker-option" role="option" data-team-value="${escapeHtml(option.value)}">
+            <span class="team-picker-swatch" aria-hidden="true"></span>
+            <span class="team-picker-label">${escapeHtml(displayLabel)}</span>
+          </button>
+        `;
+      }).join('');
+
+      menu.querySelectorAll('.team-picker-option').forEach((button) => {
+        const value = button.getAttribute('data-team-value') || '';
+        applyTeamTheme(button, value);
+        button.addEventListener('click', () => {
+          select.value = value;
+          select.dispatchEvent(new Event('change', { bubbles: true }));
+          close();
+        });
+      });
+
+      sync();
+    };
+
+    select.addEventListener('change', sync);
+    trigger.addEventListener('click', () => {
+      if (menu.hidden) {
+        open();
+      } else {
+        close();
+      }
+    });
+
+    container.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        close();
+        trigger.focus();
+      }
+    });
+
+    document.addEventListener('mousedown', (event) => {
+      if (!container.contains(event.target)) {
+        close();
+      }
+    });
+
+    render();
+
+    return {
+      refresh: render,
+      focus() {
+        trigger.focus();
+      },
+    };
+  }
+
+  function shouldEnhanceChoiceSelect(select) {
+    if (!(select instanceof HTMLSelectElement) || select.multiple || select.dataset.choiceEnhanced === 'true') {
+      return false;
+    }
+
+    if (
+      select.classList.contains('visually-hidden') ||
+      select.classList.contains('date-picker-select') ||
+      select.classList.contains('status-select-native') ||
+      select.classList.contains('endocrino-native-select-hidden') ||
+      select.id === 'team_reference'
+    ) {
+      return false;
+    }
+
+    return true;
+  }
+
+  function enhanceChoiceSelect(select) {
+    if (!shouldEnhanceChoiceSelect(select)) {
+      return null;
+    }
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'choice-select';
+    wrapper.innerHTML = `
+      <button type="button" class="choice-select-trigger" aria-haspopup="listbox" aria-expanded="false">
+        <span class="choice-select-value"></span>
+      </button>
+      <div class="choice-select-menu" role="listbox" hidden></div>
+    `;
+
+    select.dataset.choiceEnhanced = 'true';
+    select.classList.add('choice-select-native');
+    select.insertAdjacentElement('afterend', wrapper);
+    wrapper.prepend(select);
+
+    const trigger = wrapper.querySelector('.choice-select-trigger');
+    const valueNode = wrapper.querySelector('.choice-select-value');
+    const menu = wrapper.querySelector('.choice-select-menu');
+
+    if (!(trigger instanceof HTMLButtonElement) || !(valueNode instanceof HTMLElement) || !(menu instanceof HTMLElement)) {
+      return null;
+    }
+
+    const getVisibleOptions = () => Array.from(select.options)
+      .filter((option) => !option.hidden && !option.disabled && option.value !== '');
+
+    const getMenuOptions = () => {
+      const options = getVisibleOptions();
+      if (select.dataset.hideSelectedOption !== 'true' || options.length <= 1) {
+        return options;
+      }
+
+      return options.filter((option) => option.value !== select.value);
+    };
+
+    const getSelectedLabel = () => {
+      const selected = select.selectedOptions && select.selectedOptions[0]
+        ? select.selectedOptions[0]
+        : null;
+      return selected ? String(selected.textContent || '').trim() : '';
+    };
+
+    const close = () => {
+      wrapper.classList.remove('is-open');
+      trigger.setAttribute('aria-expanded', 'false');
+      menu.hidden = true;
+    };
+
+    const renderValue = () => {
+      const label = getSelectedLabel() || 'Selecione...';
+      valueNode.textContent = label;
+      valueNode.classList.toggle('is-placeholder', !select.value);
+    };
+
+    const syncSelected = () => {
+      renderValue();
+      menu.querySelectorAll('.choice-select-option').forEach((button) => {
+        const selected = button.getAttribute('data-choice-value') === select.value;
+        button.classList.toggle('is-selected', selected);
+        button.setAttribute('aria-selected', selected ? 'true' : 'false');
+      });
+    };
+
+    const renderMenu = () => {
+      menu.innerHTML = getMenuOptions().map((option) => `
+        <button type="button" class="choice-select-option" role="option" data-choice-value="${escapeHtml(option.value)}">
+          ${escapeHtml(option.textContent || option.value)}
+        </button>
+      `).join('');
+
+      menu.querySelectorAll('.choice-select-option').forEach((button) => {
+        button.addEventListener('click', () => {
+          select.value = button.getAttribute('data-choice-value') || '';
+          select.dispatchEvent(new Event('change', { bubbles: true }));
+          close();
+          trigger.focus();
+        });
+      });
+
+      syncSelected();
+    };
+
+    const open = () => {
+      renderMenu();
+      wrapper.classList.add('is-open');
+      trigger.setAttribute('aria-expanded', 'true');
+      menu.hidden = false;
+      const selected = menu.querySelector('.choice-select-option.is-selected');
+      const first = menu.querySelector('.choice-select-option');
+      const target = selected || first;
+      if (target instanceof HTMLElement) {
+        target.focus();
+      }
+    };
+
+    trigger.addEventListener('click', () => {
+      if (menu.hidden) {
+        open();
+      } else {
+        close();
+      }
+    });
+
+    wrapper.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        close();
+        trigger.focus();
+      }
+    });
+
+    document.addEventListener('mousedown', (event) => {
+      if (!wrapper.contains(event.target)) {
+        close();
+      }
+    });
+
+    select.addEventListener('change', syncSelected);
+
+    const observer = new MutationObserver(() => {
+      renderValue();
+      if (!menu.hidden) {
+        renderMenu();
+      }
+    });
+    observer.observe(select, { childList: true, subtree: true, attributes: true });
+
+    renderValue();
+
+    return {
+      refresh() {
+        renderValue();
+        if (!menu.hidden) {
+          renderMenu();
+        }
+      },
+      destroy() {
+        observer.disconnect();
+      },
+    };
+  }
+
+  function enhanceChoiceSelects(root = document) {
+    const scope = root instanceof Document || root instanceof Element ? root : document;
+    scope.querySelectorAll('select').forEach((select) => {
+      enhanceChoiceSelect(select);
+    });
+  }
+
   async function apiRequest(path, options = {}) {
     const method = options.method || 'GET';
     const headers = new Headers(options.headers || {});
@@ -928,12 +1315,12 @@
 
     writeCadhSearchState({
       ...state,
-      ses: String(context.patient.ses || state.ses || '').trim(),
+      team_ref: String(context.patient.team_ref || state.team_ref || '').trim(),
       patient: {
         id: normalizedId,
         full_name: context.patient.full_name || '',
         cpf: context.patient.cpf || '',
-        ses: context.patient.ses || '',
+        team_ref: context.patient.team_ref || '',
         birth_date: context.patient.birth_date || '',
         first_cadh_date: context.patient.first_cadh_date || '',
         age_label: context.patient.age_label || '',
@@ -1065,6 +1452,8 @@
 
     bindBackLinks();
     decorateSearchInputs(document);
+    enhanceChoiceSelects(document);
+    bindFieldGuidanceTooltips();
     renderFlashAlert('page-alert');
   }
 
@@ -1100,6 +1489,32 @@
   function normalizeEntityId(value) {
     const numericValue = Number(value || 0);
     return Number.isFinite(numericValue) && numericValue > 0 ? String(numericValue) : '';
+  }
+
+  function formatTeamName(value) {
+    const raw = String(value || '').replace(/^equipe\s*:\s*/i, '').trim();
+    if (!raw) {
+      return 'Sem equipe';
+    }
+
+    const key = normalizeSearchText(raw);
+    return TEAM_LABELS[key] || TEAM_LABELS[key.replace(/\s+/g, '_')] || 'Sem equipe';
+  }
+
+  function renderTeamBadge(value) {
+    const label = formatTeamName(value);
+    const displayLabel = label === 'Sem equipe' ? label : `Equipe: ${label}`;
+    const key = normalizeSearchText(label);
+    const theme = getTeamTheme(label);
+    const className = theme.className || (
+      key === 'sem equipe' || key === 'sem_equipe'
+        ? 'team-badge-sem-equipe'
+        : ['safira', 'ametista', 'esmeralda', 'diamante'].includes(key)
+          ? `team-badge-${key}`
+          : ''
+    );
+
+    return `<span class="team-badge${className ? ` ${className}` : ''}" style="${escapeHtml(getTeamStyle(label))}">${escapeHtml(displayLabel)}</span>`;
   }
 
   function filterByEntityId(rows, key, value) {
@@ -2148,6 +2563,113 @@
     return true;
   }
 
+  const FIELD_GUIDANCE_TOOLTIP_ID = 'siselo-field-guidance-tooltip';
+
+  function bindFieldGuidanceTooltips(options = {}) {
+    const selector = options.selector || '[class*="-field-guidance"]';
+    const anchors = new Set();
+
+    document.querySelectorAll(selector).forEach((guidance) => {
+      if (!(guidance instanceof HTMLElement) || guidance.hidden) {
+        return;
+      }
+
+      const anchor = guidance.closest('.field, .field-full, .form-field');
+      if (!(anchor instanceof HTMLElement) || anchors.has(anchor) || anchor.dataset.siseloGuidanceBound === 'true') {
+        return;
+      }
+
+      if (anchor.querySelector('textarea')) {
+        return;
+      }
+
+      const text = String(guidance.textContent || '').replace(/\s+/g, ' ').trim();
+      if (!text) {
+        return;
+      }
+
+      anchors.add(anchor);
+      anchor.dataset.siseloGuidanceBound = 'true';
+      anchor.dataset.siseloGuidanceText = text;
+
+      const show = () => showFieldGuidanceTooltip(anchor, text);
+      const hide = () => hideFieldGuidanceTooltip();
+
+      anchor.addEventListener('mouseenter', show);
+      anchor.addEventListener('focusin', show);
+      anchor.addEventListener('mouseleave', hide);
+      anchor.addEventListener('focusout', hide);
+    });
+
+    if (document.body.dataset.siseloGuidanceGlobalBound !== 'true') {
+      document.body.dataset.siseloGuidanceGlobalBound = 'true';
+      window.addEventListener('resize', hideFieldGuidanceTooltip);
+      window.addEventListener('scroll', hideFieldGuidanceTooltip, true);
+    }
+  }
+
+  function getFieldGuidanceTooltip() {
+    let tooltip = document.getElementById(FIELD_GUIDANCE_TOOLTIP_ID);
+    if (!(tooltip instanceof HTMLElement)) {
+      tooltip = document.createElement('div');
+      tooltip.id = FIELD_GUIDANCE_TOOLTIP_ID;
+      tooltip.className = 'clinical-floating-tip';
+      tooltip.hidden = true;
+      document.body.appendChild(tooltip);
+    }
+
+    return tooltip;
+  }
+
+  function showFieldGuidanceTooltip(anchor, message) {
+    if (!(anchor instanceof HTMLElement)) {
+      hideFieldGuidanceTooltip();
+      return;
+    }
+
+    const text = String(message || '').replace(/\s+/g, ' ').trim();
+    if (!text) {
+      hideFieldGuidanceTooltip();
+      return;
+    }
+
+    const tooltip = getFieldGuidanceTooltip();
+    tooltip.textContent = text;
+    tooltip.hidden = false;
+    positionFieldGuidanceTooltip(anchor, tooltip);
+  }
+
+  function hideFieldGuidanceTooltip() {
+    const tooltip = document.getElementById(FIELD_GUIDANCE_TOOLTIP_ID);
+    if (tooltip instanceof HTMLElement) {
+      tooltip.hidden = true;
+      tooltip.textContent = '';
+    }
+  }
+
+  function positionFieldGuidanceTooltip(anchor, tooltip) {
+    const viewportPadding = 12;
+    const gap = 10;
+    const anchorRect = anchor.getBoundingClientRect();
+
+    tooltip.style.left = '0px';
+    tooltip.style.top = '0px';
+    const tooltipRect = tooltip.getBoundingClientRect();
+    const tooltipWidth = tooltipRect.width;
+    const tooltipHeight = tooltipRect.height;
+    const maxLeft = Math.max(viewportPadding, window.innerWidth - tooltipWidth - viewportPadding);
+    const maxTop = Math.max(viewportPadding, window.innerHeight - tooltipHeight - viewportPadding);
+    let left = anchorRect.left;
+    let top = anchorRect.top - tooltipHeight - gap;
+
+    if (top < viewportPadding) {
+      top = anchorRect.bottom + gap;
+    }
+
+    tooltip.style.left = `${Math.max(viewportPadding, Math.min(left, maxLeft))}px`;
+    tooltip.style.top = `${Math.max(viewportPadding, Math.min(top, maxTop))}px`;
+  }
+
   const ACTION_ICON_PATHS = {
     search: 'M10.5 4a6.5 6.5 0 1 0 4.3 11.4l4 4 1.4-1.4-4-4A6.5 6.5 0 0 0 10.5 4Zm0 2a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9Z',
     view: 'M12 5c5.1 0 8.8 4.2 10 7-1.2 2.8-4.9 7-10 7S3.2 14.8 2 12c1.2-2.8 4.9-7 10-7Zm0 2C8.4 7 5.6 9.6 4.3 12 5.6 14.4 8.4 17 12 17s6.4-2.6 7.7-5C18.4 9.6 15.6 7 12 7Zm0 2.2a2.8 2.8 0 1 1 0 5.6 2.8 2.8 0 0 1 0-5.6Z',
@@ -2280,8 +2802,10 @@
     decorateSearchInputs,
     digitsOnly,
     enhanceDateInput,
+    enhanceChoiceSelects,
     escapeHtml,
     filterPatientsForSearch,
+    formatTeamName,
     formatDateInputValue,
     getApiBaseUrl,
     getSession,
@@ -2301,6 +2825,7 @@
     requireSession,
     resolveDateInputValue,
     resolveBackTarget,
+    renderTeamBadge,
     saveSessionPayload,
     setFlashAlert,
     setText,
@@ -2310,8 +2835,10 @@
     showActionError,
     showUnavailableAction,
     showAlert,
+    bindFieldGuidanceTooltips,
     setupPatientFieldPicker,
     setupPatientSearchAutocomplete,
+    setupTeamFieldPicker,
     todayDateInputValue,
     buildPatientModuleEmptyState,
     getUiPermissions,

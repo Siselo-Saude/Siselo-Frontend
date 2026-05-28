@@ -136,8 +136,8 @@ async function setupPatientFormPage() {
     data = await SISELO.apiRequest(endpoint);
   } catch (error) {}
 
-  const row = data.row || getEmptyPatientFormContext().row;
   const options = getPatientFormOptions(data.options);
+  const row = normalizePatientFormRow(data.row || getEmptyPatientFormContext().row, options);
 
   document.getElementById("form-title").textContent = data.editing
     ? "Editar Usuário"
@@ -145,7 +145,7 @@ async function setupPatientFormPage() {
 
   fillSelect("gender", options.gender_options, row.sex);
   fillSelect("race", options.race_options, row.race);
-  fillSelect("blood_type", options.blood_type_options, row.blood_type, true);
+  fillSelect("team_reference", options.team_options, row.team_ref, true);
 
   Object.keys(row).forEach((key) => {
     const field =
@@ -156,10 +156,13 @@ async function setupPatientFormPage() {
     }
   });
 
+  SISELO.setupTeamFieldPicker({ select: "team_reference" });
+
   configurePatientDateInputs();
   syncPatientClinicalTextareas();
   attachPatientMasks();
-  setupPatientStatusToggle(row.status || row.status_label || "ativo");
+  setupPatientStatusSelect(row.status || row.status_label || "ativo");
+  SISELO.enhanceChoiceSelects(document);
 
   document
     .getElementById("patient-form")
@@ -176,7 +179,11 @@ async function setupPatientFormPage() {
       }
 
       const formData = new FormData(event.currentTarget);
-      const payload = Object.fromEntries(formData.entries());
+      const payload = buildPatientSavePayload(
+        Object.fromEntries(formData.entries()),
+        row,
+        options,
+      );
 
       try {
         const result = await SISELO.apiRequest(endpoint, {
@@ -198,16 +205,13 @@ async function setupPatientFormPage() {
       } catch (error) {
         const payloadErrors =
           error.payload && error.payload.errors ? error.payload.errors : {};
-        Object.keys(payloadErrors).forEach((field) => {
-          const errorElement = document.querySelector(
-            `[data-error-for="${field}"]`,
-          );
-          if (errorElement) {
-            errorElement.textContent = payloadErrors[field];
-          }
-        });
-
-        SISELO.showAlert("page-alert", error.message, "error");
+        const firstErrorTarget = applyPatientFieldErrors(payloadErrors);
+        SISELO.showAlert(
+          "page-alert",
+          buildPatientValidationMessage(error.message, payloadErrors),
+          "error",
+        );
+        focusPatientErrorTarget(firstErrorTarget);
       }
     });
 }
@@ -299,7 +303,7 @@ function renderPatientsTable(targetId, rows, permissions, isTrash, query = "") {
 
   if (!Array.isArray(rows) || rows.length === 0) {
     tbody.innerHTML = SISELO.emptyTableRow(
-      7,
+      6,
       "Nenhum usuário encontrado.",
       !isTrash && permissions.has("patients.create")
         ? { label: "+ Novo usuário", href: "/patients/form.html" }
@@ -317,9 +321,8 @@ function renderPatientsTable(targetId, rows, permissions, isTrash, query = "") {
         <small>${SISELO.escapeHtml(row.age_label || "")}${row.age_label && row.gender_label ? " | " : ""}${SISELO.escapeHtml(row.gender_label || "")}</small>
       </td>
       <td>${SISELO.escapeHtml(row.cpf)}</td>
-      <td>${SISELO.escapeHtml(row.ses)}</td>
+      <td>${renderPatientTeamBadge(row.team_ref)}</td>
       <td>${SISELO.escapeHtml(row.phone || "")}<br><small>${SISELO.escapeHtml(row.email || "")}</small></td>
-      <td>${SISELO.escapeHtml(row.blood_type || "")}</td>
       <td>${renderPatientStatusBadge(row.status || row.status_label)}</td>
       <td>
         <div class="table-actions">
@@ -346,11 +349,14 @@ function filterPatientRows(rows, query) {
     const matchesName = search.hasLetters
       ? SISELO.matchesPersonNamePrefix(row.full_name, search)
       : true;
+    const matchesTeam = search.hasLetters
+      ? SISELO.matchesSearchText(row.team_ref, search)
+      : false;
     const matchesDigits = search.hasDigits
       ? SISELO.matchesSearchDigits(row.cpf, search)
       : true;
 
-    return matchesName && matchesDigits;
+    return (matchesName || matchesTeam) && matchesDigits;
   });
 }
 
@@ -366,7 +372,7 @@ function renderPatientsTrashTable(tbody, rows, permissions, query = "") {
     <tr>
       <td>${SISELO.highlightPersonName(row.full_name, query)}</td>
       <td>${SISELO.escapeHtml(row.cpf)}</td>
-      <td>${SISELO.escapeHtml(row.ses)}</td>
+      <td>${renderPatientTeamBadge(row.team_ref)}</td>
       <td>${SISELO.escapeHtml(row.deleted_at)}</td>
       <td>
         <div class="table-actions">
@@ -539,7 +545,7 @@ function renderPatientOverview(patient) {
   );
   const metaItems = [
     ["CPF", patient.cpf || "-"],
-    ["SES", patient.ses || "-"],
+    ["Equipe", SISELO.renderTeamBadge(patient.team_ref), true],
     [
       "Nascimento",
       patient.birth_date ? formatPatientDisplayDate(patient.birth_date) : "-",
@@ -548,10 +554,7 @@ function renderPatientOverview(patient) {
     ["Gênero", patient.gender_label || "-"],
     ["Telefone", patient.phone || "-"],
     ["Email", patient.email || "-"],
-    ["Sangue", patient.blood_type || "-"],
-    ["Convênio", patient.health_insurance || "-"],
     ["UBS", patient.ubs_ref || "-"],
-    ["Equipe", patient.team_ref || "-"],
     ["Contato de emergência", patient.emergency_contact || "-"],
   ];
 
@@ -566,10 +569,10 @@ function renderPatientOverview(patient) {
         <div class="patient360-meta-grid">
           ${metaItems
             .map(
-              ([label, value]) => `
+              ([label, value, isHtml]) => `
             <div class="patient360-meta-item">
               <span class="patient360-meta-label">${SISELO.escapeHtml(label)}</span>
-              <span class="patient360-meta-value">${SISELO.escapeHtml(value)}</span>
+              <span class="patient360-meta-value">${isHtml ? value : SISELO.escapeHtml(value)}</span>
             </div>
           `,
             )
@@ -653,32 +656,20 @@ function renderPatientStatusBadge(value) {
   return `<span class="status-badge ${config.badgeClass}">${SISELO.escapeHtml(config.label)}</span>`;
 }
 
-function setupPatientStatusToggle(initialValue) {
-  const hiddenInput = document.getElementById("patient-status");
-  const toggle = document.getElementById("patient-status-toggle");
-  if (!(hiddenInput instanceof HTMLInputElement) || !(toggle instanceof HTMLElement)) {
+function renderPatientTeamBadge(value) {
+  return SISELO.renderTeamBadge(value);
+}
+
+function setupPatientStatusSelect(initialValue) {
+  const select = document.getElementById("patient-status");
+  if (!(select instanceof HTMLSelectElement)) {
     return;
   }
 
-  const setValue = (nextValue) => {
-    const normalized = SISELO.normalizeSearchText(nextValue || "") === "inativo"
-      ? "inativo"
-      : "ativo";
-    hiddenInput.value = normalized;
-    toggle.querySelectorAll("[data-status-value]").forEach((button) => {
-      const isSelected = button.getAttribute("data-status-value") === normalized;
-      button.classList.toggle("is-selected", isSelected);
-      button.setAttribute("aria-pressed", String(isSelected));
-    });
-  };
-
-  toggle.querySelectorAll("[data-status-value]").forEach((button) => {
-    button.addEventListener("click", () => {
-      setValue(button.getAttribute("data-status-value"));
-    });
-  });
-
-  setValue(initialValue);
+  select.value = SISELO.normalizeSearchText(initialValue || "") === "inativo"
+    ? "inativo"
+    : "ativo";
+  select.dispatchEvent(new Event("change", { bubbles: true }));
 }
 
 function bindPatientPdfPlaceholder() {
@@ -796,6 +787,14 @@ function getPatientFormOptions(options) {
     raceOptions[key] = label;
   });
 
+  const teamOptions = {
+    sem_equipe: "Sem equipe",
+    safira: "Safira",
+    ametista: "Ametista",
+    esmeralda: "Esmeralda",
+    diamante: "Diamante",
+  };
+
   return {
     gender_options: safeOptions.gender_options || {
       masculino: "Masculino",
@@ -803,17 +802,7 @@ function getPatientFormOptions(options) {
       outro: "Outro",
     },
     race_options: raceOptions,
-    blood_type_options: safeOptions.blood_type_options || [
-      "A+",
-      "A-",
-      "B+",
-      "B-",
-      "AB+",
-      "AB-",
-      "O+",
-      "O-",
-      "N/A",
-    ],
+    team_options: teamOptions,
   };
 }
 
@@ -838,7 +827,6 @@ function getEmptyPatientFormContext() {
     row: {
       first_cadh_date: "",
       full_name: "",
-      ses: "",
       cpf: "",
       birth_date: "",
       sex: "",
@@ -848,8 +836,6 @@ function getEmptyPatientFormContext() {
       address: "",
       email: "",
       emergency_contact: "",
-      health_insurance: "",
-      blood_type: "",
       allergies: "",
       chronic_conditions: "",
       status: "ativo",
@@ -864,20 +850,138 @@ function getEmptyPatientSummary() {
   return {
     full_name: "",
     cpf: "",
-    ses: "",
     age_label: "",
     gender_label: "",
     status_label: "Ativo",
     phone: "",
     email: "",
-    blood_type: "",
-    health_insurance: "",
     ubs_ref: "",
     team_ref: "",
     emergency_contact: "",
     allergies: "",
     chronic_conditions: "",
   };
+}
+
+const PATIENT_FIELD_LABELS = {
+  first_cadh_date: "Data de atendimento",
+  full_name: "Nome completo",
+  cpf: "CPF",
+  birth_date: "Data de nascimento",
+  sex: "Sexo",
+  race: "Raça/Cor",
+  responsible_name: "Responsável",
+  phone: "Telefone",
+  address: "Endereço",
+  email: "E-mail",
+  emergency_contact: "Contato de emergência",
+  allergies: "Alergias",
+  chronic_conditions: "Condições crônicas",
+  ubs_ref: "UBS de referência",
+  team_ref: "Equipe",
+  status: "Status",
+  ses: "Dados internos do cadastro",
+  health_insurance: "Dados internos do cadastro",
+  blood_type: "Dados internos do cadastro",
+};
+
+const PATIENT_FIELD_TARGETS = {
+  first_cadh_date: ["attendance_date"],
+  sex: ["gender"],
+  responsible_name: ["responsible"],
+  ubs_ref: ["uds_reference"],
+  team_ref: ["team_reference"],
+};
+
+function normalizePatientFormRow(row, options) {
+  const normalizedRow = { ...(row || {}) };
+  normalizedRow.sex = normalizePatientOptionValue(
+    normalizedRow.sex,
+    options.gender_options,
+  );
+  normalizedRow.race = normalizePatientOptionValue(
+    normalizedRow.race,
+    options.race_options,
+    { amarelo: "amarela" },
+  );
+  normalizedRow.status =
+    normalizePatientOptionValue(normalizedRow.status || normalizedRow.status_label, {
+      ativo: "Ativo",
+      inativo: "Inativo",
+    }) || "ativo";
+  normalizedRow.team_ref = normalizePatientTeamValue(
+    normalizedRow.team_ref,
+    options.team_options,
+  );
+
+  return normalizedRow;
+}
+
+function normalizePatientOptionValue(value, options, aliases = {}) {
+  const rawValue = String(value || "").trim();
+  if (!rawValue) {
+    return "";
+  }
+
+  const normalizedValue = normalizePatientComparableValue(rawValue);
+  const normalizedAlias = aliases[normalizedValue];
+  if (normalizedAlias) {
+    return normalizedAlias;
+  }
+
+  return Object.entries(options || {}).reduce((matched, [optionValue, label]) => {
+    if (matched) {
+      return matched;
+    }
+
+    return [optionValue, label].some((candidate) => {
+      return normalizePatientComparableValue(candidate) === normalizedValue;
+    })
+      ? optionValue
+      : "";
+  }, "");
+}
+
+function normalizePatientTeamValue(value, options) {
+  const rawValue = String(value || "").replace(/^equipe\s*:\s*/i, "").trim();
+  return normalizePatientOptionValue(rawValue, options) || "sem_equipe";
+}
+
+function normalizePatientComparableValue(value) {
+  return SISELO.normalizeSearchText(value).replace(/[^a-z0-9]+/g, " ").trim();
+}
+
+function buildPatientSavePayload(payload, row, options) {
+  const nextPayload = { ...(payload || {}) };
+  const teamOptions = (options && options.team_options) || getPatientFormOptions({}).team_options;
+  const teamValue = normalizePatientTeamValue(
+    nextPayload.team_ref || nextPayload.team_reference || (row && row.team_ref),
+    teamOptions,
+  );
+  const cpfDigits = digitsOnly(nextPayload.cpf || (row && row.cpf));
+  const legacySes = digitsOnly(
+    nextPayload.ses || (row && row.ses) || cpfDigits.slice(0, 9),
+  )
+    .slice(0, 9)
+    .padEnd(9, "0");
+  const legacyBloodType = String(
+    nextPayload.blood_type || (row && row.blood_type) || "",
+  )
+    .trim()
+    .toUpperCase();
+  const validBloodTypes = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
+
+  nextPayload.team_ref = teamValue;
+  nextPayload.team_reference = teamValue;
+  nextPayload.ses = legacySes || "000000000";
+  nextPayload.health_insurance = String(
+    nextPayload.health_insurance || (row && row.health_insurance) || "SUS",
+  ).trim() || "SUS";
+  nextPayload.blood_type = validBloodTypes.includes(legacyBloodType)
+    ? legacyBloodType
+    : "O+";
+
+  return nextPayload;
 }
 
 function fillSelect(id, options, currentValue, allowBlank) {
@@ -905,7 +1009,112 @@ function clearFieldErrors() {
   document.querySelectorAll("[data-error-for]").forEach((element) => {
     element.textContent = "";
   });
+  document.querySelectorAll(".is-invalid").forEach((element) => {
+    element.classList.remove("is-invalid");
+  });
+  document.querySelectorAll('[aria-invalid="true"]').forEach((element) => {
+    element.removeAttribute("aria-invalid");
+  });
   SISELO.showAlert("page-alert", "", "info");
+}
+
+function applyPatientFieldErrors(errors) {
+  let firstTarget = null;
+
+  Object.entries(errors || {}).forEach(([field, message]) => {
+    const errorElement = document.querySelector(`[data-error-for="${field}"]`);
+    if (errorElement) {
+      errorElement.textContent = message;
+    }
+
+    const target = findPatientErrorTarget(field);
+    if (!target) {
+      return;
+    }
+
+    if (!firstTarget) {
+      firstTarget = target;
+    }
+
+    target.setAttribute("aria-invalid", "true");
+    target.classList.add("is-invalid");
+    const visibleTarget = getPatientVisibleErrorTarget(target);
+    if (visibleTarget && visibleTarget !== target) {
+      visibleTarget.classList.add("is-invalid");
+    }
+  });
+
+  return firstTarget;
+}
+
+function buildPatientValidationMessage(message, errors) {
+  const fields = Array.from(
+    new Set(Object.keys(errors || {}).map((field) => PATIENT_FIELD_LABELS[field] || field)),
+  ).slice(0, 4);
+
+  if (fields.length === 0) {
+    return message || "Revise os campos destacados e tente novamente.";
+  }
+
+  const remaining = Math.max(0, Object.keys(errors || {}).length - fields.length);
+  const suffix = remaining > 0 ? ` e mais ${remaining}` : "";
+  return `Revise: ${fields.join(", ")}${suffix}.`;
+}
+
+function findPatientErrorTarget(field) {
+  const targets = PATIENT_FIELD_TARGETS[field] || [field];
+
+  for (const target of targets) {
+    const element =
+      document.getElementById(target) ||
+      document.querySelector(`[name="${target}"]`) ||
+      document.querySelector(`[data-field="${target}"]`);
+    if (element instanceof HTMLElement) {
+      return element;
+    }
+  }
+
+  return null;
+}
+
+function getPatientVisibleErrorTarget(target) {
+  if (!(target instanceof HTMLElement)) {
+    return null;
+  }
+
+  const choiceSelect = target.closest(".choice-select");
+  if (choiceSelect instanceof HTMLElement) {
+    return choiceSelect;
+  }
+
+  const datePicker = target.nextElementSibling;
+  if (datePicker instanceof HTMLElement && datePicker.classList.contains("date-picker")) {
+    return datePicker;
+  }
+
+  if (target.id === "team_reference") {
+    const teamPicker = target.nextElementSibling;
+    if (teamPicker instanceof HTMLElement && teamPicker.classList.contains("team-picker")) {
+      return teamPicker;
+    }
+  }
+
+  return target;
+}
+
+function focusPatientErrorTarget(target) {
+  if (!(target instanceof HTMLElement)) {
+    return;
+  }
+
+  const visibleTarget = getPatientVisibleErrorTarget(target) || target;
+  visibleTarget.scrollIntoView({ behavior: "smooth", block: "center" });
+
+  const focusTarget =
+    visibleTarget.querySelector("button, input, select, textarea") || target;
+  if (focusTarget instanceof HTMLElement) {
+    setTimeout(() => focusTarget.focus({ preventScroll: true }), 200);
+  }
 }
 
 function configurePatientDateInputs() {
@@ -967,19 +1176,27 @@ function syncPatientClinicalTextareas() {
     return;
   }
 
+  const minHeight = 132;
+  const maxHeight = 220;
+
   const syncHeights = () => {
     textareas.forEach((textarea) => {
-      textarea.style.resize = "none";
+      textarea.style.resize = "vertical";
       textarea.style.height = "auto";
+      textarea.style.overflowY = "hidden";
     });
 
-    const nextHeight = Math.max(
-      160,
-      ...textareas.map((textarea) => textarea.scrollHeight),
+    const nextHeight = Math.min(
+      maxHeight,
+      Math.max(
+        minHeight,
+        ...textareas.map((textarea) => textarea.scrollHeight),
+      ),
     );
 
     textareas.forEach((textarea) => {
       textarea.style.height = `${nextHeight}px`;
+      textarea.style.overflowY = nextHeight >= maxHeight ? "auto" : "hidden";
     });
   };
 
@@ -991,17 +1208,9 @@ function syncPatientClinicalTextareas() {
 }
 
 function attachPatientMasks() {
-  const sesInput = document.getElementById("ses");
   const cpfInput = document.getElementById("cpf");
   const phoneInput = document.getElementById("phone");
   const emergencyInput = document.getElementById("emergency_contact");
-
-  if (sesInput) {
-    sesInput.addEventListener("input", () => {
-      sesInput.value = digitsOnly(sesInput.value).slice(0, 9);
-    });
-    sesInput.value = digitsOnly(sesInput.value).slice(0, 9);
-  }
 
   if (cpfInput) {
     cpfInput.addEventListener("input", () => {

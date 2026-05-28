@@ -42,12 +42,6 @@
             </div>
 
             <div class="field">
-              <label for="ses">SES</label>
-              <input id="ses" name="ses" maxlength="20" placeholder="Número do SES">
-              <div class="field-error" data-error-for="ses"></div>
-            </div>
-
-            <div class="field">
               <label for="cpf">CPF</label>
               <input id="cpf" name="cpf" maxlength="14" placeholder="000.000.000-00">
               <div class="field-error" data-error-for="cpf"></div>
@@ -75,6 +69,12 @@
               <label for="responsible">Responsável</label>
               <input id="responsible" name="responsible" data-field="responsible_name" maxlength="180" placeholder="Nome do responsável">
               <div class="field-error" data-error-for="responsible_name"></div>
+            </div>
+
+            <div class="field">
+              <label for="team_reference">Equipe</label>
+              <select id="team_reference" name="team_ref" data-field="team_ref"></select>
+              <div class="field-error" data-error-for="team_ref"></div>
             </div>
           </div>
         </section>
@@ -115,48 +115,30 @@
               <div class="field-error" data-error-for="ubs_ref"></div>
             </div>
 
-            <div class="field">
-              <label for="team_reference">Equipe de Referência</label>
-              <input id="team_reference" name="team_reference" data-field="team_ref" maxlength="120" placeholder="Equipe de referência">
-              <div class="field-error" data-error-for="team_ref"></div>
-            </div>
-
-            <div class="field">
-              <label for="health_insurance">Convênio</label>
-              <input id="health_insurance" name="health_insurance" maxlength="160" placeholder="SUS / convênio">
-              <div class="field-error" data-error-for="health_insurance"></div>
-            </div>
-
-            <div class="field">
-              <label for="blood_type">Tipo Sanguíneo</label>
-              <select id="blood_type" name="blood_type"></select>
-              <div class="field-error" data-error-for="blood_type"></div>
-            </div>
           </div>
         </section>
 
-        <section class="transition-panel transition-panel-details">
+        <section class="transition-panel transition-panel-details patient-assistance-panel">
           <div class="transition-panel-header">
             <h2 class="transition-panel-title">Situação Assistencial</h2>
           </div>
 
           <div class="transition-panel-grid">
-            <div class="field-full">
+            <div class="field patient-status-field">
               <label for="patient-status">Status</label>
-              <div id="patient-status-toggle" class="status-toggle" role="tablist" aria-label="Status assistencial">
-                <button type="button" class="status-toggle-option" data-status-value="ativo">Ativo</button>
-                <button type="button" class="status-toggle-option" data-status-value="inativo">Inativo</button>
-              </div>
-              <input type="hidden" id="patient-status" name="status" value="ativo">
+              <select id="patient-status" name="status" class="status-dropdown" data-hide-selected-option="true">
+                <option value="ativo">Ativo</option>
+                <option value="inativo">Inativo</option>
+              </select>
             </div>
 
-            <div class="field">
+            <div class="field patient-clinical-notes-field">
               <label for="allergies">Alergias</label>
               <textarea id="allergies" name="allergies" placeholder="Ex.: Dipirona, amendoim"></textarea>
               <div class="field-error" data-error-for="allergies"></div>
             </div>
 
-            <div class="field">
+            <div class="field patient-clinical-notes-field">
               <label for="chronic_conditions">Condições Crônicas</label>
               <textarea id="chronic_conditions" name="chronic_conditions" placeholder="Ex.: Diabetes, hipertensão"></textarea>
               <div class="field-error" data-error-for="chronic_conditions"></div>
