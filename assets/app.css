@@ -158,6 +158,14 @@ body[data-page="cadh-endocrino"] .topbar-logout,
 body[data-page="cadh-endocrino"] .topbar-account,
 body[data-page="cadh-nutricao"] .topbar-logout,
 body[data-page="cadh-nutricao"] .topbar-account,
+body[data-page="cadh-fisioterapia"] .topbar-logout,
+body[data-page="cadh-fisioterapia"] .topbar-account,
+body[data-page="cadh-farmacia"] .topbar-logout,
+body[data-page="cadh-farmacia"] .topbar-account,
+body[data-page="cadh-servico-social"] .topbar-logout,
+body[data-page="cadh-servico-social"] .topbar-account,
+body[data-page="cadh-oftalmologia"] .topbar-logout,
+body[data-page="cadh-oftalmologia"] .topbar-account,
 body[data-page="cadh-psicologia"] .topbar-logout,
 body[data-page="cadh-psicologia"] .topbar-account,
 body[data-page="cadh-enfermagem"] .topbar-logout,
@@ -1871,6 +1879,10 @@ body[data-page="transitions-trash"] .transitions-table td:nth-child(8) {
 body[data-page="cadh-cardiologia"],
 body[data-page="cadh-endocrino"],
 body[data-page="cadh-nutricao"],
+body[data-page="cadh-fisioterapia"],
+body[data-page="cadh-farmacia"],
+body[data-page="cadh-servico-social"],
+body[data-page="cadh-oftalmologia"],
 body[data-page="cadh-psicologia"],
 body[data-page="cadh-enfermagem"] {
   overflow-x: hidden;
@@ -1888,6 +1900,22 @@ body[data-page="cadh-nutricao"] {
   --clinical-table-min-width: 0;
 }
 
+body[data-page="cadh-fisioterapia"] {
+  --clinical-table-min-width: 0;
+}
+
+body[data-page="cadh-farmacia"] {
+  --clinical-table-min-width: 0;
+}
+
+body[data-page="cadh-servico-social"] {
+  --clinical-table-min-width: 0;
+}
+
+body[data-page="cadh-oftalmologia"] {
+  --clinical-table-min-width: 0;
+}
+
 body[data-page="cadh-psicologia"],
 body[data-page="cadh-enfermagem"] {
   --clinical-table-min-width: 0;
@@ -1896,6 +1924,10 @@ body[data-page="cadh-enfermagem"] {
 body[data-page="cadh-cardiologia"] .cardiologia-page,
 body[data-page="cadh-endocrino"] .endocrino-page,
 body[data-page="cadh-nutricao"] .nutricao-page,
+body[data-page="cadh-fisioterapia"] .fisioterapia-page,
+body[data-page="cadh-farmacia"] .farmacia-page,
+body[data-page="cadh-servico-social"] .social-page,
+body[data-page="cadh-oftalmologia"] .oftalmo-page,
 body[data-page="cadh-psicologia"] .psicologia-page,
 body[data-page="cadh-enfermagem"] .enfermagem-page {
   overflow-x: visible;
@@ -1904,6 +1936,10 @@ body[data-page="cadh-enfermagem"] .enfermagem-page {
 body[data-page="cadh-cardiologia"] .cardiologia-table-shell,
 body[data-page="cadh-endocrino"] .endocrino-table-shell,
 body[data-page="cadh-nutricao"] .nutricao-table-shell,
+body[data-page="cadh-fisioterapia"] .fisioterapia-table-shell,
+body[data-page="cadh-farmacia"] .farmacia-table-shell,
+body[data-page="cadh-servico-social"] .social-table-shell,
+body[data-page="cadh-oftalmologia"] .oftalmo-table-shell,
 body[data-page="cadh-psicologia"] .psicologia-table-shell,
 body[data-page="cadh-enfermagem"] .enfermagem-table-shell {
   overflow-x: hidden !important;
@@ -1913,6 +1949,10 @@ body[data-page="cadh-enfermagem"] .enfermagem-table-shell {
 body[data-page="cadh-cardiologia"] .cardiologia-table,
 body[data-page="cadh-endocrino"] .endocrino-table,
 body[data-page="cadh-nutricao"] .nutricao-table,
+body[data-page="cadh-fisioterapia"] .fisioterapia-table,
+body[data-page="cadh-farmacia"] .farmacia-table,
+body[data-page="cadh-servico-social"] .social-table,
+body[data-page="cadh-oftalmologia"] .oftalmo-table,
 body[data-page="cadh-psicologia"] .psicologia-table,
 body[data-page="cadh-enfermagem"] .enfermagem-table {
   min-width: var(--clinical-table-min-width, 1280px) !important;
@@ -1923,6 +1963,10 @@ body[data-page="cadh-enfermagem"] .enfermagem-table {
 body[data-page="cadh-cardiologia"] .cardiologia-table col,
 body[data-page="cadh-endocrino"] .endocrino-table col,
 body[data-page="cadh-nutricao"] .nutricao-table col,
+body[data-page="cadh-fisioterapia"] .fisioterapia-table col,
+body[data-page="cadh-farmacia"] .farmacia-table col,
+body[data-page="cadh-servico-social"] .social-table col,
+body[data-page="cadh-oftalmologia"] .oftalmo-table col,
 body[data-page="cadh-psicologia"] .psicologia-table col,
 body[data-page="cadh-enfermagem"] .enfermagem-table col {
   width: auto !important;
@@ -1931,6 +1975,10 @@ body[data-page="cadh-enfermagem"] .enfermagem-table col {
 body[data-page="cadh-cardiologia"] .cardiologia-col-date,
 body[data-page="cadh-endocrino"] .endocrino-col-date,
 body[data-page="cadh-nutricao"] .nutricao-col-date,
+body[data-page="cadh-fisioterapia"] .fisioterapia-col-date,
+body[data-page="cadh-farmacia"] .farmacia-col-date,
+body[data-page="cadh-servico-social"] .social-col-date,
+body[data-page="cadh-oftalmologia"] .oftalmo-col-date,
 body[data-page="cadh-psicologia"] .psicologia-col-date,
 body[data-page="cadh-enfermagem"] .enfermagem-col-date {
   width: 8% !important;
@@ -1939,6 +1987,10 @@ body[data-page="cadh-enfermagem"] .enfermagem-col-date {
 body[data-page="cadh-cardiologia"] .cardiologia-col-patient,
 body[data-page="cadh-endocrino"] .endocrino-col-patient,
 body[data-page="cadh-nutricao"] .nutricao-col-patient,
+body[data-page="cadh-fisioterapia"] .fisioterapia-col-patient,
+body[data-page="cadh-farmacia"] .farmacia-col-patient,
+body[data-page="cadh-servico-social"] .social-col-patient,
+body[data-page="cadh-oftalmologia"] .oftalmo-col-patient,
 body[data-page="cadh-psicologia"] .psicologia-col-patient,
 body[data-page="cadh-enfermagem"] .enfermagem-col-patient {
   width: 13% !important;
@@ -1947,6 +1999,10 @@ body[data-page="cadh-enfermagem"] .enfermagem-col-patient {
 body[data-page="cadh-cardiologia"] .cardiologia-col-consult,
 body[data-page="cadh-endocrino"] .endocrino-col-consult,
 body[data-page="cadh-nutricao"] .nutricao-col-consult,
+body[data-page="cadh-fisioterapia"] .fisioterapia-col-consult,
+body[data-page="cadh-farmacia"] .farmacia-col-consult,
+body[data-page="cadh-servico-social"] .social-col-consult,
+body[data-page="cadh-oftalmologia"] .oftalmo-col-consult,
 body[data-page="cadh-psicologia"] .psicologia-col-consult,
 body[data-page="cadh-enfermagem"] .enfermagem-col-consult {
   width: 10% !important;
@@ -1955,6 +2011,10 @@ body[data-page="cadh-enfermagem"] .enfermagem-col-consult {
 body[data-page="cadh-cardiologia"] .cardiologia-col-actions,
 body[data-page="cadh-endocrino"] .endocrino-col-actions,
 body[data-page="cadh-nutricao"] .nutricao-col-actions,
+body[data-page="cadh-fisioterapia"] .fisioterapia-col-actions,
+body[data-page="cadh-farmacia"] .farmacia-col-actions,
+body[data-page="cadh-servico-social"] .social-col-actions,
+body[data-page="cadh-oftalmologia"] .oftalmo-col-actions,
 body[data-page="cadh-psicologia"] .psicologia-col-actions,
 body[data-page="cadh-enfermagem"] .enfermagem-col-actions {
   width: 142px !important;
@@ -1966,6 +2026,14 @@ body[data-page="cadh-endocrino"] .endocrino-table th:last-child,
 body[data-page="cadh-endocrino"] .endocrino-table td:last-child,
 body[data-page="cadh-nutricao"] .nutricao-table th:last-child,
 body[data-page="cadh-nutricao"] .nutricao-table td:last-child,
+body[data-page="cadh-fisioterapia"] .fisioterapia-table th:last-child,
+body[data-page="cadh-fisioterapia"] .fisioterapia-table td:last-child,
+body[data-page="cadh-farmacia"] .farmacia-table th:last-child,
+body[data-page="cadh-farmacia"] .farmacia-table td:last-child,
+body[data-page="cadh-servico-social"] .social-table th:last-child,
+body[data-page="cadh-servico-social"] .social-table td:last-child,
+body[data-page="cadh-oftalmologia"] .oftalmo-table th:last-child,
+body[data-page="cadh-oftalmologia"] .oftalmo-table td:last-child,
 body[data-page="cadh-psicologia"] .psicologia-table th:last-child,
 body[data-page="cadh-psicologia"] .psicologia-table td:last-child,
 body[data-page="cadh-enfermagem"] .enfermagem-table th:last-child,
@@ -1979,6 +2047,14 @@ body[data-page="cadh-endocrino"] .endocrino-table th,
 body[data-page="cadh-endocrino"] .endocrino-table td,
 body[data-page="cadh-nutricao"] .nutricao-table th,
 body[data-page="cadh-nutricao"] .nutricao-table td,
+body[data-page="cadh-fisioterapia"] .fisioterapia-table th,
+body[data-page="cadh-fisioterapia"] .fisioterapia-table td,
+body[data-page="cadh-farmacia"] .farmacia-table th,
+body[data-page="cadh-farmacia"] .farmacia-table td,
+body[data-page="cadh-servico-social"] .social-table th,
+body[data-page="cadh-servico-social"] .social-table td,
+body[data-page="cadh-oftalmologia"] .oftalmo-table th,
+body[data-page="cadh-oftalmologia"] .oftalmo-table td,
 body[data-page="cadh-psicologia"] .psicologia-table th,
 body[data-page="cadh-psicologia"] .psicologia-table td,
 body[data-page="cadh-enfermagem"] .enfermagem-table th,
@@ -1995,6 +2071,10 @@ body[data-page="cadh-enfermagem"] .enfermagem-table td {
 body[data-page="cadh-cardiologia"] .cardiologia-empty,
 body[data-page="cadh-endocrino"] .endocrino-empty,
 body[data-page="cadh-nutricao"] .nutricao-empty,
+body[data-page="cadh-fisioterapia"] .fisioterapia-empty,
+body[data-page="cadh-farmacia"] .farmacia-empty,
+body[data-page="cadh-servico-social"] .social-empty,
+body[data-page="cadh-oftalmologia"] .oftalmo-empty,
 body[data-page="cadh-psicologia"] .psicologia-empty,
 body[data-page="cadh-enfermagem"] .enfermagem-empty {
   min-height: 120px !important;
@@ -2004,6 +2084,10 @@ body[data-page="cadh-enfermagem"] .enfermagem-empty {
 body[data-page="cadh-cardiologia"] .cardiologia-table .table-actions,
 body[data-page="cadh-endocrino"] .endocrino-table .table-actions,
 body[data-page="cadh-nutricao"] .nutricao-table .table-actions,
+body[data-page="cadh-fisioterapia"] .fisioterapia-table .table-actions,
+body[data-page="cadh-farmacia"] .farmacia-table .table-actions,
+body[data-page="cadh-servico-social"] .social-table .table-actions,
+body[data-page="cadh-oftalmologia"] .oftalmo-table .table-actions,
 body[data-page="cadh-psicologia"] .psicologia-table .table-actions,
 body[data-page="cadh-enfermagem"] .enfermagem-table .table-actions {
   justify-content: center;
@@ -2014,6 +2098,10 @@ body[data-page="cadh-enfermagem"] .enfermagem-table .table-actions {
 body[data-page="cadh-cardiologia"] .cardiologia-table .icon-btn,
 body[data-page="cadh-endocrino"] .endocrino-table .icon-btn,
 body[data-page="cadh-nutricao"] .nutricao-table .icon-btn,
+body[data-page="cadh-fisioterapia"] .fisioterapia-table .icon-btn,
+body[data-page="cadh-farmacia"] .farmacia-table .icon-btn,
+body[data-page="cadh-servico-social"] .social-table .icon-btn,
+body[data-page="cadh-oftalmologia"] .oftalmo-table .icon-btn,
 body[data-page="cadh-psicologia"] .psicologia-table .icon-btn,
 body[data-page="cadh-enfermagem"] .enfermagem-table .icon-btn {
   inline-size: 34px !important;
@@ -3286,6 +3374,10 @@ body[data-page="patients-form"] .patient-assistance-panel .patient-clinical-note
   body[data-page="cadh-cardiologia"] .cardiologia-page,
   body[data-page="cadh-endocrino"] .endocrino-page,
   body[data-page="cadh-nutricao"] .nutricao-page,
+  body[data-page="cadh-fisioterapia"] .fisioterapia-page,
+  body[data-page="cadh-farmacia"] .farmacia-page,
+  body[data-page="cadh-servico-social"] .social-page,
+  body[data-page="cadh-oftalmologia"] .oftalmo-page,
   body[data-page="cadh-psicologia"] .psicologia-page,
   body[data-page="cadh-enfermagem"] .enfermagem-page {
     padding: 20px !important;
@@ -3294,6 +3386,10 @@ body[data-page="patients-form"] .patient-assistance-panel .patient-clinical-note
   body[data-page="cadh-cardiologia"] .cardiologia-title,
   body[data-page="cadh-endocrino"] .endocrino-title,
   body[data-page="cadh-nutricao"] .nutricao-title,
+  body[data-page="cadh-fisioterapia"] .fisioterapia-title,
+  body[data-page="cadh-farmacia"] .farmacia-title,
+  body[data-page="cadh-servico-social"] .social-title,
+  body[data-page="cadh-oftalmologia"] .oftalmo-title,
   body[data-page="cadh-psicologia"] .psicologia-title,
   body[data-page="cadh-enfermagem"] .enfermagem-title {
     font-size: 1.45rem !important;
@@ -3305,6 +3401,14 @@ body[data-page="patients-form"] .patient-assistance-panel .patient-clinical-note
   body[data-page="cadh-endocrino"] .endocrino-table td,
   body[data-page="cadh-nutricao"] .nutricao-table th,
   body[data-page="cadh-nutricao"] .nutricao-table td,
+  body[data-page="cadh-fisioterapia"] .fisioterapia-table th,
+  body[data-page="cadh-fisioterapia"] .fisioterapia-table td,
+  body[data-page="cadh-farmacia"] .farmacia-table th,
+  body[data-page="cadh-farmacia"] .farmacia-table td,
+  body[data-page="cadh-servico-social"] .social-table th,
+  body[data-page="cadh-servico-social"] .social-table td,
+  body[data-page="cadh-oftalmologia"] .oftalmo-table th,
+  body[data-page="cadh-oftalmologia"] .oftalmo-table td,
   body[data-page="cadh-psicologia"] .psicologia-table th,
   body[data-page="cadh-psicologia"] .psicologia-table td,
   body[data-page="cadh-enfermagem"] .enfermagem-table th,
@@ -3317,6 +3421,10 @@ body[data-page="patients-form"] .patient-assistance-panel .patient-clinical-note
   body[data-page="cadh-cardiologia"] .cardiologia-modal,
   body[data-page="cadh-endocrino"] .endocrino-modal,
   body[data-page="cadh-nutricao"] .nutricao-modal,
+  body[data-page="cadh-fisioterapia"] .fisioterapia-modal,
+  body[data-page="cadh-farmacia"] .farmacia-modal,
+  body[data-page="cadh-servico-social"] .social-modal,
+  body[data-page="cadh-oftalmologia"] .oftalmo-modal,
   body[data-page="cadh-psicologia"] .psicologia-modal,
   body[data-page="cadh-enfermagem"] .enfermagem-modal {
     width: min(100%, calc(100vw - 16px)) !important;
