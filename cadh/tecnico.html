@@ -1,0 +1,716 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Técnico de Enfermagem</title>
+  <link rel="stylesheet" href="/assets/app.css">
+  <style>
+    .tecnico-page {
+      --tecnico-accent: #5d789f;
+      --tecnico-title: #1a2f44;
+      --tecnico-band: #bfd2ef;
+      --tecnico-soft: #eaf1f9;
+      --tecnico-border: #d1e2f2;
+      padding: 34px;
+      background:
+        radial-gradient(circle at top right, rgba(93, 120, 159, 0.1), transparent 28%),
+        linear-gradient(180deg, #f3f7fc, #edf2f7);
+    }
+
+    body[data-page="cadh-tecnico"] .container {
+      width: min(var(--app-shell-max), calc(100vw - 32px));
+      max-width: var(--app-shell-max);
+      margin: 20px auto;
+      padding: 0;
+    }
+
+    .tecnico-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .tecnico-title {
+      margin: 14px 0 0;
+      color: var(--tecnico-title);
+      font-size: 2rem;
+      line-height: 1.25;
+    }
+
+    .tecnico-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .tecnico-page .btn,
+    .tecnico-page button,
+    .tecnico-modal .btn,
+    .tecnico-modal button {
+      min-height: 46px;
+      padding: 11px 18px;
+      font-size: 1.08rem;
+      font-weight: 800;
+    }
+
+    /* ── shell e estrutura ── */
+    body[data-page="cadh-tecnico"] {
+      overflow-x: hidden;
+      --clinical-table-min-width: 0;
+    }
+
+    body[data-page="cadh-tecnico"] .tecnico-page {
+      overflow-x: visible;
+    }
+
+    .tecnico-table-shell {
+      width: 100%;
+      overflow-x: hidden !important;
+      overflow-y: hidden;
+      border: 1px solid var(--tecnico-border);
+      border-radius: 10px;
+      background: #ffffff;
+      box-shadow: 0 18px 30px rgba(15, 37, 65, 0.06);
+    }
+
+    .tecnico-table {
+      min-width: var(--clinical-table-min-width, 0) !important;
+      width: 100%;
+      table-layout: fixed;
+      border: 0;
+    }
+
+    /* colunas em % — igual ao app.css para cardiologia */
+    .tecnico-col-date    { width: 8% !important; }
+    .tecnico-col-patient { width: 13% !important; }
+    .tecnico-col-consult { width: 10% !important; }
+    .tecnico-col-peso    { width: auto !important; }
+    .tecnico-col-altura  { width: auto !important; }
+    .tecnico-col-imc     { width: auto !important; }
+    .tecnico-col-ca      { width: auto !important; }
+    .tecnico-col-intern  { width: auto !important; }
+    .tecnico-col-actions { width: 142px !important; }
+
+    /* padding, font e line-height idênticos ao app.css */
+    body[data-page="cadh-tecnico"] .tecnico-table th,
+    body[data-page="cadh-tecnico"] .tecnico-table td {
+      overflow-wrap: break-word;
+      word-break: normal;
+      hyphens: auto;
+      padding: 12px 9px !important;
+      font-size: 0.92rem !important;
+      line-height: 1.34 !important;
+      vertical-align: middle;
+      border-color: #e7eef3;
+      color: var(--tecnico-title);
+    }
+
+    .tecnico-table tbody tr {
+      background: #fff;
+    }
+
+    /* cabeçalhos de grupo */
+    .tecnico-table-group th {
+      border-top: 0;
+      color: var(--tecnico-title);
+      font-weight: 900;
+      text-align: center;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .tecnico-table-group .is-transition {
+      background: var(--tecnico-band);
+      color: #102a3c;
+      text-align: left;
+    }
+
+    .tecnico-table-group .is-specialty,
+    .tecnico-table-fields th {
+      background: var(--tecnico-soft);
+      color: var(--tecnico-title);
+    }
+
+    .tecnico-table-group .is-actions,
+    .tecnico-table-fields .is-actions-subhead {
+      background: #fbfcfd;
+      color: #405163;
+      border-left: 1px solid var(--tecnico-border);
+    }
+
+    .tecnico-table-fields th {
+      font-weight: 900;
+      text-align: left;
+    }
+
+    .tecnico-table-fields .is-actions-subhead {
+      text-align: center;
+    }
+
+    .tecnico-table td:nth-child(1) { white-space: nowrap; }
+
+    .tecnico-table td:nth-child(2) {
+      font-weight: 800;
+      color: #0e2435;
+    }
+
+    .tecnico-table th:last-child,
+    .tecnico-table td:last-child {
+      width: 142px !important;
+      border-left: 1px solid var(--tecnico-border);
+      text-align: center;
+    }
+
+    .tecnico-table td:last-child {
+      background: #fbfcfd;
+    }
+
+    /* botões de ação — idênticos ao app.css */
+    body[data-page="cadh-tecnico"] .tecnico-table .table-actions {
+      justify-content: center;
+      flex-wrap: nowrap !important;
+      gap: 8px !important;
+    }
+
+    body[data-page="cadh-tecnico"] .tecnico-table .icon-btn {
+      inline-size: 34px !important;
+      block-size: 34px !important;
+    }
+
+    /* estado vazio */
+    body[data-page="cadh-tecnico"] .tecnico-empty {
+      min-height: 120px !important;
+      font-size: 1rem;
+    }
+
+    .tecnico-empty {
+      min-height: 170px;
+      display: grid;
+      place-items: center;
+      gap: 12px;
+      padding: 32px;
+      color: #61798a;
+      text-align: center;
+    }
+
+    .tecnico-empty p {
+      margin: 0;
+      font-weight: 600;
+    }
+
+    /* Modal */
+    .tecnico-modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1100;
+      display: grid;
+      place-items: start center;
+      overflow-y: auto;
+      padding: 12px 8px 28px;
+      background: rgba(9, 17, 25, 0.62);
+    }
+
+    .tecnico-modal-overlay[hidden] {
+      display: none;
+    }
+
+    .tecnico-modal {
+      width: min(980px, calc(100vw - 28px));
+      max-height: calc(100vh - 24px);
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      overflow: hidden;
+      border: 1px solid rgba(93, 120, 159, 0.22);
+      border-radius: 16px;
+      background: #fff;
+      box-shadow: 0 26px 70px rgba(15, 37, 65, 0.24);
+    }
+
+    .tecnico-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 18px 22px;
+      border-bottom: 1px solid #e6eef4;
+      background: linear-gradient(180deg, #f4f8fd, #ffffff);
+    }
+
+    .tecnico-modal-title {
+      margin: 0;
+      color: var(--tecnico-title);
+      font-size: 1.4rem;
+      line-height: 1.3;
+    }
+
+    .tecnico-close {
+      --clinical-close-border: #d1e2f2;
+      --clinical-close-color: var(--tecnico-title);
+      --clinical-close-hover-bg: #eef4fb;
+      --clinical-close-hover-color: var(--tecnico-accent);
+    }
+
+    .tecnico-form-body {
+      overflow-y: auto;
+      padding: 28px 32px 30px;
+      background: #fbfdfe;
+    }
+
+    .tecnico-form-section {
+      margin-bottom: 20px;
+    }
+
+    .tecnico-form-section[hidden],
+    .tecnico-event-detail[hidden] {
+      display: none;
+    }
+
+    .tecnico-section-title {
+      margin: 0 0 14px;
+      color: var(--tecnico-title);
+      font-size: 1.08rem;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .tecnico-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 22px;
+    }
+
+    .tecnico-grid .field,
+    .tecnico-grid .field-full {
+      min-width: 0;
+    }
+
+    .tecnico-grid .field {
+      display: grid;
+      grid-template-rows: minmax(48px, auto) auto;
+      align-content: start;
+      gap: 8px;
+    }
+
+    .tecnico-grid .field-full {
+      grid-column: 1 / -1;
+    }
+
+    .tecnico-grid .field label,
+    .tecnico-grid .field-full label {
+      display: block;
+      color: #33556b;
+      font-size: 1.1rem;
+      font-weight: 800;
+      line-height: 1.3;
+    }
+
+    .tecnico-grid .field label {
+      display: flex;
+      align-items: flex-end;
+      min-height: 48px;
+    }
+
+    .tecnico-modal input,
+    .tecnico-modal select,
+    .tecnico-modal textarea {
+      min-height: 56px;
+      font-size: 1.12rem;
+      line-height: 1.45;
+    }
+
+    .tecnico-modal textarea {
+      min-height: 118px;
+    }
+
+    .tecnico-field-guidance {
+      margin: 6px 0 0;
+      color: #64798a;
+      font-size: 1rem;
+      line-height: 1.45;
+    }
+
+    .tecnico-imc-display {
+      display: flex;
+      align-items: center;
+      min-height: 56px;
+      padding: 0 16px;
+      border: 1px solid #c9dff0;
+      border-radius: 8px;
+      background: #eaf1f9;
+      color: var(--tecnico-title);
+      font-size: 1.18rem;
+      font-weight: 900;
+    }
+
+    .tecnico-imc-display[data-status="alerta"] {
+      border-color: #f0c95c;
+      background: #fff8df;
+      color: #563b08;
+    }
+
+    .tecnico-imc-display[data-status="critico"] {
+      border-color: #f87171;
+      background: #fff1f2;
+      color: #9f1239;
+    }
+
+    .tecnico-range-hint {
+      margin-top: 12px;
+      padding: 14px 18px;
+      border: 2px solid #f0c95c;
+      border-left: 8px solid #b48716;
+      border-radius: 12px;
+      background: #fff8df;
+      color: #563b08;
+      font-size: 1.1rem;
+      font-weight: 800;
+      line-height: 1.5;
+    }
+
+    .tecnico-age-guidance {
+      grid-column: 1 / -1;
+      margin: 8px 0 0;
+      color: #536b7a;
+      font-size: 1rem;
+      line-height: 1.45;
+    }
+
+    .tecnico-patient-summary {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      padding: 16px;
+      border: 1px solid #bfd2ef;
+      border-radius: 12px;
+      background: #eaf1f9;
+    }
+
+    .tecnico-patient-summary[hidden] {
+      display: none;
+    }
+
+    .tecnico-patient-summary span {
+      display: grid;
+      gap: 2px;
+      min-width: 0;
+      color: #456f87;
+      font-size: 0.95rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .tecnico-patient-summary strong {
+      overflow: hidden;
+      color: var(--tecnico-title);
+      font-size: 1.08rem;
+      letter-spacing: 0;
+      text-overflow: ellipsis;
+      text-transform: none;
+      white-space: nowrap;
+    }
+
+    .tecnico-form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      padding: 16px 22px;
+      border-top: 1px solid #e6eef4;
+      background: #fff;
+    }
+
+    .tecnico-form-actions .btn,
+    .tecnico-form-actions button {
+      min-width: 150px;
+      justify-content: center;
+    }
+
+    .tecnico-save-icon {
+      inline-size: 18px;
+      block-size: 18px;
+      margin-right: 8px;
+      fill: currentColor;
+      vertical-align: -3px;
+    }
+
+    /* View modal */
+    .tecnico-view-content {
+      display: grid;
+      gap: 16px;
+    }
+
+    .tecnico-view-section {
+      padding: 14px;
+      border: 1px solid #d1e2f2;
+      border-radius: 12px;
+      background: #fff;
+    }
+
+    .tecnico-view-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .tecnico-view-item {
+      min-width: 0;
+      padding: 12px;
+      border-radius: 10px;
+      background: #f4f8fc;
+    }
+
+    .tecnico-view-item.is-wide {
+      grid-column: 1 / -1;
+    }
+
+    .tecnico-view-label {
+      display: block;
+      margin-bottom: 5px;
+      color: #64798a;
+      font-size: 0.74rem;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .tecnico-view-value {
+      color: var(--tecnico-title);
+      font-weight: 700;
+      line-height: 1.45;
+      white-space: pre-wrap;
+    }
+
+    @media (max-width: 760px) {
+      .tecnico-page {
+        padding: 20px;
+      }
+
+      .tecnico-actions {
+        width: 100%;
+      }
+
+      .tecnico-actions .btn,
+      .tecnico-actions button {
+        flex: 1 1 180px;
+      }
+
+      .tecnico-grid,
+      .tecnico-view-grid,
+      .tecnico-patient-summary {
+        grid-template-columns: 1fr;
+      }
+
+      .tecnico-modal-header,
+      .tecnico-form-body,
+      .tecnico-form-actions {
+        padding-inline: 16px;
+      }
+
+      .tecnico-form-actions {
+        flex-direction: column-reverse;
+      }
+
+      .tecnico-form-actions .btn,
+      .tecnico-form-actions button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body data-page="cadh-tecnico">
+  <header class="topbar">
+    <div class="topbar-brand">Intranet CADH</div>
+    <nav class="menu">
+      <a id="nav-home" href="/index.html">Home</a>
+      <a id="nav-cadh" href="/cadh/index.html">CADH</a>
+      <a id="nav-ubs" href="/ubs/index.html">UBS</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="card tecnico-page">
+      <svg aria-hidden="true" style="display:none">
+        <symbol id="tecnico-icon-save" viewBox="0 0 24 24">
+          <path d="M5 3h12l2 2v16H5V3Zm2 2v14h10V7.8L15.2 5H15v6H8V5H7Zm3 0v4h3V5h-3Zm-1 10h6v2H9v-2Z"/>
+        </symbol>
+      </svg>
+
+      <div class="tecnico-header">
+        <div>
+          <a class="btn" href="/cadh/index.html">&larr; Voltar</a>
+          <h1 class="tecnico-title">Técnico de Enfermagem</h1>
+        </div>
+        <div class="tecnico-actions">
+          <button type="button" id="tecnico-new" class="btn btn-primary">+ Novo registro</button>
+        </div>
+      </div>
+
+      <div class="tecnico-table-shell">
+        <table class="tecnico-table" aria-label="Registros de Técnico de Enfermagem">
+          <colgroup>
+            <col class="tecnico-col-date">
+            <col class="tecnico-col-patient">
+            <col class="tecnico-col-consult">
+            <col class="tecnico-col-peso">
+            <col class="tecnico-col-altura">
+            <col class="tecnico-col-imc">
+            <col class="tecnico-col-ca">
+            <col class="tecnico-col-intern">
+            <col class="tecnico-col-actions">
+          </colgroup>
+          <thead>
+            <tr class="tecnico-table-group">
+              <th class="is-transition" colspan="3">Técnico de Enfermagem</th>
+              <th class="is-specialty" colspan="5">Dados antropométricos</th>
+              <th class="is-actions">Ações</th>
+            </tr>
+            <tr class="tecnico-table-fields">
+              <th>Data</th>
+              <th>Paciente</th>
+              <th>Consulta</th>
+              <th>Peso</th>
+              <th>Altura</th>
+              <th>IMC</th>
+              <th>Circ. Abdominal</th>
+              <th>Internação (último ano)</th>
+              <th class="is-actions-subhead" aria-label="Ações"></th>
+            </tr>
+          </thead>
+          <tbody id="tecnico-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- Form modal -->
+  <div id="tecnico-modal" class="tecnico-modal-overlay" hidden>
+    <form id="tecnico-form" class="tecnico-modal" novalidate>
+      <div class="tecnico-modal-header">
+        <h2 class="tecnico-modal-title">Técnico de Enfermagem — Registro de Consulta</h2>
+        <button type="button" class="clinical-modal-close tecnico-close" data-tecnico-close aria-label="Fechar">Fechar</button>
+      </div>
+
+      <div class="tecnico-form-body">
+        <div id="tecnico-alert" class="alert" hidden></div>
+        <input id="tecnico_record_id" name="record_id" type="hidden">
+
+        <!-- Identificação -->
+        <section class="tecnico-form-section">
+          <div class="tecnico-grid">
+            <div class="field-full">
+              <label for="tecnico_patient_search_input">Paciente *</label>
+              <select id="tecnico_patient_id" name="patient_id" class="visually-hidden" tabindex="-1" aria-hidden="true"></select>
+              <div id="tecnico_patient_search" class="transition-patient-search"></div>
+            </div>
+
+            <div id="tecnico-patient-summary" class="tecnico-patient-summary" hidden></div>
+            <p id="tecnico-age-guidance" class="tecnico-age-guidance" hidden></p>
+
+            <div class="field">
+              <label for="tecnico_consultation_date">Data da consulta *</label>
+              <input id="tecnico_consultation_date" name="consultation_date" type="date" placeholder="dd/mm/aaaa" required>
+            </div>
+
+            <div class="field">
+              <label for="tecnico_consultation_number">Nº da consulta</label>
+              <select id="tecnico_consultation_number" name="consultation_number">
+                <option value="1ª Consulta (inicial)">1ª Consulta (inicial)</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <!-- Dados antropométricos -->
+        <section class="tecnico-form-section">
+          <h3 class="tecnico-section-title">Dados antropométricos</h3>
+          <div class="tecnico-grid">
+
+            <div class="field">
+              <label for="tecnico_peso">Peso (kg)</label>
+              <input id="tecnico_peso" name="peso" inputmode="decimal" autocomplete="off" placeholder="Ex: 70,5">
+              <p class="tecnico-field-guidance">Informe apenas o número em kg (ex: 70,5). Mín: 0,3 kg · Máx: 650 kg.</p>
+            </div>
+
+            <div class="field">
+              <label for="tecnico_altura">Altura (m)</label>
+              <input id="tecnico_altura" name="altura" inputmode="decimal" autocomplete="off" placeholder="Ex: 1,70">
+              <p class="tecnico-field-guidance">Informe em metros com vírgula (ex: 1,70). Mín: 0,25 m · Máx: 3 m.</p>
+            </div>
+
+            <div class="field">
+              <label for="tecnico_imc_display">IMC (calculado automaticamente)</label>
+              <div id="tecnico_imc_display" class="tecnico-imc-display" aria-live="polite">—</div>
+              <input id="tecnico_imc" name="imc" type="hidden">
+              <p class="tecnico-field-guidance">Calculado a partir do peso e da altura informados.</p>
+            </div>
+
+            <div class="field">
+              <label for="tecnico_circ_abdominal">Circunferência Abdominal (cm)</label>
+              <input id="tecnico_circ_abdominal" name="circ_abdominal" inputmode="decimal" autocomplete="off" placeholder="Ex: 90,0">
+              <p class="tecnico-field-guidance">Informe em cm com vírgula (ex: 90,0). Mín: 20 cm · Máx: 250 cm.</p>
+            </div>
+
+            <div class="field" id="tecnico-panturrilha-field">
+              <label for="tecnico_circ_panturrilha">Circunferência da panturrilha (cm) <span style="font-weight:600;font-size:0.9em;color:#64798a">— para pacientes com +60 anos</span></label>
+              <input id="tecnico_circ_panturrilha" name="circ_panturrilha" inputmode="decimal" autocomplete="off" placeholder="Ex: 35,0">
+              <p class="tecnico-field-guidance">Informe em cm. Mín: 10 cm · Máx: 100 cm.</p>
+            </div>
+
+            <div class="field">
+              <label for="tecnico_internacao">Internação por complicação (último ano)</label>
+              <select id="tecnico_internacao" name="internacao">
+                <option value="" hidden>Selecione...</option>
+                <option>Sim</option>
+                <option>Não</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="tecnico_next_consult_date">Data da consulta subsequente</label>
+              <input id="tecnico_next_consult_date" name="next_consult_date" type="date" placeholder="dd/mm/aaaa">
+            </div>
+
+          </div>
+        </section>
+      </div>
+
+      <div class="tecnico-form-actions">
+        <button type="button" class="btn" data-tecnico-close>Cancelar</button>
+        <button type="submit" class="btn btn-primary">
+          <svg class="tecnico-save-icon" aria-hidden="true"><use href="#tecnico-icon-save"></use></svg>
+          Salvar registro
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- View modal -->
+  <div id="tecnico-view-modal" class="tecnico-modal-overlay" hidden>
+    <article class="tecnico-modal" role="dialog" aria-modal="true" aria-labelledby="tecnico-view-title">
+      <div class="tecnico-modal-header">
+        <h2 id="tecnico-view-title" class="tecnico-modal-title">Guia preenchida — Técnico de Enfermagem</h2>
+        <button type="button" class="clinical-modal-close tecnico-close" data-tecnico-view-close aria-label="Fechar">Fechar</button>
+      </div>
+
+      <div class="tecnico-form-body">
+        <div id="tecnico-view-content" class="tecnico-view-content"></div>
+      </div>
+
+      <div class="tecnico-form-actions">
+        <button type="button" class="btn" data-tecnico-view-close>Fechar</button>
+      </div>
+    </article>
+  </div>
+
+  <script src="/assets/config.js"></script>
+  <script src="/assets/app.js"></script>
+  <script src="/assets/cadh-tecnico.js"></script>
+</body>
+</html>
