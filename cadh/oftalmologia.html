@@ -1,0 +1,871 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Oftalmologia</title>
+  <link rel="stylesheet" href="/assets/app.css">
+  <style>
+    .oftalmo-page {
+      --oftalmo-accent: #5a8584;
+      --oftalmo-title: #173f40;
+      --oftalmo-band: #b4d9d8;
+      --oftalmo-soft: #e6f5f4;
+      --oftalmo-border: #c6dfde;
+      padding: 26px;
+      background:
+        radial-gradient(circle at top right, rgba(90, 133, 132, 0.14), transparent 28%),
+        linear-gradient(180deg, #f1fbfa, #eef5f3);
+    }
+
+    body[data-page="cadh-oftalmologia"] .container {
+      width: min(var(--app-shell-max), calc(100vw - 32px));
+      max-width: var(--app-shell-max);
+      margin: 20px auto;
+      padding: 0;
+    }
+
+    .oftalmo-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .oftalmo-title {
+      margin: 14px 0 0;
+      color: var(--oftalmo-title);
+      font-size: 1.65rem;
+      line-height: 1.25;
+    }
+
+    .oftalmo-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .oftalmo-page .btn,
+    .oftalmo-page button,
+    .oftalmo-modal .btn,
+    .oftalmo-modal button {
+      min-height: 46px;
+      padding: 11px 18px;
+      font-size: 0.96rem;
+      font-weight: 800;
+    }
+
+    .oftalmo-table-shell {
+      width: 100%;
+      overflow-x: auto !important;
+      overflow-y: hidden;
+      border: 1px solid var(--oftalmo-border);
+      border-radius: 10px;
+      background: #ffffff;
+      box-shadow: 0 18px 30px rgba(15, 37, 65, 0.06);
+    }
+
+    .oftalmo-table {
+      width: 1980px !important;
+      min-width: 1980px !important;
+      max-width: none;
+      table-layout: fixed;
+      border: 0;
+    }
+
+    .oftalmo-col-date { width: 112px !important; }
+    .oftalmo-col-patient { width: 150px !important; }
+    .oftalmo-col-consult { width: 140px !important; }
+    .oftalmo-col-visual { width: 138px !important; }
+    .oftalmo-col-exam { width: 132px !important; }
+    .oftalmo-col-referral-specialty { width: 150px !important; }
+    .oftalmo-col-referral-date { width: 150px !important; }
+    .oftalmo-col-plan { width: 150px !important; }
+    .oftalmo-col-actions { width: 142px !important; }
+
+    body[data-page="cadh-oftalmologia"] .oftalmo-table-shell {
+      overflow-x: auto !important;
+      overflow-y: hidden !important;
+    }
+
+    body[data-page="cadh-oftalmologia"] .oftalmo-table {
+      width: 1980px !important;
+      min-width: 1980px !important;
+      max-width: none !important;
+    }
+
+    body[data-page="cadh-oftalmologia"] .oftalmo-table .oftalmo-col-date { width: 112px !important; }
+    body[data-page="cadh-oftalmologia"] .oftalmo-table .oftalmo-col-patient { width: 150px !important; }
+    body[data-page="cadh-oftalmologia"] .oftalmo-table .oftalmo-col-consult { width: 140px !important; }
+    body[data-page="cadh-oftalmologia"] .oftalmo-table .oftalmo-col-visual { width: 138px !important; }
+    body[data-page="cadh-oftalmologia"] .oftalmo-table .oftalmo-col-exam { width: 132px !important; }
+    body[data-page="cadh-oftalmologia"] .oftalmo-table .oftalmo-col-referral-specialty { width: 150px !important; }
+    body[data-page="cadh-oftalmologia"] .oftalmo-table .oftalmo-col-referral-date { width: 150px !important; }
+    body[data-page="cadh-oftalmologia"] .oftalmo-table .oftalmo-col-plan { width: 150px !important; }
+    body[data-page="cadh-oftalmologia"] .oftalmo-table .oftalmo-col-actions { width: 142px !important; }
+
+    .oftalmo-table th,
+    .oftalmo-table td {
+      border-color: #e0eeee;
+      padding: 12px 9px;
+      color: var(--oftalmo-title);
+      font-size: 0.92rem;
+      line-height: 1.34;
+      vertical-align: middle;
+      overflow-wrap: break-word;
+      word-break: normal;
+      hyphens: none;
+    }
+
+    .oftalmo-table tbody tr {
+      background: #fff;
+    }
+
+    .oftalmo-table-group th {
+      border-top: 0;
+      color: var(--oftalmo-title);
+      font-size: 0.92rem;
+      font-weight: 900;
+      text-align: center;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .oftalmo-table-group .is-specialist {
+      background: var(--oftalmo-band);
+      text-align: left;
+    }
+
+    .oftalmo-table-group .is-visual,
+    .oftalmo-table-group .is-exams,
+    .oftalmo-table-group .is-referral,
+    .oftalmo-table-fields th {
+      background: var(--oftalmo-soft);
+    }
+
+    .oftalmo-table-group .is-plan {
+      background: #f2fbfb;
+    }
+
+    .oftalmo-table-group .is-actions,
+    .oftalmo-table-fields .is-actions-subhead {
+      background: #fbfcfd;
+      color: #405163;
+      border-left: 1px solid var(--oftalmo-border);
+    }
+
+    .oftalmo-table-fields th {
+      font-size: 0.84rem;
+      font-weight: 900;
+      text-align: left;
+      overflow-wrap: normal;
+      word-break: normal;
+      hyphens: none;
+    }
+
+    .oftalmo-table-fields .is-actions-subhead {
+      text-align: center;
+    }
+
+    .oftalmo-table td:nth-child(1),
+    .oftalmo-table td:nth-child(10),
+    .oftalmo-table td:nth-child(11) {
+      white-space: nowrap;
+    }
+
+    .oftalmo-table td:nth-child(2) {
+      font-weight: 800;
+      color: var(--oftalmo-title);
+    }
+
+    .oftalmo-referral-cell,
+    .oftalmo-list-cell {
+      display: grid;
+      gap: 4px;
+      line-height: 1.34;
+      overflow-wrap: normal;
+      word-break: normal;
+      hyphens: none;
+    }
+
+    .oftalmo-referral-cell:last-child {
+      margin-bottom: 0;
+    }
+
+    .oftalmo-referral-line {
+      display: block;
+    }
+
+    .oftalmo-referral-date,
+    .oftalmo-list-cell.is-date span {
+      white-space: nowrap;
+    }
+
+    .oftalmo-summary-cell {
+      display: grid;
+      gap: 4px;
+      line-height: 1.32;
+    }
+
+    .oftalmo-summary-line {
+      display: block;
+    }
+
+    .oftalmo-summary-line strong {
+      font-weight: 900;
+    }
+
+    .oftalmo-table th:last-child,
+    .oftalmo-table td:last-child {
+      width: 142px;
+      border-left: 1px solid var(--oftalmo-border);
+      text-align: center;
+    }
+
+    .oftalmo-table td:last-child {
+      padding: 12px 8px;
+      background: #fbfcfd;
+    }
+
+    .oftalmo-table .table-actions {
+      justify-content: center;
+      flex-wrap: nowrap;
+      gap: 8px;
+      min-height: 34px;
+    }
+
+    .oftalmo-table .icon-btn {
+      inline-size: 34px;
+      block-size: 34px;
+      display: inline-grid;
+      place-items: center;
+      padding: 0;
+      border: 1px solid #d8ebe9;
+      background: #f8fcfc;
+      color: #527877;
+    }
+
+    .oftalmo-table .icon-btn svg {
+      inline-size: 18px;
+      block-size: 18px;
+      display: block;
+    }
+
+    .oftalmo-table .icon-btn:hover,
+    .oftalmo-table .icon-btn:focus-visible {
+      background: #e6f5f4;
+      color: var(--oftalmo-accent);
+      box-shadow: 0 0 0 3px rgba(90, 133, 132, 0.14);
+      transform: none;
+    }
+
+    .oftalmo-empty {
+      min-height: 170px;
+      display: grid;
+      place-items: center;
+      gap: 12px;
+      padding: 32px;
+      color: #527877;
+      text-align: center;
+    }
+
+    .oftalmo-empty p {
+      margin: 0;
+      font-weight: 600;
+    }
+
+    .oftalmo-modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1100;
+      display: grid;
+      place-items: start center;
+      overflow-y: auto;
+      padding: 12px 8px 28px;
+      background: rgba(9, 17, 25, 0.62);
+    }
+
+    .oftalmo-modal-overlay[hidden] {
+      display: none;
+    }
+
+    .oftalmo-modal {
+      width: min(980px, calc(100vw - 28px));
+      max-height: calc(100vh - 24px);
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      overflow: hidden;
+      border: 1px solid rgba(150, 105, 67, 0.24);
+      border-radius: 16px;
+      background: #ffffff;
+      box-shadow: 0 26px 70px rgba(63, 37, 16, 0.22);
+    }
+
+    .oftalmo-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 16px 20px;
+      border-bottom: 1px solid #efd9c5;
+      background: linear-gradient(180deg, #fff8f1, #ffffff);
+    }
+
+    .oftalmo-modal-title {
+      margin: 0;
+      color: var(--oftalmo-title);
+      font-size: 1.22rem;
+      line-height: 1.3;
+    }
+
+    .oftalmo-close {
+      --clinical-close-border: var(--oftalmo-border);
+      --clinical-close-color: var(--oftalmo-title);
+      --clinical-close-hover-bg: #fff1e5;
+      --clinical-close-hover-color: var(--oftalmo-accent);
+    }
+
+    .oftalmo-form-body {
+      min-height: 0;
+      overflow-y: auto;
+      padding: 22px 24px 26px;
+      background: #fffdfb;
+    }
+
+    .oftalmo-form-section {
+      display: grid;
+      gap: 16px;
+      margin-bottom: 22px;
+      padding-top: 2px;
+      border-top: 1px solid #efd9c5;
+    }
+
+    .oftalmo-form-section:first-of-type {
+      border-top: 0;
+    }
+
+    .oftalmo-section-title {
+      margin: 0;
+      color: var(--oftalmo-title);
+      font-size: 1.08rem;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .oftalmo-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .oftalmo-grid .field,
+    .oftalmo-grid .field-full {
+      position: relative;
+      min-width: 0;
+    }
+
+    .oftalmo-grid .field {
+      display: grid;
+      grid-template-rows: minmax(40px, auto) auto;
+      align-content: start;
+      gap: 8px;
+    }
+
+    .oftalmo-grid .field-full {
+      grid-column: 1 / -1;
+    }
+
+    .oftalmo-referrals {
+      display: grid;
+      gap: 14px;
+    }
+
+    .oftalmo-referral-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .oftalmo-referral-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr) minmax(0, 1fr);
+      gap: 16px;
+      align-items: end;
+    }
+
+    .oftalmo-grid .field label,
+    .oftalmo-grid .field-full label {
+      display: block;
+      color: #18324d;
+      font-size: 0.96rem;
+      font-weight: 800;
+      line-height: 1.3;
+    }
+
+    .oftalmo-grid .field label {
+      display: flex;
+      align-items: flex-end;
+      min-height: 40px;
+    }
+
+    .oftalmo-modal input,
+    .oftalmo-modal select,
+    .oftalmo-modal textarea {
+      min-height: 48px;
+      font-size: 1rem;
+      line-height: 1.45;
+    }
+
+    .oftalmo-modal textarea {
+      min-height: 124px;
+      resize: none;
+    }
+
+    .oftalmo-field-guidance {
+      display: none;
+    }
+
+    .oftalmo-age-guidance {
+      grid-column: 1 / -1;
+      margin: 8px 0 0;
+      color: #53657a;
+      font-size: 1rem;
+      line-height: 1.45;
+    }
+
+    .oftalmo-patient-summary {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      padding: 16px;
+      border: 1px solid var(--oftalmo-border);
+      border-radius: 12px;
+      background: #fff1e5;
+    }
+
+    .oftalmo-patient-summary[hidden] {
+      display: none;
+    }
+
+    .oftalmo-patient-summary span {
+      display: grid;
+      gap: 2px;
+      min-width: 0;
+      color: #7d5b40;
+      font-size: 0.95rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .oftalmo-patient-summary strong {
+      overflow: hidden;
+      color: var(--oftalmo-title);
+      font-size: 0.98rem;
+      letter-spacing: 0;
+      text-overflow: ellipsis;
+      text-transform: none;
+      white-space: nowrap;
+    }
+
+    .oftalmo-form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      padding: 16px 22px;
+      border-top: 1px solid #efd9c5;
+      background: #ffffff;
+    }
+
+    .oftalmo-form-actions .btn,
+    .oftalmo-form-actions button {
+      min-width: 150px;
+      justify-content: center;
+    }
+
+    .oftalmo-save-icon {
+      inline-size: 18px;
+      block-size: 18px;
+      margin-right: 8px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .oftalmo-view-content {
+      display: grid;
+      gap: 16px;
+    }
+
+    .oftalmo-view-section {
+      display: grid;
+      gap: 12px;
+      padding: 14px;
+      border: 1px solid #efd9c5;
+      border-radius: 12px;
+      background: #fff;
+    }
+
+    .oftalmo-view-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .oftalmo-view-item {
+      min-width: 0;
+      padding: 12px;
+      border: 0;
+      border-radius: 10px;
+      background: #fff8f1;
+    }
+
+    .oftalmo-view-item.is-wide {
+      grid-column: 1 / -1;
+    }
+
+    .oftalmo-view-label {
+      display: block;
+      margin-bottom: 5px;
+      color: #7d6958;
+      font-size: 0.74rem;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .oftalmo-view-value {
+      color: var(--oftalmo-title);
+      font-size: 1rem;
+      font-weight: 700;
+      line-height: 1.45;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    @media (max-width: 760px) {
+      .oftalmo-page {
+        padding: 20px;
+      }
+
+      .oftalmo-actions {
+        width: 100%;
+      }
+
+      .oftalmo-actions .btn,
+      .oftalmo-actions button {
+        flex: 1 1 160px;
+        justify-content: center;
+      }
+
+      .oftalmo-grid,
+      .oftalmo-referral-row,
+      .oftalmo-view-grid,
+      .oftalmo-patient-summary {
+        grid-template-columns: 1fr;
+      }
+
+      .oftalmo-modal-header,
+      .oftalmo-form-body,
+      .oftalmo-form-actions {
+        padding-left: 18px;
+        padding-right: 18px;
+      }
+
+      .oftalmo-form-actions {
+        flex-direction: column-reverse;
+      }
+
+      .oftalmo-form-actions .btn,
+      .oftalmo-form-actions button {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body data-page="cadh-oftalmologia">
+  <header class="topbar">
+    <div class="topbar-brand">Intranet CADH</div>
+    <nav class="menu">
+      <a id="nav-home" href="/index.html">Home</a>
+      <a id="nav-cadh" href="/cadh/index.html">CADH</a>
+      <a id="nav-ubs" href="/ubs/index.html">UBS</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="card oftalmo-page">
+      <svg aria-hidden="true" style="display:none">
+        <symbol id="oftalmo-icon-save" viewBox="0 0 24 24">
+          <path d="M5 3h12l2 2v16H5V3Z"/>
+          <path d="M8 3v6h8V3"/>
+          <path d="M8 15h8v6H8v-6Z"/>
+        </symbol>
+      </svg>
+
+      <div class="oftalmo-header">
+        <div>
+          <a class="btn" href="/cadh/index.html" data-back-link data-fallback="/cadh/index.html">&larr; Voltar</a>
+          <h1 class="oftalmo-title">Oftalmologia</h1>
+        </div>
+        <div class="oftalmo-actions">
+          <button type="button" id="oftalmo-new" class="btn btn-primary">+ Novo registro</button>
+        </div>
+      </div>
+
+      <div class="oftalmo-table-shell">
+        <table class="oftalmo-table" aria-label="Registros de Oftalmologia">
+          <colgroup>
+            <col class="oftalmo-col-date">
+            <col class="oftalmo-col-patient">
+            <col class="oftalmo-col-consult">
+            <col class="oftalmo-col-visual">
+            <col class="oftalmo-col-visual">
+            <col class="oftalmo-col-exam">
+            <col class="oftalmo-col-exam">
+            <col class="oftalmo-col-exam">
+            <col class="oftalmo-col-referral-specialty">
+            <col class="oftalmo-col-referral-date">
+            <col class="oftalmo-col-referral-date">
+            <col class="oftalmo-col-plan">
+            <col class="oftalmo-col-plan">
+            <col class="oftalmo-col-actions">
+          </colgroup>
+          <thead>
+            <tr class="oftalmo-table-group">
+              <th class="is-specialist" colspan="3">Oftalmologia</th>
+              <th class="is-visual" colspan="2">Acuidade visual</th>
+              <th class="is-exams" colspan="3">Exames</th>
+              <th class="is-referral" colspan="3">Encaminhamento ao especialista</th>
+              <th class="is-plan" colspan="2">Plano de cuidado</th>
+              <th class="is-actions">Ações</th>
+            </tr>
+            <tr class="oftalmo-table-fields">
+              <th>Data</th>
+              <th>Paciente</th>
+              <th>Nº Consulta</th>
+              <th>Acuidade OD</th>
+              <th>Acuidade OE</th>
+              <th>Biomicroscopia</th>
+              <th>Tonometria</th>
+              <th>Fundoscopia</th>
+              <th>Especialista</th>
+              <th>Regula&ccedil;&atilde;o/agendamento</th>
+              <th>Execu&ccedil;&atilde;o da consulta</th>
+              <th>Fatores dificultadores</th>
+              <th>Recomenda&ccedil;&otilde;es</th>
+              <th class="is-actions-subhead" aria-label="Ações"></th>
+            </tr>
+          </thead>
+          <tbody id="oftalmo-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <div id="oftalmo-modal" class="oftalmo-modal-overlay" hidden>
+    <form id="oftalmo-form" class="oftalmo-modal" novalidate>
+      <div class="oftalmo-modal-header">
+        <h2 class="oftalmo-modal-title">Oftalmologia - Registro de Consulta</h2>
+        <button type="button" class="clinical-modal-close oftalmo-close" data-oftalmo-close aria-label="Fechar">Fechar</button>
+      </div>
+
+      <div class="oftalmo-form-body">
+        <div id="oftalmo-alert" class="alert" hidden></div>
+        <input id="oftalmo_record_id" name="record_id" type="hidden">
+
+        <section class="oftalmo-form-section">
+          <div class="oftalmo-grid">
+            <div class="field-full">
+              <label for="oftalmo_patient_search_input">Paciente *</label>
+              <select id="oftalmo_patient_id" name="patient_id" class="visually-hidden" tabindex="-1" aria-hidden="true"></select>
+              <div id="oftalmo_patient_search" class="transition-patient-search"></div>
+            </div>
+
+            <div id="oftalmo-patient-summary" class="oftalmo-patient-summary" hidden></div>
+            <p id="oftalmo-age-guidance" class="oftalmo-age-guidance" hidden></p>
+
+            <div class="field">
+              <label for="oftalmo_consultation_date">Data da consulta *</label>
+              <input id="oftalmo_consultation_date" name="consultation_date" type="date" placeholder="dd/mm/aaaa" required>
+            </div>
+
+            <div class="field">
+              <label for="oftalmo_consultation_number">Nº da consulta</label>
+              <select id="oftalmo_consultation_number" name="consultation_number">
+                <option value="1ª Consulta (inicial)">1ª Consulta (inicial)</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <section class="oftalmo-form-section">
+          <h3 class="oftalmo-section-title">Avaliação oftalmológica</h3>
+          <div class="oftalmo-grid">
+            <div class="field">
+              <label for="oftalmo_right_visual_acuity">Acuidade Visual OLHO DIREITO</label>
+              <select id="oftalmo_right_visual_acuity" name="right_visual_acuity">
+                <option value="" hidden>Selecione...</option>
+                <option value="Não percebe luz (NPL)">Não percebe luz (NPL)</option>
+                <option value="Conta dedos (CD)">Conta dedos (CD)</option>
+                <option value="Não melhora com buraco estenopeico (NMPH)">Não melhora com buraco estenopeico (NMPH)</option>
+                <option value="20/400- Sem correção">20/400- Sem correção</option>
+                <option value="20/400- Com correção">20/400- Com correção</option>
+                <option value="20/200- Sem correção">20/200- Sem correção</option>
+                <option value="20/200- Com correção">20/200- Com correção</option>
+                <option value="20/100- Sem correção">20/100- Sem correção</option>
+                <option value="20/100- Com  correção">20/100- Com  correção</option>
+                <option value="20/80-  Sem correção">20/80-  Sem correção</option>
+                <option value="20/80-  Com correção">20/80-  Com correção</option>
+                <option value="20/60- Sem correção">20/60- Sem correção</option>
+                <option value="20/60- Com correção">20/60- Com correção</option>
+                <option value="20/40- Sem correção">20/40- Sem correção</option>
+                <option value="20/40- Com correção">20/40- Com correção</option>
+                <option value="20/30- Sem correção">20/30- Sem correção</option>
+                <option value="20/30- Com correção">20/30- Com correção</option>
+                <option value="20/25- Sem correção">20/25- Sem correção</option>
+                <option value="20/25- Com correção">20/25- Com correção</option>
+                <option value="20/20- Sem correção">20/20- Sem correção</option>
+                <option value="20/20- Com correção">20/20- Com correção</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="oftalmo_left_visual_acuity">Acuidade Visual OLHO ESQUERDO</label>
+              <select id="oftalmo_left_visual_acuity" name="left_visual_acuity">
+                <option value="" hidden>Selecione...</option>
+                <option value="Não percebe luz (NPL)">Não percebe luz (NPL)</option>
+                <option value="Conta dedos (CD)">Conta dedos (CD)</option>
+                <option value="Não melhora com buraco estenopeico (NMPH)">Não melhora com buraco estenopeico (NMPH)</option>
+                <option value="20/400- Sem correção">20/400- Sem correção</option>
+                <option value="20/400- Com correção">20/400- Com correção</option>
+                <option value="20/200- Sem correção">20/200- Sem correção</option>
+                <option value="20/200- Com correção">20/200- Com correção</option>
+                <option value="20/100- Sem correção">20/100- Sem correção</option>
+                <option value="20/100- Com  correção">20/100- Com  correção</option>
+                <option value="20/80-  Sem correção">20/80-  Sem correção</option>
+                <option value="20/80-  Com correção">20/80-  Com correção</option>
+                <option value="20/60- Sem correção">20/60- Sem correção</option>
+                <option value="20/60- Com correção">20/60- Com correção</option>
+                <option value="20/40- Sem correção">20/40- Sem correção</option>
+                <option value="20/40- Com correção">20/40- Com correção</option>
+                <option value="20/30- Sem correção">20/30- Sem correção</option>
+                <option value="20/30- Com correção">20/30- Com correção</option>
+                <option value="20/25- Sem correção">20/25- Sem correção</option>
+                <option value="20/25- Com correção">20/25- Com correção</option>
+                <option value="20/20- Sem correção">20/20- Sem correção</option>
+                <option value="20/20- Com correção">20/20- Com correção</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="oftalmo_biomicroscopy">Biomicroscopia</label>
+              <select id="oftalmo_biomicroscopy" name="biomicroscopy">
+                <option value="" hidden>Selecione...</option>
+                <option value="Normal">Normal</option>
+                <option value="Afacia OD">Afacia OD</option>
+                <option value="Afacia OE">Afacia OE</option>
+                <option value="Afacia AO">Afacia AO</option>
+                <option value="Catarata OD">Catarata OD</option>
+                <option value="Catarata OE">Catarata OE</option>
+                <option value="Catarata AO">Catarata AO</option>
+                <option value="Infecções">Infecções</option>
+                <option value="Pterigio">Pterigio</option>
+                <option value="Alterações na córnea">Alterações na córnea</option>
+                <option value="Outros">Outros</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="oftalmo_tonometry">Tonometria</label>
+              <select id="oftalmo_tonometry" name="tonometry">
+                <option value="" hidden>Selecione...</option>
+                <option value="Normal">Normal</option>
+                <option value="Alterado">Alterado</option>
+                <option value="Inviável">Inviável</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="oftalmo_fundoscopy">Fundoscopia</label>
+              <select id="oftalmo_fundoscopy" name="fundoscopy">
+                <option value="" hidden>Selecione...</option>
+                <option value="Normal">Normal</option>
+                <option value="Retinopatia diabética">Retinopatia diabética</option>
+                <option value="Retinopatia hipertensiva">Retinopatia hipertensiva</option>
+                <option value="Degeneração macular relacionada com a idade">Degeneração macular relacionada com a idade</option>
+                <option value="Miopia">Miopia</option>
+                <option value="Placas de toxoplasmose">Placas de toxoplasmose</option>
+                <option value="Aplicações de laser">Aplicações de laser</option>
+                <option value="Sugestivo de glaucoma">Sugestivo de glaucoma</option>
+                <option value="Outros">Outros</option>
+                <option value="Inviavél">Inviavél</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <section class="oftalmo-form-section">
+          <h3 class="oftalmo-section-title">Encaminhamento ao especialista</h3>
+          <div class="oftalmo-referrals">
+            <div id="oftalmo-referral-list" class="oftalmo-referral-list"></div>
+          </div>
+        </section>
+
+        <section class="oftalmo-form-section">
+          <h3 class="oftalmo-section-title">Plano de cuidado</h3>
+          <div class="oftalmo-grid">
+            <div class="field-full">
+              <label for="oftalmo_barriers">Fatores dificultadores - Ficha Plano de Cuidado</label>
+              <textarea id="oftalmo_barriers" name="barriers" placeholder="Ex: dificuldade de acesso à consulta especializada, transporte, exames, colírios, óculos, acompanhante ou retorno agendado."></textarea>
+              <p class="oftalmo-field-guidance">Descreva barreiras clínicas, sociais ou de acesso que dificultam o plano oftalmológico.</p>
+            </div>
+
+            <div class="field-full">
+              <label for="oftalmo_recommendations">Recomendações - Ficha Plano de Cuidado</label>
+              <textarea id="oftalmo_recommendations" name="recommendations" placeholder="Ex: orientar retorno, acompanhar regulação, reforçar uso de óculos ou colírios, encaminhar para especialista e pactuar seguimento."></textarea>
+              <p class="oftalmo-field-guidance">Registre orientações e encaminhamentos pactuados com usuário, família e equipe.</p>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="oftalmo-form-actions">
+        <button type="button" class="btn" data-oftalmo-close>Cancelar</button>
+        <button type="submit" class="btn btn-primary">
+          <svg class="oftalmo-save-icon" aria-hidden="true"><use href="#oftalmo-icon-save"></use></svg>
+          Salvar
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div id="oftalmo-view-modal" class="oftalmo-modal-overlay" hidden>
+    <article class="oftalmo-modal" role="dialog" aria-modal="true" aria-labelledby="oftalmo-view-title">
+      <div class="oftalmo-modal-header">
+        <h2 id="oftalmo-view-title" class="oftalmo-modal-title">Guia preenchida da consulta de Oftalmologia</h2>
+        <button type="button" class="clinical-modal-close oftalmo-close" data-oftalmo-view-close aria-label="Fechar">Fechar</button>
+      </div>
+
+      <div class="oftalmo-form-body">
+        <div id="oftalmo-view-content" class="oftalmo-view-content"></div>
+      </div>
+
+      <div class="oftalmo-form-actions">
+        <button type="button" class="btn" data-oftalmo-view-close>Fechar</button>
+      </div>
+    </article>
+  </div>
+
+  <script src="/assets/config.js"></script>
+  <script src="/assets/app.js"></script>
+  <script src="/assets/cadh-oftalmologia.js"></script>
+</body>
+</html>

@@ -1,0 +1,684 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Farmácia Clínica</title>
+  <link rel="stylesheet" href="/assets/app.css">
+  <style>
+    .farmacia-page {
+      --farmacia-accent: #966943;
+      --farmacia-title: #3f2510;
+      --farmacia-band: #f4c9a5;
+      --farmacia-soft: #fff1e5;
+      --farmacia-border: #efd0b5;
+      padding: 26px;
+      background:
+        radial-gradient(circle at top right, rgba(150, 105, 67, 0.12), transparent 28%),
+        linear-gradient(180deg, #fff8f1, #eef5f3);
+    }
+
+    body[data-page="cadh-farmacia"] .container {
+      width: min(var(--app-shell-max), calc(100vw - 32px));
+      max-width: var(--app-shell-max);
+      margin: 20px auto;
+      padding: 0;
+    }
+
+    .farmacia-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .farmacia-title {
+      margin: 14px 0 0;
+      color: var(--farmacia-title);
+      font-size: 1.65rem;
+      line-height: 1.25;
+    }
+
+    .farmacia-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .farmacia-page .btn,
+    .farmacia-page button,
+    .farmacia-modal .btn,
+    .farmacia-modal button {
+      min-height: 46px;
+      padding: 11px 18px;
+      font-size: 0.96rem;
+      font-weight: 800;
+    }
+
+    .farmacia-table-shell {
+      width: 100%;
+      overflow-x: hidden;
+      border: 1px solid var(--farmacia-border);
+      border-radius: 10px;
+      background: #ffffff;
+      box-shadow: 0 18px 30px rgba(15, 37, 65, 0.06);
+    }
+
+    .farmacia-table {
+      width: 100%;
+      min-width: 0;
+      table-layout: fixed;
+      border: 0;
+    }
+
+    .farmacia-col-date { width: 8%; }
+    .farmacia-col-patient { width: 13%; }
+    .farmacia-col-consult { width: 10%; }
+    .farmacia-col-treatment { width: 18%; }
+    .farmacia-col-interaction { width: 14%; }
+    .farmacia-col-plan { width: 18%; }
+    .farmacia-col-actions { width: 142px; }
+
+    .farmacia-table th,
+    .farmacia-table td {
+      border-color: #efe1d5;
+      padding: 12px 9px;
+      color: var(--farmacia-title);
+      font-size: 0.92rem;
+      line-height: 1.34;
+      vertical-align: middle;
+      overflow-wrap: break-word;
+      word-break: normal;
+      hyphens: auto;
+    }
+
+    .farmacia-table tbody tr {
+      background: #fff;
+    }
+
+    .farmacia-table-group th {
+      border-top: 0;
+      color: var(--farmacia-title);
+      font-size: 0.92rem;
+      font-weight: 900;
+      text-align: center;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .farmacia-table-group .is-specialist {
+      background: var(--farmacia-band);
+      text-align: left;
+    }
+
+    .farmacia-table-group .is-medication,
+    .farmacia-table-fields th {
+      background: var(--farmacia-soft);
+    }
+
+    .farmacia-table-group .is-plan {
+      background: #fff6ef;
+    }
+
+    .farmacia-table-group .is-actions,
+    .farmacia-table-fields .is-actions-subhead {
+      background: #fbfcfd;
+      color: #405163;
+      border-left: 1px solid var(--farmacia-border);
+    }
+
+    .farmacia-table-fields th {
+      font-size: 0.84rem;
+      font-weight: 900;
+      text-align: left;
+    }
+
+    .farmacia-table-fields .is-actions-subhead {
+      text-align: center;
+    }
+
+    .farmacia-table td:nth-child(1) {
+      white-space: nowrap;
+    }
+
+    .farmacia-table td:nth-child(2) {
+      font-weight: 800;
+      color: #2b1708;
+    }
+
+    .farmacia-table th:last-child,
+    .farmacia-table td:last-child {
+      width: 142px;
+      border-left: 1px solid var(--farmacia-border);
+      text-align: center;
+    }
+
+    .farmacia-table td:last-child {
+      padding: 12px 8px;
+      background: #fbfcfd;
+    }
+
+    .farmacia-table .table-actions {
+      justify-content: center;
+      flex-wrap: nowrap;
+      gap: 8px;
+      min-height: 34px;
+    }
+
+    .farmacia-table .icon-btn {
+      inline-size: 34px;
+      block-size: 34px;
+      display: inline-grid;
+      place-items: center;
+      padding: 0;
+      border: 1px solid #ead9ca;
+      background: #fffaf6;
+      color: #7d6958;
+    }
+
+    .farmacia-table .icon-btn svg {
+      inline-size: 18px;
+      block-size: 18px;
+      display: block;
+    }
+
+    .farmacia-table .icon-btn:hover,
+    .farmacia-table .icon-btn:focus-visible {
+      background: #fff1e5;
+      color: var(--farmacia-accent);
+      box-shadow: 0 0 0 3px rgba(150, 105, 67, 0.12);
+      transform: none;
+    }
+
+    .farmacia-empty {
+      min-height: 170px;
+      display: grid;
+      place-items: center;
+      gap: 12px;
+      padding: 32px;
+      color: #7d6958;
+      text-align: center;
+    }
+
+    .farmacia-empty p {
+      margin: 0;
+      font-weight: 600;
+    }
+
+    .farmacia-modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1100;
+      display: grid;
+      place-items: start center;
+      overflow-y: auto;
+      padding: 12px 8px 28px;
+      background: rgba(9, 17, 25, 0.62);
+    }
+
+    .farmacia-modal-overlay[hidden] {
+      display: none;
+    }
+
+    .farmacia-modal {
+      width: min(980px, calc(100vw - 28px));
+      max-height: calc(100vh - 24px);
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      overflow: hidden;
+      border: 1px solid rgba(150, 105, 67, 0.24);
+      border-radius: 16px;
+      background: #ffffff;
+      box-shadow: 0 26px 70px rgba(63, 37, 16, 0.22);
+    }
+
+    .farmacia-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 16px 20px;
+      border-bottom: 1px solid #efd9c5;
+      background: linear-gradient(180deg, #fff8f1, #ffffff);
+    }
+
+    .farmacia-modal-title {
+      margin: 0;
+      color: var(--farmacia-title);
+      font-size: 1.22rem;
+      line-height: 1.3;
+    }
+
+    .farmacia-close {
+      --clinical-close-border: var(--farmacia-border);
+      --clinical-close-color: var(--farmacia-title);
+      --clinical-close-hover-bg: #fff1e5;
+      --clinical-close-hover-color: var(--farmacia-accent);
+    }
+
+    .farmacia-form-body {
+      min-height: 0;
+      overflow-y: auto;
+      padding: 22px 24px 26px;
+      background: #fffdfb;
+    }
+
+    .farmacia-form-section {
+      display: grid;
+      gap: 16px;
+      margin-bottom: 22px;
+      padding-top: 2px;
+      border-top: 1px solid #efd9c5;
+    }
+
+    .farmacia-form-section:first-of-type {
+      border-top: 0;
+    }
+
+    .farmacia-section-title {
+      margin: 0;
+      color: var(--farmacia-title);
+      font-size: 1.08rem;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .farmacia-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .farmacia-grid .field,
+    .farmacia-grid .field-full {
+      position: relative;
+      min-width: 0;
+    }
+
+    .farmacia-grid .field {
+      display: grid;
+      grid-template-rows: minmax(40px, auto) auto;
+      align-content: start;
+      gap: 8px;
+    }
+
+    .farmacia-grid .field-full {
+      grid-column: 1 / -1;
+    }
+
+    .farmacia-grid .field label,
+    .farmacia-grid .field-full label {
+      display: block;
+      color: #18324d;
+      font-size: 0.96rem;
+      font-weight: 800;
+      line-height: 1.3;
+    }
+
+    .farmacia-grid .field label {
+      display: flex;
+      align-items: flex-end;
+      min-height: 40px;
+    }
+
+    .farmacia-modal input,
+    .farmacia-modal select,
+    .farmacia-modal textarea {
+      min-height: 48px;
+      font-size: 1rem;
+      line-height: 1.45;
+    }
+
+    .farmacia-modal textarea {
+      min-height: 124px;
+      resize: none;
+    }
+
+    .farmacia-field-guidance {
+      display: none;
+    }
+
+    .farmacia-age-guidance {
+      grid-column: 1 / -1;
+      margin: 8px 0 0;
+      color: #53657a;
+      font-size: 1rem;
+      line-height: 1.45;
+    }
+
+    .farmacia-patient-summary {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      padding: 16px;
+      border: 1px solid var(--farmacia-border);
+      border-radius: 12px;
+      background: #fff1e5;
+    }
+
+    .farmacia-patient-summary[hidden] {
+      display: none;
+    }
+
+    .farmacia-patient-summary span {
+      display: grid;
+      gap: 2px;
+      min-width: 0;
+      color: #7d5b40;
+      font-size: 0.95rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .farmacia-patient-summary strong {
+      overflow: hidden;
+      color: var(--farmacia-title);
+      font-size: 0.98rem;
+      letter-spacing: 0;
+      text-overflow: ellipsis;
+      text-transform: none;
+      white-space: nowrap;
+    }
+
+    .farmacia-form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      padding: 16px 22px;
+      border-top: 1px solid #efd9c5;
+      background: #ffffff;
+    }
+
+    .farmacia-form-actions .btn,
+    .farmacia-form-actions button {
+      min-width: 150px;
+      justify-content: center;
+    }
+
+    .farmacia-save-icon {
+      inline-size: 18px;
+      block-size: 18px;
+      margin-right: 8px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .farmacia-view-content {
+      display: grid;
+      gap: 16px;
+    }
+
+    .farmacia-view-section {
+      display: grid;
+      gap: 12px;
+      padding: 14px;
+      border: 1px solid #efd9c5;
+      border-radius: 12px;
+      background: #fff;
+    }
+
+    .farmacia-view-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .farmacia-view-item {
+      min-width: 0;
+      padding: 12px;
+      border: 0;
+      border-radius: 10px;
+      background: #fff8f1;
+    }
+
+    .farmacia-view-item.is-wide {
+      grid-column: 1 / -1;
+    }
+
+    .farmacia-view-label {
+      display: block;
+      margin-bottom: 5px;
+      color: #7d6958;
+      font-size: 0.74rem;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .farmacia-view-value {
+      color: var(--farmacia-title);
+      font-size: 1rem;
+      font-weight: 700;
+      line-height: 1.45;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    @media (max-width: 760px) {
+      .farmacia-page {
+        padding: 20px;
+      }
+
+      .farmacia-actions {
+        width: 100%;
+      }
+
+      .farmacia-actions .btn,
+      .farmacia-actions button {
+        flex: 1 1 160px;
+        justify-content: center;
+      }
+
+      .farmacia-grid,
+      .farmacia-view-grid,
+      .farmacia-patient-summary {
+        grid-template-columns: 1fr;
+      }
+
+      .farmacia-modal-header,
+      .farmacia-form-body,
+      .farmacia-form-actions {
+        padding-left: 18px;
+        padding-right: 18px;
+      }
+
+      .farmacia-form-actions {
+        flex-direction: column-reverse;
+      }
+
+      .farmacia-form-actions .btn,
+      .farmacia-form-actions button {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body data-page="cadh-farmacia">
+  <header class="topbar">
+    <div class="topbar-brand">Intranet CADH</div>
+    <nav class="menu">
+      <a id="nav-home" href="/index.html">Home</a>
+      <a id="nav-cadh" href="/cadh/index.html">CADH</a>
+      <a id="nav-ubs" href="/ubs/index.html">UBS</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="card farmacia-page">
+      <svg aria-hidden="true" style="display:none">
+        <symbol id="farmacia-icon-save" viewBox="0 0 24 24">
+          <path d="M5 3h12l2 2v16H5V3Z"/>
+          <path d="M8 3v6h8V3"/>
+          <path d="M8 15h8v6H8v-6Z"/>
+        </symbol>
+      </svg>
+
+      <div class="farmacia-header">
+        <div>
+          <a class="btn" href="/cadh/index.html" data-back-link data-fallback="/cadh/index.html">&larr; Voltar</a>
+          <h1 class="farmacia-title">Farmácia Clínica</h1>
+        </div>
+        <div class="farmacia-actions">
+          <button type="button" id="farmacia-new" class="btn btn-primary">+ Novo registro</button>
+        </div>
+      </div>
+
+      <div class="farmacia-table-shell">
+        <table class="farmacia-table" aria-label="Registros de Farmácia Clínica">
+          <colgroup>
+            <col class="farmacia-col-date">
+            <col class="farmacia-col-patient">
+            <col class="farmacia-col-consult">
+            <col class="farmacia-col-treatment">
+            <col class="farmacia-col-interaction">
+            <col class="farmacia-col-plan">
+            <col class="farmacia-col-plan">
+            <col class="farmacia-col-actions">
+          </colgroup>
+          <thead>
+            <tr class="farmacia-table-group">
+              <th class="is-specialist" colspan="3">Farmacêutico</th>
+              <th class="is-medication" colspan="2">Acompanhamento medicamentoso</th>
+              <th class="is-plan" colspan="2">Plano de cuidado</th>
+              <th class="is-actions">Ações</th>
+            </tr>
+            <tr class="farmacia-table-fields">
+              <th>Data</th>
+              <th>Paciente</th>
+              <th>Nº Consulta</th>
+              <th>Tratamento medicamentoso</th>
+              <th>Interação medicamentosa</th>
+              <th>Fatores dificultadores</th>
+              <th>Recomendações</th>
+              <th class="is-actions-subhead" aria-label="Ações"></th>
+            </tr>
+          </thead>
+          <tbody id="farmacia-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <div id="farmacia-modal" class="farmacia-modal-overlay" hidden>
+    <form id="farmacia-form" class="farmacia-modal" novalidate>
+      <div class="farmacia-modal-header">
+        <h2 class="farmacia-modal-title">Farmácia Clínica - Registro de Consulta</h2>
+        <button type="button" class="clinical-modal-close farmacia-close" data-farmacia-close aria-label="Fechar">Fechar</button>
+      </div>
+
+      <div class="farmacia-form-body">
+        <div id="farmacia-alert" class="alert" hidden></div>
+        <input id="farmacia_record_id" name="record_id" type="hidden">
+
+        <section class="farmacia-form-section">
+          <div class="farmacia-grid">
+            <div class="field-full">
+              <label for="farmacia_patient_search_input">Paciente *</label>
+              <select id="farmacia_patient_id" name="patient_id" class="visually-hidden" tabindex="-1" aria-hidden="true"></select>
+              <div id="farmacia_patient_search" class="transition-patient-search"></div>
+            </div>
+
+            <div id="farmacia-patient-summary" class="farmacia-patient-summary" hidden></div>
+            <p id="farmacia-age-guidance" class="farmacia-age-guidance" hidden></p>
+
+            <div class="field">
+              <label for="farmacia_consultation_date">Data da consulta *</label>
+              <input id="farmacia_consultation_date" name="consultation_date" type="date" placeholder="dd/mm/aaaa" required>
+            </div>
+
+            <div class="field">
+              <label for="farmacia_consultation_number">Nº da consulta</label>
+              <select id="farmacia_consultation_number" name="consultation_number">
+                <option value="1ª Consulta (inicial)">1ª Consulta (inicial)</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <section class="farmacia-form-section">
+          <h3 class="farmacia-section-title">Acompanhamento medicamentoso</h3>
+          <div class="farmacia-grid">
+            <div class="field">
+              <label for="farmacia_medication_treatment">Tratamento medicamentoso</label>
+              <select id="farmacia_medication_treatment" name="medication_treatment">
+                <option value="" hidden>Selecione...</option>
+                <option value="Não utiliza medicamentos">Não utiliza medicamentos</option>
+                <option value="1 a 5 medicamentos">1 a 5 medicamentos</option>
+                <option value="6 a 10 medicamentos">6 a 10 medicamentos</option>
+                <option value="> 10 medicamentos">&gt; 10 medicamentos</option>
+              </select>
+              <p class="farmacia-field-guidance">Registre a faixa de uso de medicamentos conforme relato e revisão da prescrição.</p>
+            </div>
+
+            <div class="field">
+              <label for="farmacia_drug_interaction">Interação medicamentosa</label>
+              <select id="farmacia_drug_interaction" name="drug_interaction">
+                <option value="" hidden>Selecione...</option>
+                <option value="Sim">Sim</option>
+                <option value="Não">Não</option>
+              </select>
+              <p class="farmacia-field-guidance">Registre se há interação medicamentosa identificada ou suspeita durante a avaliação.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="farmacia-form-section">
+          <h3 class="farmacia-section-title">Plano de cuidado</h3>
+          <div class="farmacia-grid">
+            <div class="field-full">
+              <label for="farmacia_barriers">Fatores dificultadores - Ficha Plano de Cuidado</label>
+              <textarea id="farmacia_barriers" name="barriers" placeholder="Ex: polifarmácia, dificuldade de acesso, baixa compreensão da prescrição, eventos adversos ou uso irregular."></textarea>
+              <p class="farmacia-field-guidance">Descreva barreiras para adesão, segurança no uso dos medicamentos e continuidade do cuidado.</p>
+            </div>
+
+            <div class="field-full">
+              <label for="farmacia_recommendations">Recomendações - Ficha Plano de Cuidado</label>
+              <textarea id="farmacia_recommendations" name="recommendations" placeholder="Ex: revisar prescrição, orientar horários, avaliar interações, reforçar adesão, conciliar medicamentos e pactuar retorno."></textarea>
+              <p class="farmacia-field-guidance">Registre a orientação pactuada e os pontos para acompanhamento da equipe.</p>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="farmacia-form-actions">
+        <button type="button" class="btn" data-farmacia-close>Cancelar</button>
+        <button type="submit" class="btn btn-primary">
+          <svg class="farmacia-save-icon" aria-hidden="true"><use href="#farmacia-icon-save"></use></svg>
+          Salvar
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div id="farmacia-view-modal" class="farmacia-modal-overlay" hidden>
+    <article class="farmacia-modal" role="dialog" aria-modal="true" aria-labelledby="farmacia-view-title">
+      <div class="farmacia-modal-header">
+        <h2 id="farmacia-view-title" class="farmacia-modal-title">Guia preenchida da consulta de Farmácia Clínica</h2>
+        <button type="button" class="clinical-modal-close farmacia-close" data-farmacia-view-close aria-label="Fechar">Fechar</button>
+      </div>
+
+      <div class="farmacia-form-body">
+        <div id="farmacia-view-content" class="farmacia-view-content"></div>
+      </div>
+
+      <div class="farmacia-form-actions">
+        <button type="button" class="btn" data-farmacia-view-close>Fechar</button>
+      </div>
+    </article>
+  </div>
+
+  <script src="/assets/config.js"></script>
+  <script src="/assets/app.js"></script>
+  <script src="/assets/cadh-farmacia.js"></script>
+</body>
+</html>

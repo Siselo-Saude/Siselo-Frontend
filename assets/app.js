@@ -5,6 +5,7 @@
   const NAVIGATION_KEY = 'siselo_navigation';
   const CADH_SEARCH_KEY = 'siselo_cadh_search';
   const FLASH_ALERT_KEY = 'siselo_flash_alert';
+  const THEME_KEY = 'siselo_theme';
   const TEAM_LABELS = {
     safira: 'Safira',
     ametista: 'Ametista',
@@ -476,6 +477,98 @@
     return target;
   }
 
+  function getSameOriginReferrerPath() {
+    try {
+      if (!document.referrer) {
+        return '';
+      }
+
+      const referrerUrl = new URL(document.referrer);
+      if (referrerUrl.origin !== location.origin) {
+        return '';
+      }
+
+      const referrerPath = normalizeAppPath(`${referrerUrl.pathname}${referrerUrl.search}${referrerUrl.hash}`);
+      const currentPath = normalizeAppPath(`${location.pathname}${location.search}${location.hash}`);
+
+      if (!referrerPath || referrerPath === currentPath) {
+        return '';
+      }
+
+      return referrerPath;
+    } catch (error) {
+      return '';
+    }
+  }
+
+  function getNavigationPreviousPath() {
+    const state = readNavigationState();
+    return normalizeAppPath(state.previous);
+  }
+
+  function resolvePreviousScreenTarget(link) {
+    const fallback = link?.dataset?.fallback || link?.getAttribute?.('href') || '';
+    return getSameOriginReferrerPath() || getNavigationPreviousPath() || resolveBackTarget(fallback);
+  }
+
+  function navigatePreviousScreen(link) {
+    location.href = resolvePreviousScreenTarget(link);
+  }
+
+  function isBackShortcutBlocked(event) {
+    if (
+      event.defaultPrevented ||
+      event.ctrlKey ||
+      event.metaKey ||
+      event.altKey ||
+      event.shiftKey ||
+      document.body.classList.contains('modal-open') ||
+      document.querySelector('.choice-select.is-open, .team-picker.is-open, .date-picker.is-open')
+    ) {
+      return true;
+    }
+
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) {
+      return false;
+    }
+
+    if (
+      target.isContentEditable ||
+      target.closest('input, textarea, select, [contenteditable="true"], .choice-select, .team-picker, .date-picker')
+    ) {
+      return true;
+    }
+
+    return false;
+  }
+
+  function bindBackShortcut() {
+    if (document.documentElement.dataset.backShortcutBound === 'true') {
+      return;
+    }
+
+    document.documentElement.dataset.backShortcutBound = 'true';
+    document.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape' || isBackShortcutBlocked(event)) {
+        return;
+      }
+
+      const link = Array.from(document.querySelectorAll('[data-back-link]')).find((item) => {
+        if (!(item instanceof HTMLElement)) {
+          return false;
+        }
+
+        return item.offsetParent !== null || item.getClientRects().length > 0;
+      });
+
+      if (link) {
+        event.preventDefault();
+        navigatePreviousScreen(link);
+      }
+    });
+  }
+
   function bindBackLinks() {
     document.querySelectorAll('[data-back-link]').forEach((link) => {
       if (link.dataset.backLinkBound === 'true') {
@@ -486,25 +579,11 @@
 
       link.addEventListener('click', (event) => {
         event.preventDefault();
-
-        const ref = document.referrer;
-
-        if (ref.includes('/ubs')) {
-          window.location.href = '/ubs/index.html';
-          return;
-        }
-
-        if (ref.includes('/cadh')) {
-          window.location.href = '/cadh/index.html';
-          return;
-        }
-
-        // fallback original do sistema
-        location.href = resolveBackTarget(
-          link.dataset.fallback || link.getAttribute('href')
-        );
+        navigatePreviousScreen(link);
       });
     });
+
+    bindBackShortcut();
   }
 
   function enhanceSearchInput(input) {
@@ -1369,6 +1448,53 @@
     }
   }
 
+  function getStoredTheme() {
+    try {
+      const value = localStorage.getItem(THEME_KEY);
+      return value === 'dark' ? 'dark' : 'light';
+    } catch (error) {
+      return 'light';
+    }
+  }
+
+  function setAppTheme(theme) {
+    const nextTheme = theme === 'dark' ? 'dark' : 'light';
+    document.documentElement.dataset.theme = nextTheme;
+    try {
+      localStorage.setItem(THEME_KEY, nextTheme);
+    } catch (error) {
+    }
+    syncThemeToggleButton();
+  }
+
+  function getThemeToggleIcon(theme) {
+    return theme === 'dark'
+      ? '<svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2"/><path d="M12 19.3v2.2"/><path d="m5.4 5.4 1.5 1.5"/><path d="m17.1 17.1 1.5 1.5"/><path d="M2.5 12h2.2"/><path d="M19.3 12h2.2"/><path d="m5.4 18.6 1.5-1.5"/><path d="m17.1 6.9 1.5-1.5"/></svg>'
+      : '<svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20.7 14.2A7.4 7.4 0 0 1 9.8 3.3a8.7 8.7 0 1 0 10.9 10.9Z"/><circle cx="16.4" cy="8.2" r="1.1"/></svg>';
+  }
+
+  function syncThemeToggleButton() {
+    const button = document.getElementById('topbar-theme-toggle');
+    if (!(button instanceof HTMLButtonElement)) {
+      return;
+    }
+
+    const theme = document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
+    const nextThemeLabel = theme === 'dark' ? 'modo claro' : 'modo escuro';
+    button.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false');
+    button.title = `Alternar para ${nextThemeLabel}`;
+    button.setAttribute('aria-label', `Alternar para ${nextThemeLabel}`);
+    button.innerHTML = `
+      <span class="topbar-theme-icon">${getThemeToggleIcon(theme)}</span>
+    `;
+  }
+
+  function toggleAppTheme() {
+    setAppTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
+  }
+
+  setAppTheme(getStoredTheme());
+
   function ensureTopbarActions(user, permissions) {
     const topbar = document.querySelector('.topbar');
     if (!topbar) {
@@ -1407,12 +1533,57 @@
       });
     }
 
-    let accountLink = topbar.querySelector('#topbar-account-link');
+    let actions = topbar.querySelector('.topbar-actions');
+    if (!actions) {
+      actions = document.createElement('div');
+      actions.className = 'topbar-actions';
+      topbar.appendChild(actions);
+    }
+
+    let settingsLink = actions.querySelector('#topbar-settings-link');
+    if (!settingsLink) {
+      settingsLink = document.createElement('a');
+      settingsLink.id = 'topbar-settings-link';
+      settingsLink.className = 'topbar-icon-btn topbar-settings';
+      settingsLink.innerHTML = `
+        <svg aria-hidden="true" viewBox="0 0 24 24">
+          <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.51a2 2 0 0 1 1-1.72l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2Z"/>
+          <circle cx="12" cy="12" r="3"/>
+        </svg>
+        <span>Configurações</span>
+      `;
+      actions.appendChild(settingsLink);
+    }
+
+    settingsLink.href = permissions.has('admin.manage')
+      ? '/admin/users/list.html'
+      : '/change_password.html';
+    settingsLink.title = 'Configurações';
+    settingsLink.setAttribute('aria-label', 'Configurações');
+    settingsLink.hidden = !user;
+
+    let themeButton = actions.querySelector('#topbar-theme-toggle');
+    if (!themeButton) {
+      themeButton = document.createElement('button');
+      themeButton.id = 'topbar-theme-toggle';
+      themeButton.className = 'topbar-theme-toggle';
+      themeButton.type = 'button';
+      actions.appendChild(themeButton);
+    }
+
+    if (themeButton.dataset.bound !== 'true') {
+      themeButton.dataset.bound = 'true';
+      themeButton.addEventListener('click', toggleAppTheme);
+    }
+    themeButton.hidden = !user;
+    syncThemeToggleButton();
+
+    let accountLink = actions.querySelector('#topbar-account-link');
     if (!accountLink) {
       accountLink = document.createElement('a');
       accountLink.id = 'topbar-account-link';
       accountLink.className = 'topbar-account';
-      topbar.appendChild(accountLink);
+      actions.appendChild(accountLink);
     }
 
     accountLink.href = permissions.has('admin.manage')
@@ -1441,8 +1612,11 @@
       const link = document.getElementById(`nav-${key}`);
       if (link) {
         link.href = links[key];
+        link.classList.remove('is-active');
+        link.removeAttribute('aria-current');
         if (key === activeNavKey) {
           link.classList.add('is-active');
+          link.setAttribute('aria-current', 'page');
         }
       }
     });

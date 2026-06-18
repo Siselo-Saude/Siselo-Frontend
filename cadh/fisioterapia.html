@@ -1,0 +1,741 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fisioterapia</title>
+  <link rel="stylesheet" href="/assets/app.css">
+  <style>
+    .fisioterapia-page {
+      --fisio-accent: #5d789f;
+      --fisio-title: #1a2f44;
+      --fisio-band: #bfd2ef;
+      --fisio-soft: #eaf1f9;
+      --fisio-border: #c8d8ed;
+      padding: 26px;
+      background:
+        radial-gradient(circle at top right, rgba(93, 120, 159, 0.12), transparent 28%),
+        linear-gradient(180deg, #f4f8fd, #eef5f3);
+    }
+
+    body[data-page="cadh-fisioterapia"] .container {
+      width: min(var(--app-shell-max), calc(100vw - 32px));
+      max-width: var(--app-shell-max);
+      margin: 20px auto;
+      padding: 0;
+    }
+
+    .fisioterapia-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .fisioterapia-title {
+      margin: 14px 0 0;
+      color: var(--fisio-title);
+      font-size: 1.65rem;
+      line-height: 1.25;
+    }
+
+    .fisioterapia-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .fisioterapia-page .btn,
+    .fisioterapia-page button,
+    .fisioterapia-modal .btn,
+    .fisioterapia-modal button {
+      min-height: 46px;
+      padding: 11px 18px;
+      font-size: 0.96rem;
+      font-weight: 800;
+    }
+
+    .fisioterapia-table-shell {
+      width: 100%;
+      overflow-x: hidden;
+      border: 1px solid var(--fisio-border);
+      border-radius: 10px;
+      background: #ffffff;
+      box-shadow: 0 18px 30px rgba(15, 37, 65, 0.06);
+    }
+
+    .fisioterapia-table {
+      width: 100%;
+      min-width: 0;
+      table-layout: fixed;
+      border: 0;
+    }
+
+    .fisioterapia-col-date { width: 7%; }
+    .fisioterapia-col-patient { width: 12%; }
+    .fisioterapia-col-consult { width: 8%; }
+    .fisioterapia-col-yesno { width: 7%; }
+    .fisioterapia-col-prosthesis { width: 11%; }
+    .fisioterapia-col-modality { width: 11%; }
+    .fisioterapia-col-intensity { width: 8%; }
+    .fisioterapia-col-time { width: 9%; }
+    .fisioterapia-col-plan { width: 11%; }
+    .fisioterapia-col-actions { width: 142px; }
+
+    .fisioterapia-table th,
+    .fisioterapia-table td {
+      border-color: #e7eef3;
+      padding: 12px 9px;
+      color: var(--fisio-title);
+      font-size: 0.88rem;
+      line-height: 1.32;
+      vertical-align: middle;
+      overflow-wrap: anywhere;
+    }
+
+    .fisioterapia-table tbody tr {
+      background: #fff;
+    }
+
+    .fisioterapia-table-group th {
+      border-top: 0;
+      color: var(--fisio-title);
+      font-size: 0.92rem;
+      font-weight: 900;
+      text-align: center;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .fisioterapia-table-group .is-specialist {
+      background: var(--fisio-band);
+      text-align: left;
+    }
+
+    .fisioterapia-table-group .is-functional {
+      background: #d6e4f6;
+    }
+
+    .fisioterapia-table-group .is-activity,
+    .fisioterapia-table-fields th {
+      background: var(--fisio-soft);
+    }
+
+    .fisioterapia-table-group .is-plan {
+      background: #edf5fb;
+    }
+
+    .fisioterapia-table-group .is-actions,
+    .fisioterapia-table-fields .is-actions-subhead {
+      background: #fbfcfd;
+      color: #405163;
+      border-left: 1px solid var(--fisio-border);
+    }
+
+    .fisioterapia-table-fields th {
+      font-size: 0.82rem;
+      font-weight: 900;
+      text-align: left;
+    }
+
+    .fisioterapia-table-fields .is-actions-subhead {
+      text-align: center;
+    }
+
+    .fisioterapia-table td:nth-child(1) {
+      white-space: nowrap;
+    }
+
+    .fisioterapia-table td:nth-child(2) {
+      font-weight: 800;
+      color: #0e2435;
+    }
+
+    .fisioterapia-table th:last-child,
+    .fisioterapia-table td:last-child {
+      width: 142px;
+      border-left: 1px solid var(--fisio-border);
+      text-align: center;
+    }
+
+    .fisioterapia-table td:last-child {
+      padding: 12px 8px;
+      background: #fbfcfd;
+    }
+
+    .fisioterapia-table .table-actions {
+      justify-content: center;
+      flex-wrap: nowrap;
+      gap: 8px;
+      min-height: 34px;
+    }
+
+    .fisioterapia-table .icon-btn {
+      inline-size: 34px;
+      block-size: 34px;
+      display: inline-grid;
+      place-items: center;
+      padding: 0;
+      border: 1px solid #dce7f2;
+      background: #f8fbfe;
+      color: #61798a;
+    }
+
+    .fisioterapia-table .icon-btn svg {
+      inline-size: 18px;
+      block-size: 18px;
+      display: block;
+    }
+
+    .fisioterapia-table .icon-btn:hover,
+    .fisioterapia-table .icon-btn:focus-visible {
+      background: #eaf1f9;
+      color: var(--fisio-accent);
+      box-shadow: 0 0 0 3px rgba(93, 120, 159, 0.14);
+      transform: none;
+    }
+
+    .fisioterapia-empty {
+      min-height: 170px;
+      display: grid;
+      place-items: center;
+      gap: 12px;
+      padding: 32px;
+      color: #61798a;
+      text-align: center;
+    }
+
+    .fisioterapia-empty p {
+      margin: 0;
+      font-weight: 600;
+    }
+
+    .fisioterapia-modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1100;
+      display: grid;
+      place-items: start center;
+      overflow-y: auto;
+      padding: 12px 8px 28px;
+      background: rgba(9, 17, 25, 0.62);
+    }
+
+    .fisioterapia-modal-overlay[hidden] {
+      display: none;
+    }
+
+    .fisioterapia-modal {
+      width: min(980px, calc(100vw - 28px));
+      max-height: calc(100vh - 24px);
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      overflow: hidden;
+      border: 1px solid rgba(93, 120, 159, 0.24);
+      border-radius: 16px;
+      background: #ffffff;
+      box-shadow: 0 26px 70px rgba(15, 37, 65, 0.24);
+    }
+
+    .fisioterapia-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 16px 20px;
+      border-bottom: 1px solid #dce8f5;
+      background: linear-gradient(180deg, #f4f8fd, #ffffff);
+    }
+
+    .fisioterapia-modal-title {
+      margin: 0;
+      color: var(--fisio-title);
+      font-size: 1.22rem;
+      line-height: 1.3;
+    }
+
+    .fisioterapia-close {
+      --clinical-close-border: var(--fisio-border);
+      --clinical-close-color: var(--fisio-title);
+      --clinical-close-hover-bg: #eaf1f9;
+      --clinical-close-hover-color: var(--fisio-accent);
+    }
+
+    .fisioterapia-form-body {
+      min-height: 0;
+      overflow-y: auto;
+      padding: 22px 24px 26px;
+      background: #fbfdff;
+    }
+
+    .fisioterapia-form-section {
+      display: grid;
+      gap: 16px;
+      margin-bottom: 22px;
+      padding-top: 2px;
+      border-top: 1px solid #dce8f5;
+    }
+
+    .fisioterapia-form-section:first-of-type {
+      border-top: 0;
+    }
+
+    .fisioterapia-section-title {
+      margin: 0;
+      color: var(--fisio-title);
+      font-size: 1.08rem;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .fisioterapia-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .fisioterapia-grid .field,
+    .fisioterapia-grid .field-full {
+      position: relative;
+      min-width: 0;
+    }
+
+    .fisioterapia-grid .field {
+      display: grid;
+      grid-template-rows: minmax(40px, auto) auto;
+      align-content: start;
+      gap: 8px;
+    }
+
+    .fisioterapia-grid .field-full {
+      grid-column: 1 / -1;
+    }
+
+    .fisioterapia-grid .field label,
+    .fisioterapia-grid .field-full label {
+      display: block;
+      color: #18324d;
+      font-size: 0.96rem;
+      font-weight: 800;
+      line-height: 1.3;
+    }
+
+    .fisioterapia-grid .field label {
+      display: flex;
+      align-items: flex-end;
+      min-height: 40px;
+    }
+
+    .fisioterapia-modal input,
+    .fisioterapia-modal select,
+    .fisioterapia-modal textarea {
+      min-height: 48px;
+      font-size: 1rem;
+      line-height: 1.45;
+    }
+
+    .fisioterapia-modal textarea {
+      min-height: 124px;
+      resize: none;
+    }
+
+    .fisioterapia-field-guidance {
+      display: none;
+    }
+
+    .fisioterapia-age-guidance {
+      grid-column: 1 / -1;
+      margin: 8px 0 0;
+      color: #53657a;
+      font-size: 1rem;
+      line-height: 1.45;
+    }
+
+    .fisioterapia-patient-summary {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      padding: 16px;
+      border: 1px solid var(--fisio-border);
+      border-radius: 12px;
+      background: #eaf1f9;
+    }
+
+    .fisioterapia-patient-summary[hidden] {
+      display: none;
+    }
+
+    .fisioterapia-patient-summary span {
+      display: grid;
+      gap: 2px;
+      min-width: 0;
+      color: #456f87;
+      font-size: 0.95rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .fisioterapia-patient-summary strong {
+      overflow: hidden;
+      color: var(--fisio-title);
+      font-size: 0.98rem;
+      letter-spacing: 0;
+      text-overflow: ellipsis;
+      text-transform: none;
+      white-space: nowrap;
+    }
+
+    .fisioterapia-form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      padding: 16px 22px;
+      border-top: 1px solid #dce8f5;
+      background: #ffffff;
+    }
+
+    .fisioterapia-form-actions .btn,
+    .fisioterapia-form-actions button {
+      min-width: 150px;
+      justify-content: center;
+    }
+
+    .fisioterapia-save-icon {
+      inline-size: 18px;
+      block-size: 18px;
+      margin-right: 8px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .fisioterapia-view-content {
+      display: grid;
+      gap: 16px;
+    }
+
+    .fisioterapia-view-section {
+      display: grid;
+      gap: 12px;
+      padding: 14px;
+      border: 1px solid #dce8f5;
+      border-radius: 12px;
+      background: #fff;
+    }
+
+    .fisioterapia-view-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .fisioterapia-view-item {
+      min-width: 0;
+      padding: 12px;
+      border: 0;
+      border-radius: 10px;
+      background: #f4f8fd;
+    }
+
+    .fisioterapia-view-item.is-wide {
+      grid-column: 1 / -1;
+    }
+
+    .fisioterapia-view-label {
+      display: block;
+      margin-bottom: 5px;
+      color: #64798a;
+      font-size: 0.74rem;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .fisioterapia-view-value {
+      color: var(--fisio-title);
+      font-size: 1rem;
+      font-weight: 700;
+      line-height: 1.45;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    @media (max-width: 760px) {
+      .fisioterapia-page {
+        padding: 20px;
+      }
+
+      .fisioterapia-actions {
+        width: 100%;
+      }
+
+      .fisioterapia-actions .btn,
+      .fisioterapia-actions button {
+        flex: 1 1 160px;
+        justify-content: center;
+      }
+
+      .fisioterapia-grid,
+      .fisioterapia-view-grid,
+      .fisioterapia-patient-summary {
+        grid-template-columns: 1fr;
+      }
+
+      .fisioterapia-modal-header,
+      .fisioterapia-form-body,
+      .fisioterapia-form-actions {
+        padding-left: 18px;
+        padding-right: 18px;
+      }
+
+      .fisioterapia-form-actions {
+        flex-direction: column-reverse;
+      }
+
+      .fisioterapia-form-actions .btn,
+      .fisioterapia-form-actions button {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body data-page="cadh-fisioterapia">
+  <header class="topbar">
+    <div class="topbar-brand">Intranet CADH</div>
+    <nav class="menu">
+      <a id="nav-home" href="/index.html">Home</a>
+      <a id="nav-cadh" href="/cadh/index.html">CADH</a>
+      <a id="nav-ubs" href="/ubs/index.html">UBS</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="card fisioterapia-page">
+      <svg aria-hidden="true" style="display:none">
+        <symbol id="fisioterapia-icon-save" viewBox="0 0 24 24">
+          <path d="M5 3h12l2 2v16H5V3Z"/>
+          <path d="M8 3v6h8V3"/>
+          <path d="M8 15h8v6H8v-6Z"/>
+        </symbol>
+      </svg>
+
+      <div class="fisioterapia-header">
+        <div>
+          <a class="btn" href="/cadh/index.html" data-back-link data-fallback="/cadh/index.html">&larr; Voltar</a>
+          <h1 class="fisioterapia-title">Fisioterapia</h1>
+        </div>
+        <div class="fisioterapia-actions">
+          <button type="button" id="fisioterapia-new" class="btn btn-primary">+ Novo registro</button>
+        </div>
+      </div>
+
+      <div class="fisioterapia-table-shell">
+        <table class="fisioterapia-table" aria-label="Registros de Fisioterapia">
+          <colgroup>
+            <col class="fisioterapia-col-date">
+            <col class="fisioterapia-col-patient">
+            <col class="fisioterapia-col-consult">
+            <col class="fisioterapia-col-yesno">
+            <col class="fisioterapia-col-prosthesis">
+            <col class="fisioterapia-col-yesno">
+            <col class="fisioterapia-col-modality">
+            <col class="fisioterapia-col-intensity">
+            <col class="fisioterapia-col-time">
+            <col class="fisioterapia-col-plan">
+            <col class="fisioterapia-col-actions">
+          </colgroup>
+          <thead>
+            <tr class="fisioterapia-table-group">
+              <th class="is-specialist" colspan="3">Fisioterapeuta</th>
+              <th class="is-functional" colspan="3">Avaliação funcional</th>
+              <th class="is-activity" colspan="3">Atividade física</th>
+              <th class="is-plan">Plano de cuidado</th>
+              <th class="is-actions">Ações</th>
+            </tr>
+            <tr class="fisioterapia-table-fields">
+              <th>Data</th>
+              <th>Paciente</th>
+              <th>Nº Consulta</th>
+              <th>Amputação</th>
+              <th>Prótese</th>
+              <th>Presença de dor</th>
+              <th>Modalidade</th>
+              <th>Intensidade</th>
+              <th>Tempo por semana</th>
+              <th>Recomendações</th>
+              <th class="is-actions-subhead" aria-label="Ações"></th>
+            </tr>
+          </thead>
+          <tbody id="fisioterapia-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <div id="fisioterapia-modal" class="fisioterapia-modal-overlay" hidden>
+    <form id="fisioterapia-form" class="fisioterapia-modal" novalidate>
+      <div class="fisioterapia-modal-header">
+        <h2 class="fisioterapia-modal-title">Fisioterapia - Registro de Consulta</h2>
+        <button type="button" class="clinical-modal-close fisioterapia-close" data-fisioterapia-close aria-label="Fechar">Fechar</button>
+      </div>
+
+      <div class="fisioterapia-form-body">
+        <div id="fisioterapia-alert" class="alert" hidden></div>
+        <input id="fisioterapia_record_id" name="record_id" type="hidden">
+
+        <section class="fisioterapia-form-section">
+          <div class="fisioterapia-grid">
+            <div class="field-full">
+              <label for="fisioterapia_patient_search_input">Paciente *</label>
+              <select id="fisioterapia_patient_id" name="patient_id" class="visually-hidden" tabindex="-1" aria-hidden="true"></select>
+              <div id="fisioterapia_patient_search" class="transition-patient-search"></div>
+            </div>
+
+            <div id="fisioterapia-patient-summary" class="fisioterapia-patient-summary" hidden></div>
+            <p id="fisioterapia-age-guidance" class="fisioterapia-age-guidance" hidden></p>
+
+            <div class="field">
+              <label for="fisioterapia_consultation_date">Data da consulta *</label>
+              <input id="fisioterapia_consultation_date" name="consultation_date" type="date" placeholder="dd/mm/aaaa" required>
+            </div>
+
+            <div class="field">
+              <label for="fisioterapia_consultation_number">Nº da consulta</label>
+              <select id="fisioterapia_consultation_number" name="consultation_number">
+                <option value="1ª Consulta (inicial)">1ª Consulta (inicial)</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <section class="fisioterapia-form-section">
+          <h3 class="fisioterapia-section-title">Avaliação funcional</h3>
+          <div class="fisioterapia-grid">
+            <div class="field">
+              <label for="fisioterapia_amputation">Amputação</label>
+              <select id="fisioterapia_amputation" name="amputation">
+                <option value="" hidden>Selecione...</option>
+                <option value="Sim">Sim</option>
+                <option value="Não">Não</option>
+              </select>
+              <p class="fisioterapia-field-guidance">Registre se há amputação e considere impacto em mobilidade, equilíbrio e autocuidado.</p>
+            </div>
+
+            <div class="field">
+              <label for="fisioterapia_prosthesis">Prótese</label>
+              <select id="fisioterapia_prosthesis" name="prosthesis">
+                <option value="" hidden>Selecione...</option>
+                <option value="Sem necessidade">Sem necessidade</option>
+                <option value="Com necessidade">Com necessidade</option>
+                <option value="Sem resposta">Sem resposta</option>
+                <option value="Utilizando protese prescrita">Utilizando protese prescrita</option>
+              </select>
+              <p class="fisioterapia-field-guidance">Use a lista da planilha para indicar necessidade ou uso de prótese.</p>
+            </div>
+
+            <div class="field">
+              <label for="fisioterapia_pain_presence">Presença de dor</label>
+              <select id="fisioterapia_pain_presence" name="pain_presence">
+                <option value="" hidden>Selecione...</option>
+                <option value="Sim">Sim</option>
+                <option value="Não">Não</option>
+              </select>
+              <p class="fisioterapia-field-guidance">Registre a presença de dor relatada ou observada na consulta.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="fisioterapia-form-section">
+          <h3 class="fisioterapia-section-title">Atividade física</h3>
+          <div class="fisioterapia-grid">
+            <div class="field">
+              <label for="fisioterapia_activity_modality">Modalidade</label>
+              <select id="fisioterapia_activity_modality" name="activity_modality">
+                <option value="" hidden>Selecione...</option>
+                <option value="Tempo livre ou Lazer">Tempo livre ou Lazer</option>
+                <option value="Atividade ocupacional">Atividade ocupacional</option>
+                <option value="Deslocamento">Deslocamento</option>
+                <option value="Âmbito das atividades domésticas">Âmbito das atividades domésticas</option>
+              </select>
+              <p class="fisioterapia-field-guidance">Registre o principal contexto da atividade realizada pelo paciente na rotina.</p>
+            </div>
+
+            <div class="field">
+              <label for="fisioterapia_intensity">Intensidade</label>
+              <select id="fisioterapia_intensity" name="intensity">
+                <option value="" hidden>Selecione...</option>
+                <option value="Leve">Leve</option>
+                <option value="Moderado">Moderado</option>
+                <option value="Vigorosa">Vigorosa</option>
+              </select>
+              <p class="fisioterapia-field-guidance">Registre a intensidade principal: leve, moderada ou vigorosa.</p>
+            </div>
+
+            <div class="field">
+              <label for="fisioterapia_weekly_time">Tempo por semana</label>
+              <input id="fisioterapia_weekly_time" name="weekly_time" autocomplete="off" placeholder="Ex: 150 min/semana ou 3x/semana">
+              <p class="fisioterapia-field-guidance">Use o relato do paciente para registrar frequência, duração ou volume semanal.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="fisioterapia-form-section">
+          <h3 class="fisioterapia-section-title">Plano de cuidado</h3>
+          <div class="fisioterapia-grid">
+            <div class="field-full">
+              <label for="fisioterapia_barriers">Fatores dificultadores - Ficha Plano de Cuidado</label>
+              <textarea id="fisioterapia_barriers" name="barriers" placeholder="Ex: dor, baixa mobilidade, barreiras ambientais, medo de queda, falta de apoio familiar ou dificuldade de acesso."></textarea>
+              <p class="fisioterapia-field-guidance">Descreva o que limita funcionalidade, adesão, atividade física ou continuidade do cuidado.</p>
+            </div>
+
+            <div class="field-full">
+              <label for="fisioterapia_recommendations">Recomendações - Ficha Plano de Cuidado</label>
+              <textarea id="fisioterapia_recommendations" name="recommendations" placeholder="Ex: orientar exercícios domiciliares, treino de marcha/equilíbrio, adequação de prótese, retorno e encaminhamentos necessários."></textarea>
+              <p class="fisioterapia-field-guidance">Registre a orientação pactuada com o paciente e pontos para continuidade pela equipe.</p>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="fisioterapia-form-actions">
+        <button type="button" class="btn" data-fisioterapia-close>Cancelar</button>
+        <button type="submit" class="btn btn-primary">
+          <svg class="fisioterapia-save-icon" aria-hidden="true"><use href="#fisioterapia-icon-save"></use></svg>
+          Salvar
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div id="fisioterapia-view-modal" class="fisioterapia-modal-overlay" hidden>
+    <article class="fisioterapia-modal" role="dialog" aria-modal="true" aria-labelledby="fisioterapia-view-title">
+      <div class="fisioterapia-modal-header">
+        <h2 id="fisioterapia-view-title" class="fisioterapia-modal-title">Guia preenchida da consulta de Fisioterapia</h2>
+        <button type="button" class="clinical-modal-close fisioterapia-close" data-fisioterapia-view-close aria-label="Fechar">Fechar</button>
+      </div>
+
+      <div class="fisioterapia-form-body">
+        <div id="fisioterapia-view-content" class="fisioterapia-view-content"></div>
+      </div>
+
+      <div class="fisioterapia-form-actions">
+        <button type="button" class="btn" data-fisioterapia-view-close>Fechar</button>
+      </div>
+    </article>
+  </div>
+
+  <script src="/assets/config.js"></script>
+  <script src="/assets/app.js"></script>
+  <script src="/assets/cadh-fisioterapia.js"></script>
+</body>
+</html>
+''

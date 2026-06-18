@@ -1,0 +1,713 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Serviço Social</title>
+  <link rel="stylesheet" href="/assets/app.css">
+  <style>
+    .social-page {
+      --social-accent: #7d7351;
+      --social-title: #352f1b;
+      --social-band: #d6caa8;
+      --social-soft: #f7f3e5;
+      --social-border: #e4dac0;
+      padding: 26px;
+      background:
+        radial-gradient(circle at top right, rgba(125, 115, 81, 0.12), transparent 28%),
+        linear-gradient(180deg, #fbf8ee, #eef5f3);
+    }
+
+    body[data-page="cadh-servico-social"] .container {
+      width: min(var(--app-shell-max), calc(100vw - 32px));
+      max-width: var(--app-shell-max);
+      margin: 20px auto;
+      padding: 0;
+    }
+
+    .social-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .social-title {
+      margin: 14px 0 0;
+      color: var(--social-title);
+      font-size: 1.65rem;
+      line-height: 1.25;
+    }
+
+    .social-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .social-page .btn,
+    .social-page button,
+    .social-modal .btn,
+    .social-modal button {
+      min-height: 46px;
+      padding: 11px 18px;
+      font-size: 0.96rem;
+      font-weight: 800;
+    }
+
+    .social-table-shell {
+      width: 100%;
+      overflow-x: hidden;
+      border: 1px solid var(--social-border);
+      border-radius: 10px;
+      background: #ffffff;
+      box-shadow: 0 18px 30px rgba(15, 37, 65, 0.06);
+    }
+
+    .social-table {
+      width: 100%;
+      min-width: 0;
+      table-layout: fixed;
+      border: 0;
+    }
+
+    .social-col-date { width: 8%; }
+    .social-col-patient { width: 13%; }
+    .social-col-consult { width: 10%; }
+    .social-col-education { width: 12%; }
+    .social-col-support { width: 14%; }
+    .social-col-income { width: 14%; }
+    .social-col-assistance { width: 13%; }
+    .social-col-plan { width: 14%; }
+    .social-col-actions { width: 142px; }
+
+    .social-table th,
+    .social-table td {
+      border-color: #efe1d5;
+      padding: 12px 9px;
+      color: var(--social-title);
+      font-size: 0.92rem;
+      line-height: 1.34;
+      vertical-align: middle;
+      overflow-wrap: break-word;
+      word-break: normal;
+      hyphens: auto;
+    }
+
+    .social-table tbody tr {
+      background: #fff;
+    }
+
+    .social-table-group th {
+      border-top: 0;
+      color: var(--social-title);
+      font-size: 0.92rem;
+      font-weight: 900;
+      text-align: center;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .social-table-group .is-specialist {
+      background: var(--social-band);
+      text-align: left;
+    }
+
+    .social-table-group .is-assessment,
+    .social-table-fields th {
+      background: var(--social-soft);
+    }
+
+    .social-table-group .is-plan {
+      background: #fbf8ee;
+    }
+
+    .social-table-group .is-actions,
+    .social-table-fields .is-actions-subhead {
+      background: #fbfcfd;
+      color: #405163;
+      border-left: 1px solid var(--social-border);
+    }
+
+    .social-table-fields th {
+      font-size: 0.84rem;
+      font-weight: 900;
+      text-align: left;
+    }
+
+    .social-table-fields .is-actions-subhead {
+      text-align: center;
+    }
+
+    .social-table td:nth-child(1) {
+      white-space: nowrap;
+    }
+
+    .social-table td:nth-child(2) {
+      font-weight: 800;
+      color: #2b1708;
+    }
+
+    .social-table th:last-child,
+    .social-table td:last-child {
+      width: 142px;
+      border-left: 1px solid var(--social-border);
+      text-align: center;
+    }
+
+    .social-table td:last-child {
+      padding: 12px 8px;
+      background: #fbfcfd;
+    }
+
+    .social-table .table-actions {
+      justify-content: center;
+      flex-wrap: nowrap;
+      gap: 8px;
+      min-height: 34px;
+    }
+
+    .social-table .icon-btn {
+      inline-size: 34px;
+      block-size: 34px;
+      display: inline-grid;
+      place-items: center;
+      padding: 0;
+      border: 1px solid #ead9ca;
+      background: #fbf8ee;
+      color: #756c50;
+    }
+
+    .social-table .icon-btn svg {
+      inline-size: 18px;
+      block-size: 18px;
+      display: block;
+    }
+
+    .social-table .icon-btn:hover,
+    .social-table .icon-btn:focus-visible {
+      background: #f7f3e5;
+      color: var(--social-accent);
+      box-shadow: 0 0 0 3px rgba(125, 115, 81, 0.12);
+      transform: none;
+    }
+
+    .social-empty {
+      min-height: 170px;
+      display: grid;
+      place-items: center;
+      gap: 12px;
+      padding: 32px;
+      color: #756c50;
+      text-align: center;
+    }
+
+    .social-empty p {
+      margin: 0;
+      font-weight: 600;
+    }
+
+    .social-modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1100;
+      display: grid;
+      place-items: start center;
+      overflow-y: auto;
+      padding: 12px 8px 28px;
+      background: rgba(9, 17, 25, 0.62);
+    }
+
+    .social-modal-overlay[hidden] {
+      display: none;
+    }
+
+    .social-modal {
+      width: min(980px, calc(100vw - 28px));
+      max-height: calc(100vh - 24px);
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      overflow: hidden;
+      border: 1px solid rgba(150, 105, 67, 0.24);
+      border-radius: 16px;
+      background: #ffffff;
+      box-shadow: 0 26px 70px rgba(63, 37, 16, 0.22);
+    }
+
+    .social-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 16px 20px;
+      border-bottom: 1px solid #efd9c5;
+      background: linear-gradient(180deg, #fff8f1, #ffffff);
+    }
+
+    .social-modal-title {
+      margin: 0;
+      color: var(--social-title);
+      font-size: 1.22rem;
+      line-height: 1.3;
+    }
+
+    .social-close {
+      --clinical-close-border: var(--social-border);
+      --clinical-close-color: var(--social-title);
+      --clinical-close-hover-bg: #fff1e5;
+      --clinical-close-hover-color: var(--social-accent);
+    }
+
+    .social-form-body {
+      min-height: 0;
+      overflow-y: auto;
+      padding: 22px 24px 26px;
+      background: #fffdfb;
+    }
+
+    .social-form-section {
+      display: grid;
+      gap: 16px;
+      margin-bottom: 22px;
+      padding-top: 2px;
+      border-top: 1px solid #efd9c5;
+    }
+
+    .social-form-section:first-of-type {
+      border-top: 0;
+    }
+
+    .social-section-title {
+      margin: 0;
+      color: var(--social-title);
+      font-size: 1.08rem;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .social-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .social-grid .field,
+    .social-grid .field-full {
+      position: relative;
+      min-width: 0;
+    }
+
+    .social-grid .field {
+      display: grid;
+      grid-template-rows: minmax(40px, auto) auto;
+      align-content: start;
+      gap: 8px;
+    }
+
+    .social-grid .field-full {
+      grid-column: 1 / -1;
+    }
+
+    .social-grid .field label,
+    .social-grid .field-full label {
+      display: block;
+      color: #18324d;
+      font-size: 0.96rem;
+      font-weight: 800;
+      line-height: 1.3;
+    }
+
+    .social-grid .field label {
+      display: flex;
+      align-items: flex-end;
+      min-height: 40px;
+    }
+
+    .social-modal input,
+    .social-modal select,
+    .social-modal textarea {
+      min-height: 48px;
+      font-size: 1rem;
+      line-height: 1.45;
+    }
+
+    .social-modal textarea {
+      min-height: 124px;
+      resize: none;
+    }
+
+    .social-field-guidance {
+      display: none;
+    }
+
+    .social-age-guidance {
+      grid-column: 1 / -1;
+      margin: 8px 0 0;
+      color: #53657a;
+      font-size: 1rem;
+      line-height: 1.45;
+    }
+
+    .social-patient-summary {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      padding: 16px;
+      border: 1px solid var(--social-border);
+      border-radius: 12px;
+      background: #fff1e5;
+    }
+
+    .social-patient-summary[hidden] {
+      display: none;
+    }
+
+    .social-patient-summary span {
+      display: grid;
+      gap: 2px;
+      min-width: 0;
+      color: #7d5b40;
+      font-size: 0.95rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .social-patient-summary strong {
+      overflow: hidden;
+      color: var(--social-title);
+      font-size: 0.98rem;
+      letter-spacing: 0;
+      text-overflow: ellipsis;
+      text-transform: none;
+      white-space: nowrap;
+    }
+
+    .social-form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      padding: 16px 22px;
+      border-top: 1px solid #efd9c5;
+      background: #ffffff;
+    }
+
+    .social-form-actions .btn,
+    .social-form-actions button {
+      min-width: 150px;
+      justify-content: center;
+    }
+
+    .social-save-icon {
+      inline-size: 18px;
+      block-size: 18px;
+      margin-right: 8px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .social-view-content {
+      display: grid;
+      gap: 16px;
+    }
+
+    .social-view-section {
+      display: grid;
+      gap: 12px;
+      padding: 14px;
+      border: 1px solid #efd9c5;
+      border-radius: 12px;
+      background: #fff;
+    }
+
+    .social-view-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .social-view-item {
+      min-width: 0;
+      padding: 12px;
+      border: 0;
+      border-radius: 10px;
+      background: #fff8f1;
+    }
+
+    .social-view-item.is-wide {
+      grid-column: 1 / -1;
+    }
+
+    .social-view-label {
+      display: block;
+      margin-bottom: 5px;
+      color: #7d6958;
+      font-size: 0.74rem;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .social-view-value {
+      color: var(--social-title);
+      font-size: 1rem;
+      font-weight: 700;
+      line-height: 1.45;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    @media (max-width: 760px) {
+      .social-page {
+        padding: 20px;
+      }
+
+      .social-actions {
+        width: 100%;
+      }
+
+      .social-actions .btn,
+      .social-actions button {
+        flex: 1 1 160px;
+        justify-content: center;
+      }
+
+      .social-grid,
+      .social-view-grid,
+      .social-patient-summary {
+        grid-template-columns: 1fr;
+      }
+
+      .social-modal-header,
+      .social-form-body,
+      .social-form-actions {
+        padding-left: 18px;
+        padding-right: 18px;
+      }
+
+      .social-form-actions {
+        flex-direction: column-reverse;
+      }
+
+      .social-form-actions .btn,
+      .social-form-actions button {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body data-page="cadh-servico-social">
+  <header class="topbar">
+    <div class="topbar-brand">Intranet CADH</div>
+    <nav class="menu">
+      <a id="nav-home" href="/index.html">Home</a>
+      <a id="nav-cadh" href="/cadh/index.html">CADH</a>
+      <a id="nav-ubs" href="/ubs/index.html">UBS</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="card social-page">
+      <svg aria-hidden="true" style="display:none">
+        <symbol id="social-icon-save" viewBox="0 0 24 24">
+          <path d="M5 3h12l2 2v16H5V3Z"/>
+          <path d="M8 3v6h8V3"/>
+          <path d="M8 15h8v6H8v-6Z"/>
+        </symbol>
+      </svg>
+
+      <div class="social-header">
+        <div>
+          <a class="btn" href="/cadh/index.html" data-back-link data-fallback="/cadh/index.html">&larr; Voltar</a>
+          <h1 class="social-title">Serviço Social</h1>
+        </div>
+        <div class="social-actions">
+          <button type="button" id="social-new" class="btn btn-primary">+ Novo registro</button>
+        </div>
+      </div>
+
+      <div class="social-table-shell">
+        <table class="social-table" aria-label="Registros de Serviço Social">
+          <colgroup>
+            <col class="social-col-date">
+            <col class="social-col-patient">
+            <col class="social-col-consult">
+            <col class="social-col-education">
+            <col class="social-col-support">
+            <col class="social-col-income">
+            <col class="social-col-assistance">
+            <col class="social-col-plan">
+            <col class="social-col-plan">
+            <col class="social-col-actions">
+          </colgroup>
+          <thead>
+            <tr class="social-table-group">
+              <th class="is-specialist" colspan="3">Serviço Social</th>
+              <th class="is-assessment" colspan="4">Avaliação socioassistencial</th>
+              <th class="is-plan" colspan="2">Plano de cuidado</th>
+              <th class="is-actions">Ações</th>
+            </tr>
+            <tr class="social-table-fields">
+              <th>Data</th>
+              <th>Paciente</th>
+              <th>Nº Consulta</th>
+              <th>Escolaridade</th>
+              <th>Suporte Social</th>
+              <th>Renda familiar</th>
+              <th>Necessidade de apoio assistencial</th>
+              <th>Fatores dificultadores</th>
+              <th>Recomendações</th>
+              <th class="is-actions-subhead" aria-label="Ações"></th>
+            </tr>
+          </thead>
+          <tbody id="social-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <div id="social-modal" class="social-modal-overlay" hidden>
+    <form id="social-form" class="social-modal" novalidate>
+      <div class="social-modal-header">
+        <h2 class="social-modal-title">Serviço Social - Registro de Consulta</h2>
+        <button type="button" class="clinical-modal-close social-close" data-social-close aria-label="Fechar">Fechar</button>
+      </div>
+
+      <div class="social-form-body">
+        <div id="social-alert" class="alert" hidden></div>
+        <input id="social_record_id" name="record_id" type="hidden">
+
+        <section class="social-form-section">
+          <div class="social-grid">
+            <div class="field-full">
+              <label for="social_patient_search_input">Paciente *</label>
+              <select id="social_patient_id" name="patient_id" class="visually-hidden" tabindex="-1" aria-hidden="true"></select>
+              <div id="social_patient_search" class="transition-patient-search"></div>
+            </div>
+
+            <div id="social-patient-summary" class="social-patient-summary" hidden></div>
+            <p id="social-age-guidance" class="social-age-guidance" hidden></p>
+
+            <div class="field">
+              <label for="social_consultation_date">Data da consulta *</label>
+              <input id="social_consultation_date" name="consultation_date" type="date" placeholder="dd/mm/aaaa" required>
+            </div>
+
+            <div class="field">
+              <label for="social_consultation_number">Nº da consulta</label>
+              <select id="social_consultation_number" name="consultation_number">
+                <option value="1ª Consulta (inicial)">1ª Consulta (inicial)</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <section class="social-form-section">
+          <h3 class="social-section-title">Avaliação socioassistencial</h3>
+          <div class="social-grid">
+            <div class="field">
+              <label for="social_education">Escolaridade</label>
+              <select id="social_education" name="education">
+                <option value="" hidden>Selecione...</option>
+                <option value="Não possui">Não possui</option>
+                <option value="Educação infantil">Educação infantil</option>
+                <option value="Fundamental">Fundamental</option>
+                <option value="Médio">Médio</option>
+                <option value="Superior (Graduação)">Superior (Graduação)</option>
+                <option value="Pós-graduação">Pós-graduação</option>
+                <option value="Mestrado">Mestrado</option>
+                <option value="Doutorado">Doutorado</option>
+              </select>
+              <p class="social-field-guidance">Registre a escolaridade conforme relato do usuário ou familiar.</p>
+            </div>
+
+            <div class="field-full">
+              <label for="social_support">Suporte Social</label>
+              <textarea id="social_support" name="support" placeholder="Ex: mora sozinho, apoio familiar, cuidador, rede de vizinhos, vínculo com equipamentos sociais ou ausência de suporte."></textarea>
+              <p class="social-field-guidance">Descreva a rede de apoio e as condições sociais relevantes para continuidade do cuidado.</p>
+            </div>
+
+            <div class="field">
+              <label for="social_income">Renda familiar</label>
+              <select id="social_income" name="income">
+                <option value="" hidden>Selecione...</option>
+                <option value="Sem renda familiar">Sem renda familiar</option>
+                <option value="Até 1 salário mínimo">Até 1 salário mínimo</option>
+                <option value="De 2 a 5 salários mínimos">De 2 a 5 salários mínimos</option>
+                <option value="De 5 a 10 salários mínimos">De 5 a 10 salários mínimos</option>
+                <option value="Acima de 10 salários mínimos">Acima de 10 salários mínimos</option>
+              </select>
+              <p class="social-field-guidance">Selecione a faixa de renda familiar informada.</p>
+            </div>
+
+            <div class="field">
+              <label for="social_assistance_need">Necessidade de apoio assistencial (CRAS/CREAS/INSS/etc)</label>
+              <select id="social_assistance_need" name="assistance_need">
+                <option value="" hidden>Selecione...</option>
+                <option value="Sim">Sim</option>
+                <option value="Não">Não</option>
+              </select>
+              <p class="social-field-guidance">Registre se há necessidade de articulação com rede socioassistencial ou previdenciária.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="social-form-section">
+          <h3 class="social-section-title">Plano de cuidado</h3>
+          <div class="social-grid">
+            <div class="field-full">
+              <label for="social_barriers">Fatores dificultadores - Ficha Plano de Cuidado</label>
+              <textarea id="social_barriers" name="barriers" placeholder="Ex: vulnerabilidade social, insegurança alimentar, dificuldade de acesso a benefícios, ausência de cuidador, transporte ou documentação."></textarea>
+              <p class="social-field-guidance">Descreva barreiras sociais, familiares, econômicas ou de acesso que dificultam o plano de cuidado.</p>
+            </div>
+
+            <div class="field-full">
+              <label for="social_recommendations">Recomendações - Ficha Plano de Cuidado</label>
+              <textarea id="social_recommendations" name="recommendations" placeholder="Ex: orientar acesso a CRAS/CREAS/INSS, acionar rede de apoio, encaminhar para benefícios, organizar documentação ou pactuar acompanhamento."></textarea>
+              <p class="social-field-guidance">Registre encaminhamentos, orientações e pactuações com usuário, família e rede de apoio.</p>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="social-form-actions">
+        <button type="button" class="btn" data-social-close>Cancelar</button>
+        <button type="submit" class="btn btn-primary">
+          <svg class="social-save-icon" aria-hidden="true"><use href="#social-icon-save"></use></svg>
+          Salvar
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div id="social-view-modal" class="social-modal-overlay" hidden>
+    <article class="social-modal" role="dialog" aria-modal="true" aria-labelledby="social-view-title">
+      <div class="social-modal-header">
+        <h2 id="social-view-title" class="social-modal-title">Guia preenchida da consulta de Serviço Social</h2>
+        <button type="button" class="clinical-modal-close social-close" data-social-view-close aria-label="Fechar">Fechar</button>
+      </div>
+
+      <div class="social-form-body">
+        <div id="social-view-content" class="social-view-content"></div>
+      </div>
+
+      <div class="social-form-actions">
+        <button type="button" class="btn" data-social-view-close>Fechar</button>
+      </div>
+    </article>
+  </div>
+
+  <script src="/assets/config.js"></script>
+  <script src="/assets/app.js"></script>
+  <script src="/assets/cadh-servico-social.js"></script>
+</body>
+</html>
