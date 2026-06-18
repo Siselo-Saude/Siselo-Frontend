@@ -442,6 +442,7 @@ function fillNutricaoForm(record = null) {
   setNutricaoField("nutricao_in_natura", normalizedRecord ? normalizedRecord.in_natura : "");
   setNutricaoField("nutricao_bowel_function", normalizedRecord ? normalizedRecord.bowel_function : "");
   setNutricaoField("nutricao_water_intake", normalizedRecord ? normalizedRecord.water_intake : "");
+  setNutricaoField("nutricao_water_liters", normalizedRecord ? normalizedRecord.water_liters : "");
   setNutricaoField("nutricao_barriers", normalizedRecord ? normalizedRecord.barriers : "");
   setNutricaoField("nutricao_recommendations", normalizedRecord ? normalizedRecord.recommendations : "");
 
@@ -529,6 +530,7 @@ function saveNutricaoRecord() {
     in_natura: payload.in_natura,
     bowel_function: payload.bowel_function,
     water_intake: payload.water_intake,
+    water_liters: payload.water_liters,
     barriers: payload.barriers,
     recommendations: payload.recommendations,
     updated_at: new Date().toISOString(),
@@ -834,6 +836,7 @@ function renderNutricaoViewRecord(record) {
     ${renderNutricaoViewSection("Rotina clínica", [
       ["Funcionalidade intestinal", item.bowel_function || "-"],
       ["Ingestão hídrica", item.water_intake || "-"],
+      ["Litros por dia", item.water_liters ? `${item.water_liters} L/dia` : "-"],
     ])}
     ${renderNutricaoViewSection("Plano de cuidado", [
       ["Fatores dificultadores", item.barriers || "-", true],
@@ -860,6 +863,21 @@ function renderNutricaoViewItem(label, value, wide = false) {
       <div class="nutricao-view-value">${SISELO.escapeHtml(value || "-")}</div>
     </div>
   `;
+}
+
+function formatNutricaoWaterIntake(record) {
+  const intake = normalizeNutricaoText(record && record.water_intake);
+  const liters = normalizeNutricaoWaterLiters(record && record.water_liters);
+
+  if (intake && liters) {
+    return `${intake} (${liters} L/dia)`;
+  }
+
+  if (liters) {
+    return `${liters} L/dia`;
+  }
+
+  return intake || "-";
 }
 
 function renderNutricaoTable() {
@@ -911,7 +929,7 @@ function renderNutricaoTable() {
       <td>${SISELO.escapeHtml(record.processed || "-")}</td>
       <td>${SISELO.escapeHtml(record.in_natura || "-")}</td>
       <td>${SISELO.escapeHtml(record.bowel_function || "-")}</td>
-      <td>${SISELO.escapeHtml(record.water_intake || "-")}</td>
+      <td>${SISELO.escapeHtml(formatNutricaoWaterIntake(record))}</td>
       <td>
         <div class="table-actions">
           ${SISELO.iconButton("view", "Ver consulta nutricional", { "data-nutricao-view": record.id })}
@@ -1003,6 +1021,7 @@ function normalizeNutricaoRecord(record) {
     in_natura: normalizeNutricaoConsumption(record && record.in_natura),
     bowel_function: normalizeNutricaoBowelFunction(record && record.bowel_function),
     water_intake: normalizeNutricaoText(record && record.water_intake),
+    water_liters: normalizeNutricaoWaterLiters(record && record.water_liters),
     barriers: String((record && record.barriers) || "").trim(),
     recommendations: String((record && record.recommendations) || "").trim(),
     updated_at: String((record && record.updated_at) || "").trim(),
@@ -1011,6 +1030,24 @@ function normalizeNutricaoRecord(record) {
 
 function normalizeNutricaoText(value) {
   return String(value || "").trim();
+}
+
+function normalizeNutricaoWaterLiters(value) {
+  const original = normalizeNutricaoText(value);
+  if (!original) {
+    return "";
+  }
+
+  const decimal = original.replace(/\s+/g, "").replace(",", ".");
+  const parsed = Number(decimal);
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    return original;
+  }
+
+  return parsed.toLocaleString("pt-BR", {
+    minimumFractionDigits: parsed % 1 === 0 ? 0 : 1,
+    maximumFractionDigits: 2,
+  });
 }
 
 function normalizeNutricaoActivityModality(value) {

@@ -1,7 +1,7 @@
 const CADH_SEARCH_KEY = 'siselo_cadh_search';
 
 document.addEventListener('DOMContentLoaded', () => {
-  if (document.body.dataset.page !== 'cadh') {
+  if (!['cadh', 'ubs'].includes(document.body.dataset.page)) {
     return;
   }
   setupCadhPage();
@@ -12,7 +12,8 @@ async function setupCadhPage() {
   if (!user) return;
 
   const permissions = SISELO.getUiPermissions(user);
-  SISELO.bindShell('cadh');
+  const shellKey = document.body.dataset.page === 'ubs' ? 'ubs' : 'cadh';
+  SISELO.bindShell(shellKey);
   applyCadhModulePermissions(permissions);
   bindCadhPatientSearch(permissions);
   if (!await restoreCadhPatientSearch(permissions)) {

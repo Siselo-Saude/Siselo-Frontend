@@ -548,7 +548,7 @@
 
       <div class="nutricao-header">
         <div>
-          <a class="btn" href="/cadh/index.html">← Voltar</a>
+          <a class="btn" href="/cadh/index.html" data-back-link data-fallback="/cadh/index.html">&larr; Voltar</a>
           <h1 class="nutricao-title">Nutricionista</h1>
         </div>
         <div class="nutricao-actions">
@@ -736,6 +736,12 @@
                 <option value="Insuficiente">Insuficiente</option>
               </select>
               <p class="nutricao-field-guidance">Considere o relato do paciente, rotina, clima, atividade física, restrições clínicas e orientação profissional.</p>
+            </div>
+
+            <div class="field">
+              <label for="nutricao_water_liters">Ingestão hídrica aproximada (L/dia)</label>
+              <input id="nutricao_water_liters" name="water_liters" inputmode="decimal" autocomplete="off" placeholder="Ex: 2,0">
+              <p class="nutricao-field-guidance">Registre em litros por dia quando informado pelo paciente ou responsável.</p>
             </div>
           </div>
         </section>
