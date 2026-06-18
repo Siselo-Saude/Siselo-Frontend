@@ -1411,7 +1411,19 @@
   async function requireSession() {
     try {
       const data = await apiRequest('/auth/me.php');
-      return data.user;
+      const user = data.user;
+      const currentPath = String(location.pathname);
+      const profileRoutes = ['/welcome.html', '/coopere-login.html', '/login.html', '/change_password.html'];
+      const needsProfile = user &&
+        user.external_provider &&
+        Number(user.profile_completed || 0) !== 1;
+
+      if (needsProfile && !profileRoutes.some((path) => currentPath.endsWith(path))) {
+        location.href = '/welcome.html';
+        return null;
+      }
+
+      return user;
     } catch (error) {
       if (error.status !== 401 && error.status !== 403) {
         const cachedUser = getSession();

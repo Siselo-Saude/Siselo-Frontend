@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Acesso Coopere - SISELO</title>
+  <link rel="stylesheet" href="/assets/app.css">
+</head>
+<body data-page="coopere-login">
+  <main class="auth-shell">
+    <section class="card auth-card auth-card-centered">
+      <div class="auth-mark" aria-hidden="true"></div>
+      <h1 class="auth-title">Acesso Coopere</h1>
+      <p id="coopere-login-status" class="auth-subtitle">Validando seu acesso ao SISELO.</p>
+
+      <div id="page-alert" class="alert" hidden></div>
+
+      <form id="coopere-dev-form" class="auth-form form-grid" style="grid-template-columns:1fr;" hidden>
+        <div class="field-full">
+          <label for="dev-name">Nome completo</label>
+          <input id="dev-name" name="name" value="Usuario Teste Coopere" required>
+        </div>
+
+        <div class="field-full">
+          <label for="dev-email">Email</label>
+          <input id="dev-email" name="email" type="email" value="usuario.teste@unb.br" required>
+        </div>
+
+        <div class="field-full">
+          <label for="dev-username">Usuario Coopere</label>
+          <input id="dev-username" name="username" value="usuario.teste" required>
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-primary auth-submit" type="submit">Entrar em modo local</button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <script src="/assets/config.js"></script>
+  <script src="/assets/app.js"></script>
+  <script src="/assets/coopere-auth.js"></script>
+</body>
+</html>

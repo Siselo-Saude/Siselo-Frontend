@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bem-vindo - SISELO</title>
+  <link rel="stylesheet" href="/assets/app.css">
+</head>
+<body data-page="welcome">
+  <main class="auth-shell">
+    <section class="card auth-card auth-card-centered">
+      <div class="auth-mark" aria-hidden="true"></div>
+      <h1 class="auth-title">Bem-vindo ao SISELO</h1>
+      <p class="auth-subtitle">Complete seu perfil para continuar.</p>
+
+      <div id="page-alert" class="alert" hidden></div>
+
+      <form id="welcome-form" class="auth-form form-grid" style="grid-template-columns:1fr;">
+        <div class="field-full">
+          <label for="welcome-name">Nome</label>
+          <input id="welcome-name" name="name" readonly>
+        </div>
+
+        <div class="field-full">
+          <label for="welcome-email">Email</label>
+          <input id="welcome-email" name="email" type="email" readonly>
+        </div>
+
+        <fieldset class="auth-choice-group field-full">
+          <legend>Tipo de usuario</legend>
+          <label class="auth-choice">
+            <input name="user_type" type="radio" value="CADH" required>
+            <span>CADH</span>
+          </label>
+          <label class="auth-choice">
+            <input name="user_type" type="radio" value="UBS" required>
+            <span>UBS</span>
+          </label>
+        </fieldset>
+
+        <div class="field-full auth-specialty-field" hidden>
+          <label for="welcome-specialty">Especialidade</label>
+          <select id="welcome-specialty" name="specialty">
+            <option value="">Selecione a especialidade</option>
+          </select>
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-primary auth-submit" type="submit">Concluir perfil</button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <script src="/assets/config.js"></script>
+  <script src="/assets/app.js"></script>
+  <script src="/assets/coopere-auth.js"></script>
+</body>
+</html>
