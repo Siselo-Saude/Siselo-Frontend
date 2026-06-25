@@ -83,8 +83,8 @@
     .oftalmo-col-exam { width: 132px !important; }
     .oftalmo-col-referral-specialty { width: 150px !important; }
     .oftalmo-col-referral-date { width: 150px !important; }
-    .oftalmo-col-plan { width: 150px !important; }
-    .oftalmo-col-actions { width: 142px !important; }
+    .oftalmo-col-plan { width: auto !important; }
+    .oftalmo-col-actions { width: 210px !important; }
 
     body[data-page="cadh-oftalmologia"] .oftalmo-table-shell {
       overflow-x: auto !important;
@@ -104,8 +104,8 @@
     body[data-page="cadh-oftalmologia"] .oftalmo-table .oftalmo-col-exam { width: 132px !important; }
     body[data-page="cadh-oftalmologia"] .oftalmo-table .oftalmo-col-referral-specialty { width: 150px !important; }
     body[data-page="cadh-oftalmologia"] .oftalmo-table .oftalmo-col-referral-date { width: 150px !important; }
-    body[data-page="cadh-oftalmologia"] .oftalmo-table .oftalmo-col-plan { width: 150px !important; }
-    body[data-page="cadh-oftalmologia"] .oftalmo-table .oftalmo-col-actions { width: 142px !important; }
+    body[data-page="cadh-oftalmologia"] .oftalmo-table .oftalmo-col-plan { width: auto !important; }
+    body[data-page="cadh-oftalmologia"] .oftalmo-table .oftalmo-col-actions { width: 210px !important; }
 
     .oftalmo-table th,
     .oftalmo-table td {
@@ -626,14 +626,6 @@
             <col class="oftalmo-col-date">
             <col class="oftalmo-col-patient">
             <col class="oftalmo-col-consult">
-            <col class="oftalmo-col-visual">
-            <col class="oftalmo-col-visual">
-            <col class="oftalmo-col-exam">
-            <col class="oftalmo-col-exam">
-            <col class="oftalmo-col-exam">
-            <col class="oftalmo-col-referral-specialty">
-            <col class="oftalmo-col-referral-date">
-            <col class="oftalmo-col-referral-date">
             <col class="oftalmo-col-plan">
             <col class="oftalmo-col-plan">
             <col class="oftalmo-col-actions">
@@ -641,9 +633,6 @@
           <thead>
             <tr class="oftalmo-table-group">
               <th class="is-specialist" colspan="3">Oftalmologia</th>
-              <th class="is-visual" colspan="2">Acuidade visual</th>
-              <th class="is-exams" colspan="3">Exames</th>
-              <th class="is-referral" colspan="3">Encaminhamento ao especialista</th>
               <th class="is-plan" colspan="2">Plano de cuidado</th>
               <th class="is-actions">Ações</th>
             </tr>
@@ -651,16 +640,8 @@
               <th>Data</th>
               <th>Paciente</th>
               <th>Nº Consulta</th>
-              <th>Acuidade OD</th>
-              <th>Acuidade OE</th>
-              <th>Biomicroscopia</th>
-              <th>Tonometria</th>
-              <th>Fundoscopia</th>
-              <th>Especialista</th>
-              <th>Regula&ccedil;&atilde;o/agendamento</th>
-              <th>Execu&ccedil;&atilde;o da consulta</th>
-              <th>Fatores dificultadores</th>
-              <th>Recomenda&ccedil;&otilde;es</th>
+              <th>Fatores dificultadores - Ficha Plano de Cuidado</th>
+              <th>Recomendações - Ficha Plano de Cuidado</th>
               <th class="is-actions-subhead" aria-label="Ações"></th>
             </tr>
           </thead>

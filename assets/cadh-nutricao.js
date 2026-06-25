@@ -906,7 +906,7 @@ function renderNutricaoTable() {
       : "Selecione um usuário no CADH para visualizar os registros de Nutrição.";
     tbody.innerHTML = `
       <tr>
-        <td colspan="12">
+        <td colspan="6">
           <div class="nutricao-empty">
             <p>${SISELO.escapeHtml(emptyMessage)}</p>
           </div>
@@ -922,19 +922,14 @@ function renderNutricaoTable() {
       <td>${SISELO.escapeHtml(formatNutricaoDate(record.consultation_date))}</td>
       <td>${SISELO.escapeHtml(record.full_name || "-")}</td>
       <td>${SISELO.escapeHtml(record.consultation_number || "-")}</td>
-      <td>${SISELO.escapeHtml(record.activity_modality || "-")}</td>
-      <td>${SISELO.escapeHtml(record.activity_duration || "-")}</td>
-      <td>${SISELO.escapeHtml(record.activity_frequency || "-")}</td>
-      <td>${SISELO.escapeHtml(record.ultraprocessed || "-")}</td>
-      <td>${SISELO.escapeHtml(record.processed || "-")}</td>
-      <td>${SISELO.escapeHtml(record.in_natura || "-")}</td>
-      <td>${SISELO.escapeHtml(record.bowel_function || "-")}</td>
-      <td>${SISELO.escapeHtml(formatNutricaoWaterIntake(record))}</td>
+      <td>${SISELO.escapeHtml(record.barriers || "-")}</td>
+      <td>${SISELO.escapeHtml(record.recommendations || "-")}</td>
       <td>
         <div class="table-actions">
           ${SISELO.iconButton("view", "Ver consulta nutricional", { "data-nutricao-view": record.id })}
           ${SISELO.iconButton("pdf", "Gerar PDF", { "data-nutricao-pdf": record.id })}
           ${SISELO.iconButton("edit", "Editar registro", { "data-nutricao-edit": record.id })}
+          ${SISELO.iconButton("delete", "Remover registro", { "data-nutricao-delete": record.id })}
         </div>
       </td>
     </tr>
@@ -970,6 +965,19 @@ function bindNutricaoTableActions() {
   tbody.querySelectorAll("[data-nutricao-pdf]").forEach((button) => {
     button.addEventListener("click", () => {
       SISELO.showUnavailableAction("A geração do PDF será disponibilizada em breve.");
+    });
+  });
+
+  tbody.querySelectorAll("[data-nutricao-delete]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const record = nutricaoState.records.find((item) => item.id === button.dataset.nutricaoDelete);
+      if (!record || !(await SISELO.confirmPermanentDeletion("o registro de Nutrição", record.consultation_number))) {
+        return;
+      }
+
+      nutricaoState.records = nutricaoState.records.filter((item) => item.id !== record.id);
+      writeNutricaoRecords(nutricaoState.records);
+      renderNutricaoTable();
     });
   });
 }

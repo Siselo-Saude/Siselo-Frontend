@@ -772,7 +772,7 @@ function renderFarmaciaTable() {
       : "Selecione um usuário no CADH para visualizar os registros de Farmácia Clínica.";
     tbody.innerHTML = `
       <tr>
-        <td colspan="8">
+        <td colspan="6">
           <div class="farmacia-empty">
             <p>${SISELO.escapeHtml(emptyMessage)}</p>
           </div>
@@ -788,8 +788,6 @@ function renderFarmaciaTable() {
       <td>${SISELO.escapeHtml(formatFarmaciaDate(record.consultation_date))}</td>
       <td>${SISELO.escapeHtml(record.full_name || "-")}</td>
       <td>${SISELO.escapeHtml(record.consultation_number || "-")}</td>
-      <td>${SISELO.escapeHtml(record.medication_treatment || "-")}</td>
-      <td>${SISELO.escapeHtml(record.drug_interaction || "-")}</td>
       <td>${SISELO.escapeHtml(record.barriers || "-")}</td>
       <td>${SISELO.escapeHtml(record.recommendations || "-")}</td>
       <td>
@@ -797,6 +795,7 @@ function renderFarmaciaTable() {
           ${SISELO.iconButton("view", "Ver consulta de Farmácia Clínica", { "data-farmacia-view": record.id })}
           ${SISELO.iconButton("pdf", "Gerar PDF", { "data-farmacia-pdf": record.id })}
           ${SISELO.iconButton("edit", "Editar registro", { "data-farmacia-edit": record.id })}
+          ${SISELO.iconButton("delete", "Remover registro", { "data-farmacia-delete": record.id })}
         </div>
       </td>
     </tr>
@@ -832,6 +831,19 @@ function bindFarmaciaTableActions() {
   tbody.querySelectorAll("[data-farmacia-pdf]").forEach((button) => {
     button.addEventListener("click", () => {
       SISELO.showUnavailableAction("A geração do PDF será disponibilizada em breve.");
+    });
+  });
+
+  tbody.querySelectorAll("[data-farmacia-delete]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const record = farmaciaState.records.find((item) => item.id === button.dataset.farmaciaDelete);
+      if (!record || !(await SISELO.confirmPermanentDeletion("o registro de Farmácia Clínica", record.consultation_number))) {
+        return;
+      }
+
+      farmaciaState.records = farmaciaState.records.filter((item) => item.id !== record.id);
+      writeFarmaciaRecords(farmaciaState.records);
+      renderFarmaciaTable();
     });
   });
 }

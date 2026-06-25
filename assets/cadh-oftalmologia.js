@@ -986,7 +986,7 @@ function renderOftalmoTable() {
       : "Selecione um usuário no CADH para visualizar os registros de Oftalmologia.";
     tbody.innerHTML = `
       <tr>
-        <td colspan="14">
+        <td colspan="6">
           <div class="oftalmo-empty">
             <p>${SISELO.escapeHtml(emptyMessage)}</p>
           </div>
@@ -1002,14 +1002,6 @@ function renderOftalmoTable() {
       <td>${SISELO.escapeHtml(formatOftalmoDate(record.consultation_date))}</td>
       <td>${SISELO.escapeHtml(record.full_name || "-")}</td>
       <td>${SISELO.escapeHtml(record.consultation_number || "-")}</td>
-      <td>${SISELO.escapeHtml(record.right_visual_acuity || "-")}</td>
-      <td>${SISELO.escapeHtml(record.left_visual_acuity || "-")}</td>
-      <td>${SISELO.escapeHtml(record.biomicroscopy || "-")}</td>
-      <td>${SISELO.escapeHtml(record.tonometry || "-")}</td>
-      <td>${SISELO.escapeHtml(record.fundoscopy || "-")}</td>
-      <td>${renderOftalmoReferralColumn(record.referrals, "specialty")}</td>
-      <td>${renderOftalmoReferralColumn(record.referrals, "schedule_date")}</td>
-      <td>${renderOftalmoReferralColumn(record.referrals, "execution_date")}</td>
       <td>${SISELO.escapeHtml(record.barriers || "-")}</td>
       <td>${SISELO.escapeHtml(record.recommendations || "-")}</td>
       <td>
@@ -1017,6 +1009,7 @@ function renderOftalmoTable() {
           ${SISELO.iconButton("view", "Ver consulta de Oftalmologia", { "data-oftalmo-view": record.id })}
           ${SISELO.iconButton("pdf", "Gerar PDF", { "data-oftalmo-pdf": record.id })}
           ${SISELO.iconButton("edit", "Editar registro", { "data-oftalmo-edit": record.id })}
+          ${SISELO.iconButton("delete", "Remover registro", { "data-oftalmo-delete": record.id })}
         </div>
       </td>
     </tr>
@@ -1052,6 +1045,19 @@ function bindOftalmoTableActions() {
   tbody.querySelectorAll("[data-oftalmo-pdf]").forEach((button) => {
     button.addEventListener("click", () => {
       SISELO.showUnavailableAction("A geração do PDF será disponibilizada em breve.");
+    });
+  });
+
+  tbody.querySelectorAll("[data-oftalmo-delete]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const record = oftalmoState.records.find((item) => item.id === button.dataset.oftalmoDelete);
+      if (!record || !(await SISELO.confirmPermanentDeletion("o registro de Oftalmologia", record.consultation_number))) {
+        return;
+      }
+
+      oftalmoState.records = oftalmoState.records.filter((item) => item.id !== record.id);
+      writeOftalmoRecords(oftalmoState.records);
+      renderOftalmoTable();
     });
   });
 }

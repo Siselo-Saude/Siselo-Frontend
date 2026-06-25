@@ -916,7 +916,7 @@ function renderEnfermagemTable() {
       : "Selecione um usuário no CADH para visualizar os registros de Enfermagem.";
     tbody.innerHTML = `
       <tr>
-        <td colspan="9">
+        <td colspan="6">
           <div class="enfermagem-empty">
             <p>${SISELO.escapeHtml(emptyMessage)}</p>
           </div>
@@ -932,16 +932,14 @@ function renderEnfermagemTable() {
       <td>${SISELO.escapeHtml(formatEnfermagemDate(record.consultation_date))}</td>
       <td>${SISELO.escapeHtml(record.full_name || "-")}</td>
       <td>${SISELO.escapeHtml(record.consultation_number || "-")}</td>
-      <td>${SISELO.escapeHtml(getEnfermagemDiagnosisSummary(record))}</td>
-      <td>${SISELO.escapeHtml(record.medication_treatment || "-")}</td>
-      <td>${SISELO.escapeHtml(getEnfermagemFootSummary(record))}</td>
-      <td>${SISELO.escapeHtml(record.risk_classification || "-")}</td>
-      <td>${SISELO.escapeHtml(getEnfermagemPlanSummary(record))}</td>
+      <td>${SISELO.escapeHtml(record.barriers_plan || "-")}</td>
+      <td>${SISELO.escapeHtml(record.recommendations_plan || "-")}</td>
       <td>
         <div class="table-actions">
           ${SISELO.iconButton("view", "Ver guia clínica", { "data-enfermagem-view": record.id })}
           ${SISELO.iconButton("pdf", "Gerar PDF", { "data-enfermagem-pdf": record.id })}
           ${SISELO.iconButton("edit", "Editar registro", { "data-enfermagem-edit": record.id })}
+          ${SISELO.iconButton("delete", "Remover registro", { "data-enfermagem-delete": record.id })}
         </div>
       </td>
     </tr>
@@ -977,6 +975,19 @@ function bindEnfermagemTableActions() {
   tbody.querySelectorAll("[data-enfermagem-pdf]").forEach((button) => {
     button.addEventListener("click", () => {
       SISELO.showUnavailableAction("A geração do PDF será disponibilizada em breve.");
+    });
+  });
+
+  tbody.querySelectorAll("[data-enfermagem-delete]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const record = enfermagemState.records.find((item) => item.id === button.dataset.enfermagemDelete);
+      if (!record || !(await SISELO.confirmPermanentDeletion("o registro de Enfermagem", record.consultation_number))) {
+        return;
+      }
+
+      enfermagemState.records = enfermagemState.records.filter((item) => item.id !== record.id);
+      writeEnfermagemRecords(enfermagemState.records);
+      renderEnfermagemTable();
     });
   });
 }
