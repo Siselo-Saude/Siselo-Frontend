@@ -1672,23 +1672,27 @@
     }
 
     const key = normalizeSearchText(raw);
-    return TEAM_LABELS[key] || TEAM_LABELS[key.replace(/\s+/g, '_')] || 'Sem equipe';
+    if (TEAM_LABELS[key] || TEAM_LABELS[key.replace(/\s+/g, '_')]) {
+      return TEAM_LABELS[key] || TEAM_LABELS[key.replace(/\s+/g, '_')];
+    }
+    return raw;
   }
 
   function renderTeamBadge(value) {
     const label = formatTeamName(value);
-    const displayLabel = label === 'Sem equipe' ? label : `Equipe: ${label}`;
+    const displayLabel = label === 'Sem equipe' ? label : label.startsWith('ESF') || label.startsWith('ESB') ? label : `Equipe: ${label}`;
     const key = normalizeSearchText(label);
     const theme = getTeamTheme(label);
+    
     const className = theme.className || (
       key === 'sem equipe' || key === 'sem_equipe'
         ? 'team-badge-sem-equipe'
         : ['safira', 'ametista', 'esmeralda', 'diamante'].includes(key)
           ? `team-badge-${key}`
-          : ''
+          : 'team-badge-diamante'
     );
 
-    return `<span class="team-badge${className ? ` ${className}` : ''}" style="${escapeHtml(getTeamStyle(label))}">${escapeHtml(displayLabel)}</span>`;
+    return `<span class="team-badge${className ? ` ${className}` : ''}" style="${escapeHtml(getTeamStyle(label))}">${escapeHtml(displayLabel)}</span>`;  
   }
 
   function filterByEntityId(rows, key, value) {
