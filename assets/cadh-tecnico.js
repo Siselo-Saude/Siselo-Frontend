@@ -690,7 +690,7 @@ function renderTecnicoTable() {
     const msg = activeId
       ? "Nenhum registro encontrado para este paciente."
       : "Selecione um usuário no CADH para visualizar os registros.";
-    tbody.innerHTML = `<tr><td colspan="9"><div class="tecnico-empty"><p>${SISELO.escapeHtml(msg)}</p></div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="4"><div class="tecnico-empty"><p>${SISELO.escapeHtml(msg)}</p></div></td></tr>`;
     bindTecnicoTableActions();
     return;
   }
@@ -700,16 +700,12 @@ function renderTecnicoTable() {
       <td>${SISELO.escapeHtml(formatTecnicoDate(r.consultation_date))}</td>
       <td>${SISELO.escapeHtml(r.full_name || "-")}</td>
       <td>${SISELO.escapeHtml(r.consultation_number || "-")}</td>
-      <td>${SISELO.escapeHtml(r.peso ? `${r.peso} kg` : "-")}</td>
-      <td>${SISELO.escapeHtml(r.altura ? `${r.altura} m` : "-")}</td>
-      <td>${SISELO.escapeHtml(r.imc ? `${r.imc} kg/m²` : "-")}</td>
-      <td>${SISELO.escapeHtml(r.circ_abdominal ? `${r.circ_abdominal} cm` : "-")}</td>
-      <td>${SISELO.escapeHtml(r.internacao || "-")}</td>
       <td>
         <div class="table-actions">
           ${SISELO.iconButton("view", "Ver guia clínica", { "data-tecnico-view": r.id })}
           ${SISELO.iconButton("pdf", "Gerar PDF", { "data-tecnico-pdf": r.id })}
           ${SISELO.iconButton("edit", "Editar registro", { "data-tecnico-edit": r.id })}
+          ${SISELO.iconButton("delete", "Remover registro", { "data-tecnico-delete": r.id })}
         </div>
       </td>
     </tr>
@@ -738,6 +734,19 @@ function bindTecnicoTableActions() {
 
   tbody.querySelectorAll("[data-tecnico-pdf]").forEach((btn) => {
     btn.addEventListener("click", () => SISELO.showUnavailableAction("A geração do PDF será disponibilizada em breve."));
+  });
+
+  tbody.querySelectorAll("[data-tecnico-delete]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const record = tecnicoState.records.find((item) => item.id === btn.dataset.tecnicoDelete);
+      if (!record || !(await SISELO.confirmPermanentDeletion("o registro de Técnico de Enfermagem", record.consultation_number))) {
+        return;
+      }
+
+      tecnicoState.records = tecnicoState.records.filter((item) => item.id !== record.id);
+      writeTecnicoRecords(tecnicoState.records);
+      renderTecnicoTable();
+    });
   });
 }
 

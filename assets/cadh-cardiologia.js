@@ -1172,7 +1172,7 @@ function renderCardiologiaTable() {
       : "Selecione um usuário no CADH para visualizar os registros de Cardiologia.";
     tbody.innerHTML = `
       <tr>
-        <td colspan="9">
+        <td colspan="6">
           <div class="cardiologia-empty">
             <p>${SISELO.escapeHtml(emptyMessage)}</p>
           </div>
@@ -1183,29 +1183,23 @@ function renderCardiologiaTable() {
     return;
   }
 
-  tbody.innerHTML = records.map((record) => {
-    const clinicalRecord = mergeCardiologiaUniqueAnswers(record);
-
-    return `
-      <tr>
-        <td>${SISELO.escapeHtml(formatCardiologiaDate(record.consultation_date))}</td>
-        <td>${SISELO.escapeHtml(record.full_name || "-")}</td>
-        <td>${SISELO.escapeHtml(record.consultation_number || "-")}</td>
-        <td>${SISELO.escapeHtml(record.ldl || "-")}</td>
-        <td>${SISELO.escapeHtml(record.mapa_target_met || "-")}</td>
-        <td>${SISELO.escapeHtml(clinicalRecord.cerebrovascular || "-")}</td>
-        <td>${SISELO.escapeHtml(formatCardiologiaCoronarySummary(clinicalRecord))}</td>
-        <td>${SISELO.escapeHtml(clinicalRecord.renal_function || "-")}</td>
-        <td>
-          <div class="table-actions">
-            ${SISELO.iconButton("view", "Ver guia clínica", { "data-cardiologia-view": record.id })}
-            ${SISELO.iconButton("pdf", "Gerar PDF", { "data-cardiologia-pdf": record.id })}
-            ${SISELO.iconButton("edit", "Editar registro", { "data-cardiologia-edit": record.id })}
-          </div>
-        </td>
-      </tr>
-    `;
-  }).join("");
+  tbody.innerHTML = records.map((record) => `
+    <tr>
+      <td>${SISELO.escapeHtml(formatCardiologiaDate(record.consultation_date))}</td>
+      <td>${SISELO.escapeHtml(record.full_name || "-")}</td>
+      <td>${SISELO.escapeHtml(record.consultation_number || "-")}</td>
+      <td>${SISELO.escapeHtml(record.barriers || "-")}</td>
+      <td>${SISELO.escapeHtml(record.recommendations || "-")}</td>
+      <td>
+        <div class="table-actions">
+          ${SISELO.iconButton("view", "Ver guia clínica", { "data-cardiologia-view": record.id })}
+          ${SISELO.iconButton("pdf", "Gerar PDF", { "data-cardiologia-pdf": record.id })}
+          ${SISELO.iconButton("edit", "Editar registro", { "data-cardiologia-edit": record.id })}
+          ${SISELO.iconButton("delete", "Remover registro", { "data-cardiologia-delete": record.id })}
+        </div>
+      </td>
+    </tr>
+  `).join("");
 
   bindCardiologiaTableActions();
 }
@@ -1237,6 +1231,19 @@ function bindCardiologiaTableActions() {
   tbody.querySelectorAll("[data-cardiologia-pdf]").forEach((button) => {
     button.addEventListener("click", () => {
       SISELO.showUnavailableAction("A geração do PDF será disponibilizada em breve.");
+    });
+  });
+
+  tbody.querySelectorAll("[data-cardiologia-delete]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const record = cardiologiaState.records.find((item) => item.id === button.dataset.cardiologiaDelete);
+      if (!record || !(await SISELO.confirmPermanentDeletion("o registro de Cardiologia", record.consultation_number))) {
+        return;
+      }
+
+      cardiologiaState.records = cardiologiaState.records.filter((item) => item.id !== record.id);
+      writeCardiologiaRecords(cardiologiaState.records);
+      renderCardiologiaTable();
     });
   });
 }

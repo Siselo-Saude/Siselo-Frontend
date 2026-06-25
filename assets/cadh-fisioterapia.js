@@ -794,7 +794,7 @@ function renderFisioterapiaTable() {
       : "Selecione um usuário no CADH para visualizar os registros de Fisioterapia.";
     tbody.innerHTML = `
       <tr>
-        <td colspan="11">
+        <td colspan="6">
           <div class="fisioterapia-empty">
             <p>${SISELO.escapeHtml(emptyMessage)}</p>
           </div>
@@ -810,18 +810,14 @@ function renderFisioterapiaTable() {
       <td>${SISELO.escapeHtml(formatFisioterapiaDate(record.consultation_date))}</td>
       <td>${SISELO.escapeHtml(record.full_name || "-")}</td>
       <td>${SISELO.escapeHtml(record.consultation_number || "-")}</td>
-      <td>${SISELO.escapeHtml(record.amputation || "-")}</td>
-      <td>${SISELO.escapeHtml(record.prosthesis || "-")}</td>
-      <td>${SISELO.escapeHtml(record.pain_presence || "-")}</td>
-      <td>${SISELO.escapeHtml(record.activity_modality || "-")}</td>
-      <td>${SISELO.escapeHtml(record.intensity || "-")}</td>
-      <td>${SISELO.escapeHtml(record.weekly_time || "-")}</td>
-      <td>${SISELO.escapeHtml(getFisioterapiaPlanSummary(record))}</td>
+      <td>${SISELO.escapeHtml(record.barriers || "-")}</td>
+      <td>${SISELO.escapeHtml(record.recommendations || "-")}</td>
       <td>
         <div class="table-actions">
           ${SISELO.iconButton("view", "Ver consulta de Fisioterapia", { "data-fisioterapia-view": record.id })}
           ${SISELO.iconButton("pdf", "Gerar PDF", { "data-fisioterapia-pdf": record.id })}
           ${SISELO.iconButton("edit", "Editar registro", { "data-fisioterapia-edit": record.id })}
+          ${SISELO.iconButton("delete", "Remover registro", { "data-fisioterapia-delete": record.id })}
         </div>
       </td>
     </tr>
@@ -857,6 +853,19 @@ function bindFisioterapiaTableActions() {
   tbody.querySelectorAll("[data-fisioterapia-pdf]").forEach((button) => {
     button.addEventListener("click", () => {
       SISELO.showUnavailableAction("A geração do PDF será disponibilizada em breve.");
+    });
+  });
+
+  tbody.querySelectorAll("[data-fisioterapia-delete]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const record = fisioterapiaState.records.find((item) => item.id === button.dataset.fisioterapiaDelete);
+      if (!record || !(await SISELO.confirmPermanentDeletion("o registro de Fisioterapia", record.consultation_number))) {
+        return;
+      }
+
+      fisioterapiaState.records = fisioterapiaState.records.filter((item) => item.id !== record.id);
+      writeFisioterapiaRecords(fisioterapiaState.records);
+      renderFisioterapiaTable();
     });
   });
 }

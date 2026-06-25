@@ -782,7 +782,7 @@ function renderSocialTable() {
       : "Selecione um usuário no CADH para visualizar os registros de Serviço Social.";
     tbody.innerHTML = `
       <tr>
-        <td colspan="10">
+        <td colspan="6">
           <div class="social-empty">
             <p>${SISELO.escapeHtml(emptyMessage)}</p>
           </div>
@@ -798,10 +798,6 @@ function renderSocialTable() {
       <td>${SISELO.escapeHtml(formatSocialDate(record.consultation_date))}</td>
       <td>${SISELO.escapeHtml(record.full_name || "-")}</td>
       <td>${SISELO.escapeHtml(record.consultation_number || "-")}</td>
-      <td>${SISELO.escapeHtml(record.education || "-")}</td>
-      <td>${SISELO.escapeHtml(record.support || "-")}</td>
-      <td>${SISELO.escapeHtml(record.income || "-")}</td>
-      <td>${SISELO.escapeHtml(record.assistance_need || "-")}</td>
       <td>${SISELO.escapeHtml(record.barriers || "-")}</td>
       <td>${SISELO.escapeHtml(record.recommendations || "-")}</td>
       <td>
@@ -809,6 +805,7 @@ function renderSocialTable() {
           ${SISELO.iconButton("view", "Ver consulta de Serviço Social", { "data-social-view": record.id })}
           ${SISELO.iconButton("pdf", "Gerar PDF", { "data-social-pdf": record.id })}
           ${SISELO.iconButton("edit", "Editar registro", { "data-social-edit": record.id })}
+          ${SISELO.iconButton("delete", "Remover registro", { "data-social-delete": record.id })}
         </div>
       </td>
     </tr>
@@ -844,6 +841,19 @@ function bindSocialTableActions() {
   tbody.querySelectorAll("[data-social-pdf]").forEach((button) => {
     button.addEventListener("click", () => {
       SISELO.showUnavailableAction("A geração do PDF será disponibilizada em breve.");
+    });
+  });
+
+  tbody.querySelectorAll("[data-social-delete]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const record = socialState.records.find((item) => item.id === button.dataset.socialDelete);
+      if (!record || !(await SISELO.confirmPermanentDeletion("o registro de Serviço Social", record.consultation_number))) {
+        return;
+      }
+
+      socialState.records = socialState.records.filter((item) => item.id !== record.id);
+      writeSocialRecords(socialState.records);
+      renderSocialTable();
     });
   });
 }

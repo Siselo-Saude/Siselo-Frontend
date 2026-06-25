@@ -808,7 +808,7 @@ function renderPsicologiaTable() {
       : "Selecione um usuário no CADH para visualizar os registros de Psicologia.";
     tbody.innerHTML = `
       <tr>
-        <td colspan="9">
+        <td colspan="6">
           <div class="psicologia-empty">
             <p>${SISELO.escapeHtml(emptyMessage)}</p>
           </div>
@@ -824,16 +824,14 @@ function renderPsicologiaTable() {
       <td>${SISELO.escapeHtml(formatPsicologiaDate(record.consultation_date))}</td>
       <td>${SISELO.escapeHtml(record.full_name || "-")}</td>
       <td>${SISELO.escapeHtml(record.consultation_number || "-")}</td>
-      <td>${SISELO.escapeHtml(record.literacy || "-")}</td>
-      <td>${SISELO.escapeHtml(getPsicologiaAdherenceSummary(record))}</td>
-      <td>${SISELO.escapeHtml(getPsicologiaStageSummary(record))}</td>
-      <td>${SISELO.escapeHtml(getPsicologiaSelfCareSummary(record))}</td>
-      <td>${SISELO.escapeHtml(getPsicologiaPlanSummary(record))}</td>
+      <td>${SISELO.escapeHtml(getPsicologiaBarriersSummary(record))}</td>
+      <td>${SISELO.escapeHtml(getPsicologiaRecommendationsSummary(record))}</td>
       <td>
         <div class="table-actions">
           ${SISELO.iconButton("view", "Ver guia clínica", { "data-psicologia-view": record.id })}
           ${SISELO.iconButton("pdf", "Gerar PDF", { "data-psicologia-pdf": record.id })}
           ${SISELO.iconButton("edit", "Editar registro", { "data-psicologia-edit": record.id })}
+          ${SISELO.iconButton("delete", "Remover registro", { "data-psicologia-delete": record.id })}
         </div>
       </td>
     </tr>
@@ -871,6 +869,19 @@ function bindPsicologiaTableActions() {
       SISELO.showUnavailableAction("A geração do PDF será disponibilizada em breve.");
     });
   });
+
+  tbody.querySelectorAll("[data-psicologia-delete]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const record = psicologiaState.records.find((item) => item.id === button.dataset.psicologiaDelete);
+      if (!record || !(await SISELO.confirmPermanentDeletion("o registro de Psicologia", record.consultation_number))) {
+        return;
+      }
+
+      psicologiaState.records = psicologiaState.records.filter((item) => item.id !== record.id);
+      writePsicologiaRecords(psicologiaState.records);
+      renderPsicologiaTable();
+    });
+  });
 }
 
 function getPsicologiaAdherenceSummary(record) {
@@ -891,10 +902,16 @@ function getPsicologiaSelfCareSummary(record) {
     : record.self_care_score || "-";
 }
 
-function getPsicologiaPlanSummary(record) {
+function getPsicologiaBarriersSummary(record) {
   return isInitialPsicologiaConsultation(record.consultation_number)
-    ? record.recommendations_plan || record.barriers_plan || "-"
-    : record.goals_today || record.current_barriers || "-";
+    ? record.barriers_plan || "-"
+    : record.current_barriers || "-";
+}
+
+function getPsicologiaRecommendationsSummary(record) {
+  return isInitialPsicologiaConsultation(record.consultation_number)
+    ? record.recommendations_plan || "-"
+    : record.goals_today || "-";
 }
 
 function readPsicologiaRecords() {
