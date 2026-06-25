@@ -4005,3 +4005,707 @@ body[data-page="patients-form"] .patient-assistance-panel .patient-clinical-note
     max-height: calc(100vh - 16px) !important;
   }
 }
+
+/* COOPERE responsive integration layer */
+html {
+  min-width: 0;
+  min-height: 100%;
+  text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  min-width: 0;
+  min-height: var(--app-viewport-height, 100vh);
+  overflow-x: hidden;
+}
+
+@supports (min-height: 100dvh) {
+  body {
+    min-height: 100dvh;
+  }
+}
+
+@supports (overflow: clip) {
+  body {
+    overflow-x: clip;
+  }
+}
+
+img,
+video,
+canvas,
+svg {
+  max-width: 100%;
+}
+
+button,
+.btn,
+a {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.container,
+body[data-page="cadh"] .container,
+body[data-page="ubs"] .container,
+body[data-page^="cadh-"] .container {
+  width: min(var(--app-shell-max), calc(100% - 32px)) !important;
+}
+
+html.is-embedded .container,
+html.is-embedded body[data-page="cadh"] .container,
+html.is-embedded body[data-page="ubs"] .container,
+html.is-embedded body[data-page^="cadh-"] .container {
+  width: calc(100% - 20px) !important;
+  max-width: none !important;
+  margin-block: 10px;
+}
+
+html.is-embedded .site-endbar {
+  display: none;
+}
+
+.table-scroll,
+[class$="-table-shell"] {
+  max-width: 100%;
+  overscroll-behavior-inline: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 1263.98px) {
+  .topbar {
+    gap: 12px;
+    padding: 10px 14px;
+  }
+
+  .menu {
+    gap: 8px;
+  }
+
+  .menu a {
+    min-width: 68px;
+    padding-inline: 12px;
+  }
+
+  .container {
+    margin-block: 12px;
+  }
+
+  .home-panel,
+  .transition-card {
+    padding: 20px;
+  }
+
+  .home-access-row {
+    grid-template-columns: minmax(0, 1fr) 112px minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .home-direction-grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 16px;
+  }
+
+  .home-direction-card {
+    padding: 20px;
+  }
+
+  .admin-table {
+    min-width: 1120px;
+  }
+
+  .patients-table {
+    min-width: 860px;
+  }
+
+  .care-plans-table {
+    min-width: 760px;
+  }
+
+  .encounters-table {
+    min-width: 900px;
+  }
+
+  body[data-page^="cadh-"] {
+    --clinical-table-min-width: 920px;
+  }
+
+  body[data-page^="cadh-"] [class$="-table-shell"] {
+    overflow-x: auto !important;
+  }
+}
+
+@media (max-width: 959.98px) {
+  .topbar {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      "left actions"
+      "menu menu";
+    align-items: center;
+    gap: 10px 12px;
+  }
+
+  .topbar-left {
+    grid-area: left;
+    width: auto;
+  }
+
+  .menu {
+    grid-area: menu;
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    justify-self: stretch;
+  }
+
+  .menu a {
+    min-width: 0;
+    min-height: 44px;
+    padding: 8px 10px;
+  }
+
+  .topbar-actions {
+    grid-area: actions;
+    width: auto;
+    justify-self: end;
+    justify-content: flex-end;
+  }
+
+  .topbar-actions > * {
+    flex: 0 1 auto;
+  }
+
+  .container,
+  body[data-page="cadh"] .container,
+  body[data-page="ubs"] .container,
+  body[data-page^="cadh-"] .container {
+    width: calc(100% - 20px) !important;
+    margin-block: 10px;
+  }
+
+  .card {
+    border-radius: 20px;
+  }
+
+  .form-grid,
+  .transition-specialty-grid,
+  .transition-panel-grid,
+  .patient360-note-grid,
+  body[data-page="patients-form"] .patient-assistance-panel .transition-panel-grid {
+    grid-template-columns: 1fr;
+  }
+
+  body[data-page="patients-form"] .patient-assistance-panel .patient-status-field {
+    max-width: none;
+  }
+
+  .home-access-row,
+  .home-direction-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .home-flow-bridge {
+    display: none;
+  }
+
+  .home-direction-card {
+    min-height: 0;
+  }
+
+  .patient360-header,
+  .patient360-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .patient360-header-actions {
+    width: 100%;
+    margin-left: 0;
+    justify-content: stretch;
+  }
+
+  .patient360-header-actions .btn,
+  .patient360-header-actions button {
+    flex: 1 1 180px;
+    justify-content: center;
+  }
+
+  .toolbar,
+  .search-toolbar {
+    align-items: stretch;
+  }
+
+  .search-toolbar .search-input-shell,
+  .search-toolbar .actions {
+    flex-basis: 100%;
+    width: 100%;
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 599.98px) {
+  :root {
+    --control-height: 48px;
+    --control-radius: 12px;
+  }
+
+  body {
+    background: var(--bg);
+  }
+
+  .topbar {
+    position: sticky;
+    padding-top: max(10px, env(safe-area-inset-top));
+    padding-right: max(10px, env(safe-area-inset-right));
+    padding-bottom: 10px;
+    padding-left: max(10px, env(safe-area-inset-left));
+    gap: 8px 10px;
+    box-shadow: 0 10px 22px rgba(15, 37, 65, 0.16);
+  }
+
+  .topbar-left,
+  .topbar-actions {
+    min-width: 0;
+  }
+
+  .topbar-logout,
+  body[data-page] .topbar-logout {
+    min-width: 58px;
+    min-height: 44px;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+  }
+
+  .topbar-actions {
+    gap: 6px;
+  }
+
+  .topbar-icon-btn,
+  .topbar-theme-toggle,
+  .topbar-account,
+  body[data-page] .topbar-account {
+    min-height: 44px;
+  }
+
+  .topbar-settings {
+    inline-size: 44px;
+    min-inline-size: 44px;
+    padding: 0;
+  }
+
+  .topbar-settings span {
+    display: none;
+  }
+
+  .topbar-account,
+  body[data-page] .topbar-account {
+    inline-size: 44px;
+    min-inline-size: 44px;
+    padding: 0;
+    overflow: hidden;
+    font-size: 0;
+  }
+
+  .topbar-account::before {
+    inline-size: 14px;
+    block-size: 14px;
+    margin: 0;
+  }
+
+  .menu {
+    gap: 6px;
+  }
+
+  .menu a {
+    min-height: 44px;
+    border-radius: 9px;
+    font-size: 0.92rem;
+  }
+
+  .container,
+  html.is-embedded .container,
+  body[data-page="cadh"] .container,
+  body[data-page="ubs"] .container,
+  body[data-page^="cadh-"] .container,
+  html.is-embedded body[data-page="cadh"] .container,
+  html.is-embedded body[data-page="ubs"] .container,
+  html.is-embedded body[data-page^="cadh-"] .container {
+    width: calc(100% - 16px) !important;
+    margin-block: 8px;
+  }
+
+  .card,
+  .home-panel,
+  .transition-card,
+  .transition-panel,
+  .patient360-hero,
+  .patient360-note-card,
+  body[data-page^="cadh-"] main > .card,
+  body[data-page="cadh"] .cadh-page,
+  body[data-page="ubs"] .cadh-page {
+    padding: 14px !important;
+    border-radius: 18px;
+  }
+
+  .page-title,
+  body[data-page="home"] .page-title {
+    font-size: clamp(1.3rem, 7vw, 1.65rem);
+  }
+
+  .page-heading {
+    align-items: stretch;
+  }
+
+  .page-heading .page-title {
+    width: 100%;
+  }
+
+  .home-kicker {
+    font-size: 0.76rem;
+    letter-spacing: 0.1em;
+  }
+
+  .home-access-row {
+    margin-top: 16px;
+  }
+
+  .home-access-card {
+    min-height: 84px;
+    padding: 14px;
+    border-radius: 18px;
+    font-size: 1rem;
+  }
+
+  .home-direction-grid {
+    gap: 12px;
+    margin-block: 18px 12px;
+  }
+
+  .home-direction-card {
+    grid-template-columns: 48px minmax(0, 1fr);
+    gap: 10px 12px;
+    padding: 16px;
+    border-radius: 20px;
+  }
+
+  .home-direction-icon {
+    inline-size: 48px;
+    block-size: 48px;
+  }
+
+  .home-direction-icon svg {
+    inline-size: 26px;
+    block-size: 26px;
+  }
+
+  .home-direction-card strong {
+    font-size: 1rem;
+  }
+
+  .home-direction-card span {
+    font-size: 0.9rem;
+  }
+
+  .home-direction-card p {
+    font-size: 2rem;
+  }
+
+  .home-direction-card .btn {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .home-illustration {
+    display: none;
+  }
+
+  .site-endbar {
+    padding-bottom: max(14px, env(safe-area-inset-bottom));
+  }
+
+  input,
+  select,
+  textarea,
+  .choice-select-trigger,
+  .date-picker-select,
+  .date-picker-trigger,
+  .status-select-native {
+    font-size: 16px !important;
+  }
+
+  textarea {
+    min-height: 132px;
+    resize: vertical;
+  }
+
+  .actions,
+  .toolbar,
+  .tabs,
+  .form-actions,
+  .transition-form-actions,
+  .confirmation-modal-actions {
+    width: 100%;
+  }
+
+  .form-actions,
+  .transition-form-actions,
+  .confirmation-modal-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .form-actions .btn,
+  .form-actions button,
+  .transition-form-actions .btn,
+  .transition-form-actions button,
+  .confirmation-modal-actions .btn,
+  .search-toolbar .actions .btn,
+  .search-toolbar .actions button {
+    width: 100%;
+    min-width: 0;
+    justify-content: center;
+  }
+
+  .auth-shell {
+    min-height: var(--app-viewport-height, 100vh);
+    align-items: start;
+    padding-top: max(16px, env(safe-area-inset-top));
+    padding-right: max(12px, env(safe-area-inset-right));
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+    padding-left: max(12px, env(safe-area-inset-left));
+  }
+
+  .auth-card-centered {
+    padding: 22px 16px 18px;
+  }
+
+  .auth-choice-group {
+    grid-template-columns: 1fr;
+  }
+
+  .patient360-avatar {
+    inline-size: 68px;
+    block-size: 68px;
+    border-radius: 20px;
+  }
+
+  .patient360-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .patient360-tabs .tab-link {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+  }
+
+  .date-picker-popover {
+    inset: auto max(8px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+    max-height: calc(var(--app-viewport-height, 100vh) - 24px);
+  }
+
+  .confirmation-modal-overlay,
+  [class$="-modal-overlay"] {
+    padding-top: max(8px, env(safe-area-inset-top)) !important;
+    padding-right: max(8px, env(safe-area-inset-right)) !important;
+    padding-bottom: max(8px, env(safe-area-inset-bottom)) !important;
+    padding-left: max(8px, env(safe-area-inset-left)) !important;
+  }
+
+  .confirmation-modal,
+  body[data-page^="cadh-"] [class$="-modal"] {
+    width: 100% !important;
+    max-height: calc(var(--app-viewport-height, 100vh) - 16px) !important;
+    padding: 16px !important;
+    border-radius: 18px !important;
+  }
+
+  body[data-page^="cadh-"] [class$="-modal-header"] {
+    align-items: flex-start !important;
+    gap: 10px !important;
+  }
+
+  body[data-page^="cadh-"] [class$="-actions"] {
+    width: 100%;
+  }
+
+  .table-scroll,
+  body[data-page^="cadh-"] [class$="-table-shell"] {
+    overflow: visible !important;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .data-table,
+  body[data-page^="cadh-"] main table {
+    display: block;
+    width: 100% !important;
+    min-width: 0 !important;
+    table-layout: auto !important;
+    border: 0 !important;
+  }
+
+  .data-table colgroup,
+  body[data-page^="cadh-"] main table colgroup {
+    display: none;
+  }
+
+  .data-table thead,
+  body[data-page^="cadh-"] main table thead {
+    position: absolute !important;
+    inline-size: 1px !important;
+    block-size: 1px !important;
+    overflow: hidden !important;
+    clip: rect(0 0 0 0) !important;
+    clip-path: inset(50%) !important;
+    white-space: nowrap !important;
+  }
+
+  .data-table tbody,
+  body[data-page^="cadh-"] main table tbody {
+    display: grid !important;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .data-table tbody tr,
+  body[data-page^="cadh-"] main table tbody tr {
+    display: grid !important;
+    width: 100%;
+    padding: 10px 14px;
+    overflow: hidden;
+    border: 1px solid var(--border) !important;
+    border-radius: 16px;
+    background: var(--card) !important;
+    box-shadow: 0 10px 22px rgba(15, 37, 65, 0.06);
+  }
+
+  .data-table tbody td,
+  body[data-page^="cadh-"] main table tbody td {
+    width: 100% !important;
+    min-width: 0 !important;
+    display: grid !important;
+    grid-template-columns: minmax(92px, 36%) minmax(0, 1fr);
+    gap: 12px;
+    align-items: start;
+    padding: 9px 0 !important;
+    border: 0 !important;
+    border-bottom: 1px solid var(--border) !important;
+    background: transparent !important;
+    font-size: 0.92rem !important;
+    line-height: 1.4 !important;
+    overflow-wrap: anywhere !important;
+    white-space: normal !important;
+  }
+
+  .data-table tbody td:last-child,
+  body[data-page^="cadh-"] main table tbody td:last-child {
+    border-bottom: 0 !important;
+  }
+
+  .data-table tbody td[data-label]::before,
+  body[data-page^="cadh-"] main table tbody td[data-label]::before {
+    content: attr(data-label);
+    color: var(--muted);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    line-height: 1.35;
+    text-transform: uppercase;
+  }
+
+  .data-table tbody td[data-label="Ações"],
+  body[data-page^="cadh-"] main table tbody td[data-label="Ações"] {
+    grid-template-columns: 1fr;
+    padding-top: 12px !important;
+  }
+
+  .data-table tbody td[data-label="Ações"]::before,
+  body[data-page^="cadh-"] main table tbody td[data-label="Ações"]::before {
+    display: none;
+  }
+
+  .data-table .table-actions,
+  body[data-page^="cadh-"] main table .table-actions {
+    justify-content: flex-end !important;
+    flex-wrap: wrap !important;
+  }
+
+  .data-table .table-empty-row,
+  body[data-page^="cadh-"] main table .table-empty-row {
+    display: block !important;
+    padding: 0;
+  }
+
+  .data-table .table-empty-row td,
+  body[data-page^="cadh-"] main table td[colspan] {
+    display: block !important;
+    padding: 0 !important;
+    border: 0 !important;
+  }
+
+  .table-empty-state,
+  body[data-page^="cadh-"] main table [class$="-empty"] {
+    min-height: 160px !important;
+  }
+
+  .transition-route,
+  .table-identity-value,
+  .status-badge,
+  .team-badge {
+    min-width: 0;
+    max-width: 100%;
+    white-space: normal;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+@media (min-width: 600px) and (max-width: 959.98px) {
+  .home-direction-grid {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  }
+}
+
+@media (max-width: 599.98px) {
+  .data-table thead tr,
+  .data-table thead th,
+  body[data-page^="cadh-"] main table thead tr,
+  body[data-page^="cadh-"] main table thead th {
+    position: absolute !important;
+    width: 1px !important;
+    min-width: 0 !important;
+    max-width: 1px !important;
+    height: 1px !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    border: 0 !important;
+  }
+}
+@media (max-width: 599.98px) {
+  body[data-page^="cadh-"] main table[class$="-table"] {
+    display: block !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    table-layout: auto !important;
+  }
+
+  body[data-page^="cadh-"] main [class$="-table-shell"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: visible !important;
+  }
+}

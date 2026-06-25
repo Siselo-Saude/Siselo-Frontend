@@ -30,6 +30,108 @@
     { color: '#4d7c0f', border: '#d9f99d', bg: '#f7fee7', text: '#3f6212' },
   ];
 
+  function applyRuntimeLayoutContext() {
+    const params = new URLSearchParams(window.location.search);
+    let isEmbedded = params.get('embed') === '1' || params.get('embedded') === '1';
+
+    try {
+      isEmbedded = isEmbedded || window.self !== window.top;
+    } catch (error) {
+      isEmbedded = true;
+    }
+
+    document.documentElement.classList.toggle('is-embedded', isEmbedded);
+    document.documentElement.style.setProperty('--app-viewport-height', `${window.innerHeight}px`);
+  }
+
+  function getResponsiveTableLabels(table) {
+    const headerRows = Array.from(table.querySelectorAll('thead tr'));
+    if (headerRows.length === 0) {
+      return [];
+    }
+
+    const headerCells = Array.from(headerRows[headerRows.length - 1].querySelectorAll('th'));
+    return headerCells.map((cell, index) => {
+      const label = String(cell.getAttribute('aria-label') || cell.textContent || '')
+        .replace(/\s+/g, ' ')
+        .trim();
+      return label || (index === headerCells.length - 1 ? 'Ações' : '');
+    });
+  }
+
+  function labelResponsiveTable(table) {
+    if (!(table instanceof HTMLTableElement)) {
+      return;
+    }
+
+    const labels = getResponsiveTableLabels(table);
+    if (labels.length === 0) {
+      return;
+    }
+
+    table.querySelectorAll('tbody tr').forEach((row) => {
+      if (row.classList.contains('table-empty-row')) {
+        return;
+      }
+
+      const cells = Array.from(row.children).filter((cell) => cell instanceof HTMLTableCellElement);
+      if (cells.length !== labels.length || cells.some((cell) => Number(cell.colSpan || 1) > 1)) {
+        return;
+      }
+
+      cells.forEach((cell, index) => {
+        const label = labels[index];
+        if (label) {
+          cell.dataset.label = label;
+        } else {
+          delete cell.dataset.label;
+        }
+      });
+    });
+  }
+
+  function enhanceResponsiveTables(root = document) {
+    const scope = root instanceof Document || root instanceof Element ? root : document;
+    scope.querySelectorAll('table').forEach(labelResponsiveTable);
+
+    if (!document.body || document.documentElement.dataset.responsiveTablesBound === 'true') {
+      return;
+    }
+
+    document.documentElement.dataset.responsiveTablesBound = 'true';
+    const observer = new MutationObserver((mutations) => {
+      const tables = new Set();
+
+      mutations.forEach((mutation) => {
+        const targetTable = mutation.target instanceof Element
+          ? mutation.target.closest('table')
+          : null;
+        if (targetTable) {
+          tables.add(targetTable);
+        }
+
+        mutation.addedNodes.forEach((node) => {
+          if (!(node instanceof Element)) {
+            return;
+          }
+
+          if (node.matches('table')) {
+            tables.add(node);
+          }
+          node.querySelectorAll('table').forEach((table) => tables.add(table));
+        });
+      });
+
+      tables.forEach(labelResponsiveTable);
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+  }
+
+  applyRuntimeLayoutContext();
+  window.addEventListener('resize', applyRuntimeLayoutContext, { passive: true });
+  window.addEventListener('orientationchange', applyRuntimeLayoutContext, { passive: true });
+
   function escapeHtml(value) {
     return String(value ?? '')
       .replace(/&/g, '&amp;')
@@ -1627,6 +1729,7 @@
     bindBackLinks();
     decorateSearchInputs(document);
     enhanceChoiceSelects(document);
+    enhanceResponsiveTables(document);
     bindFieldGuidanceTooltips();
     renderFlashAlert('page-alert');
   }
@@ -2977,6 +3080,7 @@
     digitsOnly,
     enhanceDateInput,
     enhanceChoiceSelects,
+    enhanceResponsiveTables,
     escapeHtml,
     filterPatientsForSearch,
     formatTeamName,
