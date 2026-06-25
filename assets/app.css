@@ -4729,7 +4729,7 @@ body[data-page="home"] .home-app-shell {
   min-height: 100vh;
 }
 
-body[data-page="home"] .home-sidebar {
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar {
   position: fixed;
   inset: 0 auto 0 0;
   z-index: 950;
@@ -4747,16 +4747,16 @@ body[data-page="home"] .home-sidebar {
   animation: none;
 }
 
-body[data-page="home"] .home-sidebar::after {
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar::after {
   display: none;
 }
 
-body[data-page="home"] .home-sidebar .topbar-left {
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar .topbar-left {
   width: 100%;
   display: block;
 }
 
-body[data-page="home"] .home-sidebar-brand {
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-brand {
   min-height: 74px;
   display: flex;
   align-items: center;
@@ -4765,7 +4765,7 @@ body[data-page="home"] .home-sidebar-brand {
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-body[data-page="home"] .home-sidebar-mark {
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-mark {
   inline-size: 38px;
   block-size: 38px;
   display: grid;
@@ -4776,10 +4776,10 @@ body[data-page="home"] .home-sidebar-mark {
   color: #e6f2ff;
 }
 
-body[data-page="home"] .home-sidebar-mark svg,
-body[data-page="home"] .home-sidebar-nav-icon svg,
-body[data-page="home"] .home-sidebar-chevron,
-body[data-page="home"] .home-sidebar-footer svg,
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-mark svg,
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-nav-icon svg,
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-chevron,
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-footer svg,
 body[data-page="home"] .home-page-header svg,
 body[data-page="home"] .home-metric-icon svg,
 body[data-page="home"] .home-environment-icon svg,
@@ -4792,25 +4792,25 @@ body[data-page="home"] .home-pillar-icon svg {
   stroke-linejoin: round;
 }
 
-body[data-page="home"] .home-sidebar-mark svg {
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-mark svg {
   inline-size: 22px;
   block-size: 22px;
 }
 
-body[data-page="home"] .home-sidebar-brand-copy {
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-brand-copy {
   min-width: 0;
   display: grid;
   gap: 2px;
 }
 
-body[data-page="home"] .home-sidebar-brand-copy strong {
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-brand-copy strong {
   color: #fff;
   font-size: 0.92rem;
   font-weight: 900;
   letter-spacing: 0.04em;
 }
 
-body[data-page="home"] .home-sidebar-brand-copy small {
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-brand-copy small {
   color: #83afd2;
   font-size: 0.56rem;
   font-weight: 800;
@@ -4818,13 +4818,13 @@ body[data-page="home"] .home-sidebar-brand-copy small {
   text-transform: uppercase;
 }
 
-body[data-page="home"] .home-sidebar-nav {
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-nav {
   flex: 1 1 auto;
   min-height: 0;
   padding: 18px 12px;
 }
 
-body[data-page="home"] .home-sidebar-label {
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-label {
   margin: 0 8px 12px;
   color: #5e91ba;
   font-size: 0.64rem;
@@ -4833,13 +4833,13 @@ body[data-page="home"] .home-sidebar-label {
   text-transform: uppercase;
 }
 
-body[data-page="home"] .home-sidebar .menu {
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar .menu {
   width: 100%;
   display: grid;
   gap: 4px;
 }
 
-body[data-page="home"] .home-sidebar .menu a {
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar .menu a {
   position: relative;
   min-width: 0;
   min-height: 50px;
@@ -4858,7 +4858,7 @@ body[data-page="home"] .home-sidebar .menu a {
   text-align: left;
 }
 
-body[data-page="home"] .home-sidebar .menu a::before {
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar .menu a::before {
   content: "";
   position: absolute;
   inset: 11px auto 11px -1px;
@@ -4867,8 +4867,8 @@ body[data-page="home"] .home-sidebar .menu a::before {
   background: transparent;
 }
 
-body[data-page="home"] .home-sidebar .menu a:hover,
-body[data-page="home"] .home-sidebar .menu a:focus-visible {
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar .menu a:hover,
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar .menu a:focus-visible {
   border: 0;
   background: rgba(255, 255, 255, 0.08);
   color: #fff;
@@ -4876,66 +4876,66 @@ body[data-page="home"] .home-sidebar .menu a:focus-visible {
   transform: none;
 }
 
-body[data-page="home"] .home-sidebar .menu a.is-active {
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar .menu a.is-active {
   background: #315c82;
   color: #fff;
 }
 
-body[data-page="home"] .home-sidebar .menu a.is-active::before {
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar .menu a.is-active::before {
   background: #21d6bd;
 }
 
-body[data-page="home"] .home-sidebar-nav-icon {
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-nav-icon {
   display: grid;
   place-items: center;
 }
 
-body[data-page="home"] .home-sidebar-nav-icon svg {
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-nav-icon svg {
   inline-size: 19px;
   block-size: 19px;
 }
 
-body[data-page="home"] .home-sidebar-nav-copy {
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-nav-copy {
   min-width: 0;
   display: grid;
   gap: 1px;
 }
 
-body[data-page="home"] .home-sidebar-nav-copy strong,
-body[data-page="home"] .home-sidebar-nav-copy small {
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-nav-copy strong,
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-nav-copy small {
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-body[data-page="home"] .home-sidebar-nav-copy strong {
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-nav-copy strong {
   color: inherit;
   font-size: 0.9rem;
   line-height: 1.15;
 }
 
-body[data-page="home"] .home-sidebar-nav-copy small {
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-nav-copy small {
   color: #78a1c1;
   font-size: 0.68rem;
   font-weight: 500;
 }
 
-body[data-page="home"] .home-sidebar .menu a.is-active small {
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar .menu a.is-active small {
   color: #b6cde0;
 }
 
-body[data-page="home"] .home-sidebar-chevron {
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-chevron {
   inline-size: 13px;
   block-size: 13px;
   opacity: 0;
 }
 
-body[data-page="home"] .home-sidebar .menu a.is-active .home-sidebar-chevron {
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar .menu a.is-active .home-sidebar-chevron {
   opacity: 0.45;
 }
 
-body[data-page="home"] .home-sidebar-footer {
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-footer {
   width: 100%;
   display: grid;
   grid-template-columns: minmax(0, 1fr) 40px;
@@ -4945,11 +4945,11 @@ body[data-page="home"] .home-sidebar-footer {
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-body[data-page="home"] .home-sidebar-footer > * {
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-footer > * {
   min-width: 0;
 }
 
-body[data-page="home"] .home-sidebar-footer .topbar-settings {
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-footer .topbar-settings {
   grid-column: 1 / -1;
   width: 100%;
   min-height: 40px;
@@ -4961,18 +4961,18 @@ body[data-page="home"] .home-sidebar-footer .topbar-settings {
   box-shadow: none;
 }
 
-body[data-page="home"] .home-sidebar-footer .topbar-settings:hover,
-body[data-page="home"] .home-sidebar-footer .topbar-settings:focus-visible {
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-footer .topbar-settings:hover,
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-footer .topbar-settings:focus-visible {
   background: rgba(255, 255, 255, 0.08);
   color: #fff;
   transform: none;
 }
 
-body[data-page="home"] .home-sidebar-footer .topbar-theme-toggle {
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-footer .topbar-theme-toggle {
   display: none !important;
 }
 
-body[data-page="home"] .home-sidebar-footer .topbar-account {
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-footer .topbar-account {
   width: 100%;
   min-height: 48px;
   display: grid;
@@ -4988,11 +4988,11 @@ body[data-page="home"] .home-sidebar-footer .topbar-account {
   box-shadow: none;
 }
 
-body[data-page="home"] .home-sidebar-footer .topbar-account::before {
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-footer .topbar-account::before {
   display: none;
 }
 
-body[data-page="home"] .home-sidebar-user-icon {
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-user-icon {
   inline-size: 32px;
   block-size: 32px;
   display: grid;
@@ -5003,36 +5003,36 @@ body[data-page="home"] .home-sidebar-user-icon {
   color: #d8e8f4;
 }
 
-body[data-page="home"] .home-sidebar-user-icon svg {
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-user-icon svg {
   inline-size: 17px;
   block-size: 17px;
 }
 
-body[data-page="home"] .home-sidebar-user-copy {
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-user-copy {
   min-width: 0;
   display: grid;
   gap: 1px;
   text-align: left;
 }
 
-body[data-page="home"] .home-sidebar-user-copy strong,
-body[data-page="home"] .home-sidebar-user-copy small {
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-user-copy strong,
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-user-copy small {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-body[data-page="home"] .home-sidebar-user-copy strong {
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-user-copy strong {
   font-size: 0.74rem;
   color: #fff;
 }
 
-body[data-page="home"] .home-sidebar-user-copy small {
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-user-copy small {
   color: #78a1c1;
   font-size: 0.6rem;
 }
 
-body[data-page="home"] .home-sidebar-footer .topbar-logout {
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-footer .topbar-logout {
   inline-size: 40px;
   min-inline-size: 40px;
   min-height: 48px;
@@ -5045,19 +5045,19 @@ body[data-page="home"] .home-sidebar-footer .topbar-logout {
   box-shadow: none;
 }
 
-body[data-page="home"] .home-sidebar-footer .topbar-logout:hover,
-body[data-page="home"] .home-sidebar-footer .topbar-logout:focus-visible {
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-footer .topbar-logout:hover,
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-footer .topbar-logout:focus-visible {
   background: rgba(255, 255, 255, 0.12);
   color: #fff;
   transform: none;
 }
 
-body[data-page="home"] .home-sidebar-footer .topbar-logout svg {
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-footer .topbar-logout svg {
   inline-size: 18px;
   block-size: 18px;
 }
 
-body[data-page="home"] .home-sidebar-footer .topbar-logout span {
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-footer .topbar-logout span {
   position: absolute;
   inline-size: 1px;
   block-size: 1px;
@@ -5105,14 +5105,14 @@ body[data-page="home"] .home-page-header > div:first-child strong {
   font-size: 0.84rem;
 }
 
-body[data-page="home"] .home-page-status {
+:is(body[data-page="home"], body[data-page="cadh"]) .home-page-status {
   display: flex;
   align-items: center;
   gap: 9px;
 }
 
-body[data-page="home"] .home-system-status,
-body[data-page="home"] .home-current-date {
+:is(body[data-page="home"], body[data-page="cadh"]) .home-system-status,
+:is(body[data-page="home"], body[data-page="cadh"]) .home-current-date {
   min-height: 28px;
   display: inline-flex;
   align-items: center;
@@ -5122,7 +5122,7 @@ body[data-page="home"] .home-current-date {
   white-space: nowrap;
 }
 
-body[data-page="home"] .home-system-status {
+:is(body[data-page="home"], body[data-page="cadh"]) .home-system-status {
   gap: 6px;
   padding: 6px 13px;
   border: 1px solid #9ee8bb;
@@ -5132,7 +5132,7 @@ body[data-page="home"] .home-system-status {
   text-transform: uppercase;
 }
 
-body[data-page="home"] .home-system-status-dot {
+:is(body[data-page="home"], body[data-page="cadh"]) .home-system-status-dot {
   inline-size: 6px;
   block-size: 6px;
   border-radius: 50%;
@@ -5140,7 +5140,7 @@ body[data-page="home"] .home-system-status-dot {
   box-shadow: 0 0 0 3px rgba(51, 212, 119, 0.1);
 }
 
-body[data-page="home"] .home-current-date {
+:is(body[data-page="home"], body[data-page="cadh"]) .home-current-date {
   padding: 6px 14px;
   background: #e5ebf0;
   color: #49637f;
@@ -5542,45 +5542,45 @@ body[data-page="home"] .home-pillar-attention {
 }
 
 @media (max-width: 1120px) {
-  body[data-page="home"] .home-sidebar {
+  :is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar {
     width: 88px;
   }
 
-  body[data-page="home"] .home-sidebar-brand {
+  :is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-brand {
     justify-content: center;
     padding-inline: 12px;
   }
 
-  body[data-page="home"] .home-sidebar-brand-copy,
-  body[data-page="home"] .home-sidebar-label,
-  body[data-page="home"] .home-sidebar-nav-copy,
-  body[data-page="home"] .home-sidebar-chevron,
-  body[data-page="home"] .home-sidebar-footer .topbar-settings span,
-  body[data-page="home"] .home-sidebar-user-copy {
+  :is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-brand-copy,
+  :is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-label,
+  :is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-nav-copy,
+  :is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-chevron,
+  :is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-footer .topbar-settings span,
+  :is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-user-copy {
     display: none;
   }
 
-  body[data-page="home"] .home-sidebar .menu a {
+  :is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar .menu a {
     grid-template-columns: 1fr;
     place-items: center;
     padding-inline: 8px;
   }
 
-  body[data-page="home"] .home-sidebar .menu a::before {
+  :is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar .menu a::before {
     inset-block: 10px;
   }
 
-  body[data-page="home"] .home-sidebar-footer {
+  :is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-footer {
     grid-template-columns: 1fr;
   }
 
-  body[data-page="home"] .home-sidebar-footer .topbar-settings {
+  :is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-footer .topbar-settings {
     grid-column: auto;
     justify-content: center;
   }
 
-  body[data-page="home"] .home-sidebar-footer .topbar-account,
-  body[data-page="home"] .home-sidebar-footer .topbar-logout {
+  :is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-footer .topbar-account,
+  :is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-footer .topbar-logout {
     width: 100%;
     inline-size: auto;
     grid-template-columns: 1fr;
@@ -5605,7 +5605,7 @@ body[data-page="home"] .home-pillar-attention {
     display: block;
   }
 
-  body[data-page="home"] .home-sidebar {
+  :is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar {
     position: sticky;
     inset: 0 0 auto;
     width: 100%;
@@ -5618,43 +5618,43 @@ body[data-page="home"] .home-pillar-attention {
     background: #07345d;
   }
 
-  body[data-page="home"] .home-sidebar .topbar-left {
+  :is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar .topbar-left {
     width: auto;
   }
 
-  body[data-page="home"] .home-sidebar-brand {
+  :is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-brand {
     min-height: 62px;
     padding: 10px 12px;
     border-bottom: 0;
   }
 
-  body[data-page="home"] .home-sidebar-mark {
+  :is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-mark {
     inline-size: 36px;
     block-size: 36px;
   }
 
-  body[data-page="home"] .home-sidebar-nav {
+  :is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-nav {
     padding: 8px 10px 8px 0;
   }
 
-  body[data-page="home"] .home-sidebar .menu {
+  :is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar .menu {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 5px;
   }
 
-  body[data-page="home"] .home-sidebar .menu a {
+  :is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar .menu a {
     min-height: 46px;
     border-radius: 10px;
   }
 
-  body[data-page="home"] .home-sidebar .menu a::before {
+  :is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar .menu a::before {
     inset: auto 12px -1px;
     width: auto;
     height: 3px;
   }
 
-  body[data-page="home"] .home-sidebar-footer {
+  :is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-footer {
     display: none;
   }
 
@@ -5696,7 +5696,7 @@ body[data-page="home"] .home-pillar-attention {
 
 @media (max-width: 520px) {
   body[data-page="home"] .home-page-header > div:first-child span,
-  body[data-page="home"] .home-current-date {
+  :is(body[data-page="home"], body[data-page="cadh"]) .home-current-date {
     display: none;
   }
 
@@ -5704,7 +5704,7 @@ body[data-page="home"] .home-pillar-attention {
     justify-content: space-between;
   }
 
-  body[data-page="home"] .home-system-status {
+  :is(body[data-page="home"], body[data-page="cadh"]) .home-system-status {
     padding-inline: 10px;
   }
 
@@ -5736,15 +5736,15 @@ body[data-page="home"] .home-pillar-attention {
 }
 
 @media (max-width: 360px) {
-  body[data-page="home"] .home-sidebar-brand {
+  :is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-brand {
     display: none;
   }
 
-  body[data-page="home"] .home-sidebar {
+  :is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar {
     grid-template-columns: 1fr;
   }
 
-  body[data-page="home"] .home-sidebar-nav {
+  :is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-nav {
     padding-left: 10px;
   }
 
@@ -5752,7 +5752,7 @@ body[data-page="home"] .home-pillar-attention {
     grid-template-columns: 1fr;
   }
 }
-body[data-page="home"] .home-sidebar-toggle {
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-toggle {
   position: absolute;
   right: -18px;
   bottom: 64px;
@@ -5770,15 +5770,15 @@ body[data-page="home"] .home-sidebar-toggle {
   box-shadow: 2px 3px 8px rgba(12, 45, 74, 0.08);
 }
 
-body[data-page="home"] .home-sidebar-toggle:hover,
-body[data-page="home"] .home-sidebar-toggle:focus-visible {
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-toggle:hover,
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-toggle:focus-visible {
   outline: none;
   background: #f5f9fc;
   color: #0c4d86;
   transform: none;
 }
 
-body[data-page="home"] .home-sidebar-toggle svg {
+:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-toggle svg {
   inline-size: 12px;
   block-size: 12px;
   fill: none;
@@ -5847,17 +5847,17 @@ body[data-page="home"].home-sidebar-is-collapsed .home-sidebar-toggle svg {
 }
 
 @media (max-width: 1120px) and (min-width: 761px) {
-  body[data-page="home"] .home-sidebar .menu {
+  :is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar .menu {
     grid-template-columns: 1fr;
   }
 
-  body[data-page="home"] .home-sidebar-toggle {
+  :is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-toggle {
     display: none;
   }
 }
 
 @media (max-width: 760px) {
-  body[data-page="home"] .home-sidebar-toggle {
+  :is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-toggle {
     display: none;
   }
 
@@ -5921,3 +5921,713 @@ body[data-page="home"] .home-notification-button > span {
   border-radius: 50%;
   background: #e83847;
 }
+
+/* CADH Dashboard Redesign */
+body[data-page="cadh"] {
+  min-height: 100vh;
+  background: #edf3f7;
+  color: #152235;
+}
+
+body[data-page="cadh"] .cadh-app-shell {
+  min-height: 100vh;
+}
+
+body[data-page="cadh"] .cadh-sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 950;
+  width: 240px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 0;
+  border-radius: 0;
+  background: linear-gradient(180deg, #07345d 0%, #062b4e 62%, #052744 100%);
+  color: #fff;
+  box-shadow: none;
+}
+
+body[data-page="cadh"] .cadh-sidebar::after {
+  display: none;
+}
+
+body[data-page="cadh"] .cadh-sidebar .topbar-left {
+  width: 100%;
+  display: block;
+}
+
+body[data-page="cadh"] .cadh-sidebar .topbar-actions {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body[data-page="cadh"] .cadh-main-shell {
+  min-width: 0;
+  min-height: 100vh;
+  margin-left: 240px;
+}
+
+/* Collapsed sidebar state for CADH */
+body[data-page="cadh"].home-sidebar-is-collapsed .cadh-sidebar {
+  width: 88px;
+}
+
+body[data-page="cadh"].home-sidebar-is-collapsed .cadh-sidebar .home-sidebar-brand-copy,
+body[data-page="cadh"].home-sidebar-is-collapsed .cadh-sidebar .home-sidebar-label,
+body[data-page="cadh"].home-sidebar-is-collapsed .cadh-sidebar .home-sidebar-nav-copy,
+body[data-page="cadh"].home-sidebar-is-collapsed .cadh-sidebar .home-sidebar-chevron,
+body[data-page="cadh"].home-sidebar-is-collapsed .cadh-sidebar .home-sidebar-user-copy {
+  display: none;
+}
+
+body[data-page="cadh"].home-sidebar-is-collapsed .cadh-sidebar .menu {
+  grid-template-columns: 1fr;
+}
+
+body[data-page="cadh"].home-sidebar-is-collapsed .cadh-sidebar .menu a {
+  grid-template-columns: 1fr;
+  place-items: center;
+  padding-inline: 8px;
+}
+
+body[data-page="cadh"].home-sidebar-is-collapsed .cadh-main-shell {
+  margin-left: 88px;
+}
+
+body[data-page="cadh"].home-sidebar-is-collapsed .home-sidebar-toggle svg {
+  transform: rotate(180deg);
+}
+
+/* Header style for CADH page */
+body[data-page="cadh"] .cadh-page-header {
+  position: sticky;
+  top: 0;
+  z-index: 800;
+  min-height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 8px 24px;
+  border-bottom: 1px solid #d7e0e7;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 2px 8px rgba(24, 43, 65, 0.05);
+  backdrop-filter: blur(12px);
+}
+
+body[data-page="cadh"] .cadh-breadcrumb-heading {
+  display: grid;
+  gap: 1px;
+}
+
+body[data-page="cadh"] .cadh-breadcrumb-heading p {
+  margin: 0;
+  color: #60758b;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+body[data-page="cadh"] .cadh-breadcrumb-heading h1 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #152235;
+}
+
+/* Dashboard layouts for CADH */
+body[data-page="cadh"] .cadh-primary-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 18px;
+  margin-bottom: 24px;
+}
+
+body[data-page="cadh"] .cadh-patient-search {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: 100%;
+}
+
+body[data-page="cadh"] .cadh-block-title {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #0f172a;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+  padding-left: 8px;
+  border-left: 3px solid #0c4d86;
+  line-height: 1.2;
+}
+
+body[data-page="cadh"] .cadh-patient-search label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: -8px;
+}
+
+body[data-page="cadh"] .cadh-patient-search input {
+  width: 100%;
+  height: 42px;
+  padding: 8px 12px 8px 40px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background-color: #f1f5f9;
+  font-size: 0.9rem;
+  color: #1e293b;
+  transition: border-color 0.15s ease;
+}
+
+body[data-page="cadh"] .cadh-patient-search input:focus {
+  border-color: #0c4d86;
+  outline: none;
+  background-color: #fff;
+}
+
+body[data-page="cadh"] .cadh-search-button {
+  width: 100%;
+  height: 42px;
+  background-color: #0b4f88;
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+body[data-page="cadh"] .cadh-search-button:hover {
+  background-color: #083c68;
+}
+
+/* User management card and tab styles */
+body[data-page="cadh"] .cadh-management-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+body[data-page="cadh"] .cadh-module-tabs {
+  display: flex;
+  border-bottom: 1px solid #e2e8f0;
+  background-color: #f8fafc;
+  padding: 0 16px;
+  flex-wrap: wrap;
+}
+
+body[data-page="cadh"] .cadh-tab-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 16px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #64748b;
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s ease, border-color 0.15s ease;
+  cursor: pointer;
+  position: relative;
+}
+
+body[data-page="cadh"] .cadh-tab-link.active {
+  color: #0b4f88;
+  border-bottom-color: #0b4f88;
+}
+
+body[data-page="cadh"] .cadh-tab-link:hover:not(.is-locked) {
+  color: #0b4f88;
+}
+
+body[data-page="cadh"] .cadh-tab-link.is-locked {
+  color: #94a3b8;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+body[data-page="cadh"] .cadh-tab-link.is-locked svg {
+  opacity: 0.7;
+}
+
+body[data-page="cadh"] .cadh-tab-link .cadh-module-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 8px;
+  height: 8px;
+  background-color: #ef4444;
+  border-radius: 50%;
+}
+
+body[data-page="cadh"] .cadh-tab-icon svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  display: block;
+}
+
+body[data-page="cadh"] .cadh-patient-detail {
+  padding: 24px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 220px;
+}
+
+body[data-page="cadh"] .cadh-empty-state {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  max-width: 320px;
+}
+
+body[data-page="cadh"] .cadh-empty-icon {
+  width: 48px;
+  height: 48px;
+  background-color: #f1f5f9;
+  color: #94a3b8;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+}
+
+body[data-page="cadh"] .cadh-empty-icon svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+body[data-page="cadh"] .cadh-empty-state strong {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #334155;
+}
+
+body[data-page="cadh"] .cadh-empty-state p {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Patient card inside active tab */
+body[data-page="cadh"] .cadh-patient-card {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-self: flex-start;
+  text-align: left;
+}
+
+body[data-page="cadh"] .cadh-patient-card-header {
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 12px;
+}
+
+body[data-page="cadh"] .cadh-patient-card-kicker {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 4px 0;
+}
+
+body[data-page="cadh"] .cadh-patient-card-name {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #1e293b;
+  margin: 0;
+}
+
+body[data-page="cadh"] .cadh-patient-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+body[data-page="cadh"] .cadh-patient-pill {
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+body[data-page="cadh"] .cadh-patient-pill-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+}
+
+body[data-page="cadh"] .cadh-patient-pill strong {
+  font-size: 0.88rem;
+  color: #1e293b;
+}
+
+body[data-page="cadh"] .cadh-clinical-note {
+  background-color: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 8px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+body[data-page="cadh"] .cadh-clinical-note-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+body[data-page="cadh"] .cadh-clinical-note-icon {
+  width: 20px;
+  height: 20px;
+  background-color: #f59e0b;
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.85rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+}
+
+body[data-page="cadh"] .cadh-clinical-note-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #b45309;
+  margin: 0;
+}
+
+body[data-page="cadh"] .cadh-clinical-note-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+body[data-page="cadh"] .cadh-clinical-note-tag {
+  background-color: #fff;
+  border: 1px solid #fcd34d;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #d97706;
+  text-decoration: none;
+  transition: background-color 0.15s ease;
+}
+
+body[data-page="cadh"] .cadh-clinical-note-link:hover {
+  background-color: #fffbeb;
+}
+
+/* Specialties grid styling */
+body[data-page="cadh"] .cadh-specialties-section {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  margin-top: 24px;
+}
+
+body[data-page="cadh"] .cadh-specialties-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+body[data-page="cadh"] .cadh-new-patient-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #0b4f88;
+  color: #fff;
+  font-size: 0.88rem;
+  font-weight: 700;
+  padding: 8px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: background-color 0.15s ease;
+}
+
+body[data-page="cadh"] .cadh-new-patient-link:hover {
+  background-color: #083c68;
+}
+
+body[data-page="cadh"] .cadh-new-patient-link svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+body[data-page="cadh"] .cadh-specialty-guidance {
+  font-size: 0.88rem;
+  color: #b45309;
+  background-color: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: 0 0 20px 0;
+  display: flex;
+  align-items: center;
+}
+
+body[data-page="cadh"] .cadh-specialty-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+body[data-page="cadh"] .cadh-specialty-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background-color: #fff;
+  text-decoration: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+body[data-page="cadh"] .cadh-specialty-card:hover:not(.is-locked) {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+body[data-page="cadh"] .cadh-specialty-card.is-locked {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+body[data-page="cadh"] .cadh-specialty-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+}
+
+body[data-page="cadh"] .cadh-specialty-icon svg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2;
+  display: block;
+}
+
+body[data-page="cadh"] .cadh-specialty-card span:last-child {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+/* Specialty icon styles */
+body[data-page="cadh"] .cadh-specialty-tecnico .cadh-specialty-icon { background-color: #ecfeff; color: #0891b2; }
+body[data-page="cadh"] .cadh-specialty-gestor .cadh-specialty-icon { background-color: #f0f4f8; color: #1e3a8a; }
+body[data-page="cadh"] .cadh-specialty-psico .cadh-specialty-icon { background-color: #f3e8ff; color: #7e22ce; }
+body[data-page="cadh"] .cadh-specialty-enf .cadh-specialty-icon { background-color: #e6fffa; color: #0d9488; }
+body[data-page="cadh"] .cadh-specialty-nutri .cadh-specialty-icon { background-color: #f0fdf4; color: #16a34a; }
+body[data-page="cadh"] .cadh-specialty-endocrino .cadh-specialty-icon { background-color: #fff7ed; color: #ea580c; }
+body[data-page="cadh"] .cadh-specialty-cardio .cadh-specialty-icon { background-color: #fff5f5; color: #e53e3e; }
+body[data-page="cadh"] .cadh-specialty-oftalmo .cadh-specialty-icon { background-color: #e0e7ff; color: #4f46e5; }
+body[data-page="cadh"] .cadh-specialty-fisio .cadh-specialty-icon { background-color: #eff6ff; color: #2563eb; }
+body[data-page="cadh"] .cadh-specialty-social .cadh-specialty-icon { background-color: #fdf2f8; color: #db2777; }
+body[data-page="cadh"] .cadh-specialty-farma .cadh-specialty-icon { background-color: #fef9c3; color: #a16207; }
+
+/* Responsive styles for CADH Primary Grid */
+@media (max-width: 900px) {
+  body[data-page="cadh"] .cadh-primary-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Dark theme overrides for CADH layout */
+:root[data-theme="dark"] body[data-page="cadh"] {
+  background: #172629;
+  color: #d6e3e5;
+}
+
+:root[data-theme="dark"] body[data-page="cadh"] .cadh-patient-search,
+:root[data-theme="dark"] body[data-page="cadh"] .cadh-management-card,
+:root[data-theme="dark"] body[data-page="cadh"] .cadh-specialties-section {
+  background: linear-gradient(180deg, #24393e, #172629);
+  border-color: #385258;
+}
+
+:root[data-theme="dark"] body[data-page="cadh"] .cadh-page-header {
+  border-bottom-color: #385258;
+  background: rgba(32, 50, 55, 0.96);
+}
+
+:root[data-theme="dark"] body[data-page="cadh"] .cadh-breadcrumb-heading h1 {
+  color: #d6e3e5;
+}
+
+:root[data-theme="dark"] body[data-page="cadh"] .cadh-breadcrumb-heading p {
+  color: #93adb2;
+}
+
+:root[data-theme="dark"] body[data-page="cadh"] .cadh-block-title {
+  color: #d6e3e5;
+  border-left-color: #69c8bc;
+}
+
+:root[data-theme="dark"] body[data-page="cadh"] .cadh-patient-search input {
+  background-color: #1a292d;
+  border-color: #34515a;
+  color: #d6e3e5;
+}
+
+:root[data-theme="dark"] body[data-page="cadh"] .cadh-patient-search input:focus {
+  border-color: #69c8bc;
+}
+
+:root[data-theme="dark"] body[data-page="cadh"] .cadh-patient-search label {
+  color: #93adb2;
+}
+
+:root[data-theme="dark"] body[data-page="cadh"] .cadh-module-tabs {
+  background-color: #1a292d;
+  border-bottom-color: #385258;
+}
+
+:root[data-theme="dark"] body[data-page="cadh"] .cadh-tab-link {
+  color: #93adb2;
+}
+
+:root[data-theme="dark"] body[data-page="cadh"] .cadh-tab-link.active {
+  color: #69c8bc;
+  border-bottom-color: #69c8bc;
+}
+
+:root[data-theme="dark"] body[data-page="cadh"] .cadh-tab-link:hover:not(.is-locked) {
+  color: #69c8bc;
+}
+
+:root[data-theme="dark"] body[data-page="cadh"] .cadh-tab-link.is-locked {
+  color: #34515a;
+}
+
+:root[data-theme="dark"] body[data-page="cadh"] .cadh-empty-state strong {
+  color: #d6e3e5;
+}
+
+:root[data-theme="dark"] body[data-page="cadh"] .cadh-empty-state p {
+  color: #93adb2;
+}
+
+:root[data-theme="dark"] body[data-page="cadh"] .cadh-empty-icon {
+  background-color: #1a292d;
+  color: #385258;
+}
+
+:root[data-theme="dark"] body[data-page="cadh"] .cadh-patient-card-name {
+  color: #d6e3e5;
+}
+
+:root[data-theme="dark"] body[data-page="cadh"] .cadh-patient-pill {
+  background: #1d3034;
+  border-color: #385258;
+}
+
+:root[data-theme="dark"] body[data-page="cadh"] .cadh-patient-pill-label {
+  color: #93adb2;
+}
+
+:root[data-theme="dark"] body[data-page="cadh"] .cadh-patient-pill strong {
+  color: #d6e3e5;
+}
+
+:root[data-theme="dark"] body[data-page="cadh"] .cadh-specialty-card {
+  background-color: #203237;
+  border-color: #385258;
+}
+
+:root[data-theme="dark"] body[data-page="cadh"] .cadh-specialty-card span:last-child {
+  color: #d6e3e5;
+}
+
+:root[data-theme="dark"] body[data-page="cadh"] .cadh-specialty-card:hover:not(.is-locked) {
+  border-color: #69c8bc;
+}
+
+:root[data-theme="dark"] body[data-page="cadh"] .cadh-new-patient-link {
+  background-color: #18a99b;
+}
+
+:root[data-theme="dark"] body[data-page="cadh"] .cadh-new-patient-link:hover {
+  background-color: #0f766e;
+}
+
+body[data-page="cadh"] .cadh-dashboard {
+  width: calc(100% - 36px) !important;
+  max-width: none !important;
+  margin: 18px auto 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 0;
+}
+
+
+body[data-page="cadh"] .cadh-dashboard::before {
+  content: "";
+  position: fixed;
+  inset: 54px 0 0 240px;
+  z-index: -1;
+  pointer-events: none;
+  background-color: transparent;
+  background-image: radial-gradient(circle, rgba(12, 77, 134, 0.12) 1px, transparent 1.2px);
+  background-size: 28px 28px;
+}
+
+
+body[data-page="cadh"] .cadh-patient-result {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+

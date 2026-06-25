@@ -16,6 +16,76 @@ async function setupCadhPage() {
   SISELO.bindShell(shellKey);
   applyCadhModulePermissions(permissions);
   bindCadhPatientSearch(permissions);
+
+  // Initialize date element
+  const dateElement = document.getElementById('cadh-current-date');
+  const updateCurrentDate = () => {
+    if (!dateElement) return;
+    const now = new Date();
+    const localDate = [
+      now.getFullYear(),
+      String(now.getMonth() + 1).padStart(2, '0'),
+      String(now.getDate()).padStart(2, '0'),
+    ].join('-');
+    dateElement.dateTime = localDate;
+    dateElement.textContent = new Intl.DateTimeFormat('pt-BR', {
+      day: '2-digit', month: 'short', year: 'numeric'
+    }).format(now);
+  };
+  updateCurrentDate();
+  window.setInterval(updateCurrentDate, 60 * 1000);
+
+  // Initialize sidebar toggle
+  const sidebarToggle = document.getElementById('cadh-sidebar-toggle');
+  const collapsedKey = 'siselo_home_sidebar_collapsed';
+  const setSidebarCollapsed = (collapsed) => {
+    document.body.classList.toggle('home-sidebar-is-collapsed', collapsed);
+    if (sidebarToggle) {
+      sidebarToggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+      sidebarToggle.setAttribute('aria-label', collapsed ? 'Expandir menu lateral' : 'Recolher menu lateral');
+    }
+  };
+
+  let sidebarCollapsed = false;
+  try {
+    sidebarCollapsed = localStorage.getItem(collapsedKey) === 'true';
+  } catch (error) {
+  }
+  setSidebarCollapsed(sidebarCollapsed);
+
+  sidebarToggle?.addEventListener('click', () => {
+    sidebarCollapsed = !document.body.classList.contains('home-sidebar-is-collapsed');
+    setSidebarCollapsed(sidebarCollapsed);
+    try {
+      localStorage.setItem(collapsedKey, String(sidebarCollapsed));
+    } catch (error) {
+    }
+  });
+
+  // Reformat user profile & logout button in sidebar footer
+  const sidebarFooter = document.querySelector('.home-sidebar-footer');
+  const logoutButton = document.getElementById('logout-button');
+  if (sidebarFooter && logoutButton) {
+    sidebarFooter.appendChild(logoutButton);
+    logoutButton.innerHTML = '<svg aria-hidden="true" viewBox="0 0 24 24"><path d="M10 5H5v14h5M14 8l4 4-4 4M18 12H9"/></svg><span>Sair</span>';
+  }
+
+  const accountLink = document.getElementById('topbar-account-link');
+  if (accountLink) {
+    accountLink.textContent = '';
+    const icon = document.createElement('span');
+    icon.className = 'home-sidebar-user-icon';
+    icon.innerHTML = '<svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>';
+    const copy = document.createElement('span');
+    copy.className = 'home-sidebar-user-copy';
+    const name = document.createElement('strong');
+    name.textContent = user.name || 'Meu perfil';
+    const email = document.createElement('small');
+    email.textContent = user.email || 'Acessar perfil';
+    copy.append(name, email);
+    accountLink.append(icon, copy);
+  }
+
   if (!await restoreCadhPatientSearch(permissions)) {
     setCadhPatientCardsUnlocked(false);
     syncCadhPendingIndicators([]);
@@ -67,6 +137,17 @@ function bindCadhPatientSearch(permissions) {
     const result = document.getElementById('cadh-patient-result');
     if (result) {
       result.innerHTML = '';
+    }
+
+    const detail = document.getElementById('cadh-patient-detail');
+    if (detail) {
+      detail.innerHTML = `
+        <div class="cadh-empty-state">
+          <span class="cadh-empty-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#cadh-icon-users"></use></svg></span>
+          <strong>Nenhum usuário selecionado</strong>
+          <p>Busque e selecione um usuário ao lado para visualizar e gerenciar suas informações de cuidado.</p>
+        </div>
+      `;
     }
 
     if (query.length < 1) {
@@ -194,7 +275,7 @@ function setCadhPatientCardPatient(patientId) {
 }
 
 function renderCadhPatient(patient, careSummary = null) {
-  const result = document.getElementById('cadh-patient-result');
+  const result = document.getElementById('cadh-patient-detail');
   if (!result) {
     return;
   }
