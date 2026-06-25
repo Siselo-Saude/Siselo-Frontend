@@ -3,171 +3,266 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>SISELO</title>
+  <title>Painel de Controle | SISELO</title>
   <link rel="stylesheet" href="/assets/app.css">
 </head>
 <body data-page="home">
-  <header class="topbar">
-    <div class="topbar-brand">Intranet CADH</div>
-    <nav class="menu">
-      <a id="nav-home" href="/index.html">Home</a>
-      <a id="nav-cadh" href="/cadh/index.html">CADH</a>
-      <a id="nav-ubs" href="#">UBS</a>
-    </nav>
-  </header>
-
-  <main class="container">
-    <section class="card home-panel">
-      <div class="home-panel-header">
-        <div>
-          <p class="home-kicker">Sistema Integrado de Saúde</p>
-          <h1 class="page-title">SISELO</h1>
-        </div>
-      </div>
-
-      <div class="home-access-row">
-        <a id="home-cadh-card" class="home-access-card" href="/cadh/index.html">
-          <span>Acesse o ambiente do CADH</span>
-        </a>
-
-        <div class="home-flow-bridge" aria-hidden="true">
-          <svg viewBox="0 0 220 72" focusable="false">
-            <path class="home-flow-line" d="M20 36h56"/>
-            <path class="home-flow-arrow" d="M68 28l8 8-8 8"/>
-            <circle class="home-flow-center" cx="110" cy="36" r="16"/>
-            <path class="home-flow-center-mark" d="M104 31h12M104 36h12M104 41h9"/>
-            <path class="home-flow-line" d="M144 36h56"/>
-            <path class="home-flow-arrow" d="M152 28l-8 8 8 8"/>
+  <div class="home-app-shell">
+    <aside class="topbar home-sidebar" aria-label="Navegação do SISELO">
+      <div class="topbar-brand home-sidebar-brand">
+        <span class="home-sidebar-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" focusable="false">
+            <path d="M12 4v16M4 12h16"/>
+            <rect x="5" y="5" width="14" height="14" rx="5"/>
           </svg>
+        </span>
+        <span class="home-sidebar-brand-copy">
+          <strong>SISELO</strong>
+          <small>Sistema de Saúde</small>
+        </span>
+      </div>
+
+      <div class="home-sidebar-nav">
+        <p class="home-sidebar-label">Módulos</p>
+        <nav class="menu" aria-label="Módulos principais">
+          <a id="nav-home" href="/index.html">
+            <span class="home-sidebar-nav-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="m4 10 8-6 8 6v10H4V10Z"/><path d="M9 20v-6h6v6"/></svg>
+            </span>
+            <span class="home-sidebar-nav-copy"><strong>Início</strong><small>Painel geral</small></span>
+            <svg class="home-sidebar-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
+          </a>
+
+          <a id="nav-cadh" href="/cadh/index.html">
+            <span class="home-sidebar-nav-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M3 13h4l2-7 4 14 2-7h6"/></svg>
+            </span>
+            <span class="home-sidebar-nav-copy"><strong>CADH</strong><small>Atenção domiciliar</small></span>
+            <svg class="home-sidebar-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
+          </a>
+
+          <a id="nav-ubs" href="/ubs/index.html">
+            <span class="home-sidebar-nav-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M12 21s7-5.2 7-12a7 7 0 1 0-14 0c0 6.8 7 12 7 12Z"/><circle cx="12" cy="9" r="2.5"/></svg>
+            </span>
+            <span class="home-sidebar-nav-copy"><strong>UBS</strong><small>Atenção primária</small></span>
+            <svg class="home-sidebar-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
+          </a>
+        </nav>
+      </div>
+
+      <div class="topbar-actions home-sidebar-footer"></div>
+
+      <button id="home-sidebar-toggle" class="home-sidebar-toggle" type="button" aria-label="Recolher menu lateral" aria-expanded="true">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg>
+      </button>
+    </aside>
+
+    <div class="home-main-shell">
+      <header class="home-page-header">
+        <div>
+          <span>Início</span>
+          <strong>Painel de Controle</strong>
         </div>
-
-        <a id="home-ubs-card" class="home-access-card" href="#">
-          <span>Acesse o ambiente da UBS</span>
-        </a>
-      </div>
-
-      <div class="home-direction-grid">
-        <article class="home-direction-card home-direction-active">
-          <span class="home-direction-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" focusable="false">
-              <path d="M7 7v10"/>
-              <path d="M7 17 3.5 13.5"/>
-              <path d="M7 17l3.5-3.5"/>
-              <path d="M11 7h8"/>
-            </svg>
+        <div class="home-page-status">
+          <span class="home-system-status">
+            <span class="home-system-status-dot" aria-hidden="true"></span>
+            Operacional
           </span>
-          <div>
-            <strong>Encaminhamentos</strong>
-            <span>UBS → CADH</span>
+          <time id="home-current-date" class="home-current-date"></time>
+        </div>
+      </header>
+
+      <main class="container home-dashboard">
+        <section class="home-hero" aria-labelledby="home-title">
+          <div class="home-hero-content">
+            <p class="home-hero-eyebrow"><span aria-hidden="true"></span>Sistema operacional</p>
+            <h1 id="home-title">Bem-vindo ao SISELO</h1>
+            <p>Sistema Integrado de Saúde — gestão centralizada dos compartilhamentos do cuidado, atenção domiciliar e atenção primária.</p>
           </div>
-          <p id="home-total-users-count">00</p>
-          <a class="btn" href="/patients/list.html">Ver todos os usuários</a>
-        </article>
+          <div class="home-hero-orbit" aria-hidden="true"></div>
+        </section>
 
-        <article class="home-direction-card">
-          <span class="home-direction-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" focusable="false">
-              <path d="M7 7h10"/>
-              <path d="M7 12h10"/>
-              <path d="M7 17h10"/>
-            </svg>
-          </span>
-          <div>
-            <strong>Em andamento no</strong>
-            <span>CADH</span>
-          </div>
-          <p id="home-active-users-count">00</p>
-          <a class="btn" href="/patients/list.html">Ver todos os usuários</a>
-        </article>
+        <section class="home-metrics" aria-label="Indicadores do sistema">
+          <a class="home-metric-card home-metric-blue" href="/transitions/list.html">
+            <span class="home-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m5 4 14 8-14 8 3-8-3-8Z"/><path d="M8 12h7"/></svg></span>
+            <strong id="home-total-users-count">00</strong>
+            <span>Compartilhamentos UBS → CADH</span>
+          </a>
 
-        <article class="home-direction-card">
-          <span class="home-direction-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" focusable="false">
-              <path d="M17 7v10"/>
-              <path d="M17 7 13.5 10.5"/>
-              <path d="M17 7l3.5 3.5"/>
-              <path d="M5 17h8"/>
-            </svg>
-          </span>
-          <div>
-            <strong>Encaminhamentos</strong>
-            <span>CADH → UBS</span>
-          </div>
-          <p id="home-inactive-users-count">00</p>
-          <a class="btn" href="/patients/list.html">Ver todos os usuários</a>
-        </article>
-      </div>
+          <a class="home-metric-card home-metric-amber" href="/patients/list.html">
+            <span class="home-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 7v5l3 2"/></svg></span>
+            <strong id="home-active-users-count">00</strong>
+            <span>Ativos no CADH</span>
+          </a>
 
-      <div class="home-illustration" aria-hidden="true">
-        <svg viewBox="0 0 980 220" focusable="false">
-          <path class="home-ill-bg" d="M0 28h150l-42 50H0V28Zm360 0h150l-42 50H360V28Zm720 0h150l-42 50H720V28Z"/>
-          <path class="home-ill-arrow" d="M175 88c76-46 150-46 222 0"/>
-          <path class="home-ill-arrow" d="M535 88c76-46 150-46 222 0"/>
-          <path class="home-ill-cloud" d="M250 125c5-28 31-45 58-36 12-24 49-29 67-6 29-7 56 15 56 44 0 27-22 49-49 49H294c-27 0-49-22-44-51Z"/>
-          <path class="home-ill-cloud" d="M610 125c5-28 31-45 58-36 12-24 49-29 67-6 29-7 56 15 56 44 0 27-22 49-49 49H654c-27 0-49-22-44-51Z"/>
-          <g class="home-ill-screen">
-            <rect x="80" y="110" width="150" height="82" rx="12"/>
-            <path d="M102 134h76M102 154h106M102 174h64"/>
-          </g>
-          <g class="home-ill-screen">
-            <rect x="440" y="110" width="150" height="82" rx="12"/>
-            <path d="M462 134h76M462 154h106M462 174h64"/>
-          </g>
-          <g class="home-ill-screen">
-            <rect x="800" y="110" width="150" height="82" rx="12"/>
-            <path d="M822 134h76M822 154h106M822 174h64"/>
-          </g>
-          <circle class="home-ill-lock" cx="339" cy="139" r="18"/>
-          <circle class="home-ill-lock" cx="699" cy="139" r="18"/>
-        </svg>
-      </div>
-    </section>
-  </main>
+          <a class="home-metric-card home-metric-green" href="/transitions/list.html">
+            <span class="home-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/><path d="m11 12 3 3 6-7"/></svg></span>
+            <strong id="home-inactive-users-count">00</strong>
+            <span>Transições do cuidado</span>
+          </a>
 
-  <footer class="site-endbar" aria-label="Final da página">
-    <div class="container">
-      <div class="site-endbar-line"></div>
-      <p class="site-endbar-text">Fim da página</p>
+          <a class="home-metric-card home-metric-purple" href="/transitions/list.html">
+            <span class="home-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 17 10 12l3 3 6-7"/><path d="M14 8h5v5"/></svg></span>
+            <strong id="home-records-count">00</strong>
+            <span>Total de registros</span>
+          </a>
+        </section>
+
+        <section class="home-environments" aria-label="Ambientes assistenciais">
+          <a id="home-cadh-card" class="home-environment-card home-environment-cadh" href="/cadh/index.html">
+            <div class="home-environment-topline">
+              <span class="home-environment-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 13h3l2-7 4 14 2-7h5"/></svg></span>
+              <span class="home-environment-tag">Atenção domiciliar</span>
+            </div>
+            <div class="home-environment-copy">
+              <h2>CADH</h2>
+              <strong>Centro de Atenção Domiciliar Hospitalar</strong>
+              <p>Gestão de pacientes em acompanhamento domiciliar, planos de cuidado, atendimentos e transições.</p>
+            </div>
+            <span class="home-environment-action">Acessar módulo <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M14 7l5 5-5 5"/></svg></span>
+          </a>
+
+          <a id="home-ubs-card" class="home-environment-card home-environment-ubs" href="/ubs/index.html">
+            <div class="home-environment-topline">
+              <span class="home-environment-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0M16 7a3 3 0 0 1 0 6M18 19a4 4 0 0 0-3-3.8"/></svg></span>
+              <span class="home-environment-tag">Atenção primária</span>
+            </div>
+            <div class="home-environment-copy">
+              <h2>UBS</h2>
+              <strong>Unidade Básica de Saúde</strong>
+              <p>Equipe multidisciplinar, fluxo de cuidado estruturado, encaminhamentos e atenção primária integral.</p>
+            </div>
+            <span class="home-environment-action">Acessar módulo <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M14 7l5 5-5 5"/></svg></span>
+          </a>
+        </section>
+
+        <section class="home-pillars" aria-label="Pilares do cuidado">
+          <article class="home-pillar-card home-pillar-care">
+            <span class="home-pillar-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M20.8 8.6c0 5.4-8.8 10.6-8.8 10.6S3.2 14 3.2 8.6A4.5 4.5 0 0 1 12 7a4.5 4.5 0 0 1 8.8 1.6Z"/></svg>
+            </span>
+            <div><strong>Cuidado Integral</strong><p>Acompanhamento longitudinal e multidisciplinar do paciente.</p></div>
+          </article>
+
+          <article class="home-pillar-card home-pillar-safety">
+            <span class="home-pillar-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M12 3 20 7v5c0 5-3.4 8-8 9-4.6-1-8-4-8-9V7l8-4Z"/></svg>
+            </span>
+            <div><strong>Segurança do Paciente</strong><p>Processos estruturados para garantir continuidade e qualidade.</p></div>
+          </article>
+
+          <article class="home-pillar-card home-pillar-attention">
+            <span class="home-pillar-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M12 3 2.8 20h18.4L12 3Z"/><path d="M12 9v5M12 17h.01"/></svg>
+            </span>
+            <div><strong>Ponto de Atenção</strong><p>Manter a dimensão integral do cuidado em todos os níveis de atenção.</p></div>
+          </article>
+        </section>
+      </main>
     </div>
-  </footer>
+  </div>
 
   <script src="/assets/config.js"></script>
   <script src="/assets/app.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
+      const dateElement = document.getElementById('home-current-date');
+      const updateCurrentDate = () => {
+        if (!dateElement) return;
+        const now = new Date();
+        const localDate = [
+          now.getFullYear(),
+          String(now.getMonth() + 1).padStart(2, '0'),
+          String(now.getDate()).padStart(2, '0'),
+        ].join('-');
+        dateElement.dateTime = localDate;
+        dateElement.textContent = new Intl.DateTimeFormat('pt-BR', {
+          day: '2-digit', month: 'short', year: 'numeric'
+        }).format(now);
+      };
+      updateCurrentDate();
+      window.setInterval(updateCurrentDate, 60 * 1000);
+
       const user = await SISELO.requireSession();
       if (!user) return;
 
       SISELO.bindShell('home');
-      const permissions = SISELO.getUiPermissions(user);
-      document.getElementById('home-cadh-card').hidden = !(
-        permissions.has('patients.view') ||
-        permissions.has('careplans.view') ||
-        permissions.has('encounters.view') ||
-        permissions.has('transitions.view')
-      );
 
-      if (permissions.has('transitions.view')) {
+      const sidebarToggle = document.getElementById('home-sidebar-toggle');
+      const collapsedKey = 'siselo_home_sidebar_collapsed';
+      const setSidebarCollapsed = (collapsed) => {
+        document.body.classList.toggle('home-sidebar-is-collapsed', collapsed);
+        if (sidebarToggle) {
+          sidebarToggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+          sidebarToggle.setAttribute('aria-label', collapsed ? 'Expandir menu lateral' : 'Recolher menu lateral');
+        }
+      };
+
+      let sidebarCollapsed = false;
+      try {
+        sidebarCollapsed = localStorage.getItem(collapsedKey) === 'true';
+      } catch (error) {
+      }
+      setSidebarCollapsed(sidebarCollapsed);
+
+      sidebarToggle?.addEventListener('click', () => {
+        sidebarCollapsed = !document.body.classList.contains('home-sidebar-is-collapsed');
+        setSidebarCollapsed(sidebarCollapsed);
+        try {
+          localStorage.setItem(collapsedKey, String(sidebarCollapsed));
+        } catch (error) {
+        }
+      });
+
+      const sidebarFooter = document.querySelector('.home-sidebar-footer');
+      const logoutButton = document.getElementById('logout-button');
+      if (sidebarFooter && logoutButton) {
+        sidebarFooter.appendChild(logoutButton);
+        logoutButton.innerHTML = '<svg aria-hidden="true" viewBox="0 0 24 24"><path d="M10 5H5v14h5M14 8l4 4-4 4M18 12H9"/></svg><span>Sair</span>';
+      }
+
+      const accountLink = document.getElementById('topbar-account-link');
+      if (accountLink) {
+        accountLink.textContent = '';
+        const icon = document.createElement('span');
+        icon.className = 'home-sidebar-user-icon';
+        icon.innerHTML = '<svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>';
+        const copy = document.createElement('span');
+        copy.className = 'home-sidebar-user-copy';
+        const name = document.createElement('strong');
+        name.textContent = user.name || 'Meu perfil';
+        const email = document.createElement('small');
+        email.textContent = user.email || 'Acessar perfil';
+        copy.append(name, email);
+        accountLink.append(icon, copy);
+      }
+
+      const permissions = SISELO.getUiPermissions(user);
+      const canViewPatients = permissions.has('patients.view');
+      const canViewPlans = permissions.has('careplans.view');
+      const canViewEncounters = permissions.has('encounters.view');
+      const canViewTransitions = permissions.has('transitions.view');
+      const canAccessCadh = canViewPatients || canViewPlans || canViewEncounters || canViewTransitions;
+
+      document.getElementById('home-cadh-card').hidden = !canAccessCadh;
+
+      if (canViewTransitions) {
         try {
           const data = await SISELO.apiRequest('/transitions/list.php');
           const rows = Array.isArray(data.rows) ? data.rows : [];
           const normalize = (value) => SISELO.normalizeSearchText(value || '');
-          const isCadhService = (value) => {
-            const normalized = normalize(value);
-            return normalized.includes('cadh');
-          };
-          const fromUbsToCadh = rows.filter((row) => {
-            return isCadhService(row.to_service) && !isCadhService(row.from_service);
-          }).length;
+          const isCadhService = (value) => normalize(value).includes('cadh');
+          const fromUbsToCadh = rows.filter((row) => isCadhService(row.to_service) && !isCadhService(row.from_service)).length;
           const inProgress = rows.filter((row) => normalize(row.status) === 'em_andamento').length;
-          const fromCadhToUbs = rows.filter((row) => {
-            return isCadhService(row.from_service) && !isCadhService(row.to_service);
-          }).length;
+          const completedTransitions = rows.filter((row) => isCadhService(row.from_service) && !isCadhService(row.to_service)).length;
 
           document.getElementById('home-total-users-count').textContent = String(fromUbsToCadh).padStart(2, '0');
           document.getElementById('home-active-users-count').textContent = String(inProgress).padStart(2, '0');
-          document.getElementById('home-inactive-users-count').textContent = String(fromCadhToUbs).padStart(2, '0');
+          document.getElementById('home-inactive-users-count').textContent = String(completedTransitions).padStart(2, '0');
+          document.getElementById('home-records-count').textContent = String(rows.length).padStart(2, '0');
         } catch (error) {
+          // Mantém os indicadores zerados quando a API estiver indisponível.
         }
       }
     });

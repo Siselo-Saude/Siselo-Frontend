@@ -3,700 +3,152 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>CADH</title>
+  <title>CADH | SISELO</title>
   <link rel="stylesheet" href="/assets/app.css">
-  <style>
-    .cadh-page {
-      padding: 26px;
-      background:
-        radial-gradient(circle at top right, rgba(15, 118, 110, 0.05), transparent 26%),
-        linear-gradient(180deg, #f4f7f8, #eef3f5);
-    }
-
-    body[data-page="cadh"] .container {
-      width: min(var(--app-shell-max), calc(100vw - 32px));
-      max-width: var(--app-shell-max);
-      margin: 20px auto;
-      padding: 0;
-    }
-
-    .cadh-section-label {
-      margin: 0 0 14px;
-      color: #6b7f8d;
-      font-size: 0.78rem;
-      font-weight: 800;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-    }
-
-    .cadh-layout {
-      display: grid;
-      grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
-      gap: 22px;
-      align-items: start;
-    }
-
-    .cadh-patient-search {
-      display: grid;
-      gap: 12px;
-      padding: 18px;
-      border: 1px solid rgba(15, 118, 110, 0.12);
-      border-radius: 24px;
-      background:
-        radial-gradient(circle at top right, rgba(15, 118, 110, 0.08), transparent 32%),
-        linear-gradient(180deg, #f7fcfb, #ffffff);
-      box-shadow: 0 18px 34px rgba(15, 37, 65, 0.08);
-    }
-
-    .cadh-patient-search label {
-      color: #102236;
-      font-size: 0.9rem;
-      font-weight: 800;
-    }
-
-    .cadh-patient-result {
-      display: grid;
-      gap: 10px;
-    }
-
-    .cadh-patient-option {
-      display: grid;
-      gap: 4px;
-      padding: 12px 14px;
-      border: 1px solid rgba(15, 118, 110, 0.14);
-      border-radius: 16px;
-      background: #fff;
-      color: #173045;
-      text-align: left;
-      cursor: pointer;
-      transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
-    }
-
-    .cadh-patient-option:hover,
-    .cadh-patient-option:focus-visible {
-      outline: none;
-      transform: translateY(-1px);
-      border-color: rgba(15, 118, 110, 0.24);
-      box-shadow: 0 14px 24px rgba(15, 37, 65, 0.09);
-    }
-
-    .cadh-patient-option-name {
-      font-size: 1rem;
-      font-weight: 800;
-      line-height: 1.3;
-    }
-
-    .cadh-patient-option-meta {
-      color: #5f7688;
-      font-size: 0.84rem;
-      line-height: 1.4;
-    }
-
-    .cadh-patient-message {
-      margin: 0;
-      padding: 12px 14px;
-      border-radius: 16px;
-      border: 1px solid rgba(148, 163, 184, 0.18);
-      background: linear-gradient(180deg, #f7fafb, #ffffff);
-      color: #5e7283;
-      font-size: 0.88rem;
-      line-height: 1.5;
-    }
-
-    .cadh-patient-message.is-error {
-      background: #fff1f2;
-      color: #9f1239;
-    }
-
-    .cadh-patient-card {
-      display: grid;
-      gap: 14px;
-      padding: 16px;
-      border: 1px solid rgba(15, 118, 110, 0.12);
-      border-radius: 22px;
-      background: linear-gradient(180deg, #fafdfe, #ffffff);
-      box-shadow: 0 16px 26px rgba(15, 37, 65, 0.06);
-    }
-
-    .cadh-patient-card-header {
-      display: grid;
-      gap: 6px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.2);
-    }
-
-    .cadh-patient-card-kicker {
-      margin: 0;
-      color: #0f766e;
-      font-size: 0.74rem;
-      font-weight: 800;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-    }
-
-    .cadh-patient-card-name {
-      margin: 0;
-      color: #102236;
-      font-size: 1.3rem;
-      line-height: 1.28;
-    }
-
-    .cadh-patient-info {
-      display: grid;
-      gap: 10px;
-    }
-
-    .cadh-patient-pill {
-      display: grid;
-      gap: 4px;
-      padding: 12px 14px;
-      border: 1px solid rgba(148, 163, 184, 0.16);
-      border-radius: 16px;
-      background: #eef7fb;
-      color: #102236;
-      text-align: left;
-    }
-
-    .cadh-patient-pill strong {
-      font-size: 0.98rem;
-      line-height: 1.35;
-    }
-
-    .cadh-patient-pill-label {
-      color: #61798b;
-      font-size: 0.72rem;
-      font-weight: 800;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-    }
-
-    .cadh-clinical-note {
-      display: grid;
-      gap: 12px;
-      margin-top: 2px;
-      padding: 14px;
-      border: 1px solid rgba(180, 135, 22, 0.22);
-      border-radius: 18px;
-      background: linear-gradient(180deg, #fffbeb, #fff7dd);
-      color: #7c5510;
-      box-shadow: 0 10px 18px rgba(180, 135, 22, 0.08);
-    }
-
-    .cadh-clinical-note-header {
-      display: grid;
-      grid-template-columns: auto 1fr;
-      gap: 10px;
-      align-items: start;
-    }
-
-    .cadh-clinical-note-icon {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 28px;
-      height: 28px;
-      border-radius: 999px;
-      background: #f7d567;
-      color: #7c5510;
-      font-size: 0.95rem;
-      font-weight: 800;
-    }
-
-    .cadh-clinical-note-title {
-      margin: 0 0 4px;
-      font-size: 0.94rem;
-      font-weight: 800;
-    }
-
-    .cadh-clinical-note-text {
-      margin: 0;
-      font-size: 0.83rem;
-      line-height: 1.5;
-    }
-
-    .cadh-clinical-note-list {
-      display: grid;
-      gap: 8px;
-    }
-
-    .cadh-clinical-note-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      min-height: 34px;
-      padding: 6px 12px;
-      border-radius: 999px;
-      background: rgba(180, 135, 22, 0.12);
-      color: #8a5a0a;
-      font-size: 0.82rem;
-      font-weight: 700;
-    }
-
-    .cadh-clinical-note-link {
-      text-decoration: none;
-      transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
-    }
-
-    .cadh-clinical-note-link:hover,
-    .cadh-clinical-note-link:focus-visible {
-      outline: none;
-      transform: translateY(-1px);
-      box-shadow: 0 10px 18px rgba(180, 135, 22, 0.14);
-      background: rgba(180, 135, 22, 0.18);
-    }
-
-    .cadh-clinical-note-tag::before {
-      content: "";
-      inline-size: 7px;
-      block-size: 7px;
-      border-radius: 999px;
-      background: currentColor;
-      opacity: 0.72;
-    }
-
-    .cadh-module-grid,
-    .cadh-specialty-grid {
-      display: grid;
-      gap: 14px;
-    }
-
-    .cadh-module-grid + .cadh-section-label {
-      margin-top: 24px;
-    }
-
-    .cadh-module-grid {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-    }
-
-    .cadh-specialty-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .cadh-module-card,
-    .cadh-specialty-card {
-      position: relative;
-      isolation: isolate;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      min-height: 124px;
-      border: 1px solid #d8e2ea;
-      border-radius: 22px;
-      padding: 20px;
-      text-decoration: none;
-      color: #1f2937;
-      background: #fff;
-      box-shadow: 0 10px 20px rgba(15, 37, 65, 0.04);
-      overflow: hidden;
-      transition:
-        transform 0.2s ease,
-        box-shadow 0.2s ease,
-        border-color 0.2s ease,
-        filter 0.2s ease;
-    }
-
-    .cadh-module-card::after,
-    .cadh-specialty-card::after {
-      content: "";
-      position: absolute;
-      inset: -34% -18%;
-      z-index: -1;
-      background:
-        radial-gradient(circle at 22% 20%, rgba(255, 255, 255, 0.58), transparent 28%),
-        radial-gradient(circle at 78% 78%, color-mix(in srgb, var(--cadh-accent, #64748b) 24%, transparent), transparent 34%);
-      opacity: 0;
-      transform: translate3d(-10px, 10px, 0) scale(0.96);
-      transition: opacity 0.24s ease, transform 0.24s ease;
-    }
-
-    .cadh-module-card:hover,
-    .cadh-module-card:focus-visible,
-    .cadh-specialty-card:hover,
-    .cadh-specialty-card:focus-visible {
-      outline: none;
-      transform: translateY(-4px);
-      border-color: color-mix(in srgb, var(--cadh-accent, #64748b) 38%, #ffffff);
-      box-shadow:
-        0 20px 34px rgba(15, 37, 65, 0.13),
-        0 0 0 4px color-mix(in srgb, var(--cadh-accent, #64748b) 14%, transparent);
-    }
-
-    .cadh-module-card:hover::after,
-    .cadh-module-card:focus-visible::after,
-    .cadh-specialty-card:hover::after,
-    .cadh-specialty-card:focus-visible::after {
-      opacity: 1;
-      transform: translate3d(0, 0, 0) scale(1);
-    }
-
-    .cadh-module-card[hidden] {
-      display: none;
-    }
-
-    .cadh-module-card.is-locked,
-    .cadh-specialty-card.is-locked {
-      opacity: 0.52;
-      cursor: not-allowed;
-      filter: grayscale(0.28);
-      transform: none;
-      box-shadow: 0 8px 16px rgba(15, 37, 65, 0.04);
-    }
-
-    .cadh-module-card.is-locked:hover,
-    .cadh-module-card.is-locked:focus-visible,
-    .cadh-specialty-card.is-locked:hover,
-    .cadh-specialty-card.is-locked:focus-visible {
-      transform: translateY(-2px);
-      box-shadow:
-        0 16px 28px rgba(15, 37, 65, 0.1),
-        0 0 0 3px color-mix(in srgb, var(--cadh-accent, #64748b) 10%, transparent);
-    }
-
-    .cadh-module-card.is-pending {
-      border-color: rgba(180, 135, 22, 0.34);
-      box-shadow: 0 14px 26px rgba(180, 135, 22, 0.1);
-    }
-
-    .cadh-module-icon,
-    .cadh-specialty-icon {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      align-self: flex-start;
-      margin-bottom: 12px;
-      color: var(--cadh-accent, #64748b);
-      line-height: 1;
-    }
-
-    .cadh-module-icon svg,
-    .cadh-specialty-icon svg {
-      inline-size: 24px;
-      block-size: 24px;
-      stroke: currentColor;
-      stroke-width: 2;
-      fill: none;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    .cadh-specialty-icon svg {
-      inline-size: 17px;
-      block-size: 17px;
-      stroke-width: 1.8;
-      opacity: 0.78;
-    }
-
-    .cadh-module-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      width: 100%;
-    }
-
-    .cadh-module-title {
-      font-weight: 800;
-      font-size: 1.04rem;
-      line-height: 1.28;
-    }
-
-    .cadh-module-badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      flex: 0 0 auto;
-      inline-size: 12px;
-      block-size: 12px;
-      border-radius: 999px;
-      background: #d6a11d;
-      box-shadow: 0 0 0 4px rgba(180, 135, 22, 0.12);
-      overflow: hidden;
-      font-size: 0;
-      line-height: 0;
-    }
-
-    .cadh-module-badge[hidden] {
-      display: none !important;
-    }
-
-    .cadh-card-patients {
-      --cadh-accent: #08796c;
-      border-color: rgba(8, 121, 108, 0.24);
-      background: #effaf7;
-    }
-
-    .cadh-card-plans {
-      --cadh-accent: #477d99;
-      border-color: rgba(71, 125, 153, 0.22);
-      background: #eff7fc;
-    }
-
-    .cadh-card-encounters {
-      --cadh-accent: #b48716;
-      border-color: rgba(180, 135, 22, 0.24);
-      background: #fff9e7;
-    }
-
-    .cadh-card-transitions {
-      --cadh-accent: #7c5aa3;
-      border-color: rgba(124, 90, 163, 0.22);
-      background: #f7f0fb;
-    }
-
-    .cadh-specialty-card {
-      min-height: 124px;
-      align-items: flex-start;
-      text-align: left;
-      justify-content: flex-start;
-      gap: 14px;
-      font-size: 1.04rem;
-      font-weight: 800;
-      line-height: 1.32;
-      border-width: 1px;
-      border-color: rgba(15, 23, 42, 0.1);
-      color: #102236;
-    }
-
-    .cadh-specialty-card[aria-disabled="true"] {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    .cadh-specialty-endocrino {
-      --cadh-accent: #775e8c;
-      background: #d8c4e7;
-    }
-
-    .cadh-specialty-cardio {
-      --cadh-accent: #3f7191;
-      background: #82b8d8;
-    }
-
-    .cadh-specialty-psico {
-      --cadh-accent: #9d6658;
-      background: #f6b9a8;
-    }
-
-    .cadh-specialty-enf {
-      --cadh-accent: #5f8870;
-      background: #b8dcc9;
-    }
-
-    .cadh-specialty-nutri {
-      --cadh-accent: #9b8122;
-      background: #f7df80;
-    }
-
-    .cadh-specialty-fisio {
-      --cadh-accent: #5d789f;
-      background: #bfd2ef;
-    }
-
-    .cadh-specialty-farma {
-      --cadh-accent: #966943;
-      background: #f4c9a5;
-    }
-
-    .cadh-specialty-social {
-      --cadh-accent: #7d7351;
-      background: #d6caa8;
-    }
-
-    .cadh-specialty-oftalmo {
-      --cadh-accent: #5a8584;
-      background: #b4d9d8;
-    }
-
-    .cadh-specialty-tecnico {
-      --cadh-accent: #607d88;
-      background: #b7d0da;
-    }
-
-    @media (max-width: 980px) {
-      .cadh-layout {
-        grid-template-columns: 1fr;
-      }
-
-      .cadh-module-grid,
-      .cadh-specialty-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-    }
-
-    @media (max-width: 620px) {
-      .cadh-page {
-        padding: 20px;
-      }
-
-      .cadh-module-grid,
-      .cadh-specialty-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
 </head>
 <body data-page="cadh">
-  <header class="topbar">
-    <div class="topbar-brand">Intranet CADH</div>
-    <nav class="menu">
-      <a id="nav-home" href="/index.html">Home</a>
-      <a id="nav-cadh" href="/cadh/index.html">CADH</a>
-      <a id="nav-ubs" href="/ubs/index.html">UBS</a>
-    </nav>
-  </header>
-
-  <main class="container">
-    <section class="card cadh-page">
-      <svg aria-hidden="true" style="display:none">
-        <symbol id="cadh-icon-users" viewBox="0 0 24 24">
-          <path d="M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/>
-          <path d="M3.5 19a5.5 5.5 0 0 1 11 0"/>
-          <path d="M16 11a2.5 2.5 0 0 0 0-5"/>
-          <path d="M18 18a4.5 4.5 0 0 0-3-4.2"/>
-        </symbol>
-        <symbol id="cadh-icon-file" viewBox="0 0 24 24">
-          <path d="M7 3h7l4 4v14H7V3Z"/>
-          <path d="M14 3v5h5"/>
-          <path d="M10 12h6"/>
-          <path d="M10 16h6"/>
-        </symbol>
-        <symbol id="cadh-icon-care" viewBox="0 0 24 24">
-          <path d="M7 4v5a4 4 0 0 0 8 0V4"/>
-          <path d="M5 4h4"/>
-          <path d="M13 4h4"/>
-          <path d="M11 13v2a4 4 0 0 0 8 0v-1"/>
-          <circle cx="19" cy="12" r="2"/>
-        </symbol>
-        <symbol id="cadh-icon-transition" viewBox="0 0 24 24">
-          <path d="M8 7h12"/>
-          <path d="M16 3l4 4-4 4"/>
-          <path d="M16 17H4"/>
-          <path d="M8 13l-4 4 4 4"/>
-        </symbol>
-        <symbol id="cadh-icon-clipboard" viewBox="0 0 24 24">
-          <path d="M9 5h6"/>
-          <path d="M10 3h4l1 3H9l1-3Z"/>
-          <path d="M7 5H5v16h14V5h-2"/>
-          <path d="M8 11h8"/>
-          <path d="M8 15h8"/>
-        </symbol>
-        <symbol id="cadh-icon-endocrino" viewBox="0 0 24 24">
-          <path d="M12 3s6 6.2 6 11a6 6 0 0 1-12 0c0-4.8 6-11 6-11Z"/>
-          <path d="M9 14h6"/>
-          <path d="M12 11v6"/>
-        </symbol>
-        <symbol id="cadh-icon-cardio" viewBox="0 0 24 24">
-          <path d="M20.8 8.6c0 5.4-8.8 10.6-8.8 10.6S3.2 14 3.2 8.6A4.5 4.5 0 0 1 12 7a4.5 4.5 0 0 1 8.8 1.6Z"/>
-          <path d="M7 12h3l1.4-3.2L14 15l1.2-3H17"/>
-        </symbol>
-        <symbol id="cadh-icon-psico" viewBox="0 0 24 24">
-          <path d="M9 18H7.5A3.5 3.5 0 0 1 4 14.5c0-1.4.8-2.6 2-3.2A4.8 4.8 0 0 1 15.4 6a4 4 0 0 1 2.7 6.9A3 3 0 0 1 16 18h-1"/>
-          <path d="M9 18v3"/>
-          <path d="M15 18v3"/>
-          <path d="M9 10h6"/>
-          <path d="M8 13h8"/>
-        </symbol>
-        <symbol id="cadh-icon-enfermagem" viewBox="0 0 24 24">
-          <path d="M12 3l8 4v5c0 5-3.4 8-8 9-4.6-1-8-4-8-9V7l8-4Z"/>
-          <path d="M12 8v8"/>
-          <path d="M8 12h8"/>
-        </symbol>
-        <symbol id="cadh-icon-nutricao" viewBox="0 0 24 24">
-          <path d="M12 7c-2.8-2-7-.6-7 4.6C5 16.7 8.2 20 12 20s7-3.3 7-8.4C19 6.4 14.8 5 12 7Z"/>
-          <path d="M12 7c.2-2.2 1.4-3.6 3.5-4"/>
-          <path d="M13.5 5.2c1.2-.5 2.4-.3 3.5.8"/>
-        </symbol>
-        <symbol id="cadh-icon-fisio" viewBox="0 0 24 24">
-          <path d="M4 14h3l2-5 3 10 2-5h6"/>
-          <circle cx="17" cy="6" r="2"/>
-          <path d="M15 10l-2 2"/>
-          <path d="M17 10l3 3"/>
-        </symbol>
-        <symbol id="cadh-icon-farmacia" viewBox="0 0 24 24">
-          <path d="M10.5 21 3 13.5a4.2 4.2 0 0 1 6-6L16.5 15a4.2 4.2 0 0 1-6 6Z"/>
-          <path d="M8 10l6 6"/>
-          <path d="M14 3h6"/>
-          <path d="M17 3v6"/>
-        </symbol>
-        <symbol id="cadh-icon-social" viewBox="0 0 24 24">
-          <path d="M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/>
-          <path d="M3.5 19a5.5 5.5 0 0 1 11 0"/>
-          <path d="M16 11a2.5 2.5 0 0 0 0-5"/>
-          <path d="M18 18a4.5 4.5 0 0 0-3-4.2"/>
-        </symbol>
-        <symbol id="cadh-icon-oftalmo" viewBox="0 0 24 24">
-          <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/>
-          <circle cx="12" cy="12" r="3"/>
-        </symbol>
-        <symbol id="cadh-icon-tecnico" viewBox="0 0 24 24">
-          <path d="M9 5h6"/>
-          <path d="M10 3h4l1 3H9l1-3Z"/>
-          <path d="M7 5H5v16h14V5h-2"/>
-          <path d="M9 14l2 2 4-5"/>
-        </symbol>
-      </svg>
-
-      <h1 class="page-title">CADH</h1>
-
-      <div class="cadh-layout">
-        <form id="cadh-cpf-search" class="cadh-patient-search"> 
-          <label for="cadh-cpf-input">Buscar por NOME ou CPF</label>
-          <input id="cadh-cpf-input" name="cpf" placeholder="Busca por NOME ou CPF" autocomplete="off">
-          <div id="cadh-patient-result" class="cadh-patient-result"></div>
-        </form>
-
-        <div>
-          <h2 class="cadh-section-label">Módulos assistenciais</h2>
-          <div class="cadh-module-grid">
-            <a id="cadh-patients-card" class="cadh-module-card cadh-card-patients" href="/patients/list.html">
-              <span class="cadh-module-icon"><svg><use href="#cadh-icon-users"></use></svg></span>
-              <span class="cadh-module-head">
-                <span class="cadh-module-title">Usuários</span>
-              </span>
-            </a>
-
-            <a id="cadh-careplans-card" class="cadh-module-card cadh-card-plans is-locked" href="#" data-base-href="/care-plans/list.html" data-requires-patient="true" data-module-key="careplans" aria-disabled="true">
-              <span class="cadh-module-icon"><svg><use href="#cadh-icon-file"></use></svg></span>
-              <span class="cadh-module-head">
-                <span class="cadh-module-title">Planos de Cuidado</span>
-                <span class="cadh-module-badge" data-pending-badge title="Documentação pendente" aria-label="Documentação pendente" hidden></span>
-              </span>
-            </a>
-
-            <a id="cadh-encounters-card" class="cadh-module-card cadh-card-encounters is-locked" href="#" data-base-href="/encounters/list.html" data-requires-patient="true" data-module-key="encounters" aria-disabled="true">
-              <span class="cadh-module-icon"><svg><use href="#cadh-icon-care"></use></svg></span>
-              <span class="cadh-module-head">
-                <span class="cadh-module-title">Atendimentos</span>
-                <span class="cadh-module-badge" data-pending-badge title="Documentação pendente" aria-label="Documentação pendente" hidden></span>
-              </span>
-            </a>
-
-            <a id="cadh-transitions-card" class="cadh-module-card cadh-card-transitions is-locked" href="#" data-base-href="/transitions/list.html" data-requires-patient="true" data-module-key="transitions" aria-disabled="true">
-              <span class="cadh-module-icon"><svg><use href="#cadh-icon-transition"></use></svg></span>
-              <span class="cadh-module-head">
-                <span class="cadh-module-title">Transições do Cuidado</span>
-                <span class="cadh-module-badge" data-pending-badge title="Documentação pendente" aria-label="Documentação pendente" hidden></span>
-              </span>
-            </a>
-          </div>
-
-          <h2 class="cadh-section-label">Módulos clínicos por especialidade</h2>
-          <div class="cadh-specialty-grid">
-            <a class="cadh-specialty-card cadh-specialty-endocrino is-locked" href="#" data-base-href="/cadh/endocrino.html" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-endocrino"></use></svg></span>Endocrinologia</a>
-            <a class="cadh-specialty-card cadh-specialty-cardio is-locked" href="#" data-base-href="/cadh/cardiologia.html" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-cardio"></use></svg></span>Cardiologia</a>
-            <a class="cadh-specialty-card cadh-specialty-psico is-locked" href="#" data-base-href="/cadh/psicologia.html" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-psico"></use></svg></span>Psicologia</a>
-            <a class="cadh-specialty-card cadh-specialty-enf is-locked" href="#" data-base-href="/cadh/enfermagem.html" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-enfermagem"></use></svg></span>Enfermagem</a>
-            <a class="cadh-specialty-card cadh-specialty-nutri is-locked" href="#" data-base-href="/cadh/nutricao.html" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-nutricao"></use></svg></span>Nutrição</a>
-            <a class="cadh-specialty-card cadh-specialty-fisio is-locked" href="#" data-base-href="/cadh/fisioterapia.html" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-fisio"></use></svg></span>Fisioterapia</a>
-            <a class="cadh-specialty-card cadh-specialty-farma is-locked" href="#" data-base-href="/cadh/farmacia.html" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-farmacia"></use></svg></span>Farmácia Clínica</a>
-            <a class="cadh-specialty-card cadh-specialty-social is-locked" href="#" data-base-href="/cadh/servico-social.html" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-social"></use></svg></span>Serviço Social</a>
-            <a class="cadh-specialty-card cadh-specialty-oftalmo is-locked" href="#" data-base-href="/cadh/oftalmologia.html" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-oftalmo"></use></svg></span>Oftalmologia</a>
-            <a class="cadh-specialty-card cadh-specialty-tecnico is-locked" href="#" data-base-href="/cadh/tecnico.html" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-tecnico"></use></svg></span>Técnico de Enfermagem</a>
-          </div>
-        </div>
+  <div class="cadh-app-shell">
+    <aside class="topbar home-sidebar cadh-sidebar" aria-label="Navegação do SISELO">
+      <div class="topbar-brand home-sidebar-brand">
+        <span class="home-sidebar-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M12 4v16M4 12h16"/><rect x="5" y="5" width="14" height="14" rx="5"/></svg>
+        </span>
+        <span class="home-sidebar-brand-copy"><strong>SISELO</strong><small>Sistema de Saúde</small></span>
       </div>
-    </section>
-  </main>
+
+      <div class="home-sidebar-nav">
+        <p class="home-sidebar-label">Módulos</p>
+        <nav class="menu" aria-label="Módulos principais">
+          <a id="nav-home" href="/index.html">
+            <span class="home-sidebar-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m4 10 8-6 8 6v10H4V10Z"/><path d="M9 20v-6h6v6"/></svg></span>
+            <span class="home-sidebar-nav-copy"><strong>Início</strong><small>Painel geral</small></span>
+            <svg class="home-sidebar-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
+          </a>
+
+          <a id="nav-cadh" href="/cadh/index.html">
+            <span class="home-sidebar-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 13h4l2-7 4 14 2-7h6"/></svg></span>
+            <span class="home-sidebar-nav-copy"><strong>CADH</strong><small>Diabetes e hipertensão</small></span>
+            <svg class="home-sidebar-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
+          </a>
+
+          <a id="nav-ubs" href="/ubs/index.html">
+            <span class="home-sidebar-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 21s7-5.2 7-12a7 7 0 1 0-14 0c0 6.8 7 12 7 12Z"/><circle cx="12" cy="9" r="2.5"/></svg></span>
+            <span class="home-sidebar-nav-copy"><strong>UBS</strong><small>Atenção primária</small></span>
+            <svg class="home-sidebar-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
+          </a>
+        </nav>
+      </div>
+
+      <div class="topbar-actions home-sidebar-footer"></div>
+      <button id="cadh-sidebar-toggle" class="home-sidebar-toggle" type="button" aria-label="Recolher menu lateral" aria-expanded="true">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg>
+      </button>
+    </aside>
+
+    <div class="cadh-main-shell">
+      <header class="cadh-page-header">
+        <div class="cadh-breadcrumb-heading">
+          <p><span>Módulos</span><span aria-hidden="true">›</span><strong>CADH</strong></p>
+          <h1>CADH — Centro de Atenção ao Diabetes e Hipertensão</h1>
+        </div>
+        <div class="home-page-status">
+          <span class="home-system-status"><span class="home-system-status-dot" aria-hidden="true"></span>Operacional</span>
+          <time id="cadh-current-date" class="home-current-date"></time>
+        </div>
+      </header>
+
+      <main class="container cadh-dashboard">
+        <svg aria-hidden="true" class="visually-hidden">
+          <symbol id="cadh-icon-users" viewBox="0 0 24 24"><path d="M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0M16 11a2.5 2.5 0 0 0 0-5M18 18a4.5 4.5 0 0 0-3-4.2"/></symbol>
+          <symbol id="cadh-icon-file" viewBox="0 0 24 24"><path d="M7 3h7l4 4v14H7V3Z"/><path d="M14 3v5h5M10 12h6M10 16h6"/></symbol>
+          <symbol id="cadh-icon-care" viewBox="0 0 24 24"><path d="M7 4v5a4 4 0 0 0 8 0V4M5 4h4M13 4h4M11 13v2a4 4 0 0 0 8 0v-1"/><circle cx="19" cy="12" r="2"/></symbol>
+          <symbol id="cadh-icon-transition" viewBox="0 0 24 24"><path d="M8 7h12M16 3l4 4-4 4M16 17H4M8 13l-4 4 4 4"/></symbol>
+          <symbol id="cadh-icon-endocrino" viewBox="0 0 24 24"><path d="M12 3s6 6.2 6 11a6 6 0 0 1-12 0c0-4.8 6-11 6-11Z"/><path d="M9 14h6M12 11v6"/></symbol>
+          <symbol id="cadh-icon-cardio" viewBox="0 0 24 24"><path d="M20.8 8.6c0 5.4-8.8 10.6-8.8 10.6S3.2 14 3.2 8.6A4.5 4.5 0 0 1 12 7a4.5 4.5 0 0 1 8.8 1.6Z"/><path d="M7 12h3l1.4-3.2L14 15l1.2-3H17"/></symbol>
+          <symbol id="cadh-icon-psico" viewBox="0 0 24 24"><path d="M9 18H7.5A3.5 3.5 0 0 1 4 14.5c0-1.4.8-2.6 2-3.2A4.8 4.8 0 0 1 15.4 6a4 4 0 0 1 2.7 6.9A3 3 0 0 1 16 18h-1M9 18v3M15 18v3M9 10h6M8 13h8"/></symbol>
+          <symbol id="cadh-icon-enfermagem" viewBox="0 0 24 24"><path d="M4 14h3l2-5 3 10 2-5h6"/></symbol>
+          <symbol id="cadh-icon-nutricao" viewBox="0 0 24 24"><path d="M12 7c-2.8-2-7-.6-7 4.6C5 16.7 8.2 20 12 20s7-3.3 7-8.4C19 6.4 14.8 5 12 7Z"/><path d="M12 7c.2-2.2 1.4-3.6 3.5-4M13.5 5.2c1.2-.5 2.4-.3 3.5.8"/></symbol>
+          <symbol id="cadh-icon-fisio" viewBox="0 0 24 24"><path d="M4 14h3l2-5 3 10 2-5h6"/><circle cx="17" cy="6" r="2"/><path d="M15 10l-2 2M17 10l3 3"/></symbol>
+          <symbol id="cadh-icon-farmacia" viewBox="0 0 24 24"><path d="M10.5 21 3 13.5a4.2 4.2 0 0 1 6-6L16.5 15a4.2 4.2 0 0 1-6 6Z"/><path d="M8 10l6 6M14 3h6M17 3v6"/></symbol>
+          <symbol id="cadh-icon-social" viewBox="0 0 24 24"><path d="M7 15c2-3 4-4 7-4h5v3h-4l-2 3H9"/><path d="M4 13h4l3 5-3 2H4"/></symbol>
+          <symbol id="cadh-icon-oftalmo" viewBox="0 0 24 24"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="3"/></symbol>
+          <symbol id="cadh-icon-tecnico" viewBox="0 0 24 24"><path d="M7 4v5a4 4 0 0 0 8 0V4M5 4h4M13 4h4M11 13v2a4 4 0 0 0 8 0v-1"/><circle cx="19" cy="12" r="2"/></symbol>
+        </svg>
+
+        <div class="cadh-primary-grid">
+          <aside class="cadh-search-column">
+            <form id="cadh-cpf-search" class="cadh-patient-search">
+              <h2 class="cadh-block-title">Buscar usuário</h2>
+              <label for="cadh-cpf-input">Nome ou CPF</label>
+              <input id="cadh-cpf-input" name="cpf" placeholder="Nome ou CPF..." autocomplete="off">
+              <button class="cadh-search-button" type="submit">Buscar</button>
+              <div id="cadh-patient-result" class="cadh-patient-result"></div>
+            </form>
+          </aside>
+
+          <section class="cadh-management-section" aria-labelledby="cadh-management-title">
+            <h2 id="cadh-management-title" class="cadh-block-title">Gestão do usuário</h2>
+            <div class="cadh-management-card">
+              <nav class="cadh-module-grid" aria-label="Módulos assistenciais">
+                <a id="cadh-patients-card" class="cadh-module-card cadh-card-patients" href="/patients/list.html">
+                  <span class="cadh-module-icon"><svg><use href="#cadh-icon-users"></use></svg></span>
+                  <span class="cadh-module-title">Usuários</span>
+                </a>
+                <a id="cadh-careplans-card" class="cadh-module-card cadh-card-plans is-locked" href="#" data-base-href="/care-plans/list.html" data-requires-patient="true" data-module-key="careplans" aria-disabled="true">
+                  <span class="cadh-module-icon"><svg><use href="#cadh-icon-file"></use></svg></span>
+                  <span class="cadh-module-title">Planos de Cuidado</span>
+                  <span class="cadh-module-badge" data-pending-badge title="Documentação pendente" aria-label="Documentação pendente" hidden></span>
+                </a>
+                <a id="cadh-encounters-card" class="cadh-module-card cadh-card-encounters is-locked" href="#" data-base-href="/encounters/list.html" data-requires-patient="true" data-module-key="encounters" aria-disabled="true">
+                  <span class="cadh-module-icon"><svg><use href="#cadh-icon-care"></use></svg></span>
+                  <span class="cadh-module-title">Atendimentos</span>
+                  <span class="cadh-module-badge" data-pending-badge title="Documentação pendente" aria-label="Documentação pendente" hidden></span>
+                </a>
+                <a id="cadh-transitions-card" class="cadh-module-card cadh-card-transitions is-locked" href="#" data-base-href="/transitions/list.html" data-requires-patient="true" data-module-key="transitions" aria-disabled="true">
+                  <span class="cadh-module-icon"><svg><use href="#cadh-icon-transition"></use></svg></span>
+                  <span class="cadh-module-title">Transições do Cuidado</span>
+                  <span class="cadh-module-badge" data-pending-badge title="Documentação pendente" aria-label="Documentação pendente" hidden></span>
+                </a>
+              </nav>
+
+              <div id="cadh-patient-detail" class="cadh-patient-detail">
+                <div class="cadh-empty-state">
+                  <span class="cadh-empty-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#cadh-icon-users"></use></svg></span>
+                  <strong>Nenhum usuário selecionado</strong>
+                  <p>Busque e selecione um usuário ao lado para visualizar e gerenciar suas informações de cuidado.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <section class="cadh-specialties-section" aria-labelledby="cadh-specialties-title">
+          <div class="cadh-specialties-heading">
+            <h2 id="cadh-specialties-title" class="cadh-block-title cadh-block-title-green">Módulos clínicos por especialidade</h2>
+            <a id="cadh-new-patient-link" class="cadh-new-patient-link" href="/patients/form.html">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM3.5 19a5.5 5.5 0 0 1 11 0M18 8v6M15 11h6"/></svg>
+              Novo usuário
+            </a>
+          </div>
+
+          <p class="cadh-specialty-guidance">Selecione um usuário ao lado para acessar os registros das especialidades.</p>
+
+          <div class="cadh-specialty-grid">
+            <a class="cadh-specialty-card cadh-specialty-tecnico is-locked" href="#" data-base-href="/cadh/tecnico.html" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-tecnico"></use></svg></span><span>Técnico de Enfermagem</span></a>
+            <a class="cadh-specialty-card cadh-specialty-psico is-locked" href="#" data-base-href="/cadh/psicologia.html" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-psico"></use></svg></span><span>Psicologia</span></a>
+            <a class="cadh-specialty-card cadh-specialty-enf is-locked" href="#" data-base-href="/cadh/enfermagem.html" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-enfermagem"></use></svg></span><span>Enfermagem</span></a>
+            <a class="cadh-specialty-card cadh-specialty-nutri is-locked" href="#" data-base-href="/cadh/nutricao.html" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-nutricao"></use></svg></span><span>Nutrição</span></a>
+            <a class="cadh-specialty-card cadh-specialty-endocrino is-locked" href="#" data-base-href="/cadh/endocrino.html" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-endocrino"></use></svg></span><span>Endocrinologia</span></a>
+            <a class="cadh-specialty-card cadh-specialty-cardio is-locked" href="#" data-base-href="/cadh/cardiologia.html" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-cardio"></use></svg></span><span>Cardiologia</span></a>
+            <a class="cadh-specialty-card cadh-specialty-oftalmo is-locked" href="#" data-base-href="/cadh/oftalmologia.html" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-oftalmo"></use></svg></span><span>Oftalmologia</span></a>
+            <a class="cadh-specialty-card cadh-specialty-fisio is-locked" href="#" data-base-href="/cadh/fisioterapia.html" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-fisio"></use></svg></span><span>Fisioterapia</span></a>
+            <a class="cadh-specialty-card cadh-specialty-social is-locked" href="#" data-base-href="/cadh/servico-social.html" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-social"></use></svg></span><span>Serviço Social</span></a>
+            <a class="cadh-specialty-card cadh-specialty-farma is-locked" href="#" data-base-href="/cadh/farmacia.html" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-farmacia"></use></svg></span><span>Farmácia Clínica</span></a>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
 
   <script src="/assets/config.js"></script>
   <script src="/assets/app.js"></script>
