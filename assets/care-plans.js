@@ -97,8 +97,10 @@ async function setupCarePlansFormPage() {
   if (!user) return;
 
   SISELO.bindShell("careplans");
+  setupCarePlanFormShell(user);
 
   const id = SISELO.normalizeEntityId(SISELO.queryParam("id"));
+  let currentPlanId = id;
   const patientId = SISELO.normalizeEntityId(SISELO.queryParam("patient_id"));
   const endpointParams = new URLSearchParams();
   if (id) endpointParams.set("id", id);
@@ -106,10 +108,6 @@ async function setupCarePlansFormPage() {
   const endpointQuery = endpointParams.toString();
   const endpoint =
     "/care_plans/form.php" + (endpointQuery ? "?" + endpointQuery : "");
-  const listHref =
-    "/care-plans/list.html" +
-    (patientId ? "?patient_id=" + encodeURIComponent(patientId) : "");
-  const returnHref = SISELO.resolveBackTarget(listHref);
   let data = getEmptyCarePlanContext(patientId);
 
   try {
@@ -117,6 +115,7 @@ async function setupCarePlansFormPage() {
   } catch (error) {}
 
   const plan = data.plan || getEmptyCarePlanContext(patientId).plan;
+  const normalizedPlanPatientId = SISELO.normalizeEntityId(plan.patient_id || patientId);
   const patientOptions = patientId
     ? SISELO.filterPatientsById(
         Array.isArray(data.patients) ? data.patients : [],
@@ -125,53 +124,48 @@ async function setupCarePlansFormPage() {
     : Array.isArray(data.patients)
       ? data.patients
       : [];
-  document.getElementById("form-title").textContent = data.editing
-    ? "Editar Plano de Cuidado"
-    : "Novo Plano de Cuidado";
+  let selectedPatient =
+    patientOptions.find((patient) => SISELO.normalizeEntityId(patient.id) === normalizedPlanPatientId) ||
+    null;
+
+  if (normalizedPlanPatientId) {
+    const patientContext = await SISELO.loadPatientClinicalContext(normalizedPlanPatientId);
+    if (patientContext && patientContext.patient) {
+      selectedPatient = patientContext.patient;
+    }
+  }
+  const pickerRows = selectedPatient
+    ? [
+        selectedPatient,
+        ...patientOptions.filter(
+          (patient) =>
+            SISELO.normalizeEntityId(patient && patient.id) !==
+            SISELO.normalizeEntityId(selectedPatient && selectedPatient.id),
+        ),
+      ]
+    : patientOptions;
+
+  document.getElementById("form-title").textContent = "Ficha Plano de Cuidado";
+
+  const formBody = document.getElementById("care-plan-form-body");
+  if (formBody) {
+    formBody.innerHTML = renderCarePlanSheet({
+      plan,
+      items: Array.isArray(data.items) ? data.items : [],
+      patient: selectedPatient,
+      patientLocked: Boolean(patientId),
+    });
+  }
   const patientPicker = SISELO.setupPatientFieldPicker({
     select: "patient_id",
     container: "care-plan-user-search",
-    rows: patientOptions,
+    rows: pickerRows,
     currentValue: plan.patient_id,
     locked: Boolean(patientId),
     placeholder: "Digite o nome do usuário cadastrado...",
   });
-  document.getElementById("start_date").value = plan.start_date || "";
-  document.getElementById("end_date").value = plan.end_date || "";
-  document.getElementById("interventions").value = plan.interventions || "";
   configureCarePlanDateInputs();
-
-  const itemsContainer = document.getElementById("items");
-  const items =
-    Array.isArray(data.items) && data.items.length
-      ? data.items
-      : [
-          {
-            item_type: "meta",
-            title: "",
-            situation: "",
-            recommendation: "",
-            difficulty: "",
-            goal: "",
-            sort_order: 1,
-          },
-        ];
-
-  items.forEach((item) => addCarePlanItem(item));
-
-  document.querySelectorAll("[data-add-item]").forEach((button) => {
-    button.addEventListener("click", () => {
-      addCarePlanItem({
-        item_type: button.dataset.addItem,
-        title: "",
-        situation: "",
-        recommendation: "",
-        difficulty: "",
-        goal: "",
-        sort_order: itemsContainer.children.length + 1,
-      });
-    });
-  });
+  bindCarePlanDateMirrors();
 
   document
     .getElementById("care-plan-form")
@@ -194,8 +188,11 @@ async function setupCarePlansFormPage() {
       }
 
       try {
+        const submitEndpoint =
+          "/care_plans/form.php" +
+          (currentPlanId ? "?id=" + encodeURIComponent(currentPlanId) : "");
         const result = await SISELO.apiRequest(
-          endpoint || "/care_plans/form.php",
+          submitEndpoint,
           {
             method: "POST",
             body: objectFromFormData(formData),
@@ -208,11 +205,317 @@ async function setupCarePlansFormPage() {
             patientId,
         );
         await SISELO.refreshCachedPatientContext(savedPatientId);
-        location.href = returnHref;
+        currentPlanId = SISELO.normalizeEntityId(
+          result && result.plan ? result.plan.id : currentPlanId,
+        );
+        showCarePlanSavedState(currentPlanId);
       } catch (error) {
         SISELO.showAlert("page-alert", error.message, "error");
       }
     });
+}
+
+function setupCarePlanFormShell(user) {
+  const dateElement = document.getElementById("care-plan-current-date");
+  const updateCurrentDate = () => {
+    if (!dateElement) return;
+    const now = new Date();
+    const localDate = [
+      now.getFullYear(),
+      String(now.getMonth() + 1).padStart(2, "0"),
+      String(now.getDate()).padStart(2, "0"),
+    ].join("-");
+    dateElement.dateTime = localDate;
+    dateElement.textContent = new Intl.DateTimeFormat("pt-BR", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    }).format(now);
+  };
+  updateCurrentDate();
+  window.setInterval(updateCurrentDate, 60 * 1000);
+
+  const sidebarToggle = document.getElementById("care-plan-sidebar-toggle");
+  const collapsedKey = "siselo_home_sidebar_collapsed";
+  const setSidebarCollapsed = (collapsed) => {
+    document.body.classList.toggle("home-sidebar-is-collapsed", collapsed);
+    if (sidebarToggle) {
+      sidebarToggle.setAttribute("aria-expanded", collapsed ? "false" : "true");
+      sidebarToggle.setAttribute("aria-label", collapsed ? "Expandir menu lateral" : "Recolher menu lateral");
+    }
+  };
+
+  let sidebarCollapsed = false;
+  try {
+    sidebarCollapsed = localStorage.getItem(collapsedKey) === "true";
+  } catch (error) {
+  }
+  setSidebarCollapsed(sidebarCollapsed);
+
+  sidebarToggle?.addEventListener("click", () => {
+    sidebarCollapsed = !document.body.classList.contains("home-sidebar-is-collapsed");
+    setSidebarCollapsed(sidebarCollapsed);
+    try {
+      localStorage.setItem(collapsedKey, String(sidebarCollapsed));
+    } catch (error) {
+    }
+  });
+
+  const sidebarFooter = document.querySelector(".home-sidebar-footer");
+  const logoutButton = document.getElementById("logout-button");
+  if (sidebarFooter && logoutButton) {
+    sidebarFooter.appendChild(logoutButton);
+    logoutButton.innerHTML = '<svg aria-hidden="true" viewBox="0 0 24 24"><path d="M10 5H5v14h5M14 8l4 4-4 4M18 12H9"/></svg><span>Sair</span>';
+  }
+
+  const accountLink = document.getElementById("topbar-account-link");
+  if (accountLink) {
+    accountLink.textContent = "";
+    const icon = document.createElement("span");
+    icon.className = "home-sidebar-user-icon";
+    icon.innerHTML = '<svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>';
+    const copy = document.createElement("span");
+    copy.className = "home-sidebar-user-copy";
+    const name = document.createElement("strong");
+    name.textContent = user.name || "Meu perfil";
+    const email = document.createElement("small");
+    email.textContent = user.email || "Acessar perfil";
+    copy.append(name, email);
+    accountLink.append(icon, copy);
+  }
+}
+
+function renderCarePlanSheet({ plan, items, patient, patientLocked }) {
+  const lookup = buildCarePlanItemLookup(items);
+  const profileFields = [
+    "Autocuidado",
+    "Letramento funcional em saúde",
+    "Adesão terapêutica",
+    "Estágio motivacional para a mudança",
+    "Suporte familiar",
+    "Suporte social",
+  ];
+  const specialties = [
+    "Psicologia",
+    "Enfermagem",
+    "Endocrinologia",
+    "Cardiologia",
+    "Oftalmologia",
+    "Nutrição",
+    "Assistência Social",
+    "Fisioterapia",
+  ];
+
+  return `
+    <select id="patient_id" name="patient_id" class="visually-hidden" tabindex="-1" aria-hidden="true"></select>
+
+    <section class="care-plan-patient-picker ${patientLocked ? "is-locked" : ""}">
+      <label>
+        <span>Usuário</span>
+        <div id="care-plan-user-search" class="transition-patient-search"></div>
+      </label>
+    </section>
+
+    <section class="care-plan-section care-plan-register-section">
+      <header>Dados cadastrais do usuário do SUS</header>
+      <div class="care-plan-register-grid">
+        ${renderCarePlanStaticField("CPF usuário do SUS", patient && patient.cpf)}
+        ${renderCarePlanStaticField("Equipe de referência", patient && SISELO.formatTeamName(patient.team_ref))}
+        ${renderCarePlanStaticField("Nome", patient && patient.full_name)}
+        ${renderCarePlanStaticField("Nome social", patient && patient.social_name)}
+        ${renderCarePlanStaticField("Data de nascimento", formatCarePlanDate(patient && patient.birth_date))}
+        ${renderCarePlanStaticField("Data do primeiro atendimento no CADH", formatCarePlanDate(patient && patient.first_cadh_date))}
+        ${renderCarePlanStaticField("Unidade Básica de Saúde de Origem", patient && patient.ubs_ref)}
+        ${renderCarePlanStaticField("Equipe de saúde da família", patient && SISELO.formatTeamName(patient.team_ref))}
+        ${renderCarePlanStaticField("Endereço", patient && patient.address)}
+        ${renderCarePlanStaticField("Telefone", patient && patient.phone)}
+        ${renderCarePlanStaticField("Apoio familiar (nome)", patient && patient.responsible_name)}
+        ${renderCarePlanStaticField("Apoio comunitário (nome)", patient && patient.emergency_contact)}
+        <label>
+          <span>Data de início</span>
+          <input id="start_date" name="start_date" type="date" value="${SISELO.escapeHtml(plan.start_date || SISELO.todayDateInputValue())}" required>
+        </label>
+        <label>
+          <span>Data da próxima revisão</span>
+          <input id="end_date" name="end_date" type="date" value="${SISELO.escapeHtml(plan.end_date || "")}">
+        </label>
+      </div>
+    </section>
+
+    <section class="care-plan-section">
+      <header>Plano de cuidados</header>
+      <div class="care-plan-profile-grid">
+        ${profileFields.map((title, index) => renderCarePlanProfileField(title, lookup, index + 1)).join("")}
+      </div>
+    </section>
+
+    <section class="care-plan-section">
+      <header>Identificação dos fatores dificultadores e recomendações</header>
+      <div class="care-plan-matrix care-plan-specialty-matrix">
+        <div class="care-plan-matrix-head">Especialidade</div>
+        <div class="care-plan-matrix-head">Fatores dificultadores</div>
+        <div class="care-plan-matrix-head">Recomendação</div>
+        ${specialties.map((title, index) => renderCarePlanSpecialtyRow(title, lookup, 20 + index)).join("")}
+      </div>
+    </section>
+
+    <section class="care-plan-section">
+      <header>Intervenções medicamentosas e não medicamentosas</header>
+      <div class="care-plan-two-column">
+        ${renderCarePlanRecommendationField("Endocrinologia", lookup, 40)}
+        ${renderCarePlanRecommendationField("Cardiologia", lookup, 41)}
+      </div>
+    </section>
+
+    <section class="care-plan-section">
+      <header>Orientações para sinais de alerta</header>
+      <div class="care-plan-matrix care-plan-alert-matrix">
+        <div class="care-plan-matrix-head">Situação</div>
+        <div class="care-plan-matrix-head">Recomendação</div>
+        ${[1, 2, 3].map((number, index) => renderCarePlanAlertRow(number, lookup, 50 + index)).join("")}
+      </div>
+    </section>
+
+    <section class="care-plan-section">
+      <header>Prioridades e recomendações da equipe especializada</header>
+      <div class="care-plan-matrix care-plan-alert-matrix">
+        <div class="care-plan-matrix-head">Principais dificuldades encontradas</div>
+        <div class="care-plan-matrix-head">Metas estabelecidas</div>
+        ${[1, 2, 3].map((number, index) => renderCarePlanGoalRow(number, lookup, 60 + index)).join("")}
+      </div>
+    </section>
+
+    <section class="care-plan-section">
+      <header>Para registro da APS</header>
+      <div class="care-plan-two-column">
+        <label>
+          <span>Data da avaliação da APS</span>
+          <input id="aps_review_date" type="date" value="${SISELO.escapeHtml(plan.end_date || "")}">
+        </label>
+        <label>
+          <span>Monitoramento na APS</span>
+          <input id="interventions" name="interventions" value="${SISELO.escapeHtml(plan.interventions || "")}" placeholder="Descrever o monitoramento...">
+        </label>
+      </div>
+    </section>
+  `;
+}
+
+function renderCarePlanStaticField(label, value) {
+  return `
+    <div class="care-plan-static-field">
+      <span>${SISELO.escapeHtml(label)}</span>
+      <strong>${SISELO.escapeHtml(value || "—")}</strong>
+    </div>
+  `;
+}
+
+function renderCarePlanProfileField(title, lookup, sortOrder) {
+  const item = findCarePlanItem(lookup, "recomendacao", title);
+  return `
+    <label>
+      ${renderCarePlanHiddenItemFields("recomendacao", title, sortOrder, { situation: "", difficulty: "", goal: "" })}
+      <span>${SISELO.escapeHtml(title)}</span>
+      <select name="recommendation[]">
+        ${["", "Adequado", "Parcial", "Necessita apoio", "Não avaliado"].map((option) => `
+          <option value="${SISELO.escapeHtml(option)}" ${String(item.recommendation || "") === option ? "selected" : ""}>${option ? SISELO.escapeHtml(option) : "Selecione..."}</option>
+        `).join("")}
+      </select>
+    </label>
+  `;
+}
+
+function renderCarePlanSpecialtyRow(title, lookup, sortOrder) {
+  const item = findCarePlanItem(lookup, "dificuldade", title);
+  return `
+    <div class="care-plan-row-title">
+      ${renderCarePlanHiddenItemFields("dificuldade", title, sortOrder, { situation: "", goal: "" })}
+      <strong>${SISELO.escapeHtml(title)}</strong>
+    </div>
+    <textarea name="difficulty[]" rows="2" placeholder="Fatores dificultadores...">${SISELO.escapeHtml(item.difficulty || "")}</textarea>
+    <textarea name="recommendation[]" rows="2" placeholder="Recomendação...">${SISELO.escapeHtml(item.recommendation || "")}</textarea>
+  `;
+}
+
+function renderCarePlanRecommendationField(title, lookup, sortOrder) {
+  const item = findCarePlanItem(lookup, "recomendacao", title);
+  return `
+    <label>
+      ${renderCarePlanHiddenItemFields("recomendacao", title, sortOrder, { situation: "", difficulty: "", goal: "" })}
+      <span>${SISELO.escapeHtml(title)}</span>
+      <textarea name="recommendation[]" rows="2" placeholder="Ex.: conduta, medicamentos, orientações...">${SISELO.escapeHtml(item.recommendation || "")}</textarea>
+    </label>
+  `;
+}
+
+function renderCarePlanAlertRow(number, lookup, sortOrder) {
+  const title = `Sinal de alerta ${number}`;
+  const item = findCarePlanItem(lookup, "alerta", title);
+  return `
+    <label>
+      ${renderCarePlanHiddenItemFields("alerta", title, sortOrder, { difficulty: "", goal: "" })}
+      <textarea name="situation[]" rows="1" placeholder="Situação ${number}...">${SISELO.escapeHtml(item.situation || "")}</textarea>
+    </label>
+    <textarea name="recommendation[]" rows="1" placeholder="Recomendação ${number}...">${SISELO.escapeHtml(item.recommendation || "")}</textarea>
+  `;
+}
+
+function renderCarePlanGoalRow(number, lookup, sortOrder) {
+  const title = `Prioridade ${number}`;
+  const item = findCarePlanItem(lookup, "meta", title);
+  return `
+    <label>
+      ${renderCarePlanHiddenItemFields("meta", title, sortOrder, { situation: "", recommendation: "" })}
+      <textarea name="difficulty[]" rows="2" placeholder="Dificuldade ${number}...">${SISELO.escapeHtml(item.difficulty || "")}</textarea>
+    </label>
+    <textarea name="goal[]" rows="2" placeholder="Meta ${number}...">${SISELO.escapeHtml(item.goal || "")}</textarea>
+  `;
+}
+
+function renderCarePlanHiddenItemFields(type, title, sortOrder, hiddenValues = {}) {
+  return `
+    <input type="hidden" name="item_type[]" value="${SISELO.escapeHtml(type)}">
+    <input type="hidden" name="title[]" value="${SISELO.escapeHtml(title)}">
+    <input type="hidden" name="sort_order[]" value="${SISELO.escapeHtml(sortOrder)}">
+    ${hiddenValues.situation !== undefined ? `<input type="hidden" name="situation[]" value="${SISELO.escapeHtml(hiddenValues.situation)}">` : ""}
+    ${hiddenValues.recommendation !== undefined ? `<input type="hidden" name="recommendation[]" value="${SISELO.escapeHtml(hiddenValues.recommendation)}">` : ""}
+    ${hiddenValues.difficulty !== undefined ? `<input type="hidden" name="difficulty[]" value="${SISELO.escapeHtml(hiddenValues.difficulty)}">` : ""}
+    ${hiddenValues.goal !== undefined ? `<input type="hidden" name="goal[]" value="${SISELO.escapeHtml(hiddenValues.goal)}">` : ""}
+  `;
+}
+
+function buildCarePlanItemLookup(items) {
+  return (Array.isArray(items) ? items : []).map((item) => ({
+    ...item,
+    lookupKey: getCarePlanItemKey(item.item_type, item.title),
+  }));
+}
+
+function findCarePlanItem(lookup, type, title) {
+  return lookup.find((item) => item.lookupKey === getCarePlanItemKey(type, title)) || {};
+}
+
+function getCarePlanItemKey(type, title) {
+  return `${SISELO.normalizeSearchText(type)}::${SISELO.normalizeSearchText(title)}`;
+}
+
+function formatCarePlanDate(value) {
+  const date = SISELO.parseDateInputValue(value);
+  return date ? new Intl.DateTimeFormat("pt-BR").format(date) : value || "";
+}
+
+function showCarePlanSavedState(planId) {
+  SISELO.showAlert("page-alert", "Plano de cuidado salvo com sucesso.", "success");
+  if (planId) {
+    const url = new URL(location.href);
+    url.searchParams.set("id", planId);
+    history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
+  }
+
+  document.querySelectorAll(".care-plan-save-button").forEach((button) => {
+    button.classList.add("is-saved");
+    button.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><use href="#care-plan-icon-check"></use></svg> Plano Salvo!';
+  });
 }
 
 async function setupCarePlansTrashPage() {
@@ -573,4 +876,25 @@ function configureCarePlanDateInputs() {
   startInput.addEventListener("change", syncCarePlanDates);
   endInput.addEventListener("change", syncCarePlanDates);
   syncCarePlanDates();
+}
+
+function bindCarePlanDateMirrors() {
+  const endInput = document.getElementById("end_date");
+  const apsInput = document.getElementById("aps_review_date");
+
+  if (!(endInput instanceof HTMLInputElement) || !(apsInput instanceof HTMLInputElement)) {
+    return;
+  }
+
+  apsInput.min = endInput.min || "1900-01-01";
+  apsInput.max = endInput.max || SISELO.shiftDateInputValue(SISELO.todayDateInputValue(), { years: 5 });
+
+  endInput.addEventListener("change", () => {
+    apsInput.value = endInput.value;
+  });
+
+  apsInput.addEventListener("change", () => {
+    endInput.value = apsInput.value;
+    SISELO.syncEnhancedDateInput(endInput);
+  });
 }

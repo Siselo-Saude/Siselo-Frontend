@@ -734,7 +734,12 @@
       icon = document.createElement('span');
       icon.className = 'search-input-icon';
       icon.setAttribute('aria-hidden', 'true');
-      icon.innerHTML = actionIcon('search');
+      icon.innerHTML = `
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <circle cx="11" cy="11" r="6.5"></circle>
+          <path d="m16.2 16.2 3.8 3.8"></path>
+        </svg>
+      `;
       wrapper.prepend(icon);
     }
 

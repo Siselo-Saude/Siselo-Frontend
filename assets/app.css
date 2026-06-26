@@ -1118,7 +1118,11 @@ body[data-page="transitions-trash"] .container {
 .search-input-icon svg {
   inline-size: 18px;
   block-size: 18px;
-  fill: currentColor;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .back-link {
@@ -7266,6 +7270,7 @@ body[data-page="cadh"] .cadh-selected-patient-list dd.is-team {
 }
 
 body[data-page="cadh"] .cadh-transition-cta {
+  width: 100%;
   display: grid;
   grid-template-columns: 42px minmax(0, 1fr) 22px;
   align-items: center;
@@ -7273,11 +7278,15 @@ body[data-page="cadh"] .cadh-transition-cta {
   min-height: 64px;
   margin-top: 18px;
   padding: 11px 16px;
+  border: 0;
   border-radius: 14px;
   background: #158a73;
   color: #fff;
+  font: inherit;
+  text-align: left;
   text-decoration: none;
   box-shadow: 0 12px 22px rgba(21, 138, 115, 0.18);
+  cursor: pointer;
   transition: background-color 0.16s ease, box-shadow 0.16s ease;
 }
 
@@ -9354,5 +9363,1130 @@ body[data-page="ubs"] .ubs-empty-state p {
   body[data-page="ubs"] .ubs-followup-card {
     grid-template-columns: 1fr;
   }
+}
+
+/* Siselo UI stability layer */
+:is(.btn, button, .menu a, .icon-btn, .home-sidebar .menu a, .home-environment-card, .home-metric-card, .cadh-tab-link, .cadh-specialty-card, .cadh-transition-cta, .ubs-tab, .ubs-row-action, .ubs-filter-button):hover,
+:is(.btn, button, .menu a, .icon-btn, .home-sidebar .menu a, .home-environment-card, .home-metric-card, .cadh-tab-link, .cadh-specialty-card, .cadh-transition-cta, .ubs-tab, .ubs-row-action, .ubs-filter-button):focus-visible,
+:is(.btn, button, .menu a, .icon-btn, .home-sidebar .menu a, .home-environment-card, .home-metric-card, .cadh-tab-link, .cadh-specialty-card, .cadh-transition-cta, .ubs-tab, .ubs-row-action, .ubs-filter-button):active {
+  transform: none !important;
+}
+
+:is(.btn, button, .menu a, .icon-btn, .home-sidebar .menu a, .cadh-tab-link, .cadh-transition-cta, .ubs-tab) {
+  transition-property: background-color, border-color, color, box-shadow, opacity;
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]) .home-sidebar-toggle {
+  position: fixed;
+  left: 228px;
+  right: auto;
+  bottom: 88px;
+  z-index: 980;
+  inline-size: 28px;
+  block-size: 44px;
+  display: grid !important;
+  place-items: center;
+  padding: 0;
+  border: 1px solid #cfdbe7;
+  border-radius: 0 12px 12px 0;
+  background: #fff;
+  color: #627a95;
+  box-shadow: 0 8px 18px rgba(24, 43, 65, 0.12);
+  transition: left 0.18s ease, background-color 0.16s ease, color 0.16s ease, box-shadow 0.16s ease;
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]).home-sidebar-is-collapsed .home-sidebar-toggle {
+  left: 76px;
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]).home-sidebar-is-collapsed .home-sidebar-toggle svg {
+  transform: rotate(180deg);
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]) .home-page-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: max-content;
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]) .home-user-role-status {
+  min-width: 142px;
+  justify-content: center;
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]) .home-current-date {
+  min-width: 138px;
+  justify-content: center;
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]) .home-system-status-icon,
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]) .home-system-status-icon svg {
+  inline-size: 16px;
+  block-size: 16px;
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]) .home-system-status-icon svg {
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+body[data-page="care-plans-form"] {
+  --care-plan-sidebar-width: 240px;
+  --care-plan-sidebar-collapsed-width: 88px;
+  --care-plan-blue: #0b4f88;
+  --care-plan-blue-dark: #073f73;
+  --care-plan-ink: #0e1c2e;
+  --care-plan-muted: #526983;
+  --care-plan-border: #cbd7e3;
+  --care-plan-shadow: 0 12px 26px rgba(24, 43, 65, 0.07);
+  min-height: 100vh;
+  background: #edf3f7;
+  color: var(--care-plan-ink);
+}
+
+body[data-page="care-plans-form"] .care-plan-app-shell {
+  min-height: 100vh;
+}
+
+body[data-page="care-plans-form"] .care-plan-sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 950;
+  width: var(--care-plan-sidebar-width);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: visible;
+  padding: 0;
+  border-radius: 0;
+  background: linear-gradient(180deg, #07345d 0%, #062b4e 62%, #052744 100%);
+  color: #fff;
+  box-shadow: none;
+}
+
+body[data-page="care-plans-form"] .care-plan-sidebar::after {
+  display: none;
+}
+
+body[data-page="care-plans-form"] .care-plan-sidebar .topbar-left {
+  width: 100%;
+  display: block;
+}
+
+body[data-page="care-plans-form"] .home-sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 22px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body[data-page="care-plans-form"] .home-sidebar-mark {
+  inline-size: 38px;
+  block-size: 38px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #e6f2ff;
+}
+
+body[data-page="care-plans-form"] .home-sidebar-mark svg,
+body[data-page="care-plans-form"] .home-sidebar-nav-icon svg,
+body[data-page="care-plans-form"] .home-sidebar-chevron,
+body[data-page="care-plans-form"] .home-sidebar-footer svg,
+body[data-page="care-plans-form"] .care-plan-full-header svg,
+body[data-page="care-plans-form"] .care-plan-save-button svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+body[data-page="care-plans-form"] .home-sidebar-mark svg {
+  inline-size: 22px;
+  block-size: 22px;
+}
+
+body[data-page="care-plans-form"] .home-sidebar-brand-copy,
+body[data-page="care-plans-form"] .home-sidebar-nav-copy,
+body[data-page="care-plans-form"] .home-sidebar-user-copy {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+body[data-page="care-plans-form"] .home-sidebar-brand-copy strong {
+  color: #fff;
+  font-size: 0.92rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+}
+
+body[data-page="care-plans-form"] .home-sidebar-brand-copy small {
+  color: #83afd2;
+  font-size: 0.56rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+body[data-page="care-plans-form"] .home-sidebar-nav {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 18px 12px;
+}
+
+body[data-page="care-plans-form"] .home-sidebar-label {
+  margin: 0 8px 12px;
+  color: #5e91ba;
+  font-size: 0.64rem;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+body[data-page="care-plans-form"] .home-sidebar .menu {
+  width: 100%;
+  display: grid;
+  gap: 4px;
+}
+
+body[data-page="care-plans-form"] .home-sidebar .menu a {
+  position: relative;
+  min-width: 0;
+  min-height: 50px;
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr) 16px;
+  gap: 10px;
+  align-items: center;
+  justify-content: initial;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: #8eb2ce;
+  box-shadow: none;
+  font-size: 1rem;
+  text-align: left;
+  text-decoration: none;
+}
+
+body[data-page="care-plans-form"] .home-sidebar .menu a::before {
+  content: "";
+  position: absolute;
+  inset: 11px auto 11px -1px;
+  width: 3px;
+  border-radius: 999px;
+  background: transparent;
+}
+
+body[data-page="care-plans-form"] .home-sidebar .menu a:hover,
+body[data-page="care-plans-form"] .home-sidebar .menu a:focus-visible {
+  outline: none;
+  border: 0;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  box-shadow: none;
+}
+
+body[data-page="care-plans-form"] .home-sidebar .menu a.is-active {
+  background: #315c82;
+  color: #fff;
+}
+
+body[data-page="care-plans-form"] .home-sidebar .menu a.is-active::before {
+  background: #21d6bd;
+}
+
+body[data-page="care-plans-form"] .home-sidebar-nav-icon {
+  display: grid;
+  place-items: center;
+}
+
+body[data-page="care-plans-form"] .home-sidebar-nav-icon svg {
+  inline-size: 19px;
+  block-size: 19px;
+}
+
+body[data-page="care-plans-form"] .home-sidebar-nav-copy strong,
+body[data-page="care-plans-form"] .home-sidebar-nav-copy small,
+body[data-page="care-plans-form"] .home-sidebar-user-copy strong,
+body[data-page="care-plans-form"] .home-sidebar-user-copy small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+body[data-page="care-plans-form"] .home-sidebar-nav-copy strong {
+  color: inherit;
+  font-size: 0.9rem;
+  line-height: 1.15;
+}
+
+body[data-page="care-plans-form"] .home-sidebar-nav-copy small {
+  color: #78a1c1;
+  font-size: 0.68rem;
+  font-weight: 500;
+}
+
+body[data-page="care-plans-form"] .home-sidebar .menu a.is-active small {
+  color: #b6cde0;
+}
+
+body[data-page="care-plans-form"] .home-sidebar-chevron {
+  inline-size: 13px;
+  block-size: 13px;
+  opacity: 0;
+}
+
+body[data-page="care-plans-form"] .home-sidebar .menu a.is-active .home-sidebar-chevron {
+  opacity: 0.45;
+}
+
+body[data-page="care-plans-form"] .home-sidebar-footer {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 40px;
+  gap: 8px;
+  align-items: center;
+  padding: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body[data-page="care-plans-form"] .home-sidebar-footer .topbar-settings {
+  grid-column: 1 / -1;
+  width: 100%;
+  min-height: 40px;
+  justify-content: flex-start;
+  padding: 8px 10px;
+  border: 0;
+  background: transparent;
+  color: #8eb2ce;
+  box-shadow: none;
+}
+
+body[data-page="care-plans-form"] .home-sidebar-footer .topbar-theme-toggle {
+  display: none !important;
+}
+
+body[data-page="care-plans-form"] .home-sidebar-footer .topbar-account {
+  width: 100%;
+  min-height: 48px;
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 9px;
+  align-items: center;
+  justify-content: initial;
+  padding: 7px 9px;
+  border: 0;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  box-shadow: none;
+}
+
+body[data-page="care-plans-form"] .home-sidebar-footer .topbar-account::before {
+  display: none;
+}
+
+body[data-page="care-plans-form"] .home-sidebar-user-icon {
+  inline-size: 32px;
+  block-size: 32px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  color: #d8e8f4;
+}
+
+body[data-page="care-plans-form"] .home-sidebar-user-icon svg {
+  inline-size: 17px;
+  block-size: 17px;
+}
+
+body[data-page="care-plans-form"] .home-sidebar-user-copy strong {
+  font-size: 0.74rem;
+  color: #fff;
+}
+
+body[data-page="care-plans-form"] .home-sidebar-user-copy small {
+  color: #78a1c1;
+  font-size: 0.6rem;
+}
+
+body[data-page="care-plans-form"] .home-sidebar-footer .topbar-logout {
+  inline-size: 40px;
+  min-inline-size: 40px;
+  min-height: 48px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: rgba(255, 255, 255, 0.06);
+  color: #8eb2ce;
+  box-shadow: none;
+}
+
+body[data-page="care-plans-form"] .home-sidebar-footer .topbar-logout span {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+body[data-page="care-plans-form"] .care-plan-main-shell {
+  min-width: 0;
+  min-height: 100vh;
+  margin-left: var(--care-plan-sidebar-width);
+}
+
+body[data-page="care-plans-form"].home-sidebar-is-collapsed .care-plan-sidebar {
+  width: var(--care-plan-sidebar-collapsed-width);
+}
+
+body[data-page="care-plans-form"].home-sidebar-is-collapsed .care-plan-main-shell {
+  margin-left: var(--care-plan-sidebar-collapsed-width);
+}
+
+body[data-page="care-plans-form"].home-sidebar-is-collapsed .care-plan-sidebar .home-sidebar-brand-copy,
+body[data-page="care-plans-form"].home-sidebar-is-collapsed .care-plan-sidebar .home-sidebar-label,
+body[data-page="care-plans-form"].home-sidebar-is-collapsed .care-plan-sidebar .home-sidebar-nav-copy,
+body[data-page="care-plans-form"].home-sidebar-is-collapsed .care-plan-sidebar .home-sidebar-chevron,
+body[data-page="care-plans-form"].home-sidebar-is-collapsed .care-plan-sidebar .home-sidebar-user-copy,
+body[data-page="care-plans-form"].home-sidebar-is-collapsed .care-plan-sidebar .topbar-settings span {
+  display: none;
+}
+
+body[data-page="care-plans-form"].home-sidebar-is-collapsed .care-plan-sidebar .menu a {
+  grid-template-columns: 1fr;
+  place-items: center;
+  padding-inline: 8px;
+}
+
+body[data-page="care-plans-form"] .care-plan-page-header {
+  position: sticky;
+  top: 0;
+  z-index: 800;
+  min-height: 66px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 10px 26px 10px 30px;
+  border-bottom: 1px solid #d5e0e8;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 2px 8px rgba(24, 43, 65, 0.05);
+  backdrop-filter: blur(12px);
+}
+
+body[data-page="care-plans-form"] .care-plan-page-header p {
+  margin: 0;
+  color: #334155;
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+body[data-page="care-plans-form"] .care-plan-board {
+  position: relative;
+  width: calc(100% - 48px) !important;
+  max-width: none !important;
+  min-height: calc(100vh - 66px);
+  margin: 24px auto 34px;
+  display: grid;
+  gap: 18px;
+  padding: 0;
+}
+
+body[data-page="care-plans-form"] .care-plan-board::before {
+  content: "";
+  position: fixed;
+  inset: 66px 0 0 var(--care-plan-sidebar-width);
+  z-index: -1;
+  pointer-events: none;
+  background-image: radial-gradient(circle, rgba(12, 77, 134, 0.16) 1px, transparent 1.2px);
+  background-size: 35px 35px;
+}
+
+body[data-page="care-plans-form"].home-sidebar-is-collapsed .care-plan-board::before {
+  left: var(--care-plan-sidebar-collapsed-width);
+}
+
+body[data-page="care-plans-form"] .care-plan-full-header {
+  display: grid;
+  grid-template-columns: 32px 50px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  min-height: 78px;
+  padding: 12px 0;
+}
+
+body[data-page="care-plans-form"] .care-plan-back-link,
+body[data-page="care-plans-form"] .care-plan-header-icon {
+  display: grid;
+  place-items: center;
+}
+
+body[data-page="care-plans-form"] .care-plan-back-link {
+  inline-size: 32px;
+  block-size: 32px;
+  border-radius: 8px;
+  color: #64748b;
+  text-decoration: none;
+}
+
+body[data-page="care-plans-form"] .care-plan-header-icon {
+  inline-size: 48px;
+  block-size: 48px;
+  border-radius: 12px;
+  background: var(--care-plan-blue);
+  color: #fff;
+  box-shadow: 0 12px 22px rgba(12, 77, 134, 0.2);
+}
+
+body[data-page="care-plans-form"] .care-plan-header-icon svg {
+  inline-size: 24px;
+  block-size: 24px;
+}
+
+body[data-page="care-plans-form"] .care-plan-title-copy {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+body[data-page="care-plans-form"] .care-plan-title-copy p {
+  margin: 0;
+  color: var(--care-plan-blue);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+body[data-page="care-plans-form"] .care-plan-title-copy h1 {
+  margin: 0;
+  color: #071526;
+  font-size: 1.28rem;
+  line-height: 1.2;
+}
+
+body[data-page="care-plans-form"] .care-plan-save-button {
+  min-width: 142px;
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 10px;
+  background: var(--care-plan-blue);
+  color: #fff;
+  font-weight: 900;
+}
+
+body[data-page="care-plans-form"] .care-plan-save-button svg {
+  inline-size: 16px;
+  block-size: 16px;
+}
+
+body[data-page="care-plans-form"] .care-plan-save-button.is-saved {
+  background: var(--care-plan-blue);
+}
+
+body[data-page="care-plans-form"] .care-plan-sheet {
+  display: grid;
+  gap: 18px;
+  overflow: visible;
+}
+
+body[data-page="care-plans-form"] .care-plan-form-body {
+  display: grid;
+  gap: 18px;
+}
+
+body[data-page="care-plans-form"] .care-plan-section {
+  overflow: visible;
+  border: 1px solid var(--care-plan-border);
+  border-radius: 5px;
+  background: #fff;
+  box-shadow: var(--care-plan-shadow);
+}
+
+body[data-page="care-plans-form"] .care-plan-section > header {
+  min-height: 31px;
+  display: grid;
+  place-items: center;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--care-plan-border);
+  background: #245a86;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.07em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+body[data-page="care-plans-form"] .care-plan-register-grid,
+body[data-page="care-plans-form"] .care-plan-profile-grid,
+body[data-page="care-plans-form"] .care-plan-two-column {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0;
+}
+
+body[data-page="care-plans-form"] .care-plan-register-grid > *,
+body[data-page="care-plans-form"] .care-plan-profile-grid > *,
+body[data-page="care-plans-form"] .care-plan-two-column > * {
+  min-width: 0;
+  padding: 11px 14px;
+  border-right: 1px solid #d7e0e8;
+  border-bottom: 1px solid #d7e0e8;
+}
+
+body[data-page="care-plans-form"] .care-plan-register-grid > *:nth-child(2n),
+body[data-page="care-plans-form"] .care-plan-profile-grid > *:nth-child(2n),
+body[data-page="care-plans-form"] .care-plan-two-column > *:nth-child(2n) {
+  border-right: 0;
+}
+
+body[data-page="care-plans-form"] .care-plan-static-field {
+  min-height: 36px;
+  display: grid;
+  grid-template-columns: minmax(140px, 0.8fr) minmax(0, 1.2fr);
+  gap: 12px;
+  align-items: center;
+}
+
+body[data-page="care-plans-form"] .care-plan-static-field span,
+body[data-page="care-plans-form"] .care-plan-section label span,
+body[data-page="care-plans-form"] .care-plan-matrix-head {
+  color: var(--care-plan-muted);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+body[data-page="care-plans-form"] .care-plan-static-field strong {
+  min-width: 0;
+  color: #001124;
+  font-size: 0.83rem;
+  font-weight: 800;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+body[data-page="care-plans-form"] .care-plan-section label {
+  min-width: 0;
+  display: grid;
+  gap: 7px;
+}
+
+body[data-page="care-plans-form"] .care-plan-section input,
+body[data-page="care-plans-form"] .care-plan-section select,
+body[data-page="care-plans-form"] .care-plan-section textarea,
+body[data-page="care-plans-form"] .care-plan-section .date-picker-trigger {
+  width: 100%;
+  min-height: 34px;
+  border: 1px solid #b9c9d8;
+  border-radius: 5px;
+  background: #f4f7fa;
+  color: #061525;
+  box-shadow: none;
+  font-size: 0.86rem;
+}
+
+body[data-page="care-plans-form"] .care-plan-section textarea {
+  min-height: 70px;
+  resize: vertical;
+}
+
+body[data-page="care-plans-form"] .care-plan-section input:focus,
+body[data-page="care-plans-form"] .care-plan-section select:focus,
+body[data-page="care-plans-form"] .care-plan-section textarea:focus,
+body[data-page="care-plans-form"] .care-plan-section .date-picker-trigger:focus-visible {
+  outline: none;
+  border-color: var(--care-plan-blue);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(12, 77, 134, 0.1);
+}
+
+body[data-page="care-plans-form"] .care-plan-matrix {
+  display: grid;
+  gap: 0;
+}
+
+body[data-page="care-plans-form"] .care-plan-specialty-matrix {
+  grid-template-columns: minmax(180px, 0.7fr) minmax(0, 1fr) minmax(0, 1fr);
+}
+
+body[data-page="care-plans-form"] .care-plan-alert-matrix {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+body[data-page="care-plans-form"] .care-plan-matrix > * {
+  min-width: 0;
+  padding: 11px 14px;
+  border-right: 1px solid #d7e0e8;
+  border-bottom: 1px solid #d7e0e8;
+}
+
+body[data-page="care-plans-form"] .care-plan-specialty-matrix > *:nth-child(3n),
+body[data-page="care-plans-form"] .care-plan-alert-matrix > *:nth-child(2n) {
+  border-right: 0;
+}
+
+body[data-page="care-plans-form"] .care-plan-matrix-head {
+  min-height: 36px;
+  display: grid;
+  align-items: center;
+  background: #f6f9fb;
+}
+
+body[data-page="care-plans-form"] .care-plan-row-title {
+  display: grid;
+  align-items: center;
+  background: #fbfcfd;
+}
+
+body[data-page="care-plans-form"] .care-plan-row-title strong {
+  color: #061525;
+  font-size: 0.86rem;
+  font-weight: 900;
+}
+
+body[data-page="care-plans-form"] .care-plan-patient-picker {
+  border: 1px solid var(--care-plan-border);
+  border-radius: 8px;
+  padding: 14px;
+  background: #fff;
+  box-shadow: var(--care-plan-shadow);
+}
+
+body[data-page="care-plans-form"] .care-plan-patient-picker.is-locked {
+  display: none;
+}
+
+body[data-page="care-plans-form"] .care-plan-bottom-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 0 6px 6px;
+}
+
+body[data-page="care-plans-form"] .care-plan-secondary-action {
+  min-width: 86px;
+  min-height: 38px;
+  border: 0;
+  border-radius: 10px;
+  background: #e7eef4;
+  color: #071526;
+  font-weight: 900;
+}
+
+body[data-page="care-plans-form"] .date-picker,
+body[data-page="care-plans-form"] .date-picker-popover {
+  z-index: 1200;
+}
+
+body[data-page="care-plans-form"] .date-picker-popover {
+  max-height: min(430px, calc(100vh - 96px));
+  overflow: auto;
+}
+
+@media (max-width: 1120px) and (min-width: 761px) {
+  :is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-toggle {
+    display: grid !important;
+  }
+}
+
+@media (max-width: 900px) {
+  body[data-page="care-plans-form"] .care-plan-register-grid,
+  body[data-page="care-plans-form"] .care-plan-profile-grid,
+  body[data-page="care-plans-form"] .care-plan-two-column,
+  body[data-page="care-plans-form"] .care-plan-specialty-matrix,
+  body[data-page="care-plans-form"] .care-plan-alert-matrix {
+    grid-template-columns: 1fr;
+  }
+
+  body[data-page="care-plans-form"] .care-plan-register-grid > *,
+  body[data-page="care-plans-form"] .care-plan-profile-grid > *,
+  body[data-page="care-plans-form"] .care-plan-two-column > *,
+  body[data-page="care-plans-form"] .care-plan-matrix > * {
+    border-right: 0;
+  }
+
+  body[data-page="care-plans-form"] .care-plan-full-header {
+    grid-template-columns: 32px 44px minmax(0, 1fr);
+  }
+
+  body[data-page="care-plans-form"] #care-plan-top-save {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 760px) {
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="care-plans-form"]) .home-sidebar-toggle {
+    display: none !important;
+  }
+
+  body[data-page="care-plans-form"] .care-plan-sidebar {
+    position: sticky;
+    inset: 0 0 auto;
+    width: 100%;
+    min-height: 0;
+    height: auto;
+  }
+
+  body[data-page="care-plans-form"] .care-plan-sidebar .topbar-actions.home-sidebar-footer {
+    display: none;
+  }
+
+  body[data-page="care-plans-form"] .care-plan-main-shell,
+  body[data-page="care-plans-form"].home-sidebar-is-collapsed .care-plan-main-shell {
+    margin-left: 0;
+  }
+
+  body[data-page="care-plans-form"] .care-plan-page-header {
+    position: static;
+    padding: 9px 14px;
+  }
+
+  body[data-page="care-plans-form"] .care-plan-board {
+    width: calc(100% - 20px) !important;
+    margin: 12px auto 20px;
+  }
+
+  body[data-page="care-plans-form"] .care-plan-board::before {
+    inset: 116px 0 0;
+  }
+}
+
+/* Unified module sidebar rhythm */
+@media (min-width: 761px) {
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]) .home-sidebar {
+    width: 240px;
+    overflow: visible;
+    transition: width 0.18s ease;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]) .home-sidebar-nav {
+    padding: 18px 12px;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]) .home-sidebar .menu {
+    display: grid;
+    gap: 6px;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]) .home-sidebar .menu a {
+    width: 100%;
+    min-height: 56px;
+    display: grid;
+    grid-template-columns: 28px minmax(0, 1fr) 16px;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border: 0;
+    border-radius: 12px;
+    background: transparent;
+    color: #8eb2ce;
+    box-shadow: none;
+    text-align: left;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]) .home-sidebar .menu a.is-active {
+    background: #315c82;
+    color: #fff;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]) .home-sidebar .menu a::before {
+    inset: 11px auto 11px 0;
+    width: 3px;
+    border-radius: 999px;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]) .home-sidebar-nav-icon {
+    inline-size: 28px;
+    block-size: 28px;
+    display: grid;
+    place-items: center;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]) .home-sidebar-nav-copy {
+    min-width: 0;
+    display: grid;
+    gap: 2px;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]) .home-sidebar-nav-copy strong {
+    font-size: 0.94rem;
+    line-height: 1.12;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]) .home-sidebar-nav-copy small {
+    font-size: 0.68rem;
+    line-height: 1.2;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]) .home-sidebar-chevron {
+    justify-self: end;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]).home-sidebar-is-collapsed .home-sidebar {
+    width: 88px;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]).home-sidebar-is-collapsed :is(.home-main-shell, .cadh-main-shell, .ubs-main-shell, .care-plan-main-shell) {
+    margin-left: 88px;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]).home-sidebar-is-collapsed .home-sidebar-nav {
+    padding-inline: 16px;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]).home-sidebar-is-collapsed .home-sidebar .menu a {
+    width: 56px;
+    min-height: 56px;
+    grid-template-columns: 1fr;
+    place-items: center;
+    justify-self: center;
+    padding: 0;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]).home-sidebar-is-collapsed .home-sidebar .menu a::before {
+    inset: 11px auto 11px 0;
+  }
+}
+
+/* Care plan response boxes */
+body[data-page="care-plans-form"] .care-plan-section {
+  border-radius: 12px;
+  box-shadow: 0 10px 24px rgba(24, 43, 65, 0.07);
+}
+
+body[data-page="care-plans-form"] .care-plan-register-grid,
+body[data-page="care-plans-form"] .care-plan-profile-grid,
+body[data-page="care-plans-form"] .care-plan-two-column,
+body[data-page="care-plans-form"] .care-plan-matrix {
+  gap: 12px;
+  padding: 14px;
+}
+
+body[data-page="care-plans-form"] .care-plan-register-grid > *,
+body[data-page="care-plans-form"] .care-plan-profile-grid > *,
+body[data-page="care-plans-form"] .care-plan-two-column > *,
+body[data-page="care-plans-form"] .care-plan-matrix > * {
+  padding: 0;
+  border-right: 0;
+  border-bottom: 0;
+}
+
+body[data-page="care-plans-form"] .care-plan-static-field,
+body[data-page="care-plans-form"] .care-plan-row-title {
+  min-height: 74px;
+  padding: 12px 14px;
+  border: 1px solid #d5e1ec;
+  border-radius: 8px;
+  background: #f8fbfd;
+}
+
+body[data-page="care-plans-form"] .care-plan-row-title {
+  display: grid;
+  align-items: center;
+}
+
+body[data-page="care-plans-form"] .care-plan-section input,
+body[data-page="care-plans-form"] .care-plan-section select,
+body[data-page="care-plans-form"] .care-plan-section textarea,
+body[data-page="care-plans-form"] .care-plan-section .date-picker-trigger {
+  min-height: 40px;
+  border-color: #c7d6e4;
+  border-radius: 8px;
+  background: #f6f9fc;
+}
+
+body[data-page="care-plans-form"] .care-plan-section textarea {
+  min-height: 78px;
+  padding: 10px 12px;
+  line-height: 1.35;
+}
+
+body[data-page="care-plans-form"] .care-plan-matrix-head {
+  min-height: auto;
+  padding: 0 2px 2px;
+  background: transparent;
+}
+
+/* Final shared module shell polish */
+@media (min-width: 761px) {
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]) .home-sidebar-brand {
+    min-height: 76px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]) .home-sidebar-mark {
+    inline-size: 40px;
+    block-size: 40px;
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.14);
+    color: #e6f2ff;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]) .home-sidebar-mark svg,
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]) .home-sidebar-nav-icon svg,
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]) .home-sidebar-footer svg {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]) .home-sidebar-mark svg {
+    inline-size: 22px;
+    block-size: 22px;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]) .home-sidebar-brand-copy {
+    min-width: 0;
+    display: grid;
+    gap: 2px;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]) .home-sidebar-brand-copy strong {
+    color: #fff;
+    font-size: 0.92rem;
+    font-weight: 900;
+    letter-spacing: 0.04em;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]) .home-sidebar-brand-copy small {
+    color: #83afd2;
+    font-size: 0.56rem;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]) .home-sidebar-label {
+    margin: 0 8px 12px;
+    color: #5e91ba;
+    font-size: 0.64rem;
+    font-weight: 900;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]) .home-sidebar .menu a.is-active::before {
+    background: #21d6bd;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]) .home-sidebar .menu a.is-active small {
+    color: #b6cde0;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]) .home-sidebar-footer {
+    width: 100%;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 40px;
+    gap: 8px;
+    align-items: center;
+    padding: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]) .home-sidebar-footer .topbar-settings {
+    grid-column: 1 / -1;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]) .home-sidebar-footer .topbar-account {
+    min-width: 0;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]) .home-sidebar-footer .topbar-logout {
+    justify-self: end;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]).home-sidebar-is-collapsed .home-sidebar-brand {
+    justify-content: center;
+    padding-inline: 0;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]).home-sidebar-is-collapsed .home-sidebar-brand-copy,
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]).home-sidebar-is-collapsed .home-sidebar-label,
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]).home-sidebar-is-collapsed .home-sidebar-nav-copy,
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]).home-sidebar-is-collapsed .home-sidebar-chevron,
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]).home-sidebar-is-collapsed .home-sidebar-user-copy,
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]).home-sidebar-is-collapsed .home-sidebar-footer .topbar-settings span,
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]).home-sidebar-is-collapsed .home-sidebar-footer .topbar-logout span {
+    display: none !important;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]).home-sidebar-is-collapsed .home-sidebar-footer {
+    grid-template-columns: 1fr;
+    padding-inline: 16px;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]).home-sidebar-is-collapsed .home-sidebar-footer .topbar-settings,
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]).home-sidebar-is-collapsed .home-sidebar-footer .topbar-account,
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]).home-sidebar-is-collapsed .home-sidebar-footer .topbar-logout {
+    min-inline-size: 48px;
+    inline-size: 48px;
+    justify-self: center;
+    justify-content: center;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]).home-sidebar-is-collapsed .home-sidebar-footer .topbar-settings {
+    grid-column: auto;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]) .home-sidebar-toggle {
+    display: grid !important;
+  }
+}
+
+@media (max-width: 760px) {
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="care-plans-form"]) .home-sidebar-toggle {
+    display: none !important;
+  }
+}
+
+body[data-page="care-plans-form"] .care-plan-sheet {
+  gap: 18px;
+}
+
+body[data-page="care-plans-form"] .care-plan-section {
+  overflow: visible;
+}
+
+body[data-page="care-plans-form"] .care-plan-section label,
+body[data-page="care-plans-form"] .care-plan-matrix > textarea,
+body[data-page="care-plans-form"] .care-plan-matrix > .care-plan-row-title {
+  min-width: 0;
+}
+
+body[data-page="care-plans-form"] .care-plan-section label {
+  display: grid;
+  gap: 7px;
 }
 

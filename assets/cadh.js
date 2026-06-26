@@ -21,14 +21,36 @@ const CADH_DEFAULT_CARE_PLAN_ITEMS = [
   { item_type: 'meta', title: 'Prioridades e recomendações da equipe especializada', situation: '', difficulty: '', recommendation: '', goal: '', sort_order: 11 },
 ];
 
-const CADH_TRANSITION_ORIGIN = 'CADH — Centro de Atenção Domiciliar Hospitalar';
+const CADH_TRANSITION_ORIGIN = 'CADH — Centro de Atendimento ao Diabético e Hipertensão';
 
 const CADH_DEFAULT_UBS_OPTIONS = [
-  'UBS Central',
-  'UBS Norte',
-  'UBS Sul',
-  'UBS Leste',
-  'UBS Oeste',
+  'UBS 01 PARANOÁ',
+  'UBS 02 PARANOÁ - Quadra 18',
+  'UBS 03 PARANOÁ - Paranoá Parque',
+  'UBS 04 PARANOÁ - Jardim II',
+  'UBS 05 PARANOÁ - Quebrada dos Neres',
+  'UBS 06 PARANOÁ - Cariru',
+  'UBS 07 PARANOÁ - Café sem Troco',
+  'UBS 08 PARANOÁ - PADDF',
+  'UBS 01 ITAPOÃ',
+  'UBS 02 ITAPOÃ',
+  'UBS 03 ITAPOÃ',
+  'UBS 04 ITAPOÃ',
+  'UBS 01 SÃO SEBASTIÃO',
+  'UBS 02 SÃO SEBASTIÃO - T.R.E.',
+  'UBS 03 SÃO SEBASTIÃO - Oeste',
+  'UBS 04 SÃO SEBASTIÃO - Morro Azul',
+  'UBS 05 SÃO SEBASTIÃO - Nova Betânia',
+  'UBS 06 SÃO SEBASTIÃO - São Francisco',
+  'UBS 07 SÃO SEBASTIÃO - Morro da Cruz',
+  'UBS 08 SÃO SEBASTIÃO - Cavas de Baixo',
+  'UBS 09 SÃO SEBASTIÃO - Bosque',
+  'UBS 10 SÃO SEBASTIÃO - João Cândido',
+  'UBS 11 SÃO SEBASTIÃO - Bosque 2',
+  'UBS 12 SÃO SEBASTIÃO - São José',
+  'UBS 1 JARDINS MANGUEIRAL',
+  'UBS 03 JARDIM BOTÂNICO',
+  'UBS 19 SÃO SEBASTIÃO - Vila do Boa',
 ];
 
 const CADH_ESF_OPTIONS = [
@@ -455,18 +477,22 @@ function renderCadhSelectedPatientSummary(patient) {
         ${renderCadhDefinition('Telefone', patient.phone)}
       </dl>
     </article>
-    <a class="cadh-transition-cta" href="/transitions/form.html?patient_id=${encodeURIComponent(patient.id)}">
+    <button class="cadh-transition-cta" type="button">
       <span class="cadh-transition-cta-icon" aria-hidden="true">
         <svg viewBox="0 0 24 24"><path d="M4 4v6h6M20 20v-6h-6"/><path d="M5 19a8 8 0 0 0 13-3M19 5a8 8 0 0 0-13 3"/></svg>
       </span>
       <span><strong>Transição do Cuidado</strong><small>CADH &rarr; UBS</small></span>
       <svg class="cadh-transition-cta-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
-    </a>
+    </button>
   `;
 
   result.querySelector('.cadh-selected-patient-clear')?.addEventListener('click', () => {
     clearCadhSelectedPatient();
     document.getElementById('cadh-cpf-input')?.focus();
+  });
+  result.querySelector('.cadh-transition-cta')?.addEventListener('click', () => {
+    activateCadhManagementTab('transitions');
+    document.getElementById('cadh-management-title')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 }
 
@@ -486,7 +512,6 @@ function renderCadhUserDetailsTab(patient) {
         <dl>
           ${renderCadhDefinition('Nome Completo', patient.full_name)}
           ${renderCadhDefinition('CPF', patient.cpf)}
-          ${renderCadhDefinition('SES', patient.ses)}
           ${renderCadhDefinition('Data de Nascimento', formatCadhDate(patient.birth_date))}
           ${renderCadhDefinition('Idade', patient.age_label)}
           ${renderCadhDefinition('Raça/Cor', formatCadhRace(patient.race))}
@@ -1131,10 +1156,11 @@ function getCadhUbsOptions(patient) {
   const labels = [];
   const addLabel = (value) => {
     const label = String(value || '').trim();
-    if (!label || normalizeCadhText(label) === 'sem equipe') {
+    const normalizedLabel = normalizeCadhText(label);
+    if (!label || normalizedLabel === 'sem equipe' || normalizedLabel === 'ubs') {
       return;
     }
-    if (!labels.some((item) => normalizeCadhText(item) === normalizeCadhText(label))) {
+    if (!labels.some((item) => normalizeCadhText(item) === normalizedLabel)) {
       labels.push(label);
     }
   };
