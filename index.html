@@ -9,17 +9,19 @@
 <body data-page="home">
   <div class="home-app-shell">
     <aside class="topbar home-sidebar" aria-label="Navegação do SISELO">
-      <div class="topbar-brand home-sidebar-brand">
-        <span class="home-sidebar-mark" aria-hidden="true">
-          <svg viewBox="0 0 24 24" focusable="false">
-            <path d="M12 4v16M4 12h16"/>
-            <rect x="5" y="5" width="14" height="14" rx="5"/>
-          </svg>
-        </span>
-        <span class="home-sidebar-brand-copy">
-          <strong>SISELO</strong>
-          <small>Sistema de Saúde</small>
-        </span>
+      <div class="topbar-left">
+        <div class="topbar-brand home-sidebar-brand">
+          <span class="home-sidebar-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false">
+              <path d="M12 4v16M4 12h16"/>
+              <rect x="5" y="5" width="14" height="14" rx="5"/>
+            </svg>
+          </span>
+          <span class="home-sidebar-brand-copy">
+            <strong>SISELO</strong>
+            <small>Sistema de Saúde</small>
+          </span>
+        </div>
       </div>
 
       <div class="home-sidebar-nav">
@@ -65,9 +67,14 @@
           <strong>Painel de Controle</strong>
         </div>
         <div class="home-page-status">
-          <span class="home-system-status">
-            <span class="home-system-status-dot" aria-hidden="true"></span>
-            Operacional
+          <span class="home-system-status home-user-role-status home-user-role-admin">
+            <span class="home-system-status-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M12 3 20 7v5c0 5-3.4 8-8 9-4.6-1-8-4-8-9V7l8-4Z"/>
+                <path d="M9 12l2 2 4-5"/>
+              </svg>
+            </span>
+            <span>Administrador</span>
           </span>
           <time id="home-current-date" class="home-current-date"></time>
         </div>

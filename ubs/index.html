@@ -3,498 +3,137 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>UBS</title>
+  <title>UBS - Unidade Básica de Saúde | SISELO</title>
   <link rel="stylesheet" href="/assets/app.css">
-  <style>
-    .cadh-page {
-      padding: 26px;
-      background:
-        radial-gradient(circle at top right, rgba(15, 118, 110, 0.05), transparent 26%),
-        linear-gradient(180deg, #f4f7f8, #eef3f5);
-    }
-
-    .cadh-section-label {
-      margin: 0 0 14px;
-      color: #6b7f8d;
-      font-size: 0.78rem;
-      font-weight: 800;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-    }
-
-    .cadh-layout {
-      display: grid;
-      grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
-      gap: 22px;
-      align-items: start;
-    }
-
-    .cadh-patient-search {
-      display: grid;
-      gap: 12px;
-      padding: 18px;
-      border: 1px solid rgba(15, 118, 110, 0.12);
-      border-radius: 24px;
-      background:
-        radial-gradient(circle at top right, rgba(15, 118, 110, 0.08), transparent 32%),
-        linear-gradient(180deg, #f7fcfb, #ffffff);
-      box-shadow: 0 18px 34px rgba(15, 37, 65, 0.08);
-    }
-
-    .cadh-patient-search label {
-      color: #102236;
-      font-size: 0.9rem;
-      font-weight: 800;
-    }
-
-    .cadh-patient-result {
-      display: grid;
-      gap: 10px;
-    }
-
-    .cadh-patient-option {
-      display: grid;
-      gap: 4px;
-      padding: 12px 14px;
-      border: 1px solid rgba(15, 118, 110, 0.14);
-      border-radius: 16px;
-      background: #fff;
-      color: #173045;
-      text-align: left;
-      cursor: pointer;
-      transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
-    }
-
-    .cadh-patient-option:hover,
-    .cadh-patient-option:focus-visible {
-      outline: none;
-      transform: translateY(-1px);
-      border-color: rgba(15, 118, 110, 0.24);
-      box-shadow: 0 14px 24px rgba(15, 37, 65, 0.09);
-    }
-
-    .cadh-patient-option-name {
-      font-size: 1rem;
-      font-weight: 800;
-      line-height: 1.3;
-    }
-
-    .cadh-patient-option-meta {
-      color: #5f7688;
-      font-size: 0.84rem;
-      line-height: 1.4;
-    }
-
-    .cadh-patient-message {
-      margin: 0;
-      padding: 12px 14px;
-      border-radius: 16px;
-      border: 1px solid rgba(148, 163, 184, 0.18);
-      background: linear-gradient(180deg, #f7fafb, #ffffff);
-      color: #5e7283;
-      font-size: 0.88rem;
-      line-height: 1.5;
-    }
-
-    .cadh-patient-message.is-error {
-      background: #fff1f2;
-      color: #9f1239;
-    }
-
-    .cadh-patient-card {
-      display: grid;
-      gap: 14px;
-      padding: 16px;
-      border: 1px solid rgba(15, 118, 110, 0.12);
-      border-radius: 22px;
-      background: linear-gradient(180deg, #fafdfe, #ffffff);
-      box-shadow: 0 16px 26px rgba(15, 37, 65, 0.06);
-    }
-
-    .cadh-patient-card-header {
-      display: grid;
-      gap: 6px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.2);
-    }
-
-    .cadh-patient-card-kicker {
-      margin: 0;
-      color: #0f766e;
-      font-size: 0.74rem;
-      font-weight: 800;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-    }
-
-    .cadh-patient-card-name {
-      margin: 0;
-      color: #102236;
-      font-size: 1.3rem;
-      line-height: 1.28;
-    }
-
-    .cadh-patient-info {
-      display: grid;
-      gap: 10px;
-    }
-
-    .cadh-patient-pill {
-      display: grid;
-      gap: 4px;
-      padding: 12px 14px;
-      border: 1px solid rgba(148, 163, 184, 0.16);
-      border-radius: 16px;
-      background: #eef7fb;
-      color: #102236;
-      text-align: left;
-    }
-
-    .cadh-patient-pill strong {
-      font-size: 0.98rem;
-      line-height: 1.35;
-    }
-
-    .cadh-patient-pill-label {
-      color: #61798b;
-      font-size: 0.72rem;
-      font-weight: 800;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-    }
-
-    .cadh-clinical-note {
-      display: grid;
-      gap: 12px;
-      margin-top: 2px;
-      padding: 14px;
-      border: 1px solid rgba(180, 135, 22, 0.22);
-      border-radius: 18px;
-      background: linear-gradient(180deg, #fffbeb, #fff7dd);
-      color: #7c5510;
-      box-shadow: 0 10px 18px rgba(180, 135, 22, 0.08);
-    }
-
-    .cadh-clinical-note-header {
-      display: grid;
-      grid-template-columns: auto 1fr;
-      gap: 10px;
-      align-items: start;
-    }
-
-    .cadh-clinical-note-icon {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 28px;
-      height: 28px;
-      border-radius: 999px;
-      background: #f7d567;
-      color: #7c5510;
-      font-size: 0.95rem;
-      font-weight: 800;
-    }
-
-    .cadh-clinical-note-title {
-      margin: 0 0 4px;
-      font-size: 0.94rem;
-      font-weight: 800;
-    }
-
-    .cadh-clinical-note-text {
-      margin: 0;
-      font-size: 0.83rem;
-      line-height: 1.5;
-    }
-
-    .cadh-clinical-note-list {
-      display: grid;
-      gap: 8px;
-    }
-
-    .cadh-clinical-note-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      min-height: 34px;
-      padding: 6px 12px;
-      border-radius: 999px;
-      background: rgba(180, 135, 22, 0.12);
-      color: #8a5a0a;
-      font-size: 0.82rem;
-      font-weight: 700;
-    }
-
-    .cadh-clinical-note-link {
-      text-decoration: none;
-      transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
-    }
-
-    .cadh-clinical-note-link:hover,
-    .cadh-clinical-note-link:focus-visible {
-      outline: none;
-      transform: translateY(-1px);
-      box-shadow: 0 10px 18px rgba(180, 135, 22, 0.14);
-      background: rgba(180, 135, 22, 0.18);
-    }
-
-    .cadh-clinical-note-tag::before {
-      content: "";
-      inline-size: 7px;
-      block-size: 7px;
-      border-radius: 999px;
-      background: currentColor;
-      opacity: 0.72;
-    }
-
-    .cadh-module-grid,
-    .cadh-specialty-grid {
-      display: grid;
-      gap: 14px;
-    }
-
-    .cadh-module-grid {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-    }
-
-    .cadh-specialty-grid {
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    }
-
-    .cadh-module-card,
-    .cadh-specialty-card {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      min-height: 124px;
-      border: 1px solid #d8e2ea;
-      border-radius: 22px;
-      padding: 20px;
-      text-decoration: none;
-      color: #1f2937;
-      background: #fff;
-      box-shadow: 0 10px 20px rgba(15, 37, 65, 0.04);
-      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
-    }
-
-    .cadh-module-card:hover,
-    .cadh-specialty-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 18px 28px rgba(15, 37, 65, 0.08);
-    }
-
-    .cadh-module-card[hidden] {
-      display: none;
-    }
-
-    .cadh-module-card.is-locked {
-      opacity: 0.44;
-      cursor: not-allowed;
-      filter: grayscale(0.28);
-      transform: none;
-      box-shadow: none;
-    }
-
-    .cadh-module-card.is-pending {
-      border-color: rgba(180, 135, 22, 0.34);
-      box-shadow: 0 14px 26px rgba(180, 135, 22, 0.1);
-    }
-
-    .cadh-module-icon,
-    .cadh-specialty-icon {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      align-self: flex-start;
-      margin-bottom: 12px;
-      color: var(--cadh-accent, #64748b);
-      line-height: 1;
-    }
-
-    .cadh-module-icon svg,
-    .cadh-specialty-icon svg {
-      inline-size: 24px;
-      block-size: 24px;
-      stroke: currentColor;
-      stroke-width: 2;
-      fill: none;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    .cadh-specialty-icon svg {
-      inline-size: 17px;
-      block-size: 17px;
-      stroke-width: 1.8;
-      opacity: 0.78;
-    }
-
-    .cadh-module-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      width: 100%;
-    }
-
-    .cadh-module-title {
-      font-weight: 800;
-      font-size: 1.04rem;
-      line-height: 1.28;
-    }
-
-    .cadh-module-badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      flex: 0 0 auto;
-      inline-size: 12px;
-      block-size: 12px;
-      border-radius: 999px;
-      background: #d6a11d;
-      box-shadow: 0 0 0 4px rgba(180, 135, 22, 0.12);
-      overflow: hidden;
-      font-size: 0;
-      line-height: 0;
-    }
-
-    .cadh-module-badge[hidden] {
-      display: none !important;
-    }
-
-    .cadh-card-patients {
-      --cadh-accent: #08796c;
-      border-color: rgba(8, 121, 108, 0.24);
-      background: #effaf7;
-    }
-
-    .cadh-card-plans {
-      --cadh-accent: #477d99;
-      border-color: rgba(71, 125, 153, 0.22);
-      background: #eff7fc;
-    }
-
-    .cadh-card-encounters {
-      --cadh-accent: #b48716;
-      border-color: rgba(180, 135, 22, 0.24);
-      background: #fff9e7;
-    }
-
-
-    @media (max-width: 980px) {
-      .cadh-layout {
-        grid-template-columns: 1fr;
-      }
-
-      .cadh-module-grid,
-      .cadh-specialty-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-    }
-
-    @media (max-width: 620px) {
-      .cadh-page {
-        padding: 20px;
-      }
-
-      .cadh-module-grid,
-      .cadh-specialty-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
 </head>
 <body data-page="ubs">
-  <header class="topbar">
-    <div class="topbar-brand">Intranet UBS</div>
-    <nav class="menu">
-      <a id="nav-home" href="/index.html">Home</a>
-      <a id="nav-cadh" href="/cadh/index.html">CADH</a>
-      <a id="nav-ubs" href="/ubs/index.html">UBS</a>
-    </nav>
-  </header>
-
-  <main class="container">
-    <section class="card cadh-page">
-      <svg aria-hidden="true" style="display:none">
-        <symbol id="cadh-icon-users" viewBox="0 0 24 24">
-          <path d="M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/>
-          <path d="M3.5 19a5.5 5.5 0 0 1 11 0"/>
-          <path d="M16 11a2.5 2.5 0 0 0 0-5"/>
-          <path d="M18 18a4.5 4.5 0 0 0-3-4.2"/>
-        </symbol>
-        <symbol id="cadh-icon-file" viewBox="0 0 24 24">
-          <path d="M7 3h7l4 4v14H7V3Z"/>
-          <path d="M14 3v5h5"/>
-          <path d="M10 12h6"/>
-          <path d="M10 16h6"/>
-        </symbol>
-        <symbol id="cadh-icon-care" viewBox="0 0 24 24">
-          <path d="M7 4v5a4 4 0 0 0 8 0V4"/>
-          <path d="M5 4h4"/>
-          <path d="M13 4h4"/>
-          <path d="M11 13v2a4 4 0 0 0 8 0v-1"/>
-          <circle cx="19" cy="12" r="2"/>
-        </symbol>
-        <symbol id="cadh-icon-transition" viewBox="0 0 24 24">
-          <path d="M8 7h12"/>
-          <path d="M16 3l4 4-4 4"/>
-          <path d="M16 17H4"/>
-          <path d="M8 13l-4 4 4 4"/>
-        </symbol>
-        <symbol id="cadh-icon-clipboard" viewBox="0 0 24 24">
-          <path d="M9 5h6"/>
-          <path d="M10 3h4l1 3H9l1-3Z"/>
-          <path d="M7 5H5v16h14V5h-2"/>
-          <path d="M8 11h8"/>
-          <path d="M8 15h8"/>
-        </symbol>
-      </svg>
-
-      <h1 class="page-title">UBS</h1>
-
-      <div class="cadh-layout">
-        <form id="cadh-cpf-search" class="cadh-patient-search">
-          <label for="cadh-cpf-input">Buscar por NOME ou CPF</label>
-          <input id="cadh-cpf-input" name="q" placeholder="Busca por NOME ou CPF" autocomplete="off">
-          <div id="cadh-patient-result" class="cadh-patient-result"></div>
-        </form>
-
-        <div>
-          <h2 class="cadh-section-label">Módulos assistenciais</h2>
-          <div class="cadh-module-grid">
-            <a id="cadh-patients-card" class="cadh-module-card cadh-card-patients" href="/patients/list.html">
-              <span class="cadh-module-icon"><svg><use href="#cadh-icon-users"></use></svg></span>
-              <span class="cadh-module-head">
-                <span class="cadh-module-title">Usuários</span>
-              </span>
-            </a>
-
-            <a id="cadh-careplans-card" class="cadh-module-card cadh-card-plans is-locked" href="#" data-base-href="/care-plans/list.html" data-requires-patient="true" data-module-key="careplans" aria-disabled="true">
-              <span class="cadh-module-icon"><svg><use href="#cadh-icon-file"></use></svg></span>
-              <span class="cadh-module-head">
-                <span class="cadh-module-title">Planos de Cuidado</span>
-                <span class="cadh-module-badge" data-pending-badge title="Documentação pendente" aria-label="Documentação pendente" hidden></span>
-              </span>
-            </a>
-
-            <a id="cadh-encounters-card" class="cadh-module-card cadh-card-encounters is-locked" href="#" data-base-href="/encounters/list.html" data-requires-patient="true" data-module-key="encounters" aria-disabled="true">
-              <span class="cadh-module-icon"><svg><use href="#cadh-icon-care"></use></svg></span>
-              <span class="cadh-module-head">
-                <span class="cadh-module-title">Atendimentos</span>
-                <span class="cadh-module-badge" data-pending-badge title="Documentação pendente" aria-label="Documentação pendente" hidden></span>
-              </span>
-            </a>
-
-          </div>
-
+  <div class="cadh-app-shell ubs-app-shell">
+    <aside class="topbar home-sidebar cadh-sidebar ubs-sidebar" aria-label="Navegação do SISELO">
+      <div class="topbar-left">
+        <div class="topbar-brand home-sidebar-brand">
+          <span class="home-sidebar-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false">
+              <path d="M12 4v16M4 12h16"/>
+              <rect x="5" y="5" width="14" height="14" rx="5"/>
+            </svg>
+          </span>
+          <span class="home-sidebar-brand-copy">
+            <strong>SISELO</strong>
+            <small>Sistema de Saúde</small>
+          </span>
         </div>
       </div>
-    </section>
-  </main>
+
+      <div class="home-sidebar-nav">
+        <p class="home-sidebar-label">Módulos</p>
+        <nav class="menu" aria-label="Módulos principais">
+          <a id="nav-home" href="/index.html">
+            <span class="home-sidebar-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m4 10 8-6 8 6v10H4V10Z"/><path d="M9 20v-6h6v6"/></svg></span>
+            <span class="home-sidebar-nav-copy"><strong>Início</strong><small>Painel geral</small></span>
+            <svg class="home-sidebar-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
+          </a>
+
+          <a id="nav-cadh" href="/cadh/index.html">
+            <span class="home-sidebar-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 13h4l2-7 4 14 2-7h6"/></svg></span>
+            <span class="home-sidebar-nav-copy"><strong>CADH</strong><small>Atenção Domiciliar</small></span>
+            <svg class="home-sidebar-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
+          </a>
+
+          <a id="nav-ubs" href="/ubs/index.html">
+            <span class="home-sidebar-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 21s7-5.2 7-12a7 7 0 1 0-14 0c0 6.8 7 12 7 12Z"/><circle cx="12" cy="9" r="2.5"/></svg></span>
+            <span class="home-sidebar-nav-copy"><strong>UBS</strong><small>Atenção Primária</small></span>
+            <svg class="home-sidebar-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
+          </a>
+        </nav>
+      </div>
+
+      <div class="topbar-actions home-sidebar-footer"></div>
+      <button id="ubs-sidebar-toggle" class="home-sidebar-toggle" type="button" aria-label="Recolher menu lateral" aria-expanded="true">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg>
+      </button>
+    </aside>
+
+    <div class="cadh-main-shell ubs-main-shell">
+      <header class="cadh-page-header ubs-page-header">
+        <div class="cadh-breadcrumb-heading">
+          <p><a class="cadh-breadcrumb-link" href="/index.html">Módulos</a><span aria-hidden="true">›</span><strong>UBS</strong></p>
+          <h1>UBS - Unidade Básica de Saúde</h1>
+        </div>
+        <div class="home-page-status">
+          <span class="home-system-status home-user-role-status home-user-role-admin">
+            <span class="home-system-status-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M12 3 20 7v5c0 5-3.4 8-8 9-4.6-1-8-4-8-9V7l8-4Z"/>
+                <path d="M9 12l2 2 4-5"/>
+              </svg>
+            </span>
+            <span>Administrador</span>
+          </span>
+          <time id="ubs-current-date" class="home-current-date"></time>
+        </div>
+      </header>
+
+      <main class="container ubs-dashboard">
+        <svg aria-hidden="true" class="visually-hidden">
+          <symbol id="ubs-icon-pin" viewBox="0 0 24 24"><path d="M12 21s7-5.2 7-12a7 7 0 1 0-14 0c0 6.8 7 12 7 12Z"/><circle cx="12" cy="9" r="2.5"/></symbol>
+          <symbol id="ubs-icon-users" viewBox="0 0 24 24"><path d="M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0M16 11a2.5 2.5 0 0 0 0-5M18 18a4.5 4.5 0 0 0-3-4.2"/></symbol>
+          <symbol id="ubs-icon-clipboard" viewBox="0 0 24 24"><path d="M9 5h6"/><path d="M10 3h4l1 3H9l1-3Z"/><path d="M7 5H5v16h14V5h-2"/><path d="M8 11h8M8 15h8"/></symbol>
+          <symbol id="ubs-icon-calendar" viewBox="0 0 24 24"><path d="M7 2v4M17 2v4M4 9h16M5 4h14a1 1 0 0 1 1 1v15H4V5a1 1 0 0 1 1-1Z"/></symbol>
+          <symbol id="ubs-icon-filter" viewBox="0 0 24 24"><path d="M4 5h16l-6 7v5l-4 2v-7L4 5Z"/></symbol>
+          <symbol id="ubs-icon-transition" viewBox="0 0 24 24"><path d="M7 7h11l-3-3M17 17H6l3 3"/></symbol>
+          <symbol id="ubs-icon-empty" viewBox="0 0 24 24"><path d="M7 3h7l4 4v14H7V3Z"/><path d="M14 3v5h5M10 12h6M10 16h4"/></symbol>
+        </svg>
+
+        <section class="ubs-module-hero" aria-labelledby="ubs-module-title">
+          <div class="ubs-module-hero-main">
+            <span class="ubs-module-hero-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><use href="#ubs-icon-pin"></use></svg>
+            </span>
+            <div class="ubs-module-hero-copy">
+              <p>Atenção primária à saúde</p>
+              <h2 id="ubs-module-title">Unidade Básica de Saúde</h2>
+            </div>
+          </div>
+          <dl class="ubs-module-metrics" aria-label="Resumo UBS">
+            <div>
+              <dt id="ubs-metric-transitioned">0</dt>
+              <dd>Transicionados</dd>
+            </div>
+            <div>
+              <dt id="ubs-metric-followups">0</dt>
+              <dd>Acompanhamentos</dd>
+            </div>
+            <div>
+              <dt id="ubs-metric-next">0</dt>
+              <dd>Próx. 30 dias</dd>
+            </div>
+          </dl>
+        </section>
+
+        <section class="ubs-workspace" aria-label="Gestão UBS">
+          <nav class="ubs-tabs" aria-label="Módulos da UBS">
+            <button id="ubs-tab-transitioned" class="ubs-tab active" type="button" data-ubs-tab="transitioned">
+              <span class="ubs-tab-icon"><svg><use href="#ubs-icon-users"></use></svg></span>
+              Usuários Transicionados
+            </button>
+            <button id="ubs-tab-followup" class="ubs-tab" type="button" data-ubs-tab="followup">
+              <span class="ubs-tab-icon"><svg><use href="#ubs-icon-clipboard"></use></svg></span>
+              Acompanhamento
+            </button>
+            <button id="ubs-tab-next" class="ubs-tab" type="button" data-ubs-tab="next">
+              <span class="ubs-tab-icon"><svg><use href="#ubs-icon-calendar"></use></svg></span>
+              Próximos Contatos
+            </button>
+          </nav>
+
+          <div id="ubs-tab-panel" class="ubs-tab-panel"></div>
+        </section>
+      </main>
+    </div>
+  </div>
 
   <script src="/assets/config.js"></script>
   <script src="/assets/app.js"></script>
-  <script src="/assets/cadh.js"></script>
+  <script src="/assets/ubs.js"></script>
 </body>
 </html>

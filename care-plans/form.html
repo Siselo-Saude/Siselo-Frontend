@@ -3,85 +3,118 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Plano de Cuidado</title>
+  <title>Ficha Plano de Cuidado | SISELO</title>
   <link rel="stylesheet" href="/assets/app.css">
 </head>
 <body data-page="care-plans-form">
-  <header class="topbar">
-    <div class="topbar-brand">Intranet CADH</div>
-    <nav class="menu">
-      <a id="nav-home" href="/index.html">Home</a>
-      <a id="nav-cadh" href="/cadh/index.html">CADH</a>
-      <a id="nav-ubs" href="/ubs/index.html">UBS</a>
-    </nav>
-  </header>
-
-  <main class="container">
-    <section class="card transition-card">
-      <a class="btn" href="/care-plans/list.html" data-back-link data-fallback="/care-plans/list.html">&larr; Voltar</a>
-      <h1 id="form-title" class="page-title" style="margin-top:14px;">Novo Plano de Cuidado</h1>
-      <div id="page-alert" class="alert" hidden></div>
-
-      <form id="care-plan-form" class="transition-form-shell">
-        <section class="transition-panel transition-panel-patient">
-          <div class="transition-panel-header">
-            <h2 class="transition-panel-title">Dados do Usuário</h2>
-          </div>
-
-          <div class="transition-panel-grid">
-            <div class="field-full">
-              <label for="patient-search-input">Usuário</label>
-              <select id="patient_id" name="patient_id" class="visually-hidden" tabindex="-1" aria-hidden="true"></select>
-              <div id="care-plan-user-search" class="transition-patient-search"></div>
-            </div>
-          </div>
-        </section>
-
-        <section class="transition-panel transition-panel-details">
-          <div class="transition-panel-header">
-            <h2 class="transition-panel-title">Dados do Plano</h2>
-          </div>
-
-          <div class="transition-panel-grid">
-            <div class="field">
-              <label for="start_date">Início</label>
-              <input id="start_date" name="start_date" type="date" placeholder="dd/mm/aaaa">
-            </div>
-
-            <div class="field">
-              <label for="end_date">Fim</label>
-              <input id="end_date" name="end_date" type="date" placeholder="dd/mm/aaaa">
-            </div>
-
-            <div class="field-full">
-              <label for="interventions">Condutas terapêuticas</label>
-              <textarea id="interventions" name="interventions" placeholder="Descreva as condutas do plano"></textarea>
-            </div>
-          </div>
-        </section>
-
-        <section class="transition-panel transition-panel-details">
-          <div class="transition-panel-header">
-            <h2 class="transition-panel-title">Itens Assistenciais</h2>
-          </div>
-
-          <div class="actions" style="margin-top:0;">
-            <button type="button" class="btn" data-add-item="alerta">+ Alerta</button>
-            <button type="button" class="btn" data-add-item="meta">+ Meta</button>
-            <button type="button" class="btn" data-add-item="dificuldade">+ Dificuldade</button>
-            <button type="button" class="btn" data-add-item="recomendacao">+ Recomendação</button>
-          </div>
-
-          <div id="items"></div>
-        </section>
-
-        <div class="form-actions transition-form-actions">
-          <a class="btn" href="/care-plans/list.html" data-back-link data-fallback="/care-plans/list.html">Cancelar</a>
-          <button class="btn btn-primary" type="submit">Salvar plano</button>
+  <div class="care-plan-app-shell">
+    <aside class="topbar home-sidebar care-plan-sidebar" aria-label="Navegação do SISELO">
+      <div class="topbar-left">
+        <div class="topbar-brand home-sidebar-brand">
+          <span class="home-sidebar-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false">
+              <path d="M12 4v16M4 12h16"/>
+              <rect x="5" y="5" width="14" height="14" rx="5"/>
+            </svg>
+          </span>
+          <span class="home-sidebar-brand-copy">
+            <strong>SISELO</strong>
+            <small>Sistema de Saúde</small>
+          </span>
         </div>
-      </form>
-    </section>
-  </main>
+      </div>
+
+      <div class="home-sidebar-nav">
+        <p class="home-sidebar-label">Módulos</p>
+        <nav class="menu" aria-label="Módulos principais">
+          <a id="nav-home" href="/index.html">
+            <span class="home-sidebar-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m4 10 8-6 8 6v10H4V10Z"/><path d="M9 20v-6h6v6"/></svg></span>
+            <span class="home-sidebar-nav-copy"><strong>Início</strong><small>Painel geral</small></span>
+            <svg class="home-sidebar-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
+          </a>
+
+          <a id="nav-cadh" href="/cadh/index.html">
+            <span class="home-sidebar-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 13h4l2-7 4 14 2-7h6"/></svg></span>
+            <span class="home-sidebar-nav-copy"><strong>CADH</strong><small>Atenção Domiciliar</small></span>
+            <svg class="home-sidebar-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
+          </a>
+
+          <a id="nav-ubs" href="/ubs/index.html">
+            <span class="home-sidebar-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 21s7-5.2 7-12a7 7 0 1 0-14 0c0 6.8 7 12 7 12Z"/><circle cx="12" cy="9" r="2.5"/></svg></span>
+            <span class="home-sidebar-nav-copy"><strong>UBS</strong><small>Atenção Primária</small></span>
+            <svg class="home-sidebar-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
+          </a>
+        </nav>
+      </div>
+
+      <div class="topbar-actions home-sidebar-footer"></div>
+      <button id="care-plan-sidebar-toggle" class="home-sidebar-toggle" type="button" aria-label="Recolher menu lateral" aria-expanded="true">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg>
+      </button>
+    </aside>
+
+    <div class="care-plan-main-shell">
+      <header class="care-plan-page-header">
+        <div>
+          <p>Página</p>
+        </div>
+        <div class="home-page-status">
+          <span class="home-system-status home-user-role-status home-user-role-admin">
+            <span class="home-system-status-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M12 3 20 7v5c0 5-3.4 8-8 9-4.6-1-8-4-8-9V7l8-4Z"/>
+                <path d="M9 12l2 2 4-5"/>
+              </svg>
+            </span>
+            <span>Administrador</span>
+          </span>
+          <time id="care-plan-current-date" class="home-current-date"></time>
+        </div>
+      </header>
+
+      <main class="container care-plan-board">
+        <svg aria-hidden="true" class="visually-hidden">
+          <symbol id="care-plan-icon-file" viewBox="0 0 24 24"><path d="M7 3h7l4 4v14H7V3Z"/><path d="M14 3v5h5M10 12h6M10 16h4"/></symbol>
+          <symbol id="care-plan-icon-save" viewBox="0 0 24 24"><path d="M5 3h12l2 2v16H5V3Z"/><path d="M8 3v6h8V3M8 21v-7h8v7"/></symbol>
+          <symbol id="care-plan-icon-back" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></symbol>
+          <symbol id="care-plan-icon-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8.5 12.5 2.2 2.2 4.8-5.4"/></symbol>
+        </svg>
+
+        <section class="care-plan-full-header" aria-labelledby="form-title">
+          <a class="care-plan-back-link" href="/care-plans/list.html" data-back-link data-fallback="/care-plans/list.html" aria-label="Voltar">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#care-plan-icon-back"></use></svg>
+          </a>
+          <span class="care-plan-header-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><use href="#care-plan-icon-file"></use></svg>
+          </span>
+          <div class="care-plan-title-copy">
+            <p>CADH - Planificação da Atenção à Saúde / SUS</p>
+            <h1 id="form-title">Ficha Plano de Cuidado</h1>
+          </div>
+          <button id="care-plan-top-save" class="btn btn-primary care-plan-save-button" type="submit" form="care-plan-form">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#care-plan-icon-save"></use></svg>
+            Salvar Plano
+          </button>
+        </section>
+
+        <div id="page-alert" class="alert" hidden></div>
+
+        <form id="care-plan-form" class="care-plan-sheet">
+          <div id="care-plan-form-body" class="care-plan-form-body">
+            <p class="care-plan-loading">Carregando ficha do plano de cuidado...</p>
+          </div>
+
+          <div class="care-plan-bottom-actions">
+            <a class="btn care-plan-secondary-action" href="/care-plans/list.html" data-back-link data-fallback="/care-plans/list.html">Voltar</a>
+            <button id="care-plan-bottom-save" class="btn btn-primary care-plan-save-button" type="submit">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#care-plan-icon-save"></use></svg>
+              Salvar Plano de Cuidado
+            </button>
+          </div>
+        </form>
+      </main>
+    </div>
+  </div>
 
   <script src="/assets/config.js"></script>
   <script src="/assets/app.js"></script>

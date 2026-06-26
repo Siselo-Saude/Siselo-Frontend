@@ -673,6 +673,8 @@
 
   function bindBackLinks() {
     document.querySelectorAll('[data-back-link]').forEach((link) => {
+      enhanceBackLink(link);
+
       if (link.dataset.backLinkBound === 'true') {
         return;
       }
@@ -686,6 +688,32 @@
     });
 
     bindBackShortcut();
+  }
+
+  function enhanceBackLink(link) {
+    if (!(link instanceof HTMLElement) || link.dataset.backLinkEnhanced === 'true') {
+      return;
+    }
+
+    link.dataset.backLinkEnhanced = 'true';
+    link.classList.add('back-link');
+    link.title = link.title || 'Voltar para a tela anterior';
+    link.setAttribute('aria-label', link.getAttribute('aria-label') || 'Voltar para a tela anterior');
+
+    if (!link.querySelector('svg')) {
+      const text = String(link.textContent || 'Voltar')
+        .replace(/^[←\u2190\-\s]+/, '')
+        .replace(/\s+/g, ' ')
+        .trim() || 'Voltar';
+
+      link.innerHTML = `
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M15 5 8 12l7 7"/>
+          <path d="M9 12h11"/>
+        </svg>
+        <span>${escapeHtml(text)}</span>
+      `;
+    }
   }
 
   function enhanceSearchInput(input) {
@@ -1597,12 +1625,92 @@
 
   setAppTheme(getStoredTheme());
 
+  function normalizeRoleName(value) {
+    return String(value || '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .trim();
+  }
+
+  function getUserRoleMeta(user, permissions) {
+    const roles = Array.isArray(user && user.roles)
+      ? user.roles.map(normalizeRoleName)
+      : [];
+    const specialty = String((user && user.specialty) || '').trim();
+    const userType = String((user && user.user_type) || '').trim().toUpperCase();
+
+    if (permissions.has('admin.manage') || roles.includes('admin')) {
+      return { kind: 'admin', label: 'Administrador' };
+    }
+
+    if (roles.includes('alimentador')) {
+      return { kind: 'editor', label: specialty || 'Alimentador' };
+    }
+
+    if (roles.includes('visualizador')) {
+      return { kind: 'viewer', label: 'Visualizador' };
+    }
+
+    if (specialty) {
+      return { kind: 'clinical', label: specialty };
+    }
+
+    if (userType) {
+      return { kind: userType === 'CADH' ? 'clinical' : 'viewer', label: userType };
+    }
+
+    return { kind: 'user', label: 'Usuário' };
+  }
+
+  function getUserRoleIcon(kind) {
+    const icons = {
+      admin: '<path d="M12 3 20 7v5c0 5-3.4 8-8 9-4.6-1-8-4-8-9V7l8-4Z"/><path d="M9 12l2 2 4-5"/>',
+      editor: '<path d="M4 20h4l10.5-10.5a2.1 2.1 0 0 0-3-3L5 17v3Z"/><path d="m13.5 7.5 3 3"/>',
+      clinical: '<path d="M4 14h4l2-7 4 14 2-7h4"/>',
+      viewer: '<path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="3"/>',
+      user: '<circle cx="12" cy="8" r="3"/><path d="M5 20a7 7 0 0 1 14 0"/>',
+    };
+
+    return `
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        ${icons[kind] || icons.user}
+      </svg>
+    `;
+  }
+
+  function syncUserRoleStatus(user, permissions) {
+    const meta = getUserRoleMeta(user, permissions);
+    document.querySelectorAll('.home-system-status').forEach((status) => {
+      if (!(status instanceof HTMLElement)) {
+        return;
+      }
+
+      status.classList.remove(
+        'home-user-role-status',
+        'home-user-role-admin',
+        'home-user-role-editor',
+        'home-user-role-clinical',
+        'home-user-role-viewer',
+        'home-user-role-user'
+      );
+      status.classList.add('home-user-role-status', `home-user-role-${meta.kind}`);
+      status.title = meta.label;
+      status.setAttribute('aria-label', meta.label);
+      status.innerHTML = `
+        <span class="home-system-status-icon" aria-hidden="true">${getUserRoleIcon(meta.kind)}</span>
+        <span>${escapeHtml(meta.label)}</span>
+      `;
+    });
+  }
+
   function ensureTopbarActions(user, permissions) {
     const topbar = document.querySelector('.topbar');
     if (!topbar) {
       return;
     }
 
+    const isSidebarShell = topbar.classList.contains('home-sidebar');
     const brand = topbar.querySelector('.topbar-brand');
     let left = topbar.querySelector('.topbar-left');
     if (!left) {
@@ -1617,14 +1725,24 @@
       }
     }
 
-    let logoutButton = left.querySelector('#logout-button');
+    let actions = topbar.querySelector('.topbar-actions');
+    if (!actions) {
+      actions = document.createElement('div');
+      actions.className = 'topbar-actions';
+      topbar.appendChild(actions);
+    }
+
+    const logoutContainer = isSidebarShell ? actions : left;
+    let logoutButton = topbar.querySelector('#logout-button');
     if (!logoutButton) {
       logoutButton = document.createElement('a');
       logoutButton.id = 'logout-button';
       logoutButton.className = 'topbar-logout';
       logoutButton.href = '/login.html';
       logoutButton.textContent = 'Sair';
-      left.insertBefore(logoutButton, left.firstChild);
+      logoutContainer.insertBefore(logoutButton, logoutContainer.firstChild);
+    } else if (logoutButton.parentElement !== logoutContainer && isSidebarShell) {
+      logoutContainer.appendChild(logoutButton);
     }
 
     if (logoutButton.dataset.bound !== 'true') {
@@ -1633,13 +1751,6 @@
         event.preventDefault();
         logout();
       });
-    }
-
-    let actions = topbar.querySelector('.topbar-actions');
-    if (!actions) {
-      actions = document.createElement('div');
-      actions.className = 'topbar-actions';
-      topbar.appendChild(actions);
     }
 
     let settingsLink = actions.querySelector('#topbar-settings-link');
@@ -1695,6 +1806,7 @@
     accountLink.title = permissions.has('admin.manage') ? 'Admin' : 'Meu perfil';
     accountLink.setAttribute('aria-label', permissions.has('admin.manage') ? 'Admin' : 'Meu perfil');
     accountLink.hidden = !user;
+    syncUserRoleStatus(user, permissions);
   }
 
   function bindShell(activeKey) {
