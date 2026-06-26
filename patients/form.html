@@ -33,7 +33,7 @@
               <label for="attendance_date">Data de Atendimento</label>
               <input id="attendance_date" name="attendance_date" data-field="first_cadh_date" type="date" placeholder="dd/mm/aaaa">
               <div class="field-error" data-error-for="first_cadh_date"></div>
-            </div>
+            </div>''
 
             <div class="field">
               <label for="full_name">Nome Completo</label>
@@ -71,9 +71,20 @@
               <div class="field-error" data-error-for="responsible_name"></div>
             </div>
 
+            <!-- UBS e Equipe lado a lado na mesma seção de Identificação -->
+            <div class="field">
+              <label for="ubs_ref">UBS</label>
+              <select id="ubs_ref" name="ubs_ref" data-field="ubs_ref">
+                <option value="">Selecione</option>
+              </select>
+              <div class="field-error" data-error-for="ubs_ref"></div>
+            </div>
+
             <div class="field">
               <label for="team_reference">Equipe</label>
-              <select id="team_reference" name="team_ref" data-field="team_ref"></select>
+              <select id="team_reference" name="team_ref" data-field="team_ref" disabled>
+                <option value="">Selecione a UBS primeiro</option>
+              </select>
               <div class="field-error" data-error-for="team_ref"></div>
             </div>
           </div>
@@ -108,13 +119,6 @@
               <input id="emergency_contact" name="emergency_contact" maxlength="15" placeholder="(61) 99999-9999">
               <div class="field-error" data-error-for="emergency_contact"></div>
             </div>
-
-            <div class="field">
-              <label for="uds_reference">UBS de Referência</label>
-              <input id="uds_reference" name="uds_reference" data-field="ubs_ref" maxlength="120" placeholder="UBS de referência">
-              <div class="field-error" data-error-for="ubs_ref"></div>
-            </div>
-
           </div>
         </section>
 
