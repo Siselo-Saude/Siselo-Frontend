@@ -18,6 +18,216 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+const PATIENT_LEGACY_TEAM_OPTIONS = {
+  safira: "Safira",
+  ametista: "Ametista",
+  esmeralda: "Esmeralda",
+  diamante: "Diamante",
+};
+
+const PATIENT_UBS_TEAM_GROUPS = [
+  {
+    ubs: "UBS 01 PARANOÁ",
+    teams: [
+      "ESF EQUIPE 08 - BRANCA",
+      "ESF EQUIPE 09 - AMARELA",
+      "ESF EQUIPE 10 - AZUL",
+      "ESF EQUIPE 11 - VERDE",
+      "ESF EQUIPE 12 - ROSA",
+      "ESF EQUIPE 13 - LILÁS",
+      "ESF EQUIPE 14 - MARROM",
+      "ESF EQUIPE 15 - DOURADA",
+      "ESF EQUIPE 16 - LARANJA",
+      "ESF EQUIPE 17 - PRATA",
+      "EMULTI AROEIRA",
+      "ECR MESTRE DAMIÃO",
+    ],
+  },
+  {
+    ubs: "UBS 02 PARANOÁ - Quadra 18",
+    teams: [
+      "ESF EQUIPE 01 - QUADRA 18",
+      "ESF EQUIPE 02 - QUADRA 18",
+      "ESF EQUIPE 03 - QUADRA 18",
+    ],
+  },
+  {
+    ubs: "UBS 03 PARANOÁ - Paranoá Parque",
+    teams: [
+      "ESF EQUIPE 18 - BURITI",
+      "ESF EQUIPE 20 - JACARANDÁ",
+      "ESF EQUIPE 21 - IPÊ",
+      "ESF EQUIPE 22 - JEQUITIBÁ",
+      "ESF EQUIPE 23 - PEQUI",
+    ],
+  },
+  {
+    ubs: "UBS 04 PARANOÁ - Jardim II",
+    teams: ["ESF EQUIPE 02 - JARDIM II", "ESB JARDIM II"],
+  },
+  {
+    ubs: "UBS 05 PARANOÁ - Quebrada dos Neres",
+    teams: ["ESF EQUIPE QUEBRADA DOS NERES"],
+  },
+  {
+    ubs: "UBS 06 PARANOÁ - Cariru",
+    teams: ["ESF EQUIPE 04 - CARIRU", "ESB CARIRU"],
+  },
+  {
+    ubs: "UBS 07 PARANOÁ - Café sem Troco",
+    teams: ["ESF EQUIPE CAFÉ SEM TROCO"],
+  },
+  {
+    ubs: "UBS 08 PARANOÁ - PADDF",
+    teams: ["ESF EQUIPE PADDF"],
+  },
+  {
+    ubs: "UBS 01 ITAPOÃ",
+    teams: [
+      "ESF EQUIPE 07 - ROSA",
+      "ESF EQUIPE 08 - LARANJA",
+      "ESF EQUIPE 09 - LILÁS",
+      "ESF EQUIPE 10 - CINZA",
+      "ESF EQUIPE 12 - VERDE",
+      "ESF EQUIPE 13 - VERMELHA",
+    ],
+  },
+  {
+    ubs: "UBS 02 ITAPOÃ",
+    teams: ["ESF EQUIPE 01", "ESF EQUIPE 02", "ESF EQUIPE ESMERALDA"],
+  },
+  {
+    ubs: "UBS 03 ITAPOÃ",
+    teams: ["ESF EQUIPE 03", "ESF EQUIPE 04", "ESF EQUIPE 05"],
+  },
+  {
+    ubs: "UBS 04 ITAPOÃ",
+    teams: ["ESF EQUIPE RUBI"],
+  },
+  {
+    ubs: "UBS 01 SÃO SEBASTIÃO",
+    teams: [
+      "ESF EQUIPE 04 - LARANJA",
+      "ESF EQUIPE 07 - LILÁS",
+      "ESF EQUIPE 08 - ROSA",
+      "ESF EQUIPE 09 - VERDE",
+      "ESF EQUIPE 10 - VERMELHA",
+      "ESF DOURADA",
+    ],
+  },
+  {
+    ubs: "UBS 02 SÃO SEBASTIÃO - T.R.E.",
+    teams: ["ESF EQUIPE T.R.E."],
+  },
+  {
+    ubs: "UBS 03 SÃO SEBASTIÃO - Oeste",
+    teams: ["ESF EQUIPE 12 - OESTE 2", "ESB OESTE SSB"],
+  },
+  {
+    ubs: "UBS 04 SÃO SEBASTIÃO - Morro Azul",
+    teams: ["ESF EQUIPE MORRO AZUL"],
+  },
+  {
+    ubs: "UBS 05 SÃO SEBASTIÃO - Nova Betânia",
+    teams: ["ESF EQUIPE 01 - NOVA BETANIA", "ESB NOVA BETANIA SSB"],
+  },
+  {
+    ubs: "UBS 06 SÃO SEBASTIÃO - São Francisco",
+    teams: ["ESF EQUIPE 16 - SÃO FRANCISCO"],
+  },
+  {
+    ubs: "UBS 07 SÃO SEBASTIÃO - Morro da Cruz",
+    teams: ["ESF EQUIPE 02 - MORRO DA CRUZ"],
+  },
+  {
+    ubs: "UBS 08 SÃO SEBASTIÃO - Cavas de Baixo",
+    teams: ["ESF EQUIPE 03 - CAVAS DE BAIXO"],
+  },
+  {
+    ubs: "UBS 09 SÃO SEBASTIÃO - Bosque",
+    teams: [
+      "ESF EQ 21 - BOSQUE 1",
+      "ESF EQUIPE 23 - VILA NOVA 2",
+      "ESB BOSQUE 1 SSB",
+      "EMULTI IPE AMARELO",
+    ],
+  },
+  {
+    ubs: "UBS 10 SÃO SEBASTIÃO - João Cândido",
+    teams: ["ESF EQUIPE 22 - JOÃO CÂNDIDO"],
+  },
+  {
+    ubs: "UBS 11 SÃO SEBASTIÃO - Bosque 2",
+    teams: ["ESF EQUIPE 25 - BOSQUE 2"],
+  },
+  {
+    ubs: "UBS 12 SÃO SEBASTIÃO - São José",
+    teams: ["ESF EQUIPE 17 - SÃO JOSÉ"],
+  },
+  {
+    ubs: "UBS 14 SÃO SEBASTIÃO - PDF IV",
+    teams: [
+      "EQ. AMPLIADA 27 TIPO III CDP",
+      "EQ. PSICOSOCIAL 30H - 2238861",
+      "EQ. AMPLIADA ROSIMEIRE RODRIGUES",
+    ],
+  },
+  {
+    ubs: "UBS 15 SÃO SEBASTIÃO - CIR",
+    teams: [
+      "EQ. PSICOSOCIAL 30H - 2238853",
+      "EQ. AMPLIADA 30H - 2238942",
+      "EQ. PSICOSOCIAL 30H - 2238969",
+      "EQ. AMPLIADA CARLA MACHADO",
+    ],
+  },
+  {
+    ubs: "UBS 16 SÃO SEBASTIÃO - PDF 1",
+    teams: [
+      "EQ. PSICOSOCIAL 30H - 2238837",
+      "EQ. AMPLIADA 20H - 2238896",
+      "EQ. PSICOSOCIAL 20H - 2238918",
+      "EQ. AMPLIADA EURICO JARDIM",
+    ],
+  },
+  {
+    ubs: "UBS 17 SÃO SEBASTIÃO - PDF 2",
+    teams: [
+      "EQ. PSICOSOCIAL 30H - 2238845",
+      "EQ. AMPLIADA 20H - 2238926",
+      "EQ. PSICOSOCIAL 20H - 2238934",
+      "EQ. AMPLIADA ALFA",
+    ],
+  },
+  {
+    ubs: "UBS 19 SÃO SEBASTIÃO - Vila do Boa",
+    teams: ["ESF EQUIPE VILA DO BOA"],
+  },
+  {
+    ubs: "UBS 20 SÃO SEBASTIÃO CDP",
+    teams: [
+      "EQ. PSICOSOCIAL 30H - 2238888",
+      "EQUIPE AMPLIADA 20H - 2502216",
+    ],
+  },
+  {
+    ubs: "UBS 1 JARDINS MANGUEIRAL",
+    teams: [
+      "ESF DIAMANTE",
+      "ESF AMETISTA",
+      "ESF SAFIRA",
+      "ESF ESMERALDA",
+      "ESB 1 JARDINS MANGUEIRAL",
+      "ESB 2 JARDINS MANGUEIRAL",
+      "EMULTI RUBI",
+    ],
+  },
+  {
+    ubs: "UBS 03 JARDIM BOTÂNICO",
+    teams: ["ESF TORORO"],
+  },
+];
+
 async function setupPatientsListPage() {
   const user = await SISELO.requireSession();
   if (!user) {
@@ -140,12 +350,12 @@ async function setupPatientFormPage() {
   const row = normalizePatientFormRow(data.row || getEmptyPatientFormContext().row, options);
 
   document.getElementById("form-title").textContent = data.editing
-    ? "Editar Usuário"
-    : "Novo Usuário";
+    ? "Editar Usuário CADH"
+    : "Cadastro do Usuário CADH / CADHin";
 
-  fillSelect("gender", options.gender_options, row.sex);
-  fillSelect("race", options.race_options, row.race);
-  fillSelect("team_reference", options.team_options, row.team_ref, true);
+  fillSelect("gender", options.gender_options, row.sex, true, "Selecione...");
+  fillSelect("race", options.race_options, row.race, true, "Selecione...");
+  setupPatientUbsTeamControls(options, row);
 
   Object.keys(row).forEach((key) => {
     const field =
@@ -156,13 +366,13 @@ async function setupPatientFormPage() {
     }
   });
 
-  SISELO.setupTeamFieldPicker({ select: "team_reference" });
-
   configurePatientDateInputs();
   syncPatientClinicalTextareas();
   attachPatientMasks();
   setupPatientStatusSelect(row.status || row.status_label || "ativo");
+  syncPatientStatusCard(row.status || row.status_label || "ativo", data.editing);
   SISELO.enhanceChoiceSelects(document);
+  SISELO.applyUiComponents(document);
 
   document
     .getElementById("patient-form")
@@ -672,6 +882,113 @@ function setupPatientStatusSelect(initialValue) {
   select.dispatchEvent(new Event("change", { bubbles: true }));
 }
 
+function syncPatientStatusCard(initialValue, editing) {
+  const select = document.getElementById("patient-status");
+  const title = document.querySelector("[data-patient-status-title]");
+  const copy = document.querySelector("[data-patient-status-copy]");
+  if (!(select instanceof HTMLSelectElement) || !title || !copy) {
+    return;
+  }
+
+  const sync = () => {
+    const inactive = SISELO.normalizeSearchText(select.value) === "inativo";
+    title.textContent = inactive
+      ? "Inativo"
+      : editing
+        ? "Ativo"
+        : "Ativo — Nova Admissão";
+    copy.innerHTML = inactive
+      ? "Este usuário está marcado como <b>Inativo</b> no CADH."
+      : "O status é automaticamente definido como <b>Ativo</b> no primeiro cadastro, pois representa nova admissão ao CADH.";
+  };
+
+  select.value = SISELO.normalizeSearchText(initialValue || "") === "inativo"
+    ? "inativo"
+    : "ativo";
+  select.addEventListener("change", sync);
+  sync();
+}
+
+function setupPatientUbsTeamControls(options, row) {
+  const ubsSelect = document.getElementById("uds_reference");
+  const teamSelect = document.getElementById("team_reference");
+  if (!(ubsSelect instanceof HTMLSelectElement) || !(teamSelect instanceof HTMLSelectElement)) {
+    return;
+  }
+
+  ubsSelect.classList.remove("patient-native-select");
+  ubsSelect.removeAttribute("data-native-select");
+  teamSelect.classList.remove("patient-native-select");
+  teamSelect.removeAttribute("data-native-select");
+
+  const currentUbsRaw = String(row && row.ubs_ref ? row.ubs_ref : "").trim();
+  const currentTeamRaw = String(row && row.team_ref ? row.team_ref : "").trim();
+  const currentUbs = normalizePatientLegacyUbsValue(currentUbsRaw);
+  const currentTeam = normalizePatientLegacyTeamValue(currentTeamRaw);
+  const ubsOptions = { ...(options.ubs_options || {}) };
+  if (currentUbs && !Object.prototype.hasOwnProperty.call(ubsOptions, currentUbs)) {
+    ubsOptions[currentUbs] = currentUbs;
+  }
+  fillSelect("uds_reference", ubsOptions, currentUbs, true, "Selecione a UBS...");
+
+  const renderTeamOptions = (nextCurrentTeam = "", preserveCurrentTeam = true) => {
+    const selectedUbs = String(ubsSelect.value || "").trim();
+    const selectedTeam = nextCurrentTeam || (preserveCurrentTeam ? teamSelect.value || currentTeam : "");
+    const teamOptions = getPatientTeamOptionsForUbs(selectedUbs, selectedTeam);
+    fillSelect("team_reference", teamOptions, selectedTeam, true, "Selecione a equipe...");
+    teamSelect.disabled = selectedUbs === "";
+  };
+
+  let teamPicker = null;
+
+  ubsSelect.addEventListener("change", () => {
+    teamSelect.value = "";
+    renderTeamOptions("", false);
+    teamPicker?.refresh();
+  });
+
+  renderTeamOptions(currentTeam);
+  teamPicker = SISELO.setupTeamFieldPicker({ select: teamSelect });
+}
+
+function getPatientUbsOptions() {
+  return PATIENT_UBS_TEAM_GROUPS.reduce((options, group) => {
+    options[group.ubs] = group.ubs;
+    return options;
+  }, {});
+}
+
+function getPatientPdfTeamOptions() {
+  return PATIENT_UBS_TEAM_GROUPS.reduce((options, group) => {
+    group.teams.forEach((team) => {
+      options[team] = team;
+    });
+    return options;
+  }, {});
+}
+
+function getPatientTeamOptionsForUbs(ubs, currentTeam = "") {
+  const normalizedUbs = normalizePatientComparableValue(ubs);
+  const group = PATIENT_UBS_TEAM_GROUPS.find((item) => {
+    return normalizePatientComparableValue(item.ubs) === normalizedUbs;
+  });
+
+  const options = {};
+  if (group) {
+    group.teams.forEach((team) => {
+      options[team] = team;
+    });
+  }
+
+  const normalizedCurrentTeam = String(currentTeam || "").trim();
+  if (normalizedCurrentTeam && !Object.prototype.hasOwnProperty.call(options, normalizedCurrentTeam)) {
+    const legacyLabel = PATIENT_LEGACY_TEAM_OPTIONS[normalizedCurrentTeam];
+    options[normalizedCurrentTeam] = legacyLabel || normalizedCurrentTeam;
+  }
+
+  return options;
+}
+
 function bindPatientPdfPlaceholder() {
   const button = document.getElementById("patient-pdf-button");
   if (!button || button.dataset.bound === "true") {
@@ -788,11 +1105,8 @@ function getPatientFormOptions(options) {
   });
 
   const teamOptions = {
-    sem_equipe: "Sem equipe",
-    safira: "Safira",
-    ametista: "Ametista",
-    esmeralda: "Esmeralda",
-    diamante: "Diamante",
+    ...PATIENT_LEGACY_TEAM_OPTIONS,
+    ...getPatientPdfTeamOptions(),
   };
 
   return {
@@ -802,6 +1116,7 @@ function getPatientFormOptions(options) {
       outro: "Outro",
     },
     race_options: raceOptions,
+    ubs_options: getPatientUbsOptions(),
     team_options: teamOptions,
   };
 }
@@ -909,6 +1224,7 @@ function normalizePatientFormRow(row, options) {
       ativo: "Ativo",
       inativo: "Inativo",
     }) || "ativo";
+  normalizedRow.ubs_ref = normalizePatientLegacyUbsValue(normalizedRow.ubs_ref);
   normalizedRow.team_ref = normalizePatientTeamValue(
     normalizedRow.team_ref,
     options.team_options,
@@ -944,11 +1260,55 @@ function normalizePatientOptionValue(value, options, aliases = {}) {
 
 function normalizePatientTeamValue(value, options) {
   const rawValue = String(value || "").replace(/^equipe\s*:\s*/i, "").trim();
-  return normalizePatientOptionValue(rawValue, options) || "sem_equipe";
+  const legacyValue = normalizePatientLegacyTeamValue(rawValue);
+
+  return normalizePatientOptionValue(legacyValue, options);
 }
 
 function normalizePatientComparableValue(value) {
   return SISELO.normalizeSearchText(value).replace(/[^a-z0-9]+/g, " ").trim();
+}
+
+function normalizePatientLegacyUbsValue(value) {
+  const rawValue = String(value || "").trim();
+  const comparable = normalizePatientComparableValue(rawValue);
+  if (
+    comparable === "ubs 16 sao sebastiao pdf i" ||
+    comparable === "ubs 16 sao sebastiao pdf 1"
+  ) {
+    return "UBS 16 SÃO SEBASTIÃO - PDF 1";
+  }
+
+  if (
+    comparable === "ubs 17 sao sebastiao pdf ii" ||
+    comparable === "ubs 17 sao sebastiao pdf 2"
+  ) {
+    return "UBS 17 SÃO SEBASTIÃO - PDF 2";
+  }
+
+  if (comparable === "ubs 20 sao sebastiao cdp") {
+    return "UBS 20 SÃO SEBASTIÃO CDP";
+  }
+
+  return rawValue;
+}
+
+function normalizePatientLegacyTeamValue(value) {
+  const rawValue = String(value || "").trim();
+  const comparable = normalizePatientComparableValue(rawValue);
+  if (
+    comparable === "esf equipe pdf iv" ||
+    comparable === "esf equipe cir" ||
+    comparable === "esf equipe pdf i" ||
+    comparable === "esf equipe pdf ii" ||
+    comparable === "esf equipe pdf 1" ||
+    comparable === "esf equipe pdf 2" ||
+    comparable === "esf equipe cdp"
+  ) {
+    return "";
+  }
+
+  return rawValue;
 }
 
 function buildPatientSavePayload(payload, row, options) {
@@ -958,12 +1318,6 @@ function buildPatientSavePayload(payload, row, options) {
     nextPayload.team_ref || nextPayload.team_reference || (row && row.team_ref),
     teamOptions,
   );
-  const cpfDigits = digitsOnly(nextPayload.cpf || (row && row.cpf));
-  const legacySes = digitsOnly(
-    nextPayload.ses || (row && row.ses) || cpfDigits.slice(0, 9),
-  )
-    .slice(0, 9)
-    .padEnd(9, "0");
   const legacyBloodType = String(
     nextPayload.blood_type || (row && row.blood_type) || "",
   )
@@ -973,7 +1327,7 @@ function buildPatientSavePayload(payload, row, options) {
 
   nextPayload.team_ref = teamValue;
   nextPayload.team_reference = teamValue;
-  nextPayload.ses = legacySes || "000000000";
+  delete nextPayload.ses;
   nextPayload.health_insurance = String(
     nextPayload.health_insurance || (row && row.health_insurance) || "SUS",
   ).trim() || "SUS";
@@ -984,7 +1338,7 @@ function buildPatientSavePayload(payload, row, options) {
   return nextPayload;
 }
 
-function fillSelect(id, options, currentValue, allowBlank) {
+function fillSelect(id, options, currentValue, allowBlank, placeholderLabel = "Selecione") {
   const select = document.getElementById(id);
   if (!select) {
     return;
@@ -995,7 +1349,7 @@ function fillSelect(id, options, currentValue, allowBlank) {
     : Object.entries(options || {});
 
   select.innerHTML =
-    `${allowBlank ? '<option value="">Selecione</option>' : '<option value="">Selecione</option>'}` +
+    `${allowBlank ? `<option value="">${SISELO.escapeHtml(placeholderLabel)}</option>` : `<option value="">${SISELO.escapeHtml(placeholderLabel)}</option>`}` +
     entries
       .map(
         ([value, label]) => `

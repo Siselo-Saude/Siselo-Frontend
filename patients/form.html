@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Usuário - SISELO</title>
+  <title>Usu&aacute;rio CADH - SISELO</title>
   <link rel="stylesheet" href="/assets/app.css">
 </head>
 <body data-page="patients-form">
@@ -16,131 +16,166 @@
     </nav>
   </header>
 
-  <main class="container">
-    <section class="card transition-card">
-      <a class="btn" href="/patients/list.html" data-back-link data-fallback="/patients/list.html">&larr; Voltar</a>
-      <h1 id="form-title" class="page-title" style="margin-top:14px;">Novo Usuário</h1>
+  <main class="container patient-form-page">
+    <header class="patient-form-heading">
+      <a class="patient-form-back" href="/patients/list.html" data-back-link data-fallback="/patients/list.html" aria-label="Voltar">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M15 18l-6-6 6-6"/>
+        </svg>
+      </a>
+      <span class="patient-form-heading-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <circle cx="12" cy="8" r="3"/>
+          <path d="M5 20a7 7 0 0 1 14 0"/>
+        </svg>
+      </span>
+      <div class="patient-form-heading-copy">
+        <span>CADH</span>
+        <h1 id="form-title" class="page-title">Cadastro do Usu&aacute;rio CADH / CADHin</h1>
+      </div>
+    </header>
+
+    <section class="card transition-card patient-form-card">
       <div id="page-alert" class="alert" hidden></div>
 
       <form id="patient-form" class="transition-form-shell">
-        <section class="transition-panel transition-panel-patient">
+        <section class="transition-panel transition-panel-patient patient-form-panel">
           <div class="transition-panel-header">
-            <h2 class="transition-panel-title">Identificação</h2>
+            <h2 class="transition-panel-title">Dados de Admiss&atilde;o</h2>
           </div>
 
           <div class="transition-panel-grid">
             <div class="field">
-              <label for="attendance_date">Data de Atendimento</label>
-              <input id="attendance_date" name="attendance_date" data-field="first_cadh_date" type="date" placeholder="dd/mm/aaaa">
+              <label for="attendance_date">Data do 1&ordm; Atendimento no CADH <span class="required-marker">*</span></label>
+              <input id="attendance_date" name="attendance_date" data-field="first_cadh_date" type="text" inputmode="numeric" autocomplete="off" placeholder="dd/mm/aaaa" required>
               <div class="field-error" data-error-for="first_cadh_date"></div>
             </div>
+          </div>
+        </section>
 
+        <section class="transition-panel transition-panel-patient patient-form-panel">
+          <div class="transition-panel-header">
+            <h2 class="transition-panel-title">Dados Cadastrais do Usu&aacute;rio do SUS</h2>
+          </div>
+
+          <div class="transition-panel-grid">
             <div class="field">
-              <label for="full_name">Nome Completo</label>
-              <input id="full_name" name="full_name" maxlength="180" placeholder="Nome completo">
+              <label for="full_name">Nome Completo <span class="required-marker">*</span></label>
+              <input id="full_name" name="full_name" maxlength="180" placeholder="Nome completo" required>
               <div class="field-error" data-error-for="full_name"></div>
             </div>
 
             <div class="field">
-              <label for="cpf">CPF</label>
-              <input id="cpf" name="cpf" maxlength="14" placeholder="000.000.000-00">
+              <label for="cpf">CPF <span class="required-marker">*</span></label>
+              <input id="cpf" name="cpf" maxlength="14" placeholder="000.000.000-00" required>
               <div class="field-error" data-error-for="cpf"></div>
             </div>
 
             <div class="field">
-              <label for="birth_date">Data de Nascimento</label>
-              <input id="birth_date" name="birth_date" type="date" placeholder="dd/mm/aaaa">
+              <label for="birth_date">Data de Nascimento <span class="required-marker">*</span></label>
+              <input id="birth_date" name="birth_date" type="text" inputmode="numeric" autocomplete="off" placeholder="dd/mm/aaaa" required>
               <div class="field-error" data-error-for="birth_date"></div>
             </div>
 
             <div class="field">
-              <label for="gender">Sexo</label>
-              <select id="gender" name="gender"></select>
+              <label for="gender">Sexo <span class="required-marker">*</span></label>
+              <select id="gender" name="gender" class="patient-native-select" data-native-select="true" required></select>
               <div class="field-error" data-error-for="sex"></div>
             </div>
 
             <div class="field">
-              <label for="race">Raça/Cor</label>
-              <select id="race" name="race"></select>
+              <label for="race">Ra&ccedil;a/Cor <span class="required-marker">*</span></label>
+              <select id="race" name="race" class="patient-native-select" data-native-select="true" required></select>
               <div class="field-error" data-error-for="race"></div>
             </div>
 
             <div class="field">
-              <label for="responsible">Responsável</label>
-              <input id="responsible" name="responsible" data-field="responsible_name" maxlength="180" placeholder="Nome do responsável">
+              <label for="responsible">Respons&aacute;vel <span class="required-marker">*</span></label>
+              <input id="responsible" name="responsible" data-field="responsible_name" maxlength="180" placeholder="Nome do respons&aacute;vel" required>
               <div class="field-error" data-error-for="responsible_name"></div>
             </div>
 
             <div class="field">
-              <label for="team_reference">Equipe</label>
-              <select id="team_reference" name="team_ref" data-field="team_ref"></select>
+              <label for="phone">Telefone <span class="required-marker">*</span></label>
+              <input id="phone" name="phone" maxlength="15" placeholder="(61) 9 0000-0000" required>
+              <div class="field-error" data-error-for="phone"></div>
+            </div>
+
+            <div class="field">
+              <label for="address">Endere&ccedil;o <span class="required-marker">*</span></label>
+              <input id="address" name="address" maxlength="255" placeholder="Endere&ccedil;o completo" required>
+              <div class="field-error" data-error-for="address"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="transition-panel transition-panel-details patient-form-panel">
+          <div class="transition-panel-header">
+            <h2 class="transition-panel-title">UBS e Equipe de Refer&ecirc;ncia</h2>
+          </div>
+
+          <div class="transition-panel-grid">
+            <div class="field">
+              <label for="uds_reference">UBS de Origem (Refer&ecirc;ncia) <span class="required-marker">*</span></label>
+              <select id="uds_reference" name="uds_reference" data-field="ubs_ref" class="patient-native-select" data-native-select="true" required></select>
+              <div class="field-error" data-error-for="ubs_ref"></div>
+            </div>
+
+            <div class="field">
+              <label for="team_reference">Equipe de Refer&ecirc;ncia <span class="required-marker">*</span></label>
+              <select id="team_reference" name="team_ref" data-field="team_ref" class="patient-native-select" data-native-select="true" required></select>
               <div class="field-error" data-error-for="team_ref"></div>
             </div>
           </div>
         </section>
 
-        <section class="transition-panel transition-panel-details">
+        <section class="transition-panel transition-panel-details patient-form-panel">
           <div class="transition-panel-header">
-            <h2 class="transition-panel-title">Contato e Referência</h2>
+            <h2 class="transition-panel-title">Rede de Apoio</h2>
           </div>
 
           <div class="transition-panel-grid">
             <div class="field">
-              <label for="phone">Telefone</label>
-              <input id="phone" name="phone" maxlength="15" placeholder="(61) 99999-9999">
-              <div class="field-error" data-error-for="phone"></div>
-            </div>
-
-            <div class="field">
-              <label for="email">E-mail</label>
-              <input id="email" name="email" type="email" maxlength="190" placeholder="nome@email.com">
-              <div class="field-error" data-error-for="email"></div>
-            </div>
-
-            <div class="field">
-              <label for="address">Endereço</label>
-              <input id="address" name="address" maxlength="255" placeholder="Rua, número e bairro">
-              <div class="field-error" data-error-for="address"></div>
-            </div>
-
-            <div class="field">
-              <label for="emergency_contact">Contato de Emergência</label>
-              <input id="emergency_contact" name="emergency_contact" maxlength="15" placeholder="(61) 99999-9999">
+              <label for="emergency_contact">Contato de Emerg&ecirc;ncia <span class="required-marker">*</span></label>
+              <input id="emergency_contact" name="emergency_contact" maxlength="15" placeholder="(61) 9 0000-0000" required>
               <div class="field-error" data-error-for="emergency_contact"></div>
             </div>
 
             <div class="field">
-              <label for="uds_reference">UBS de Referência</label>
-              <input id="uds_reference" name="uds_reference" data-field="ubs_ref" maxlength="120" placeholder="UBS de referência">
-              <div class="field-error" data-error-for="ubs_ref"></div>
+              <label for="email">E-mail <span class="required-marker">*</span></label>
+              <input id="email" name="email" type="email" maxlength="190" placeholder="nome@email.com" required>
+              <div class="field-error" data-error-for="email"></div>
             </div>
-
           </div>
         </section>
 
-        <section class="transition-panel transition-panel-details patient-assistance-panel">
+        <section class="transition-panel transition-panel-details patient-assistance-panel patient-form-panel">
           <div class="transition-panel-header">
-            <h2 class="transition-panel-title">Situação Assistencial</h2>
+            <h2 class="transition-panel-title">Situa&ccedil;&atilde;o Assistencial</h2>
           </div>
 
           <div class="transition-panel-grid">
-            <div class="field patient-status-field">
-              <label for="patient-status">Status</label>
-              <select id="patient-status" name="status" class="status-dropdown" data-hide-selected-option="true">
+            <div class="field patient-status-field patient-form-status-card">
+              <span class="patient-form-status-dot" aria-hidden="true"></span>
+              <div>
+                <strong data-patient-status-title>Ativo &mdash; Nova Admiss&atilde;o</strong>
+                <p data-patient-status-copy>O status &eacute; automaticamente definido como <b>Ativo</b> no primeiro cadastro, pois representa nova admiss&atilde;o ao CADH.</p>
+              </div>
+              <select id="patient-status" name="status" class="status-dropdown patient-status-native" data-native-select="true" aria-label="Status do usu&aacute;rio">
                 <option value="ativo">Ativo</option>
                 <option value="inativo">Inativo</option>
               </select>
             </div>
 
             <div class="field patient-clinical-notes-field">
-              <label for="allergies">Alergias</label>
-              <textarea id="allergies" name="allergies" placeholder="Ex.: Dipirona, amendoim"></textarea>
+              <label for="allergies">Alergias <span class="required-marker">*</span></label>
+              <textarea id="allergies" name="allergies" placeholder="Ex.: Dipirona, amendoim" required></textarea>
               <div class="field-error" data-error-for="allergies"></div>
             </div>
 
             <div class="field patient-clinical-notes-field">
-              <label for="chronic_conditions">Condições Crônicas</label>
-              <textarea id="chronic_conditions" name="chronic_conditions" placeholder="Ex.: Diabetes, hipertensão"></textarea>
+              <label for="chronic_conditions">Condi&ccedil;&otilde;es Cr&ocirc;nicas <span class="required-marker">*</span></label>
+              <textarea id="chronic_conditions" name="chronic_conditions" placeholder="Ex.: Diabetes, hipertens&atilde;o" required></textarea>
               <div class="field-error" data-error-for="chronic_conditions"></div>
             </div>
           </div>
@@ -148,7 +183,7 @@
 
         <div class="form-actions transition-form-actions">
           <a class="btn" href="/patients/list.html" data-back-link data-fallback="/patients/list.html">Cancelar</a>
-          <button class="btn btn-primary" type="submit">Salvar usuário</button>
+          <button class="btn btn-primary" type="submit">Salvar Cadastro</button>
         </div>
       </form>
     </section>

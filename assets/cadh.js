@@ -21,37 +21,44 @@ const CADH_DEFAULT_CARE_PLAN_ITEMS = [
   { item_type: 'meta', title: 'Prioridades e recomendações da equipe especializada', situation: '', difficulty: '', recommendation: '', goal: '', sort_order: 11 },
 ];
 
-const CADH_TRANSITION_ORIGIN = 'CADH — Centro de Atendimento ao Diabético e Hipertensão';
+const CADH_TRANSITION_ORIGIN = 'CADH — Centro de Atenção Domiciliar Hospitalar';
 
-const CADH_DEFAULT_UBS_OPTIONS = [
-  'UBS 01 PARANOÁ',
-  'UBS 02 PARANOÁ - Quadra 18',
-  'UBS 03 PARANOÁ - Paranoá Parque',
-  'UBS 04 PARANOÁ - Jardim II',
-  'UBS 05 PARANOÁ - Quebrada dos Neres',
-  'UBS 06 PARANOÁ - Cariru',
-  'UBS 07 PARANOÁ - Café sem Troco',
-  'UBS 08 PARANOÁ - PADDF',
-  'UBS 01 ITAPOÃ',
-  'UBS 02 ITAPOÃ',
-  'UBS 03 ITAPOÃ',
-  'UBS 04 ITAPOÃ',
-  'UBS 01 SÃO SEBASTIÃO',
-  'UBS 02 SÃO SEBASTIÃO - T.R.E.',
-  'UBS 03 SÃO SEBASTIÃO - Oeste',
-  'UBS 04 SÃO SEBASTIÃO - Morro Azul',
-  'UBS 05 SÃO SEBASTIÃO - Nova Betânia',
-  'UBS 06 SÃO SEBASTIÃO - São Francisco',
-  'UBS 07 SÃO SEBASTIÃO - Morro da Cruz',
-  'UBS 08 SÃO SEBASTIÃO - Cavas de Baixo',
-  'UBS 09 SÃO SEBASTIÃO - Bosque',
-  'UBS 10 SÃO SEBASTIÃO - João Cândido',
-  'UBS 11 SÃO SEBASTIÃO - Bosque 2',
-  'UBS 12 SÃO SEBASTIÃO - São José',
-  'UBS 1 JARDINS MANGUEIRAL',
-  'UBS 03 JARDIM BOTÂNICO',
-  'UBS 19 SÃO SEBASTIÃO - Vila do Boa',
+const CADH_UBS_TEAM_GROUPS = [
+  { ubs: 'UBS 01 PARANOÁ', teams: ['ESF EQUIPE 08 - BRANCA', 'ESF EQUIPE 09 - AMARELA', 'ESF EQUIPE 10 - AZUL', 'ESF EQUIPE 11 - VERDE', 'ESF EQUIPE 12 - ROSA', 'ESF EQUIPE 13 - LILÁS', 'ESF EQUIPE 14 - MARROM', 'ESF EQUIPE 15 - DOURADA', 'ESF EQUIPE 16 - LARANJA', 'ESF EQUIPE 17 - PRATA', 'EMULTI AROEIRA', 'ECR MESTRE DAMIÃO'] },
+  { ubs: 'UBS 02 PARANOÁ - Quadra 18', teams: ['ESF EQUIPE 01 - QUADRA 18', 'ESF EQUIPE 02 - QUADRA 18', 'ESF EQUIPE 03 - QUADRA 18'] },
+  { ubs: 'UBS 03 PARANOÁ - Paranoá Parque', teams: ['ESF EQUIPE 18 - BURITI', 'ESF EQUIPE 20 - JACARANDÁ', 'ESF EQUIPE 21 - IPÊ', 'ESF EQUIPE 22 - JEQUITIBÁ', 'ESF EQUIPE 23 - PEQUI'] },
+  { ubs: 'UBS 04 PARANOÁ - Jardim II', teams: ['ESF EQUIPE 02 - JARDIM II', 'ESB JARDIM II'] },
+  { ubs: 'UBS 05 PARANOÁ - Quebrada dos Neres', teams: ['ESF EQUIPE QUEBRADA DOS NERES'] },
+  { ubs: 'UBS 06 PARANOÁ - Cariru', teams: ['ESF EQUIPE 04 - CARIRU', 'ESB CARIRU'] },
+  { ubs: 'UBS 07 PARANOÁ - Café sem Troco', teams: ['ESF EQUIPE CAFÉ SEM TROCO'] },
+  { ubs: 'UBS 08 PARANOÁ - PADDF', teams: ['ESF EQUIPE PADDF'] },
+  { ubs: 'UBS 01 ITAPOÃ', teams: ['ESF EQUIPE 07 - ROSA', 'ESF EQUIPE 08 - LARANJA', 'ESF EQUIPE 09 - LILÁS', 'ESF EQUIPE 10 - CINZA', 'ESF EQUIPE 12 - VERDE', 'ESF EQUIPE 13 - VERMELHA'] },
+  { ubs: 'UBS 02 ITAPOÃ', teams: ['ESF EQUIPE 01', 'ESF EQUIPE 02', 'ESF EQUIPE ESMERALDA'] },
+  { ubs: 'UBS 03 ITAPOÃ', teams: ['ESF EQUIPE 03', 'ESF EQUIPE 04', 'ESF EQUIPE 05'] },
+  { ubs: 'UBS 04 ITAPOÃ', teams: ['ESF EQUIPE RUBI'] },
+  { ubs: 'UBS 01 SÃO SEBASTIÃO', teams: ['ESF EQUIPE 04 - LARANJA', 'ESF EQUIPE 07 - LILÁS', 'ESF EQUIPE 08 - ROSA', 'ESF EQUIPE 09 - VERDE', 'ESF EQUIPE 10 - VERMELHA', 'ESF DOURADA'] },
+  { ubs: 'UBS 02 SÃO SEBASTIÃO - T.R.E.', teams: ['ESF EQUIPE T.R.E.'] },
+  { ubs: 'UBS 03 SÃO SEBASTIÃO - Oeste', teams: ['ESF EQUIPE 12 - OESTE 2', 'ESB OESTE SSB'] },
+  { ubs: 'UBS 04 SÃO SEBASTIÃO - Morro Azul', teams: ['ESF EQUIPE MORRO AZUL'] },
+  { ubs: 'UBS 05 SÃO SEBASTIÃO - Nova Betânia', teams: ['ESF EQUIPE 01 - NOVA BETANIA', 'ESB NOVA BETANIA SSB'] },
+  { ubs: 'UBS 06 SÃO SEBASTIÃO - São Francisco', teams: ['ESF EQUIPE 16 - SÃO FRANCISCO'] },
+  { ubs: 'UBS 07 SÃO SEBASTIÃO - Morro da Cruz', teams: ['ESF EQUIPE 02 - MORRO DA CRUZ'] },
+  { ubs: 'UBS 08 SÃO SEBASTIÃO - Cavas de Baixo', teams: ['ESF EQUIPE 03 - CAVAS DE BAIXO'] },
+  { ubs: 'UBS 09 SÃO SEBASTIÃO - Bosque', teams: ['ESF EQ 21 - BOSQUE 1', 'ESF EQUIPE 23 - VILA NOVA 2', 'ESB BOSQUE 1 SSB', 'EMULTI IPE AMARELO'] },
+  { ubs: 'UBS 10 SÃO SEBASTIÃO - João Cândido', teams: ['ESF EQUIPE 22 - JOÃO CÂNDIDO'] },
+  { ubs: 'UBS 11 SÃO SEBASTIÃO - Bosque 2', teams: ['ESF EQUIPE 25 - BOSQUE 2'] },
+  { ubs: 'UBS 12 SÃO SEBASTIÃO - São José', teams: ['ESF EQUIPE 17 - SÃO JOSÉ'] },
+  { ubs: 'UBS 14 SÃO SEBASTIÃO - PDF IV', teams: ['EQ. AMPLIADA 27 TIPO III CDP', 'EQ. PSICOSOCIAL 30H - 2238861', 'EQ. AMPLIADA ROSIMEIRE RODRIGUES'] },
+  { ubs: 'UBS 15 SÃO SEBASTIÃO - CIR', teams: ['EQ. PSICOSOCIAL 30H - 2238853', 'EQ. AMPLIADA 30H - 2238942', 'EQ. PSICOSOCIAL 30H - 2238969', 'EQ. AMPLIADA CARLA MACHADO'] },
+  { ubs: 'UBS 16 SÃO SEBASTIÃO - PDF 1', teams: ['EQ. PSICOSOCIAL 30H - 2238837', 'EQ. AMPLIADA 20H - 2238896', 'EQ. PSICOSOCIAL 20H - 2238918', 'EQ. AMPLIADA EURICO JARDIM'] },
+  { ubs: 'UBS 17 SÃO SEBASTIÃO - PDF 2', teams: ['EQ. PSICOSOCIAL 30H - 2238845', 'EQ. AMPLIADA 20H - 2238926', 'EQ. PSICOSOCIAL 20H - 2238934', 'EQ. AMPLIADA ALFA'] },
+  { ubs: 'UBS 19 SÃO SEBASTIÃO - Vila do Boa', teams: ['ESF EQUIPE VILA DO BOA'] },
+  { ubs: 'UBS 20 SÃO SEBASTIÃO CDP', teams: ['EQ. PSICOSOCIAL 30H - 2238888', 'EQUIPE AMPLIADA 20H - 2502216'] },
+  { ubs: 'UBS 1 JARDINS MANGUEIRAL', teams: ['ESF DIAMANTE', 'ESF AMETISTA', 'ESF SAFIRA', 'ESF ESMERALDA', 'ESB 1 JARDINS MANGUEIRAL', 'ESB 2 JARDINS MANGUEIRAL', 'EMULTI RUBI'] },
+  { ubs: 'UBS 03 JARDIM BOTÂNICO', teams: ['ESF TORORO'] },
 ];
+
+const CADH_DEFAULT_UBS_OPTIONS = CADH_UBS_TEAM_GROUPS.map((group) => group.ubs);
 
 const CADH_ESF_OPTIONS = [
   { value: 'safira', label: 'Equipe Safira' },
@@ -440,14 +447,22 @@ async function activateCadhManagementTab(tabKey) {
 function renderCadhEmptyManagementState() {
   const detail = document.getElementById('cadh-patient-detail');
   if (!detail) return;
+  const canCreatePatient = cadhPermissions.has('patients.create');
 
   detail.innerHTML = `
     <div class="cadh-empty-state">
       <span class="cadh-empty-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#cadh-icon-users"></use></svg></span>
       <strong>Nenhum usuário selecionado</strong>
       <p>Busque e selecione um usuário ao lado para visualizar e gerenciar suas informações de cuidado.</p>
+      ${canCreatePatient ? `
+        <a class="cadh-empty-new-patient-link btn btn-primary" href="/patients/form.html">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM3.5 19a5.5 5.5 0 0 1 11 0M18 8v6M15 11h6"/></svg>
+          Novo usuário
+        </a>
+      ` : ''}
     </div>
   `;
+  SISELO.applyUiComponents(detail);
 }
 
 function renderCadhSelectedPatientSummary(patient) {
@@ -546,6 +561,66 @@ async function renderCadhCarePlanTab(patient, options = {}) {
   const canCreate = cadhPermissions.has('careplans.create');
   const canUpdate = cadhPermissions.has('careplans.update');
   const canEdit = planId ? canUpdate : canCreate;
+  const formHref = `/care-plans/form.html?patient_id=${encodeURIComponent(patientId)}${planId ? `&id=${encodeURIComponent(planId)}` : ''}`;
+  const newPlanHref = `/care-plans/form.html?patient_id=${encodeURIComponent(patientId)}`;
+  const primaryLabel = planId ? 'Editar Plano de Cuidado' : 'Iniciar Plano de Cuidado';
+  const stateCopy = planId
+    ? `Plano de cuidado iniciado${currentPlan.start_date ? ` em ${formatCadhDate(currentPlan.start_date)}` : ''}.`
+    : 'Plano de cuidado ainda não iniciado para este usuário.';
+  const stateAction = planId ? 'Editar agora →' : 'Iniciar agora →';
+
+  const carePlanRowsMarkup = rows.length
+    ? `
+      <div class="cadh-care-plan-inline-list" aria-label="Planos de cuidado do usuário">
+        ${rows.map((row) => {
+          const rowId = SISELO.normalizeEntityId(row && row.id);
+          const rowEditHref = `/care-plans/form.html?patient_id=${encodeURIComponent(patientId)}${rowId ? `&id=${encodeURIComponent(rowId)}` : ''}`;
+          return `
+            <article class="cadh-care-plan-inline-row">
+              <div>
+                <strong>${SISELO.escapeHtml(row.full_name || patient.full_name || 'Plano de cuidado')}</strong>
+                <span>Início: ${SISELO.escapeHtml(formatCadhDate(row.start_date) || '-')} ${row.end_date ? ` · Revisão: ${SISELO.escapeHtml(formatCadhDate(row.end_date))}` : ''}</span>
+              </div>
+              ${canUpdate && rowId ? `<a class="btn" href="${rowEditHref}">Editar plano</a>` : ''}
+            </article>
+          `;
+        }).join('')}
+      </div>
+    `
+    : '';
+
+  detail.innerHTML = `
+    <section class="cadh-inline-panel cadh-care-plan-overview-screen">
+      <div class="cadh-care-plan-overview-header">
+        <div>
+          <h3>Plano de Cuidado</h3>
+          <p>${SISELO.escapeHtml(patient.full_name || '-')}</p>
+        </div>
+        <div class="cadh-inline-actions">
+          ${planId && canCreate ? `<a class="btn" href="${newPlanHref}">+ Novo plano</a>` : ''}
+          ${canEdit ? `<a class="btn btn-primary" href="${formHref}">${primaryLabel}</a>` : ''}
+        </div>
+      </div>
+
+      <div class="cadh-care-plan-guide">
+        <strong>Como funciona o Plano de Cuidado no CADH:</strong>
+        <ol>
+          <li>Cada especialidade preenche seus campos durante o atendimento do usuário.</li>
+          <li>Ao final do ciclo, o Gestor do Cuidado convoca reunião interdisciplinar.</li>
+          <li>Na reunião, o plano é reaberto para discussão e pactuação das metas terapêuticas.</li>
+          <li>Com o usuário estabilizado, o Plano subsidia a decisão de Transição do Cuidado para a APS.</li>
+        </ol>
+      </div>
+
+      ${carePlanRowsMarkup}
+
+      <div class="cadh-care-plan-empty-card" ${rows.length ? 'hidden' : ''}>
+        <p>${SISELO.escapeHtml(stateCopy)}</p>
+        ${canEdit ? `<a href="${formHref}">${stateAction}</a>` : '<span>Você pode visualizar os planos pela lista, mas não tem permissão para criar ou editar.</span>'}
+      </div>
+    </section>
+  `;
+  return;
 
   if (!canEdit) {
     detail.innerHTML = `
@@ -601,11 +676,11 @@ async function renderCadhCarePlanTab(patient, options = {}) {
         <div class="cadh-care-plan-grid">
           <label>
             <span>Início</span>
-            <input name="start_date" type="date" value="${SISELO.escapeHtml(plan.start_date || SISELO.todayDateInputValue())}">
+            <input name="start_date" type="text" inputmode="numeric" autocomplete="off" placeholder="dd/mm/aaaa" value="${SISELO.escapeHtml(plan.start_date || SISELO.todayDateInputValue())}">
           </label>
           <label>
             <span>Fim</span>
-            <input name="end_date" type="date" value="${SISELO.escapeHtml(plan.end_date || '')}">
+            <input name="end_date" type="text" inputmode="numeric" autocomplete="off" placeholder="dd/mm/aaaa" value="${SISELO.escapeHtml(plan.end_date || '')}">
           </label>
           <label class="is-wide">
             <span>Condutas terapêuticas</span>
@@ -670,6 +745,8 @@ function bindCadhCarePlanForm(patient) {
   const form = document.getElementById('cadh-care-plan-form');
   if (!form) return;
 
+  SISELO.enhanceChoiceSelects(form);
+  SISELO.applyUiComponents(form);
   enhanceCadhCarePlanDates(form);
 
   form.addEventListener('submit', async (event) => {
@@ -715,8 +792,6 @@ function bindCadhCarePlanForm(patient) {
 }
 
 function enhanceCadhCarePlanDates(form) {
-  const today = SISELO.todayDateInputValue();
-  const maxPlanDate = SISELO.shiftDateInputValue(today, { years: 5 });
   const startInput = form.querySelector('input[name="start_date"]');
   const endInput = form.querySelector('input[name="end_date"]');
 
@@ -729,11 +804,11 @@ function enhanceCadhCarePlanDates(form) {
   startInput.dataset.dateLabel = 'Início';
   endInput.dataset.dateLabel = 'Fim';
 
-  SISELO.enhanceDateInput(startInput, { min: '1900-01-01', max: maxPlanDate });
-  SISELO.enhanceDateInput(endInput, { min: '1900-01-01', max: maxPlanDate });
+  SISELO.enhanceDateInput(startInput, { min: '1900-01-01' });
+  SISELO.enhanceDateInput(endInput, { min: '1900-01-01' });
 
   const syncCarePlanDates = () => {
-    startInput.max = endInput.value || maxPlanDate;
+    startInput.max = endInput.value || '';
     endInput.min = startInput.value && startInput.value > '1900-01-01' ? startInput.value : '1900-01-01';
     if (startInput.value && startInput.max && startInput.value > startInput.max) {
       startInput.value = startInput.max;
@@ -852,7 +927,7 @@ function renderCadhTransitionTab(patient, options = {}) {
   const canCreate = cadhPermissions.has('transitions.create');
   const listHref = `/transitions/list.html?patient_id=${encodeURIComponent(patientId)}`;
   const ubsOptions = getCadhUbsOptions(patient);
-  const teamValue = normalizeCadhTeamValue(patient.team_ref);
+  const teamValue = String(patient.team_ref || '').trim();
 
   if (!canCreate) {
     detail.innerHTML = `
@@ -905,7 +980,6 @@ function renderCadhTransitionTab(patient, options = {}) {
           <span>Equipe de Saúde da Família (ESF)</span>
           <select name="destination_team" data-preferred-team="${SISELO.escapeHtml(teamValue)}" disabled>
             <option value="">Selecione a eSF...</option>
-            ${CADH_ESF_OPTIONS.map((option) => `<option value="${SISELO.escapeHtml(option.value)}">${SISELO.escapeHtml(option.label)}</option>`).join('')}
           </select>
         </label>
 
@@ -926,18 +1000,49 @@ function bindCadhTransitionForm(patient) {
   const form = document.getElementById('cadh-transition-form');
   if (!form) return;
 
+  SISELO.enhanceChoiceSelects(form);
+  SISELO.applyUiComponents(form);
   const ubsSelect = form.elements.destination_ubs;
   const teamSelect = form.elements.destination_team;
   const submitButton = form.querySelector('.cadh-transition-submit');
 
+  const populateTeamOptions = () => {
+    if (!(ubsSelect instanceof HTMLSelectElement) || !(teamSelect instanceof HTMLSelectElement)) {
+      return;
+    }
+
+    const selectedUbs = getCadhSelectedOptionLabel(ubsSelect) || String(ubsSelect.value || '').trim();
+    const preferredTeam = String(teamSelect.dataset.preferredTeam || '').trim();
+    const nextOptions = getCadhTeamOptionsForUbs(selectedUbs, preferredTeam);
+    const previousTeam = String(teamSelect.value || '').trim();
+    const validPrevious = nextOptions.some((option) => option.value === previousTeam);
+    const validPreferred = nextOptions.some((option) => option.value === preferredTeam);
+
+    teamSelect.innerHTML = `
+      <option value="">Selecione a eSF...</option>
+      ${nextOptions.map((option) => `<option value="${SISELO.escapeHtml(option.value)}">${SISELO.escapeHtml(option.label)}</option>`).join('')}
+    `;
+
+    if (validPrevious) {
+      teamSelect.value = previousTeam;
+    } else if (validPreferred) {
+      teamSelect.value = preferredTeam;
+    } else {
+      teamSelect.value = '';
+    }
+  };
+
   const syncTransitionFormState = () => {
     const hasUbs = Boolean(ubsSelect && ubsSelect.value);
     if (teamSelect instanceof HTMLSelectElement) {
+      const previousTeamValue = teamSelect.value;
+      populateTeamOptions();
       teamSelect.disabled = !hasUbs;
       if (!hasUbs) {
         teamSelect.value = '';
-      } else if (!teamSelect.value) {
-        teamSelect.value = teamSelect.dataset.preferredTeam || '';
+      }
+      if (teamSelect.value !== previousTeamValue) {
+        teamSelect.dispatchEvent(new Event('change', { bubbles: true }));
       }
     }
     if (submitButton instanceof HTMLButtonElement) {
@@ -1176,6 +1281,30 @@ function getCadhUbsOptions(patient) {
   CADH_DEFAULT_UBS_OPTIONS.forEach(addLabel);
 
   return labels.map((label) => ({ value: label, label }));
+}
+
+function getCadhTeamOptionsForUbs(ubs, preferredTeam = '') {
+  const normalizedUbs = normalizeCadhText(ubs);
+  const group = CADH_UBS_TEAM_GROUPS.find((item) => normalizeCadhText(item.ubs) === normalizedUbs);
+  const teams = group ? [...group.teams] : [];
+  const normalizedPreferred = normalizeCadhText(preferredTeam);
+
+  if (
+    preferredTeam &&
+    normalizedPreferred !== 'sem equipe' &&
+    !teams.some((team) => normalizeCadhText(team) === normalizedPreferred)
+  ) {
+    teams.unshift(preferredTeam);
+  }
+
+  if (!teams.length) {
+    teams.push('Sem equipe definida');
+  }
+
+  return teams.map((team) => {
+    const value = normalizeCadhText(team) === 'sem equipe definida' ? 'sem_equipe' : team;
+    return { value, label: team };
+  });
 }
 
 function normalizeCadhTeamValue(value) {

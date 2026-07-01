@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>CADH — Centro de Atendimento ao Diabético e Hipertensão | SISELO</title>
+  <title>CADH — Centro de Atenção Domiciliar Hospitalar | SISELO</title>
   <link rel="stylesheet" href="/assets/app.css">
 </head>
 <body data-page="cadh">
@@ -13,8 +13,8 @@
         <div class="topbar-brand home-sidebar-brand">
           <span class="home-sidebar-mark" aria-hidden="true">
             <svg viewBox="0 0 24 24" focusable="false">
-              <path d="M12 4v16M4 12h16"/>
-              <rect x="5" y="5" width="14" height="14" rx="5"/>
+              <circle cx="12" cy="12" r="7"/>
+              <path d="M5 12h14M12 5c2 2.1 3 4.4 3 7s-1 4.9-3 7M12 5c-2 2.1-3 4.4-3 7s1 4.9 3 7"/>
             </svg>
           </span>
           <span class="home-sidebar-brand-copy">
@@ -35,7 +35,7 @@
 
           <a id="nav-cadh" href="/cadh/index.html">
             <span class="home-sidebar-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 13h4l2-7 4 14 2-7h6"/></svg></span>
-            <span class="home-sidebar-nav-copy"><strong>CADH</strong><small>Diabetes e Hipertensão</small></span>
+            <span class="home-sidebar-nav-copy"><strong>CADH</strong><small>Atenção Domiciliar</small></span>
             <svg class="home-sidebar-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
           </a>
 
@@ -57,17 +57,12 @@
       <header class="cadh-page-header">
         <div class="cadh-breadcrumb-heading">
           <p><a class="cadh-breadcrumb-link" href="/index.html">Módulos</a><span aria-hidden="true">›</span><strong>CADH</strong></p>
-          <h1>CADH — Centro de Atendimento ao Diabético e Hipertensão</h1>
+          <h1>CADH — Centro de Atenção Domiciliar Hospitalar</h1>
         </div>
         <div class="home-page-status">
-          <span class="home-system-status home-user-role-status home-user-role-admin">
-            <span class="home-system-status-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" focusable="false">
-                <path d="M12 3 20 7v5c0 5-3.4 8-8 9-4.6-1-8-4-8-9V7l8-4Z"/>
-                <path d="M9 12l2 2 4-5"/>
-              </svg>
-            </span>
-            <span>Administrador</span>
+          <span class="home-operational-status cadh-operational-status">
+            <span class="home-operational-status-dot" aria-hidden="true"></span>
+            <span class="home-operational-status-label">Operacional</span>
           </span>
           <time id="cadh-current-date" class="home-current-date"></time>
         </div>
@@ -98,13 +93,13 @@
           </span>
           <div class="cadh-module-hero-copy">
             <p>Módulo clínico</p>
-            <h2 id="cadh-module-hero-title">Centro de Atendimento ao Diabético e Hipertensão</h2>
+            <h2 id="cadh-module-hero-title">Centro de Atenção Domiciliar Hospitalar</h2>
           </div>
         </section>
 
         <div class="cadh-primary-grid">
           <aside class="cadh-search-column">
-            <form id="cadh-cpf-search" class="cadh-patient-search">
+            <form id="cadh-cpf-search" class="cadh-patient-search" data-ui-card="true">
               <h2 class="cadh-block-title">Buscar usuário</h2>
               <label for="cadh-cpf-input">Nome ou CPF</label>
               <input id="cadh-cpf-input" name="cpf" placeholder="Nome ou CPF..." autocomplete="off">
@@ -115,8 +110,8 @@
 
           <section class="cadh-management-section" aria-labelledby="cadh-management-title">
             <h2 id="cadh-management-title" class="cadh-block-title">Gestão do usuário</h2>
-            <div class="cadh-management-card">
-              <nav class="cadh-module-tabs" aria-label="Módulos assistenciais">
+            <div class="cadh-management-card" data-ui-card="true">
+              <nav class="cadh-module-tabs" aria-label="Módulos assistenciais" data-ui-tabs="true">
                 <a id="cadh-patients-card" class="cadh-tab-link active" href="/patients/list.html">
                   <span class="cadh-tab-icon"><svg><use href="#cadh-icon-users"></use></svg></span>
                   <span>Usuários</span>
@@ -158,20 +153,20 @@
             </a>
           </div>
 
-          <p class="cadh-specialty-guidance">Selecione um usuário ao lado para acessar os registros das especialidades.</p>
+          <p class="cadh-specialty-guidance" data-ui-alert="true">Selecione um usuário ao lado para registrar atendimentos nas especialidades.</p>
 
           <div class="cadh-specialty-grid">
-            <a class="cadh-specialty-card cadh-specialty-tecnico is-locked" href="#" data-base-href="/cadh/tecnico.html" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-tecnico"></use></svg></span><span>Técnico de Enfermagem</span></a>
-            <a class="cadh-specialty-card cadh-specialty-gestor is-locked" href="#" data-base-href="/care-plans/list.html" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-gestor"></use></svg></span><span>Gestor do Cuidado</span></a>
-            <a class="cadh-specialty-card cadh-specialty-psico is-locked" href="#" data-base-href="/cadh/psicologia.html" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-psico"></use></svg></span><span>Psicologia</span></a>
-            <a class="cadh-specialty-card cadh-specialty-enf is-locked" href="#" data-base-href="/cadh/enfermagem.html" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-enfermagem"></use></svg></span><span>Enfermagem</span></a>
-            <a class="cadh-specialty-card cadh-specialty-nutri is-locked" href="#" data-base-href="/cadh/nutricao.html" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-nutricao"></use></svg></span><span>Nutrição</span></a>
-            <a class="cadh-specialty-card cadh-specialty-endocrino is-locked" href="#" data-base-href="/cadh/endocrino.html" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-endocrino"></use></svg></span><span>Endocrinologia</span></a>
-            <a class="cadh-specialty-card cadh-specialty-cardio is-locked" href="#" data-base-href="/cadh/cardiologia.html" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-cardio"></use></svg></span><span>Cardiologia</span></a>
-            <a class="cadh-specialty-card cadh-specialty-oftalmo is-locked" href="#" data-base-href="/cadh/oftalmologia.html" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-oftalmo"></use></svg></span><span>Oftalmologia</span></a>
-            <a class="cadh-specialty-card cadh-specialty-fisio is-locked" href="#" data-base-href="/cadh/fisioterapia.html" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-fisio"></use></svg></span><span>Fisioterapia</span></a>
-            <a class="cadh-specialty-card cadh-specialty-social is-locked" href="#" data-base-href="/cadh/servico-social.html" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-social"></use></svg></span><span>Serviço Social</span></a>
-            <a class="cadh-specialty-card cadh-specialty-farma is-locked" href="#" data-base-href="/cadh/farmacia.html" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-farmacia"></use></svg></span><span>Farmácia Clínica</span></a>
+            <a class="cadh-specialty-card cadh-specialty-tecnico is-locked" href="#" data-ui-card="true" data-ui-button="true" data-base-href="/cadh/tecnico.html" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-tecnico"></use></svg></span><span>Técnico de Enfermagem</span></a>
+            <a class="cadh-specialty-card cadh-specialty-gestor is-locked" href="#" data-ui-card="true" data-ui-button="true" data-base-href="/cadh/gestor.html" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-gestor"></use></svg></span><span>Gestor do Cuidado</span></a>
+            <a class="cadh-specialty-card cadh-specialty-psico is-locked" href="#" data-ui-card="true" data-ui-button="true" data-base-href="/cadh/psicologia.html" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-psico"></use></svg></span><span>Psicologia</span></a>
+            <a class="cadh-specialty-card cadh-specialty-enf is-locked" href="#" data-ui-card="true" data-ui-button="true" data-base-href="/cadh/enfermagem.html" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-enfermagem"></use></svg></span><span>Enfermagem</span></a>
+            <a class="cadh-specialty-card cadh-specialty-nutri is-locked" href="#" data-ui-card="true" data-ui-button="true" data-base-href="/cadh/nutricao.html" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-nutricao"></use></svg></span><span>Nutrição</span></a>
+            <a class="cadh-specialty-card cadh-specialty-endocrino is-locked" href="#" data-ui-card="true" data-ui-button="true" data-base-href="/cadh/endocrino.html" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-endocrino"></use></svg></span><span>Endocrinologia</span></a>
+            <a class="cadh-specialty-card cadh-specialty-cardio is-locked" href="#" data-ui-card="true" data-ui-button="true" data-base-href="/cadh/cardiologia.html" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-cardio"></use></svg></span><span>Cardiologia</span></a>
+            <a class="cadh-specialty-card cadh-specialty-oftalmo is-locked" href="#" data-ui-card="true" data-ui-button="true" data-base-href="/cadh/oftalmologia.html" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-oftalmo"></use></svg></span><span>Oftalmologia</span></a>
+            <a class="cadh-specialty-card cadh-specialty-fisio is-locked" href="#" data-ui-card="true" data-ui-button="true" data-base-href="/cadh/fisioterapia.html" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-fisio"></use></svg></span><span>Fisioterapia</span></a>
+            <a class="cadh-specialty-card cadh-specialty-social is-locked" href="#" data-ui-card="true" data-ui-button="true" data-base-href="/cadh/servico-social.html" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-social"></use></svg></span><span>Serviço Social</span></a>
+            <a class="cadh-specialty-card cadh-specialty-farma is-locked" href="#" data-ui-card="true" data-ui-button="true" data-base-href="/cadh/farmacia.html" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-farmacia"></use></svg></span><span>Farmácia Clínica</span></a>
           </div>
         </section>
       </main>

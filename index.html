@@ -13,8 +13,8 @@
         <div class="topbar-brand home-sidebar-brand">
           <span class="home-sidebar-mark" aria-hidden="true">
             <svg viewBox="0 0 24 24" focusable="false">
-              <path d="M12 4v16M4 12h16"/>
-              <rect x="5" y="5" width="14" height="14" rx="5"/>
+              <circle cx="12" cy="12" r="7"/>
+              <path d="M5 12h14M12 5c2 2.1 3 4.4 3 7s-1 4.9-3 7M12 5c-2 2.1-3 4.4-3 7s1 4.9 3 7"/>
             </svg>
           </span>
           <span class="home-sidebar-brand-copy">
@@ -39,7 +39,7 @@
             <span class="home-sidebar-nav-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24"><path d="M3 13h4l2-7 4 14 2-7h6"/></svg>
             </span>
-            <span class="home-sidebar-nav-copy"><strong>CADH</strong><small>Diabetes e Hipertensão</small></span>
+            <span class="home-sidebar-nav-copy"><strong>CADH</strong><small>Atenção Domiciliar</small></span>
             <svg class="home-sidebar-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
           </a>
 
@@ -67,25 +67,20 @@
           <strong>Painel de Controle</strong>
         </div>
         <div class="home-page-status">
-          <span class="home-system-status home-user-role-status home-user-role-admin">
-            <span class="home-system-status-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" focusable="false">
-                <path d="M12 3 20 7v5c0 5-3.4 8-8 9-4.6-1-8-4-8-9V7l8-4Z"/>
-                <path d="M9 12l2 2 4-5"/>
-              </svg>
-            </span>
-            <span>Administrador</span>
+          <span class="home-operational-status">
+            <span class="home-operational-status-dot" aria-hidden="true"></span>
+            <span class="home-operational-status-label">Operacional</span>
           </span>
-          <time id="home-current-date" class="home-current-date"></time>
+          <time id="home-current-date" class="home-current-date" hidden></time>
         </div>
       </header>
 
       <main class="container home-dashboard">
         <section class="home-hero" aria-labelledby="home-title">
           <div class="home-hero-content">
-            <p class="home-hero-eyebrow"><span aria-hidden="true"></span>Sistema de saúde</p>
+            <p class="home-hero-eyebrow"><span aria-hidden="true"></span>Sistema operacional</p>
             <h1 id="home-title">Bem-vindo ao SISELO</h1>
-            <p>Sistema Integrado de Saúde — gestão centralizada dos compartilhamentos do cuidado, CADH e atenção primária.</p>
+            <p>Sistema Integrado de Saúde — gestão centralizada de compartilhamentos do cuidado, atenção domiciliar e atenção primária.</p>
           </div>
           <div class="home-hero-orbit" aria-hidden="true"></div>
         </section>
@@ -106,13 +101,13 @@
           <a class="home-metric-card home-metric-green" href="/transitions/list.html">
             <span class="home-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/><path d="m11 12 3 3 6-7"/></svg></span>
             <strong id="home-inactive-users-count">00</strong>
-            <span>Transições do cuidado</span>
+            <span>Transições do Cuidado</span>
           </a>
 
           <a class="home-metric-card home-metric-purple" href="/transitions/list.html">
             <span class="home-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 17 10 12l3 3 6-7"/><path d="M14 8h5v5"/></svg></span>
             <strong id="home-records-count">00</strong>
-            <span>Total de registros</span>
+            <span>Total Registros</span>
           </a>
         </section>
 
@@ -120,12 +115,12 @@
           <a id="home-cadh-card" class="home-environment-card home-environment-cadh" href="/cadh/index.html">
             <div class="home-environment-topline">
               <span class="home-environment-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 13h3l2-7 4 14 2-7h5"/></svg></span>
-              <span class="home-environment-tag">Diabetes e hipertensão</span>
+              <span class="home-environment-tag">Atenção domiciliar</span>
             </div>
             <div class="home-environment-copy">
               <h2>CADH</h2>
-              <strong>Centro de Atendimento ao Diabético e Hipertensão</strong>
-              <p>Gestão de usuários acompanhados pelo CADH, planos de cuidado, atendimentos e transições.</p>
+              <strong>Centro de Atenção Domiciliar Hospitalar</strong>
+              <p>Gestão de pacientes em acompanhamento domiciliar, planos de cuidado, atendimentos e transições.</p>
             </div>
             <span class="home-environment-action">Acessar módulo <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M14 7l5 5-5 5"/></svg></span>
           </a>
@@ -143,7 +138,6 @@
             <span class="home-environment-action">Acessar módulo <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M14 7l5 5-5 5"/></svg></span>
           </a>
         </section>
-
         <section class="home-pillars" aria-label="Pilares do cuidado">
           <article class="home-pillar-card home-pillar-care">
             <span class="home-pillar-icon" aria-hidden="true">

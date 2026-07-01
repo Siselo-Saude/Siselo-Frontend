@@ -13,8 +13,8 @@
         <div class="topbar-brand home-sidebar-brand">
           <span class="home-sidebar-mark" aria-hidden="true">
             <svg viewBox="0 0 24 24" focusable="false">
-              <path d="M12 4v16M4 12h16"/>
-              <rect x="5" y="5" width="14" height="14" rx="5"/>
+              <circle cx="12" cy="12" r="7"/>
+              <path d="M5 12h14M12 5c2 2.1 3 4.4 3 7s-1 4.9-3 7M12 5c-2 2.1-3 4.4-3 7s1 4.9 3 7"/>
             </svg>
           </span>
           <span class="home-sidebar-brand-copy">
@@ -35,7 +35,7 @@
 
           <a id="nav-cadh" href="/cadh/index.html">
             <span class="home-sidebar-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 13h4l2-7 4 14 2-7h6"/></svg></span>
-            <span class="home-sidebar-nav-copy"><strong>CADH</strong><small>Diabetes e Hipertensão</small></span>
+            <span class="home-sidebar-nav-copy"><strong>CADH</strong><small>Atenção Domiciliar</small></span>
             <svg class="home-sidebar-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
           </a>
 
@@ -91,10 +91,6 @@
             <p>CADH - Planificação da Atenção à Saúde / SUS</p>
             <h1 id="form-title">Ficha Plano de Cuidado</h1>
           </div>
-          <button id="care-plan-top-save" class="btn btn-primary care-plan-save-button" type="submit" form="care-plan-form">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#care-plan-icon-save"></use></svg>
-            Salvar Plano
-          </button>
         </section>
 
         <div id="page-alert" class="alert" hidden></div>
@@ -108,7 +104,7 @@
             <a class="btn care-plan-secondary-action" href="/care-plans/list.html" data-back-link data-fallback="/care-plans/list.html">Voltar</a>
             <button id="care-plan-bottom-save" class="btn btn-primary care-plan-save-button" type="submit">
               <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#care-plan-icon-save"></use></svg>
-              Salvar Plano de Cuidado
+              Salvar Plano
             </button>
           </div>
         </form>

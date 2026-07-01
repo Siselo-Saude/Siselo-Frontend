@@ -155,6 +155,9 @@ async function setupCarePlansFormPage() {
       patient: selectedPatient,
       patientLocked: Boolean(patientId),
     });
+    SISELO.enhanceChoiceSelects(formBody);
+    setupCarePlanGoalRepeater();
+    SISELO.applyUiComponents(formBody);
   }
   const patientPicker = SISELO.setupPatientFieldPicker({
     select: "patient_id",
@@ -216,6 +219,16 @@ async function setupCarePlansFormPage() {
 }
 
 function setupCarePlanFormShell(user) {
+  document.querySelectorAll(".home-sidebar .menu a").forEach((link) => {
+    link.classList.remove("is-active");
+    link.removeAttribute("aria-current");
+  });
+  const activeCadhLink = document.getElementById("nav-cadh");
+  if (activeCadhLink) {
+    activeCadhLink.classList.add("is-active");
+    activeCadhLink.setAttribute("aria-current", "page");
+  }
+
   const dateElement = document.getElementById("care-plan-current-date");
   const updateCurrentDate = () => {
     if (!dateElement) return;
@@ -320,24 +333,24 @@ function renderCarePlanSheet({ plan, items, patient, patientLocked }) {
       <header>Dados cadastrais do usuário do SUS</header>
       <div class="care-plan-register-grid">
         ${renderCarePlanStaticField("CPF usuário do SUS", patient && patient.cpf)}
-        ${renderCarePlanStaticField("Equipe de referência", patient && SISELO.formatTeamName(patient.team_ref))}
+        ${renderCarePlanStaticField("Equipe de referência", patient && SISELO.formatTeamName(patient.team_ref), "care-plan-team-highlight")}
         ${renderCarePlanStaticField("Nome", patient && patient.full_name)}
         ${renderCarePlanStaticField("Nome social", patient && patient.social_name)}
         ${renderCarePlanStaticField("Data de nascimento", formatCarePlanDate(patient && patient.birth_date))}
         ${renderCarePlanStaticField("Data do primeiro atendimento no CADH", formatCarePlanDate(patient && patient.first_cadh_date))}
         ${renderCarePlanStaticField("Unidade Básica de Saúde de Origem", patient && patient.ubs_ref)}
-        ${renderCarePlanStaticField("Equipe de saúde da família", patient && SISELO.formatTeamName(patient.team_ref))}
+        ${renderCarePlanStaticField("Equipe de saúde da família", patient && SISELO.formatTeamName(patient.team_ref), "care-plan-team-highlight")}
         ${renderCarePlanStaticField("Endereço", patient && patient.address)}
         ${renderCarePlanStaticField("Telefone", patient && patient.phone)}
         ${renderCarePlanStaticField("Apoio familiar (nome)", patient && patient.responsible_name)}
         ${renderCarePlanStaticField("Apoio comunitário (nome)", patient && patient.emergency_contact)}
         <label>
           <span>Data de início</span>
-          <input id="start_date" name="start_date" type="date" value="${SISELO.escapeHtml(plan.start_date || SISELO.todayDateInputValue())}" required>
+          <input id="start_date" name="start_date" type="text" inputmode="numeric" autocomplete="off" placeholder="dd/mm/aaaa" value="${SISELO.escapeHtml(plan.start_date || SISELO.todayDateInputValue())}" required>
         </label>
         <label>
           <span>Data da próxima revisão</span>
-          <input id="end_date" name="end_date" type="date" value="${SISELO.escapeHtml(plan.end_date || "")}">
+          <input id="end_date" name="end_date" type="text" inputmode="numeric" autocomplete="off" placeholder="dd/mm/aaaa" value="${SISELO.escapeHtml(plan.end_date || "")}">
         </label>
       </div>
     </section>
@@ -378,10 +391,18 @@ function renderCarePlanSheet({ plan, items, patient, patientLocked }) {
 
     <section class="care-plan-section">
       <header>Prioridades e recomendações da equipe especializada</header>
-      <div class="care-plan-matrix care-plan-alert-matrix">
+      <div id="care-plan-goals-matrix" class="care-plan-matrix care-plan-alert-matrix care-plan-goals-matrix">
         <div class="care-plan-matrix-head">Principais dificuldades encontradas</div>
         <div class="care-plan-matrix-head">Metas estabelecidas</div>
-        ${[1, 2, 3].map((number, index) => renderCarePlanGoalRow(number, lookup, 60 + index)).join("")}
+        ${getCarePlanGoalNumbers(lookup).map((number, index) => renderCarePlanGoalRow(number, lookup, 60 + index)).join("")}
+      </div>
+      <div class="care-plan-repeat-actions" aria-label="Gerenciar prioridades e metas">
+        <button type="button" class="care-plan-repeat-button ui-button" data-care-plan-goal-add aria-label="Adicionar prioridade">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+        <button type="button" class="care-plan-repeat-button ui-button" data-care-plan-goal-remove aria-label="Remover prioridade">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg>
+        </button>
       </div>
     </section>
 
@@ -390,7 +411,7 @@ function renderCarePlanSheet({ plan, items, patient, patientLocked }) {
       <div class="care-plan-two-column">
         <label>
           <span>Data da avaliação da APS</span>
-          <input id="aps_review_date" type="date" value="${SISELO.escapeHtml(plan.end_date || "")}">
+          <input id="aps_review_date" type="text" inputmode="numeric" autocomplete="off" placeholder="dd/mm/aaaa" value="${SISELO.escapeHtml(plan.end_date || "")}">
         </label>
         <label>
           <span>Monitoramento na APS</span>
@@ -401,9 +422,9 @@ function renderCarePlanSheet({ plan, items, patient, patientLocked }) {
   `;
 }
 
-function renderCarePlanStaticField(label, value) {
+function renderCarePlanStaticField(label, value, className = "") {
   return `
-    <div class="care-plan-static-field">
+    <div class="care-plan-static-field ${SISELO.escapeHtml(className)}">
       <span>${SISELO.escapeHtml(label)}</span>
       <strong>${SISELO.escapeHtml(value || "—")}</strong>
     </div>
@@ -464,12 +485,95 @@ function renderCarePlanGoalRow(number, lookup, sortOrder) {
   const title = `Prioridade ${number}`;
   const item = findCarePlanItem(lookup, "meta", title);
   return `
-    <label>
-      ${renderCarePlanHiddenItemFields("meta", title, sortOrder, { situation: "", recommendation: "" })}
-      <textarea name="difficulty[]" rows="2" placeholder="Dificuldade ${number}...">${SISELO.escapeHtml(item.difficulty || "")}</textarea>
-    </label>
-    <textarea name="goal[]" rows="2" placeholder="Meta ${number}...">${SISELO.escapeHtml(item.goal || "")}</textarea>
+    <div class="care-plan-goal-row" data-care-plan-goal-row data-goal-number="${number}">
+      <label>
+        ${renderCarePlanHiddenItemFields("meta", title, sortOrder, { situation: "", recommendation: "" })}
+        <textarea name="difficulty[]" rows="2" placeholder="Dificuldade ${number}...">${SISELO.escapeHtml(item.difficulty || "")}</textarea>
+      </label>
+      <label>
+        <span class="visually-hidden">Meta ${number}</span>
+        <textarea name="goal[]" rows="2" placeholder="Meta ${number}...">${SISELO.escapeHtml(item.goal || "")}</textarea>
+      </label>
+    </div>
   `;
+}
+
+function getCarePlanGoalNumbers(lookup) {
+  const numbers = [];
+
+  for (let number = 1; number <= 12; number += 1) {
+    const item = findCarePlanItem(lookup, "meta", `Prioridade ${number}`);
+    const hasContent = Boolean(
+      String(item.difficulty || "").trim() ||
+      String(item.goal || "").trim(),
+    );
+
+    if (number === 1 || hasContent) {
+      numbers.push(number);
+    }
+  }
+
+  return numbers.length ? numbers : [1];
+}
+
+function setupCarePlanGoalRepeater() {
+  const matrix = document.getElementById("care-plan-goals-matrix");
+  const addButton = document.querySelector("[data-care-plan-goal-add]");
+  const removeButton = document.querySelector("[data-care-plan-goal-remove]");
+
+  if (!matrix || !addButton || !removeButton) {
+    return;
+  }
+
+  const getRows = () => Array.from(matrix.querySelectorAll("[data-care-plan-goal-row]"));
+  const syncRows = () => {
+    const rows = getRows();
+    rows.forEach((row, index) => {
+      const number = index + 1;
+      row.dataset.goalNumber = String(number);
+      const titleInput = row.querySelector('input[name="title[]"]');
+      const sortInput = row.querySelector('input[name="sort_order[]"]');
+      if (titleInput instanceof HTMLInputElement) {
+        titleInput.value = `Prioridade ${number}`;
+      }
+      if (sortInput instanceof HTMLInputElement) {
+        sortInput.value = String(60 + index);
+      }
+      row.querySelector('textarea[name="difficulty[]"]')?.setAttribute("placeholder", `Dificuldade ${number}...`);
+      row.querySelector('textarea[name="goal[]"]')?.setAttribute("placeholder", `Meta ${number}...`);
+      const hiddenLabel = row.querySelector(".visually-hidden");
+      if (hiddenLabel) {
+        hiddenLabel.textContent = `Meta ${number}`;
+      }
+    });
+    removeButton.disabled = rows.length <= 1;
+    removeButton.setAttribute("aria-disabled", rows.length <= 1 ? "true" : "false");
+  };
+
+  addButton.addEventListener("click", () => {
+    const nextNumber = getRows().length + 1;
+    const template = document.createElement("template");
+    template.innerHTML = renderCarePlanGoalRow(nextNumber, [], 60 + nextNumber - 1).trim();
+    const row = template.content.firstElementChild;
+    if (row) {
+      matrix.appendChild(row);
+      syncRows();
+      row.querySelector("textarea")?.focus();
+    }
+  });
+
+  removeButton.addEventListener("click", () => {
+    const rows = getRows();
+    if (rows.length <= 1) {
+      syncRows();
+      return;
+    }
+
+    rows[rows.length - 1].remove();
+    syncRows();
+  });
+
+  syncRows();
 }
 
 function renderCarePlanHiddenItemFields(type, title, sortOrder, hiddenValues = {}) {
@@ -605,8 +709,8 @@ function renderCarePlansTable(
     <tr>
       <td>${row.id}</td>
       <td><span class="patient-name">${SISELO.highlightPersonName(row.full_name, query)}</span></td>
-      <td>${SISELO.escapeHtml(row.start_date)}</td>
-      <td>${SISELO.escapeHtml(row.end_date || "")}</td>
+      <td>${SISELO.escapeHtml(formatCarePlanDate(row.start_date))}</td>
+      <td>${SISELO.escapeHtml(formatCarePlanDate(row.end_date))}</td>
       <td>
         <div class="table-actions">
           ${SISELO.iconLink("pdf", `${SISELO.getApiBaseUrl()}/care_plans/pdf.php?id=${row.id}`, "Gerar PDF", { target: "_blank", rel: "noreferrer" })}
@@ -632,8 +736,8 @@ function renderCarePlansTrashTable(tbody, rows, permissions, query = "") {
     <tr>
       <td>${row.id}</td>
       <td><span class="patient-name">${SISELO.highlightPersonName(row.full_name, query)}</span></td>
-      <td>${SISELO.escapeHtml(row.start_date)}</td>
-      <td>${SISELO.escapeHtml(row.end_date || "")}</td>
+      <td>${SISELO.escapeHtml(formatCarePlanDate(row.start_date))}</td>
+      <td>${SISELO.escapeHtml(formatCarePlanDate(row.end_date))}</td>
       <td>${SISELO.escapeHtml(row.deleted_at || "")}</td>
       <td>
         <div class="table-actions">
@@ -830,15 +934,14 @@ function objectFromFormData(formData) {
 }
 
 function configureCarePlanDateInputs() {
-  const today = SISELO.todayDateInputValue();
-  const maxPlanDate = SISELO.shiftDateInputValue(today, { years: 5 });
   const startInput = SISELO.enhanceDateInput("start_date", {
     min: "1900-01-01",
-    max: maxPlanDate,
   });
   const endInput = SISELO.enhanceDateInput("end_date", {
     min: "1900-01-01",
-    max: maxPlanDate,
+  });
+  SISELO.enhanceDateInput("aps_review_date", {
+    min: "1900-01-01",
   });
 
   if (!startInput || !endInput) {
@@ -847,11 +950,16 @@ function configureCarePlanDateInputs() {
 
   const baseMin = "1900-01-01";
   const syncCarePlanDates = () => {
-    startInput.max = endInput.value || maxPlanDate;
+    const apsInput = document.getElementById("aps_review_date");
+    startInput.max = endInput.value || "";
     endInput.min =
       startInput.value && startInput.value > baseMin
         ? startInput.value
         : baseMin;
+    if (apsInput instanceof HTMLInputElement) {
+      apsInput.min = endInput.min;
+      apsInput.max = endInput.max || "";
+    }
 
     if (startInput.value) {
       startInput.value = SISELO.clampDateInputValue(
@@ -865,12 +973,15 @@ function configureCarePlanDateInputs() {
       endInput.value = SISELO.clampDateInputValue(
         endInput.value,
         endInput.min,
-        maxPlanDate,
+        "",
       );
     }
 
     SISELO.syncEnhancedDateInput(startInput);
     SISELO.syncEnhancedDateInput(endInput);
+    if (apsInput instanceof HTMLInputElement) {
+      SISELO.syncEnhancedDateInput(apsInput);
+    }
   };
 
   startInput.addEventListener("change", syncCarePlanDates);
@@ -887,10 +998,11 @@ function bindCarePlanDateMirrors() {
   }
 
   apsInput.min = endInput.min || "1900-01-01";
-  apsInput.max = endInput.max || SISELO.shiftDateInputValue(SISELO.todayDateInputValue(), { years: 5 });
+  apsInput.max = endInput.max || "";
 
   endInput.addEventListener("change", () => {
     apsInput.value = endInput.value;
+    SISELO.syncEnhancedDateInput(apsInput);
   });
 
   apsInput.addEventListener("change", () => {
