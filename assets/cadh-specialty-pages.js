@@ -409,6 +409,8 @@
         </div>
       </form>
     `;
+
+    bindSpecialtyRecordActions(config, patient);
   }
 
   function renderSpecialtyRecords(config, patient) {
@@ -437,6 +439,7 @@
               <th>Data</th>
               <th>Consulta</th>
               <th>Atualizado em</th>
+              <th>Ações</th>
             </tr>
           </thead>
           <tbody>
@@ -445,12 +448,232 @@
                 <td>${SISELO.escapeHtml(formatSpecialtyDate(record.consultation_date))}</td>
                 <td>${SISELO.escapeHtml(record.consultation_number || "-")}</td>
                 <td>${SISELO.escapeHtml(formatSpecialtyDateTime(record.updated_at))}</td>
+                <td>
+                  <div class="table-actions clinical-specialty-record-actions">
+                    ${SISELO.iconButton("view", "Ver exames", { "data-clinical-record-view": record.id })}
+                    ${SISELO.iconButton("pdf", "Gerar PDF", { "data-clinical-record-pdf": record.id })}
+                    ${SISELO.iconButton("edit", "Editar registro", { "data-clinical-record-edit": record.id })}
+                    ${SISELO.iconButton("delete", "Remover registro", { "data-clinical-record-delete": record.id })}
+                  </div>
+                </td>
               </tr>
             `).join("")}
           </tbody>
         </table>
       </div>
     `;
+  }
+
+  function bindSpecialtyRecordActions(config, patient) {
+    const container = document.getElementById("clinical-specialty-records");
+    if (!container || !patient) return;
+
+    container.querySelectorAll("[data-clinical-record-view]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const record = findPatientRecord(config, patient.id, button.dataset.clinicalRecordView);
+        if (record) {
+          openSpecialtyRecordView(config, record);
+        }
+      });
+    });
+
+    container.querySelectorAll("[data-clinical-record-pdf]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const record = findPatientRecord(config, patient.id, button.dataset.clinicalRecordPdf);
+        if (record) {
+          SISELO.showUnavailableAction("A geração do PDF será disponibilizada em breve.");
+        }
+      });
+    });
+
+    container.querySelectorAll("[data-clinical-record-edit]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const record = findPatientRecord(config, patient.id, button.dataset.clinicalRecordEdit);
+        if (record) {
+          loadSpecialtyRecordIntoForm(config, record);
+        }
+      });
+    });
+
+    container.querySelectorAll("[data-clinical-record-delete]").forEach((button) => {
+      button.addEventListener("click", async () => {
+        const record = findPatientRecord(config, patient.id, button.dataset.clinicalRecordDelete);
+        if (!record || !(await SISELO.confirmPermanentDeletion(`o registro de ${config.title}`, record.consultation_number))) {
+          return;
+        }
+
+        const records = readRecords(config.storageKey).filter((item) => String(item.id) !== String(record.id));
+        writeRecords(config.storageKey, records);
+        renderSpecialtyContent(config, patient);
+        bindSpecialtyForm(config, patient);
+      });
+    });
+  }
+
+  function findPatientRecord(config, patientId, recordId) {
+    const normalizedPatientId = SISELO.normalizeEntityId(patientId);
+    const normalizedRecordId = String(recordId || "").trim();
+    return readRecords(config.storageKey).find((record) => (
+      SISELO.normalizeEntityId(record.patient_id) === normalizedPatientId &&
+      String(record.id || "").trim() === normalizedRecordId
+    )) || null;
+  }
+
+  function loadSpecialtyRecordIntoForm(config, record) {
+    const form = document.getElementById("clinical-specialty-form");
+    if (!(form instanceof HTMLFormElement)) return;
+
+    Object.entries(record || {}).forEach(([name, value]) => {
+      setSpecialtyControlValue(form.elements[name], value);
+    });
+
+    setSpecialtyControlValue(form.elements.record_id, record.id || "");
+    syncConditionalSections(form, config);
+    form.querySelectorAll("input, select, textarea").forEach((control) => {
+      control.dispatchEvent(new Event("input", { bubbles: true }));
+      control.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+    SISELO.showAlert("clinical-specialty-alert", "Registro carregado para edição.", "success");
+    form.scrollIntoView({ block: "start", behavior: "smooth" });
+  }
+
+  function setSpecialtyControlValue(control, value) {
+    if (!control) return;
+    const nextValue = value == null ? "" : String(value);
+
+    if (control instanceof RadioNodeList) {
+      control.value = nextValue;
+      return;
+    }
+
+    if (control instanceof HTMLSelectElement) {
+      ensureSpecialtySelectValue(control, nextValue);
+      control.value = nextValue;
+      return;
+    }
+
+    if (control instanceof HTMLInputElement || control instanceof HTMLTextAreaElement) {
+      control.value = nextValue;
+    }
+  }
+
+  function ensureSpecialtySelectValue(select, value) {
+    if (!(select instanceof HTMLSelectElement) || !value) return;
+
+    const option = Array.from(select.options).find((item) => item.value === value);
+    if (option) {
+      option.disabled = false;
+      return;
+    }
+
+    select.add(new Option(value, value));
+  }
+
+  function openSpecialtyRecordView(config, record) {
+    const overlay = ensureSpecialtyRecordModal();
+    const title = overlay.querySelector("[data-clinical-record-title]");
+    const body = overlay.querySelector("[data-clinical-record-body]");
+    const dialog = overlay.querySelector(".clinical-record-view-modal");
+    if (!title || !body || !dialog) return;
+
+    title.textContent = `${config.title} - Registro salvo`;
+    body.innerHTML = renderSpecialtyRecordView(config, record);
+    overlay.hidden = false;
+    overlay.classList.add("is-open");
+    document.body.classList.add("modal-open");
+    dialog.focus();
+  }
+
+  function ensureSpecialtyRecordModal() {
+    let overlay = document.getElementById("clinical-record-view-overlay");
+    if (overlay) return overlay;
+
+    overlay = document.createElement("div");
+    overlay.id = "clinical-record-view-overlay";
+    overlay.className = "clinical-record-view-overlay";
+    overlay.hidden = true;
+    overlay.innerHTML = `
+      <div class="clinical-record-view-modal" role="dialog" aria-modal="true" aria-labelledby="clinical-record-view-title" tabindex="-1">
+        <header>
+          <h2 id="clinical-record-view-title" data-clinical-record-title>Registro salvo</h2>
+          <button class="clinical-record-view-close" type="button" aria-label="Fechar" data-clinical-record-close>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+          </button>
+        </header>
+        <div class="clinical-record-view-body" data-clinical-record-body></div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+
+    overlay.addEventListener("click", (event) => {
+      if (event.target === overlay) closeSpecialtyRecordModal();
+    });
+    overlay.querySelector("[data-clinical-record-close]")?.addEventListener("click", closeSpecialtyRecordModal);
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && !overlay.hidden) closeSpecialtyRecordModal();
+    });
+
+    return overlay;
+  }
+
+  function closeSpecialtyRecordModal() {
+    const overlay = document.getElementById("clinical-record-view-overlay");
+    if (!overlay) return;
+    overlay.classList.remove("is-open");
+    overlay.hidden = true;
+    document.body.classList.remove("modal-open");
+  }
+
+  function renderSpecialtyRecordView(config, record) {
+    const identification = [
+      ["Paciente", record.full_name || "-"],
+      ["CPF", record.cpf || "-"],
+      ["Equipe", SISELO.formatTeamName(record.team_ref) || "-"],
+      ["Data de nascimento", formatSpecialtyDate(record.birth_date)],
+      ["Idade", record.age_label || "-"],
+      ["1º atendimento no CADH", formatSpecialtyDate(record.first_cadh_date)],
+    ];
+    const consultation = [
+      ["Data da consulta", formatSpecialtyDate(record.consultation_date)],
+      ["Nº da consulta", record.consultation_number || "-"],
+      ["Atualizado em", formatSpecialtyDateTime(record.updated_at)],
+    ];
+
+    return `
+      ${renderSpecialtyRecordViewSection("Identificação", identification)}
+      ${renderSpecialtyRecordViewSection("Consulta", consultation)}
+      ${config.sections.map((sectionConfig) => renderSpecialtyRecordFieldSection(sectionConfig, record)).join("")}
+    `;
+  }
+
+  function renderSpecialtyRecordFieldSection(sectionConfig, record) {
+    const rows = (sectionConfig.fields || [])
+      .filter((fieldConfig) => !["patient_id", "record_id", "consultation_date", "consultation_number"].includes(fieldConfig.name))
+      .map((fieldConfig) => [stripRequiredStar(fieldConfig.label), formatSpecialtyRecordValue(fieldConfig, record[fieldConfig.name])]);
+
+    if (!rows.length) return "";
+    return renderSpecialtyRecordViewSection(sectionConfig.title, rows);
+  }
+
+  function renderSpecialtyRecordViewSection(title, rows) {
+    return `
+      <section class="clinical-record-view-section">
+        <h3>${SISELO.escapeHtml(title)}</h3>
+        <dl>
+          ${rows.map(([label, value]) => `
+            <div>
+              <dt>${SISELO.escapeHtml(label)}</dt>
+              <dd>${SISELO.escapeHtml(value || "-")}</dd>
+            </div>
+          `).join("")}
+        </dl>
+      </section>
+    `;
+  }
+
+  function formatSpecialtyRecordValue(fieldConfig, value) {
+    if (fieldConfig.type === "date") return formatSpecialtyDate(value);
+    return String(value || "-").trim() || "-";
   }
 
   function renderSpecialtyRecordsEmpty() {

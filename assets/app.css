@@ -11235,7 +11235,7 @@ body[data-page="cadh-specialty-form"] .clinical-specialty-records-scroll {
 }
 
 body[data-page="cadh-specialty-form"] .clinical-specialty-records-table {
-  min-width: 520px;
+  min-width: 680px;
   border-collapse: collapse;
 }
 
@@ -11258,6 +11258,149 @@ body[data-page="cadh-specialty-form"] .clinical-specialty-records-table th {
 
 body[data-page="cadh-specialty-form"] .clinical-specialty-records-table tr:last-child td {
   border-bottom: 0;
+}
+
+body[data-page="cadh-specialty-form"] .clinical-specialty-records-table th:last-child,
+body[data-page="cadh-specialty-form"] .clinical-specialty-records-table td:last-child {
+  width: 172px;
+  text-align: center;
+}
+
+body[data-page="cadh-specialty-form"] .clinical-specialty-record-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: nowrap;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+body[data-page="cadh-specialty-form"] .clinical-specialty-record-actions .icon-btn {
+  inline-size: 34px;
+  block-size: 34px;
+  min-inline-size: 34px;
+  border: 1px solid #d6e2ec;
+  border-radius: 10px;
+  background: #f8fbfd;
+}
+
+.clinical-record-view-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(6, 20, 38, 0.46);
+}
+
+.clinical-record-view-overlay[hidden] {
+  display: none !important;
+}
+
+.clinical-record-view-modal {
+  width: min(760px, 100%);
+  max-height: min(760px, calc(100vh - 48px));
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  border: 1px solid #cbd8e2;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 24px 64px rgba(7, 35, 64, 0.26);
+}
+
+.clinical-record-view-modal:focus {
+  outline: none;
+}
+
+.clinical-record-view-modal > header {
+  min-height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 18px;
+  border-bottom: 1px solid #dbe5ed;
+  background: #f8fafc;
+}
+
+.clinical-record-view-modal h2 {
+  margin: 0;
+  color: #071526;
+  font-size: 1rem;
+  font-weight: 900;
+}
+
+.clinical-record-view-close {
+  inline-size: 36px;
+  block-size: 36px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #cbd8e2;
+  border-radius: 10px;
+  background: #fff;
+  color: #526b86;
+}
+
+.clinical-record-view-close svg {
+  inline-size: 18px;
+  block-size: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.clinical-record-view-body {
+  overflow: auto;
+  padding: 18px;
+  display: grid;
+  gap: 14px;
+}
+
+.clinical-record-view-section {
+  overflow: hidden;
+  border: 1px solid #dbe5ed;
+  border-radius: 12px;
+}
+
+.clinical-record-view-section h3 {
+  margin: 0;
+  padding: 10px 14px;
+  background: #e9eef3;
+  color: #526b86;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.clinical-record-view-section dl {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.clinical-record-view-section div {
+  min-width: 0;
+  padding: 12px 14px;
+  border-top: 1px solid #edf2f6;
+}
+
+.clinical-record-view-section dt {
+  margin: 0 0 4px;
+  color: #526b86;
+  font-size: 0.72rem;
+  font-weight: 900;
+}
+
+.clinical-record-view-section dd {
+  margin: 0;
+  color: #071526;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
 }
 
 body[data-page="cadh-specialty-form"] .clinical-specialty-records-empty {
