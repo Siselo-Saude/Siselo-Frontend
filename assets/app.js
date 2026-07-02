@@ -3662,11 +3662,10 @@
     const currentYear = instance.state.viewDate.getFullYear();
     const currentMonth = instance.state.viewDate.getMonth();
     const currentSystemYear = today.getFullYear();
-    const yearWindow = 6;
     const minYearLimit = bounds.min ? bounds.min.getFullYear() : currentSystemYear - 130;
     const maxYearLimit = bounds.max ? bounds.max.getFullYear() : currentSystemYear + 100;
-    const minYear = Math.max(minYearLimit, currentYear - yearWindow);
-    const maxYear = Math.min(maxYearLimit, currentYear + yearWindow);
+    const minYear = minYearLimit;
+    const maxYear = maxYearLimit;
 
     instance.monthSelect.innerHTML = DATE_PICKER_MONTH_NAMES.map((monthName, monthIndex) => {
       const monthDate = createDateAtNoon(currentYear, monthIndex, 1);
