@@ -5,7 +5,6 @@
   const NAVIGATION_KEY = 'siselo_navigation';
   const CADH_SEARCH_KEY = 'siselo_cadh_search';
   const FLASH_ALERT_KEY = 'siselo_flash_alert';
-  const THEME_KEY = 'siselo_theme';
   const TEAM_LABELS = {
     safira: 'Safira',
     ametista: 'Ametista',
@@ -148,7 +147,6 @@
       '.topbar-logout',
       '.topbar-account',
       '.topbar-icon-btn',
-      '.topbar-theme-toggle',
       '.cadh-search-button',
       '.cadh-new-patient-link',
       '.cadh-tab-link',
@@ -1172,9 +1170,24 @@
     return normalizeAppPath(state.previous);
   }
 
+  function isSamePathGroup(firstPath, secondPath) {
+    const first = normalizeAppPath(firstPath);
+    const second = normalizeAppPath(secondPath);
+    if (!first || !second) {
+      return false;
+    }
+
+    const firstSegment = new URL(first, location.origin).pathname.split('/').filter(Boolean)[0] || '';
+    const secondSegment = new URL(second, location.origin).pathname.split('/').filter(Boolean)[0] || '';
+    return firstSegment !== '' && firstSegment === secondSegment;
+  }
+
   function resolvePreviousScreenTarget(link) {
     const fallback = link?.dataset?.fallback || link?.getAttribute?.('href') || '';
-    return getSameOriginReferrerPath() || getNavigationPreviousPath() || resolveBackTarget(fallback);
+    const scopedFallback = resolveBackTarget(fallback);
+    const previousPath = getSameOriginReferrerPath() || getNavigationPreviousPath();
+
+    return isSamePathGroup(previousPath, scopedFallback) ? previousPath : scopedFallback;
   }
 
   function navigatePreviousScreen(link) {
@@ -1711,6 +1724,29 @@
     element.style.setProperty('--team-text', theme.text);
   }
 
+  function closeOpenPopovers(exceptElement = null) {
+    const except = exceptElement instanceof Element ? exceptElement : null;
+
+    document.querySelectorAll('.choice-select.is-open, .team-picker.is-open').forEach((wrapper) => {
+      if (except && wrapper === except) {
+        return;
+      }
+
+      wrapper.classList.remove('is-open');
+      wrapper.querySelector('.choice-select-trigger, .team-picker-trigger')?.setAttribute('aria-expanded', 'false');
+      const menu = wrapper.querySelector('.choice-select-menu, .team-picker-menu');
+      if (menu instanceof HTMLElement) {
+        menu.hidden = true;
+      }
+    });
+
+    if (activeDatePicker && (!except || activeDatePicker.wrapper !== except)) {
+      closeDatePicker(activeDatePicker, false);
+    }
+
+    hideFieldGuidanceTooltip();
+  }
+
   function setupTeamFieldPicker(options = {}) {
     const select = options.select instanceof HTMLSelectElement
       ? options.select
@@ -1761,6 +1797,7 @@
     };
 
     const open = () => {
+      closeOpenPopovers(container);
       container.classList.add('is-open');
       trigger.setAttribute('aria-expanded', 'true');
       menu.hidden = false;
@@ -1865,10 +1902,15 @@
       return false;
     }
 
+    if (document.body && document.body.dataset.page === 'cadh-specialty-form') {
+      return false;
+    }
+
     if (
       select.classList.contains('visually-hidden') ||
       select.classList.contains('date-picker-select') ||
       select.classList.contains('status-select-native') ||
+      select.classList.contains('clinical-specialty-native-select') ||
       select.classList.contains('patient-native-select') ||
       select.classList.contains('endocrino-native-select-hidden') ||
       select.dataset.nativeSelect === 'true' ||
@@ -1967,6 +2009,7 @@
     };
 
     const open = () => {
+      closeOpenPopovers(wrapper);
       renderMenu();
       wrapper.classList.add('is-open');
       trigger.setAttribute('aria-expanded', 'true');
@@ -2156,52 +2199,15 @@
     }
   }
 
-  function getStoredTheme() {
+  function removeAppThemePreference() {
+    document.documentElement.removeAttribute('data-theme');
     try {
-      const value = localStorage.getItem(THEME_KEY);
-      return value === 'dark' ? 'dark' : 'light';
-    } catch (error) {
-      return 'light';
-    }
-  }
-
-  function setAppTheme(theme) {
-    const nextTheme = theme === 'dark' ? 'dark' : 'light';
-    document.documentElement.dataset.theme = nextTheme;
-    try {
-      localStorage.setItem(THEME_KEY, nextTheme);
+      localStorage.removeItem('siselo_theme');
     } catch (error) {
     }
-    syncThemeToggleButton();
   }
 
-  function getThemeToggleIcon(theme) {
-    return theme === 'dark'
-      ? '<svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2"/><path d="M12 19.3v2.2"/><path d="m5.4 5.4 1.5 1.5"/><path d="m17.1 17.1 1.5 1.5"/><path d="M2.5 12h2.2"/><path d="M19.3 12h2.2"/><path d="m5.4 18.6 1.5-1.5"/><path d="m17.1 6.9 1.5-1.5"/></svg>'
-      : '<svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20.7 14.2A7.4 7.4 0 0 1 9.8 3.3a8.7 8.7 0 1 0 10.9 10.9Z"/><circle cx="16.4" cy="8.2" r="1.1"/></svg>';
-  }
-
-  function syncThemeToggleButton() {
-    const button = document.getElementById('topbar-theme-toggle');
-    if (!(button instanceof HTMLButtonElement)) {
-      return;
-    }
-
-    const theme = document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
-    const nextThemeLabel = theme === 'dark' ? 'modo claro' : 'modo escuro';
-    button.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false');
-    button.title = `Alternar para ${nextThemeLabel}`;
-    button.setAttribute('aria-label', `Alternar para ${nextThemeLabel}`);
-    button.innerHTML = `
-      <span class="topbar-theme-icon">${getThemeToggleIcon(theme)}</span>
-    `;
-  }
-
-  function toggleAppTheme() {
-    setAppTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
-  }
-
-  setAppTheme(getStoredTheme());
+  removeAppThemePreference();
 
   function normalizeRoleName(value) {
     return String(value || '')
@@ -2352,22 +2358,6 @@
     settingsLink.title = 'Configurações';
     settingsLink.setAttribute('aria-label', 'Configurações');
     settingsLink.hidden = !user;
-
-    let themeButton = actions.querySelector('#topbar-theme-toggle');
-    if (!themeButton) {
-      themeButton = document.createElement('button');
-      themeButton.id = 'topbar-theme-toggle';
-      themeButton.className = 'topbar-theme-toggle';
-      themeButton.type = 'button';
-      actions.appendChild(themeButton);
-    }
-
-    if (themeButton.dataset.bound !== 'true') {
-      themeButton.dataset.bound = 'true';
-      themeButton.addEventListener('click', toggleAppTheme);
-    }
-    themeButton.hidden = !user;
-    syncThemeToggleButton();
 
     let accountLink = actions.querySelector('#topbar-account-link');
     if (!accountLink) {
@@ -2689,11 +2679,10 @@
 
     actions.classList.add('home-sidebar-footer');
     const settingsLink = actions.querySelector('#topbar-settings-link');
-    const themeButton = actions.querySelector('#topbar-theme-toggle');
     const accountLink = actions.querySelector('#topbar-account-link');
     const logoutButton = actions.querySelector('#logout-button');
 
-    [settingsLink, themeButton, accountLink, logoutButton].forEach((item) => {
+    [settingsLink, accountLink, logoutButton].forEach((item) => {
       if (item) {
         actions.appendChild(item);
       }
@@ -2836,7 +2825,7 @@
     }
 
     const key = normalizeSearchText(raw);
-    return TEAM_LABELS[key] || TEAM_LABELS[key.replace(/\s+/g, '_')] || 'Sem equipe';
+    return TEAM_LABELS[key] || TEAM_LABELS[key.replace(/\s+/g, '_')] || raw;
   }
 
   function renderTeamBadge(value) {
@@ -3507,6 +3496,8 @@
     if (!instance) {
       return;
     }
+
+    closeOpenPopovers(instance.wrapper);
 
     if (activeDatePicker && activeDatePicker !== instance) {
       closeDatePicker(activeDatePicker, false);

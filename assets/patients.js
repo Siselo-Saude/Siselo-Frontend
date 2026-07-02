@@ -19,6 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 const PATIENT_LEGACY_TEAM_OPTIONS = {
+  sem_equipe: "Sem equipe",
   safira: "Safira",
   ametista: "Ametista",
   esmeralda: "Esmeralda",

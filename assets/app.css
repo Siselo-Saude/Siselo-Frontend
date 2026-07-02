@@ -180,8 +180,7 @@ a {
 
 .topbar-logout,
 .topbar-account,
-.topbar-icon-btn,
-.topbar-theme-toggle {
+.topbar-icon-btn {
   min-height: 40px;
   display: inline-flex;
   align-items: center;
@@ -231,8 +230,7 @@ a {
   box-shadow: 0 14px 24px rgba(15, 37, 65, 0.16);
 }
 
-.topbar-icon-btn,
-.topbar-theme-toggle {
+.topbar-icon-btn {
   border: 1px solid rgba(255, 255, 255, 0.16);
   background: var(--topbar-control-bg);
   color: var(--topbar-control-text);
@@ -244,16 +242,8 @@ a {
   transition: background 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
 }
 
-.topbar-theme-toggle {
-  inline-size: 44px;
-  min-inline-size: 44px;
-  padding: 0;
-}
-
 .topbar-icon-btn:hover,
-.topbar-icon-btn:focus-visible,
-.topbar-theme-toggle:hover,
-.topbar-theme-toggle:focus-visible {
+.topbar-icon-btn:focus-visible {
   outline: none;
   background: var(--topbar-control-hover);
   border-color: rgba(255, 255, 255, 0.3);
@@ -261,8 +251,7 @@ a {
   box-shadow: 0 12px 20px rgba(0, 0, 0, 0.14);
 }
 
-.topbar-icon-btn svg,
-.topbar-theme-icon svg {
+.topbar-icon-btn svg {
   inline-size: 18px;
   block-size: 18px;
   display: block;
@@ -273,28 +262,10 @@ a {
   stroke-linejoin: round;
 }
 
-.topbar-icon-btn span,
-.topbar-theme-label {
+.topbar-icon-btn span {
   font-size: 0.92rem;
   font-weight: 800;
   white-space: nowrap;
-}
-
-.topbar-theme-icon {
-  inline-size: 30px;
-  block-size: 30px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 999px;
-  background:
-    radial-gradient(circle at 38% 38%, rgba(255, 214, 89, 0.72), rgba(255, 214, 89, 0.2) 42%, transparent 43%),
-    rgba(255, 255, 255, 0.13);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
-}
-
-.topbar-theme-label {
-  display: none;
 }
 
 .topbar-account::before {
@@ -429,8 +400,7 @@ a {
   color: #f1dddd;
 }
 
-:root[data-theme="dark"] .topbar-icon-btn,
-:root[data-theme="dark"] .topbar-theme-toggle {
+:root[data-theme="dark"] .topbar-icon-btn {
   border-color: rgba(232, 243, 244, 0.16);
   background: var(--topbar-control-bg);
   color: var(--topbar-control-text);
@@ -438,18 +408,10 @@ a {
 }
 
 :root[data-theme="dark"] .topbar-icon-btn:hover,
-:root[data-theme="dark"] .topbar-icon-btn:focus-visible,
-:root[data-theme="dark"] .topbar-theme-toggle:hover,
-:root[data-theme="dark"] .topbar-theme-toggle:focus-visible {
+:root[data-theme="dark"] .topbar-icon-btn:focus-visible {
   border-color: rgba(232, 243, 244, 0.3);
   background: var(--topbar-control-hover);
   box-shadow: 0 12px 20px rgba(0, 0, 0, 0.18);
-}
-
-:root[data-theme="dark"] .topbar-theme-icon {
-  background:
-    radial-gradient(circle at 38% 38%, rgba(255, 211, 77, 0.68), rgba(255, 211, 77, 0.18) 42%, transparent 43%),
-    rgba(226, 243, 241, 0.12);
 }
 
 :root[data-theme="dark"] th,
@@ -3860,12 +3822,7 @@ body[data-page="patients-form"] .patient-assistance-panel .patient-clinical-note
     flex: 1 1 140px;
   }
 
-  .topbar-actions > .topbar-theme-toggle {
-    flex: 0 0 44px;
-  }
-
   .topbar-icon-btn,
-  .topbar-theme-toggle,
   .topbar-account {
     min-width: 0;
   }
@@ -4305,7 +4262,6 @@ html.is-embedded .site-endbar {
   }
 
   .topbar-icon-btn,
-  .topbar-theme-toggle,
   .topbar-account,
   body[data-page] .topbar-account {
     min-height: 44px;
@@ -4990,10 +4946,6 @@ body[data-page="home"] .home-pillar-icon svg {
   background: rgba(255, 255, 255, 0.08);
   color: #fff;
   transform: none;
-}
-
-:is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-footer .topbar-theme-toggle {
-  display: none !important;
 }
 
 :is(body[data-page="home"], body[data-page="cadh"]) .home-sidebar-footer .topbar-account {
@@ -8323,10 +8275,6 @@ body[data-page="ubs"] .home-sidebar-footer .topbar-settings:focus-visible {
   transform: none;
 }
 
-body[data-page="ubs"] .home-sidebar-footer .topbar-theme-toggle {
-  display: none !important;
-}
-
 body[data-page="ubs"] .home-sidebar-footer .topbar-account {
   width: 100%;
   min-height: 48px;
@@ -9982,10 +9930,6 @@ body[data-page="care-plans-form"] .home-sidebar-footer .topbar-settings {
   box-shadow: none;
 }
 
-body[data-page="care-plans-form"] .home-sidebar-footer .topbar-theme-toggle {
-  display: none !important;
-}
-
 body[data-page="care-plans-form"] .home-sidebar-footer .topbar-account {
   width: 100%;
   min-height: 48px;
@@ -11269,7 +11213,7 @@ body[data-page="cadh-specialty-form"] .clinical-specialty-field.is-wide {
   grid-column: 1 / -1;
 }
 
-body[data-page="cadh-specialty-form"] .clinical-specialty-field > span {
+body[data-page="cadh-specialty-form"] .clinical-specialty-field > label {
   color: #526b86;
   font-size: 0.73rem;
   font-weight: 900;
@@ -11777,10 +11721,6 @@ body.siselo-auto-shell .home-sidebar-footer .topbar-settings {
   background: transparent;
   color: #9fb8cf;
   font-weight: 800;
-}
-
-body.siselo-auto-shell .home-sidebar-footer .topbar-theme-toggle {
-  display: none !important;
 }
 
 body.siselo-auto-shell .home-sidebar-footer .topbar-account {
@@ -14179,15 +14119,6 @@ body[data-page="cadh-specialty-form"] .home-sidebar-footer .topbar-settings {
   border-radius: 10px !important;
   background: transparent !important;
   color: var(--siselo-sidebar-muted) !important;
-}
-
-body.siselo-sidebar-shell .home-sidebar-footer .topbar-theme-toggle,
-body[data-page="home"] .home-sidebar-footer .topbar-theme-toggle,
-body[data-page="cadh"] .home-sidebar-footer .topbar-theme-toggle,
-body[data-page="ubs"] .home-sidebar-footer .topbar-theme-toggle,
-body[data-page="care-plans-form"] .home-sidebar-footer .topbar-theme-toggle,
-body[data-page="cadh-specialty-form"] .home-sidebar-footer .topbar-theme-toggle {
-  display: none !important;
 }
 
 body.siselo-sidebar-shell .home-sidebar-footer .topbar-account,

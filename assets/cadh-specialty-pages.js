@@ -461,7 +461,7 @@
     let control = "";
     if (fieldConfig.type === "select") {
       control = `
-        <select ${common} class="status-select-native"${required}>
+        <select ${common} class="clinical-specialty-native-select" data-native-select="true"${required}>
           ${renderOptions(fieldConfig.options || [])}
         </select>
       `;
@@ -478,10 +478,10 @@
     }
 
     return `
-      <label class="clinical-specialty-field${wideClass}" for="${SISELO.escapeHtml(id)}" data-field-name="${SISELO.escapeHtml(fieldConfig.name)}" data-legacy-container-id="${SISELO.escapeHtml(fieldConfig.legacyContainerId || "")}">
-        <span>${SISELO.escapeHtml(stripRequiredStar(fieldConfig.label))}</span>
+      <div class="clinical-specialty-field${wideClass}" data-field-name="${SISELO.escapeHtml(fieldConfig.name)}" data-legacy-container-id="${SISELO.escapeHtml(fieldConfig.legacyContainerId || "")}">
+        <label for="${SISELO.escapeHtml(id)}">${SISELO.escapeHtml(stripRequiredStar(fieldConfig.label))}</label>
         ${control}
-      </label>
+      </div>
     `;
   }
 
@@ -638,7 +638,7 @@
     if (!invalidControl) return null;
 
     const fieldElement = invalidControl.closest(".clinical-specialty-field");
-    const label = cleanText(fieldElement ? fieldElement.querySelector("span")?.textContent : "") || invalidControl.name || "campo obrigatório";
+    const label = cleanText(fieldElement ? fieldElement.querySelector("label")?.textContent : "") || invalidControl.name || "campo obrigatório";
     return { control: invalidControl, label };
   }
 
