@@ -28,6 +28,7 @@
     { color: '#0369a1', border: '#bae6fd', bg: '#f0f9ff', text: '#075985' },
     { color: '#4d7c0f', border: '#d9f99d', bg: '#f7fee7', text: '#3f6212' },
   ];
+  let currentDateTickerBound = false;
 
   function applyRuntimeLayoutContext() {
     const params = new URLSearchParams(window.location.search);
@@ -2217,31 +2218,62 @@
       .trim();
   }
 
-  function getUserRoleMeta(user, permissions) {
+  function normalizeDisplayName(value) {
+    return String(value || '').replace(/\s+/g, ' ').trim();
+  }
+
+  function userHasAdminAccess(user, permissions = getUiPermissions(user)) {
+    const roles = Array.isArray(user && user.roles)
+      ? user.roles.map(normalizeRoleName)
+      : [];
+    const profileValues = [
+      user && user.role,
+      user && user.profile,
+      user && user.perfil,
+      user && user.user_role,
+      user && user.access_level,
+      user && user.type,
+      user && user.user_type,
+    ].map(normalizeRoleName);
+
+    return Boolean(
+      permissions.has('admin.manage') ||
+      roles.some((role) => role === 'admin' || role === 'administrador') ||
+      profileValues.some((value) => value === 'admin' || value === 'administrador') ||
+      (user && (user.is_admin === true || user.is_admin === 1 || user.admin === true || user.admin === 1))
+    );
+  }
+
+  function getUserRoleMeta(user, permissions = getUiPermissions(user)) {
     const roles = Array.isArray(user && user.roles)
       ? user.roles.map(normalizeRoleName)
       : [];
     const specialty = String((user && user.specialty) || '').trim();
     const userType = String((user && user.user_type) || '').trim().toUpperCase();
+    const name = normalizeDisplayName(user && user.name);
 
-    if (permissions.has('admin.manage') || roles.includes('admin')) {
-      return { kind: 'admin', label: 'Administrador' };
+    if (userHasAdminAccess(user, permissions)) {
+      return { kind: 'admin', label: 'Administrador', detail: '' };
     }
 
     if (roles.includes('alimentador')) {
-      return { kind: 'editor', label: specialty || 'Alimentador' };
+      return { kind: 'editor', label: specialty || 'Alimentador', detail: name || 'Profissional' };
     }
 
     if (roles.includes('visualizador')) {
-      return { kind: 'viewer', label: 'Visualizador' };
+      return { kind: 'viewer', label: 'Visualizador', detail: name || '' };
     }
 
     if (specialty) {
-      return { kind: 'clinical', label: specialty };
+      return { kind: 'clinical', label: specialty, detail: name || '' };
     }
 
     if (userType) {
-      return { kind: userType === 'CADH' ? 'clinical' : 'viewer', label: userType };
+      return { kind: userType === 'CADH' ? 'clinical' : 'viewer', label: userType, detail: name || '' };
+    }
+
+    if (name) {
+      return { kind: 'user', label: name, detail: '' };
     }
 
     return { kind: 'user', label: 'Usuário' };
@@ -2263,14 +2295,61 @@
     `;
   }
 
+  function getCurrentDateParts() {
+    const now = new Date();
+    return {
+      iso: [
+        now.getFullYear(),
+        String(now.getMonth() + 1).padStart(2, '0'),
+        String(now.getDate()).padStart(2, '0'),
+      ].join('-'),
+      label: new Intl.DateTimeFormat('pt-BR', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+      }).format(now),
+    };
+  }
+
+  function syncCurrentDateElements() {
+    const currentDate = getCurrentDateParts();
+    document.querySelectorAll('.home-current-date, [data-shell-current-date]').forEach((element) => {
+      if (!(element instanceof HTMLElement)) {
+        return;
+      }
+
+      if (element instanceof HTMLTimeElement) {
+        element.dateTime = currentDate.iso;
+      } else {
+        element.setAttribute('datetime', currentDate.iso);
+      }
+      element.hidden = false;
+      element.removeAttribute('hidden');
+      element.textContent = currentDate.label;
+    });
+  }
+
+  function bindCurrentDateTicker() {
+    syncCurrentDateElements();
+    if (currentDateTickerBound) {
+      return;
+    }
+
+    currentDateTickerBound = true;
+    window.setInterval(syncCurrentDateElements, 60 * 1000);
+  }
+
   function syncUserRoleStatus(user, permissions) {
     const meta = getUserRoleMeta(user, permissions);
-    document.querySelectorAll('.home-system-status').forEach((status) => {
+    const title = [meta.detail, meta.label].filter(Boolean).join(' - ') || meta.label;
+    document.querySelectorAll('.home-system-status, .home-operational-status').forEach((status) => {
       if (!(status instanceof HTMLElement)) {
         return;
       }
 
       status.classList.remove(
+        'home-operational-status',
+        'cadh-operational-status',
         'home-user-role-status',
         'home-user-role-admin',
         'home-user-role-editor',
@@ -2278,12 +2357,15 @@
         'home-user-role-viewer',
         'home-user-role-user'
       );
-      status.classList.add('home-user-role-status', `home-user-role-${meta.kind}`);
-      status.title = meta.label;
-      status.setAttribute('aria-label', meta.label);
+      status.classList.add('home-system-status', 'home-user-role-status', `home-user-role-${meta.kind}`);
+      status.title = title;
+      status.setAttribute('aria-label', title);
       status.innerHTML = `
         <span class="home-system-status-icon" aria-hidden="true">${getUserRoleIcon(meta.kind)}</span>
-        <span>${escapeHtml(meta.label)}</span>
+        <span class="home-system-status-copy">
+          ${meta.detail ? `<span class="home-system-status-name">${escapeHtml(meta.detail)}</span>` : ''}
+          <span class="home-system-status-role">${escapeHtml(meta.label)}</span>
+        </span>
       `;
     });
   }
@@ -2352,9 +2434,6 @@
       actions.appendChild(settingsLink);
     }
 
-    settingsLink.href = permissions.has('admin.manage')
-      ? '/admin/users/list.html'
-      : '/change_password.html';
     settingsLink.title = 'Configurações';
     settingsLink.setAttribute('aria-label', 'Configurações');
     settingsLink.hidden = !user;
@@ -2367,12 +2446,17 @@
       actions.appendChild(accountLink);
     }
 
-    accountLink.href = permissions.has('admin.manage')
+    const hasAdminAccess = userHasAdminAccess(user, permissions);
+    settingsLink.href = hasAdminAccess
+      ? '/admin/users/list.html'
+      : '/change_password.html';
+
+    accountLink.href = hasAdminAccess
       ? '/admin/users/list.html'
       : '/admin/users/list.html?self=1';
     accountLink.textContent = user && user.name ? user.name : 'Meu perfil';
-    accountLink.title = permissions.has('admin.manage') ? 'Admin' : 'Meu perfil';
-    accountLink.setAttribute('aria-label', permissions.has('admin.manage') ? 'Admin' : 'Meu perfil');
+    accountLink.title = hasAdminAccess ? 'Admin' : 'Meu perfil';
+    accountLink.setAttribute('aria-label', hasAdminAccess ? 'Admin' : 'Meu perfil');
     accountLink.hidden = !user;
     syncUserRoleStatus(user, permissions);
   }
@@ -2568,23 +2652,7 @@
       return;
     }
 
-    const updateCurrentDate = () => {
-      const now = new Date();
-      const localDate = [
-        now.getFullYear(),
-        String(now.getMonth() + 1).padStart(2, '0'),
-        String(now.getDate()).padStart(2, '0'),
-      ].join('-');
-      dateElement.dateTime = localDate;
-      dateElement.textContent = new Intl.DateTimeFormat('pt-BR', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric',
-      }).format(now);
-    };
-
-    updateCurrentDate();
-    window.setInterval(updateCurrentDate, 60 * 1000);
+    bindCurrentDateTicker();
   }
 
   function bindUnifiedHeaderTitleSync(header, activeKey) {
@@ -2771,6 +2839,7 @@
 
     setText('current-user-name', user ? user.name : '');
     ensureTopbarActions(user, permissions);
+    bindCurrentDateTicker();
     syncUnifiedSidebarFooter(user);
     bindUnifiedSidebarToggle();
 
@@ -4172,6 +4241,7 @@
     setText,
     shiftDateInputValue,
     showToast,
+    syncCurrentDate: syncCurrentDateElements,
     syncEnhancedDateInput,
     syncSearchUrl,
     showActionError,

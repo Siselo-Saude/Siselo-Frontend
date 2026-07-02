@@ -63,25 +63,9 @@ async function setupUbsPage() {
 }
 
 function setupUbsHeaderDate() {
-  const dateElement = document.getElementById('ubs-current-date');
-  const updateCurrentDate = () => {
-    if (!dateElement) return;
-    const now = new Date();
-    const localDate = [
-      now.getFullYear(),
-      String(now.getMonth() + 1).padStart(2, '0'),
-      String(now.getDate()).padStart(2, '0'),
-    ].join('-');
-    dateElement.dateTime = localDate;
-    dateElement.textContent = new Intl.DateTimeFormat('pt-BR', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-    }).format(now);
-  };
-
-  updateCurrentDate();
-  window.setInterval(updateCurrentDate, 60 * 1000);
+  if (SISELO.syncCurrentDate) {
+    SISELO.syncCurrentDate();
+  }
 }
 
 function setupUbsSidebar(user) {

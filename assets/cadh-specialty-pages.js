@@ -273,24 +273,9 @@
   }
 
   function setupHeaderDate() {
-    const dateElement = document.getElementById("clinical-current-date");
-    const updateCurrentDate = () => {
-      if (!dateElement) return;
-      const now = new Date();
-      dateElement.dateTime = [
-        now.getFullYear(),
-        String(now.getMonth() + 1).padStart(2, "0"),
-        String(now.getDate()).padStart(2, "0"),
-      ].join("-");
-      dateElement.textContent = new Intl.DateTimeFormat("pt-BR", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-      }).format(now);
-    };
-
-    updateCurrentDate();
-    window.setInterval(updateCurrentDate, 60 * 1000);
+    if (SISELO.syncCurrentDate) {
+      SISELO.syncCurrentDate();
+    }
   }
 
   function setupSidebar(user) {
@@ -409,6 +394,7 @@
 
     root.innerHTML = `
       ${titlebar}
+      ${renderSpecialtyRecords(config, patient)}
       <form id="clinical-specialty-form" class="clinical-specialty-form" autocomplete="off" novalidate>
         <input type="hidden" name="record_id" value="">
         <input type="hidden" name="patient_id" value="${SISELO.escapeHtml(patient.id)}">
@@ -422,6 +408,56 @@
           </button>
         </div>
       </form>
+    `;
+  }
+
+  function renderSpecialtyRecords(config, patient) {
+    const records = getPatientSpecialtyRecords(config, patient && patient.id);
+    const countLabel = `${records.length} ${records.length === 1 ? "registro" : "registros"}`;
+
+    return `
+      <section id="clinical-specialty-records" class="clinical-specialty-section clinical-specialty-records" aria-labelledby="clinical-specialty-records-title">
+        <header>
+          <span id="clinical-specialty-records-title">Registros salvos</span>
+          <small>${SISELO.escapeHtml(countLabel)}</small>
+        </header>
+        <div class="clinical-specialty-records-body">
+          ${records.length ? renderSpecialtyRecordsTable(records) : renderSpecialtyRecordsEmpty()}
+        </div>
+      </section>
+    `;
+  }
+
+  function renderSpecialtyRecordsTable(records) {
+    return `
+      <div class="clinical-specialty-records-scroll">
+        <table class="clinical-specialty-records-table">
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Consulta</th>
+              <th>Atualizado em</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${records.map((record) => `
+              <tr>
+                <td>${SISELO.escapeHtml(formatSpecialtyDate(record.consultation_date))}</td>
+                <td>${SISELO.escapeHtml(record.consultation_number || "-")}</td>
+                <td>${SISELO.escapeHtml(formatSpecialtyDateTime(record.updated_at))}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  function renderSpecialtyRecordsEmpty() {
+    return `
+      <div class="clinical-specialty-records-empty">
+        Nenhum registro salvo para esta especialidade.
+      </div>
     `;
   }
 
@@ -504,6 +540,7 @@
     if (!(form instanceof HTMLFormElement) || !patient) return;
 
     hydrateConsultationOptions(form, config, patient);
+    enhanceSpecialtyDateInputs(form);
     bindSpecialtyDerivedFields(form);
     syncConditionalSections(form, config);
 
@@ -516,6 +553,35 @@
       event.preventDefault();
       saveSpecialtyRecord(form, config, patient);
     });
+  }
+
+  function enhanceSpecialtyDateInputs(form) {
+    form.querySelectorAll('input[type="date"]').forEach((input) => {
+      if (!(input instanceof HTMLInputElement)) return;
+      SISELO.enhanceDateInput(input, getSpecialtyDateOptions(input));
+    });
+  }
+
+  function getSpecialtyDateOptions(input) {
+    const today = SISELO.todayDateInputValue();
+    const label = document.querySelector(`label[for="${input.id}"]`);
+    const text = SISELO.normalizeSearchText([
+      input.name,
+      input.id,
+      label ? label.textContent : "",
+    ].join(" "));
+    const futureDate = (
+      text.includes("subsequente") ||
+      text.includes("agendamento") ||
+      text.includes("regulacao") ||
+      text.includes("retorno") ||
+      text.includes("next") ||
+      text.includes("schedule")
+    );
+
+    return futureDate
+      ? { min: today }
+      : { min: "1900-01-01", max: today };
   }
 
   function hydrateConsultationOptions(form, config, patient) {
@@ -583,6 +649,8 @@
   }
 
   function saveSpecialtyRecord(form, config, patient) {
+    if (!SISELO.validateEnhancedDateInputs(form, { alertId: "clinical-specialty-alert" })) return;
+
     const invalid = getFirstInvalidField(form);
     if (invalid) {
       SISELO.showAlert("clinical-specialty-alert", `Preencha: ${invalid.label}.`, "error");
@@ -625,7 +693,10 @@
     }
 
     writeRecords(config.storageKey, records);
-    renderSuccess(config);
+    renderSpecialtyContent(config, patient);
+    bindSpecialtyForm(config, patient);
+    SISELO.showAlert("clinical-specialty-alert", "Atendimento salvo com sucesso.", "success");
+    document.getElementById("clinical-specialty-records")?.scrollIntoView({ block: "nearest" });
   }
 
   function getFirstInvalidField(form) {
@@ -654,6 +725,25 @@
     ));
   }
 
+  function getPatientSpecialtyRecords(config, patientId) {
+    const normalizedPatientId = SISELO.normalizeEntityId(patientId);
+    if (!normalizedPatientId) return [];
+
+    return readRecords(config.storageKey)
+      .filter((record) => SISELO.normalizeEntityId(record.patient_id) === normalizedPatientId)
+      .sort(compareSpecialtyRecords);
+  }
+
+  function compareSpecialtyRecords(left, right) {
+    const ordinalDiff = parseConsultationOrdinal(right.consultation_number) - parseConsultationOrdinal(left.consultation_number);
+    if (ordinalDiff !== 0) return ordinalDiff;
+
+    const dateDiff = String(right.consultation_date || "").localeCompare(String(left.consultation_date || ""));
+    if (dateDiff !== 0) return dateDiff;
+
+    return String(right.updated_at || "").localeCompare(String(left.updated_at || ""));
+  }
+
   function readRecords(storageKey) {
     try {
       const parsed = JSON.parse(localStorage.getItem(storageKey) || "[]");
@@ -667,6 +757,24 @@
     try {
       localStorage.setItem(storageKey, JSON.stringify((Array.isArray(records) ? records : []).filter(Boolean)));
     } catch (error) {}
+  }
+
+  function formatSpecialtyDate(value) {
+    const date = SISELO.parseDateInputValue(value);
+    if (!date) return "-";
+    return new Intl.DateTimeFormat("pt-BR").format(date);
+  }
+
+  function formatSpecialtyDateTime(value) {
+    const date = new Date(value);
+    if (!Number.isFinite(date.getTime())) return "-";
+    return new Intl.DateTimeFormat("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(date);
   }
 
   function renderSuccess(config) {

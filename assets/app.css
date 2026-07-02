@@ -5143,9 +5143,45 @@ body[data-page="home"] .home-page-header > div:first-child strong {
 }
 
 :is(body[data-page="home"], body[data-page="cadh"]) .home-user-role-status > span:last-child {
-  max-width: 170px;
+  max-width: 280px;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.home-system-status-copy {
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.home-system-status-name,
+.home-system-status-role {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.home-system-status-name {
+  max-width: 150px;
+  color: inherit;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.home-system-status-role {
+  max-width: 150px;
+  text-transform: uppercase;
+}
+
+.home-system-status-name + .home-system-status-role::before {
+  content: "-";
+  margin-right: 6px;
+  opacity: 0.55;
 }
 
 :is(body[data-page="home"], body[data-page="cadh"]) .home-user-role-admin {
@@ -11180,6 +11216,60 @@ body[data-page="cadh-specialty-form"] .clinical-specialty-section {
   box-shadow: 0 10px 24px rgba(24, 43, 65, 0.07);
 }
 
+body[data-page="cadh-specialty-form"] .clinical-specialty-records {
+  width: min(1010px, 100%);
+  margin-bottom: 18px;
+}
+
+body[data-page="cadh-specialty-form"] .clinical-specialty-records > header small {
+  color: #60758b;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+body[data-page="cadh-specialty-form"] .clinical-specialty-records-body {
+  padding: 14px 18px 18px;
+}
+
+body[data-page="cadh-specialty-form"] .clinical-specialty-records-scroll {
+  width: 100%;
+  overflow-x: auto;
+}
+
+body[data-page="cadh-specialty-form"] .clinical-specialty-records-table {
+  min-width: 520px;
+  border-collapse: collapse;
+}
+
+body[data-page="cadh-specialty-form"] .clinical-specialty-records-table th,
+body[data-page="cadh-specialty-form"] .clinical-specialty-records-table td {
+  padding: 11px 12px;
+  border: 0;
+  border-bottom: 1px solid #e4edf3;
+  color: #071526;
+  text-align: left;
+}
+
+body[data-page="cadh-specialty-form"] .clinical-specialty-records-table th {
+  color: #526b86;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+body[data-page="cadh-specialty-form"] .clinical-specialty-records-table tr:last-child td {
+  border-bottom: 0;
+}
+
+body[data-page="cadh-specialty-form"] .clinical-specialty-records-empty {
+  padding: 4px 0;
+  color: #60758b;
+  font-weight: 700;
+}
+
 body[data-page="cadh-specialty-form"] .clinical-specialty-section > header {
   min-height: 38px;
   display: grid;
@@ -11194,6 +11284,12 @@ body[data-page="cadh-specialty-form"] .clinical-specialty-section > header {
   letter-spacing: 0.04em;
   text-align: center;
   text-transform: uppercase;
+}
+
+body[data-page="cadh-specialty-form"] .clinical-specialty-records > header {
+  grid-template-columns: minmax(0, 1fr) auto;
+  place-items: center stretch;
+  text-align: left;
 }
 
 body[data-page="cadh-specialty-form"] .clinical-specialty-grid {
@@ -11223,7 +11319,8 @@ body[data-page="cadh-specialty-form"] .clinical-specialty-field > label {
 
 body[data-page="cadh-specialty-form"] .clinical-specialty-field input,
 body[data-page="cadh-specialty-form"] .clinical-specialty-field select,
-body[data-page="cadh-specialty-form"] .clinical-specialty-field textarea {
+body[data-page="cadh-specialty-form"] .clinical-specialty-field textarea,
+body[data-page="cadh-specialty-form"] .clinical-specialty-field .date-picker-trigger {
   width: 100%;
   min-height: 42px;
   padding: 9px 14px;
@@ -11235,6 +11332,18 @@ body[data-page="cadh-specialty-form"] .clinical-specialty-field textarea {
   font-size: 1rem;
   box-shadow: none;
   transition: border-color 0.16s ease, box-shadow 0.16s ease, background-color 0.16s ease;
+}
+
+body[data-page="cadh-specialty-form"] .clinical-specialty-field .date-picker {
+  width: 100%;
+}
+
+body[data-page="cadh-specialty-form"] .clinical-specialty-field .date-picker-select {
+  min-height: 40px;
+  padding-inline: 10px 8px;
+  border-radius: 10px;
+  background-color: rgba(243, 249, 248, 0.98);
+  font-size: 0.92rem;
 }
 
 body[data-page="cadh-specialty-form"] .clinical-specialty-field textarea {
@@ -11258,7 +11367,8 @@ body[data-page="cadh-specialty-form"] .clinical-specialty-calculated {
 
 body[data-page="cadh-specialty-form"] .clinical-specialty-field input:focus,
 body[data-page="cadh-specialty-form"] .clinical-specialty-field select:focus,
-body[data-page="cadh-specialty-form"] .clinical-specialty-field textarea:focus {
+body[data-page="cadh-specialty-form"] .clinical-specialty-field textarea:focus,
+body[data-page="cadh-specialty-form"] .clinical-specialty-field .date-picker-trigger:focus-visible {
   outline: none;
   border-color: #0b4f88;
   background: #f7fbff;
