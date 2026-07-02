@@ -110,24 +110,62 @@
           </dl>
         </section>
 
-        <section class="ubs-workspace" aria-label="Gestão UBS">
-          <nav class="ubs-tabs" aria-label="Módulos da UBS">
-            <button id="ubs-tab-transitioned" class="ubs-tab active" type="button" data-ubs-tab="transitioned">
-              <span class="ubs-tab-icon"><svg><use href="#ubs-icon-users"></use></svg></span>
-              Usuários Transicionados
-            </button>
-            <button id="ubs-tab-followup" class="ubs-tab" type="button" data-ubs-tab="followup">
-              <span class="ubs-tab-icon"><svg><use href="#ubs-icon-clipboard"></use></svg></span>
-              Acompanhamento
-            </button>
-            <button id="ubs-tab-next" class="ubs-tab" type="button" data-ubs-tab="next">
-              <span class="ubs-tab-icon"><svg><use href="#ubs-icon-calendar"></use></svg></span>
-              Próximos Contatos
-            </button>
-          </nav>
+        <div class="cadh-primary-grid ubs-primary-grid">
+          <aside class="cadh-search-column ubs-search-column">
+            <form id="ubs-transition-search-form" class="cadh-patient-search ubs-patient-search" data-ui-card="true">
+              <h2 class="cadh-block-title">Buscar usuário</h2>
+              <label class="ubs-search-label" for="ubs-transition-search">Nome ou CPF</label>
+              <label class="ubs-search-shell">
+                <span class="search-input-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></span>
+                <input id="ubs-transition-search" name="query" placeholder="Nome ou CPF..." autocomplete="off">
+              </label>
+              <button class="cadh-search-button" type="submit">Buscar</button>
+              <button id="ubs-filter-toggle" class="ubs-filter-button" type="button">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#ubs-icon-filter"></use></svg>
+                Filtros
+              </button>
+              <div id="ubs-filter-panel" class="ubs-filter-panel" hidden>
+                <label>
+                  <span>UBS de destino</span>
+                  <select id="ubs-filter-destination">
+                    <option value="">Todas</option>
+                  </select>
+                </label>
+                <label>
+                  <span>ESF / Equipe</span>
+                  <input id="ubs-filter-team" placeholder="Filtrar por equipe...">
+                </label>
+                <label>
+                  <span>Período (mês)</span>
+                  <input id="ubs-filter-month" type="month">
+                </label>
+              </div>
+              <button id="ubs-filter-clear" class="ubs-filter-clear" type="button" hidden>Limpar filtros</button>
+            </form>
+          </aside>
 
-          <div id="ubs-tab-panel" class="ubs-tab-panel"></div>
-        </section>
+          <section class="cadh-management-section ubs-management-section" aria-labelledby="ubs-management-title">
+            <h2 id="ubs-management-title" class="cadh-block-title">Gestão UBS</h2>
+            <section class="ubs-workspace" aria-label="Gestão UBS">
+              <nav class="ubs-tabs" aria-label="Módulos da UBS">
+                <button id="ubs-tab-transitioned" class="ubs-tab active" type="button" data-ubs-tab="transitioned">
+                  <span class="ubs-tab-icon"><svg><use href="#ubs-icon-users"></use></svg></span>
+                  Usuários Transicionados
+                </button>
+                <button id="ubs-tab-followup" class="ubs-tab" type="button" data-ubs-tab="followup">
+                  <span class="ubs-tab-icon"><svg><use href="#ubs-icon-clipboard"></use></svg></span>
+                  Acompanhamento
+                </button>
+                <button id="ubs-tab-next" class="ubs-tab" type="button" data-ubs-tab="next">
+                  <span class="ubs-tab-icon"><svg><use href="#ubs-icon-calendar"></use></svg></span>
+                  Próximos Contatos
+                </button>
+              </nav>
+
+              <div id="ubs-tab-panel" class="ubs-tab-panel"></div>
+            </section>
+          </section>
+        </div>
       </main>
     </div>
   </div>

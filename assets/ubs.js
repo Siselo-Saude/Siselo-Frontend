@@ -58,6 +58,8 @@ async function setupUbsPage() {
   await loadUbsTransitions();
 
   bindUbsTabs();
+  bindUbsFilterControls();
+  syncUbsFilterSidebar();
   updateUbsMetrics();
   activateUbsTab('transitioned');
 }
@@ -169,40 +171,9 @@ function renderUbsTransitionedTab() {
   if (!panel) return;
 
   const rows = getFilteredUbsTransitions();
-  const ubsOptions = getUbsDestinationOptions();
-  const activeFilters = getUbsActiveFilterCount();
+  syncUbsFilterSidebar();
 
   panel.innerHTML = `
-    <div class="ubs-toolbar">
-      <label class="ubs-search-shell">
-        <span class="search-input-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></span>
-        <input id="ubs-transition-search" placeholder="Buscar por nome ou CPF..." value="${SISELO.escapeHtml(ubsFilterState.query)}">
-      </label>
-      <button id="ubs-filter-toggle" class="ubs-filter-button" type="button">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#ubs-icon-filter"></use></svg>
-        Filtros${activeFilters ? ` (${activeFilters})` : ''}
-      </button>
-      ${activeFilters ? '<button id="ubs-filter-clear" class="ubs-filter-clear" type="button">× Limpar</button>' : ''}
-    </div>
-
-    <div id="ubs-filter-panel" class="ubs-filter-panel" ${ubsFiltersOpen || activeFilters ? '' : 'hidden'}>
-      <label>
-        <span>UBS de destino</span>
-        <select id="ubs-filter-destination">
-          <option value="">Todas</option>
-          ${ubsOptions.map((option) => `<option value="${SISELO.escapeHtml(option)}" ${ubsFilterState.ubs === option ? 'selected' : ''}>${SISELO.escapeHtml(option)}</option>`).join('')}
-        </select>
-      </label>
-      <label>
-        <span>ESF / Equipe</span>
-        <input id="ubs-filter-team" placeholder="Filtrar por equipe..." value="${SISELO.escapeHtml(ubsFilterState.team)}">
-      </label>
-      <label>
-        <span>Período (mês)</span>
-        <input id="ubs-filter-month" type="month" value="${SISELO.escapeHtml(ubsFilterState.month)}">
-      </label>
-    </div>
-
     <div class="ubs-table-card">
       ${rows.length ? renderUbsTransitionedTable(rows) : renderUbsEmptyState('transition', 'Nenhuma transição do cuidado registrada.', 'Ajuste os filtros ou registre uma transição no CADH.')}
     </div>
@@ -249,38 +220,6 @@ function renderUbsTransitionedTable(rows) {
 }
 
 function bindUbsTransitionedControls() {
-  const searchInput = document.getElementById('ubs-transition-search');
-  searchInput?.addEventListener('input', () => {
-    ubsFilterState.query = searchInput.value;
-    renderUbsTransitionedTab();
-  });
-
-  document.getElementById('ubs-filter-toggle')?.addEventListener('click', () => {
-    ubsFiltersOpen = !ubsFiltersOpen;
-    renderUbsTransitionedTab();
-  });
-
-  document.getElementById('ubs-filter-clear')?.addEventListener('click', () => {
-    ubsFilterState = { query: '', ubs: '', team: '', month: '' };
-    ubsFiltersOpen = false;
-    renderUbsTransitionedTab();
-  });
-
-  document.getElementById('ubs-filter-destination')?.addEventListener('change', (event) => {
-    ubsFilterState.ubs = event.currentTarget.value;
-    renderUbsTransitionedTab();
-  });
-
-  document.getElementById('ubs-filter-team')?.addEventListener('input', (event) => {
-    ubsFilterState.team = event.currentTarget.value;
-    renderUbsTransitionedTab();
-  });
-
-  document.getElementById('ubs-filter-month')?.addEventListener('change', (event) => {
-    ubsFilterState.month = event.currentTarget.value;
-    renderUbsTransitionedTab();
-  });
-
   document.querySelectorAll('[data-ubs-follow]').forEach((button) => {
     button.addEventListener('click', () => {
       ubsSelectedTransitionId = button.dataset.ubsFollow || '';
@@ -288,6 +227,107 @@ function bindUbsTransitionedControls() {
       activateUbsTab('followup');
     });
   });
+}
+
+function bindUbsFilterControls() {
+  document.getElementById('ubs-transition-search-form')?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    if (ubsActiveTab === 'transitioned') {
+      renderUbsTransitionedTab();
+    }
+  });
+
+  document.getElementById('ubs-transition-search')?.addEventListener('input', (event) => {
+    ubsFilterState.query = event.currentTarget.value;
+    if (ubsActiveTab === 'transitioned') {
+      renderUbsTransitionedTab();
+    }
+  });
+
+  document.getElementById('ubs-filter-toggle')?.addEventListener('click', () => {
+    ubsFiltersOpen = !ubsFiltersOpen;
+    syncUbsFilterSidebar();
+  });
+
+  document.getElementById('ubs-filter-clear')?.addEventListener('click', () => {
+    ubsFilterState = { query: '', ubs: '', team: '', month: '' };
+    ubsFiltersOpen = false;
+    syncUbsFilterSidebar();
+    if (ubsActiveTab === 'transitioned') {
+      renderUbsTransitionedTab();
+    }
+  });
+
+  document.getElementById('ubs-filter-destination')?.addEventListener('change', (event) => {
+    ubsFilterState.ubs = event.currentTarget.value;
+    syncUbsFilterSidebar();
+    if (ubsActiveTab === 'transitioned') {
+      renderUbsTransitionedTab();
+    }
+  });
+
+  document.getElementById('ubs-filter-team')?.addEventListener('input', (event) => {
+    ubsFilterState.team = event.currentTarget.value;
+    syncUbsFilterSidebar();
+    if (ubsActiveTab === 'transitioned') {
+      renderUbsTransitionedTab();
+    }
+  });
+
+  document.getElementById('ubs-filter-month')?.addEventListener('change', (event) => {
+    ubsFilterState.month = event.currentTarget.value;
+    syncUbsFilterSidebar();
+    if (ubsActiveTab === 'transitioned') {
+      renderUbsTransitionedTab();
+    }
+  });
+}
+
+function syncUbsFilterSidebar() {
+  const activeFilters = getUbsActiveFilterCount();
+  const searchInput = document.getElementById('ubs-transition-search');
+  const destinationSelect = document.getElementById('ubs-filter-destination');
+  const teamInput = document.getElementById('ubs-filter-team');
+  const monthInput = document.getElementById('ubs-filter-month');
+  const filterPanel = document.getElementById('ubs-filter-panel');
+  const filterToggle = document.getElementById('ubs-filter-toggle');
+  const clearButton = document.getElementById('ubs-filter-clear');
+
+  if (searchInput && document.activeElement !== searchInput) {
+    searchInput.value = ubsFilterState.query;
+  }
+
+  if (destinationSelect && document.activeElement !== destinationSelect) {
+    destinationSelect.innerHTML = `
+      <option value="">Todas</option>
+      ${getUbsDestinationOptions().map((option) => `<option value="${SISELO.escapeHtml(option)}">${SISELO.escapeHtml(option)}</option>`).join('')}
+    `;
+    destinationSelect.value = ubsFilterState.ubs;
+  }
+
+  if (teamInput && document.activeElement !== teamInput) {
+    teamInput.value = ubsFilterState.team;
+  }
+
+  if (monthInput && document.activeElement !== monthInput) {
+    monthInput.value = ubsFilterState.month;
+  }
+
+  if (filterPanel) {
+    filterPanel.hidden = !(ubsFiltersOpen || activeFilters);
+  }
+
+  if (filterToggle) {
+    filterToggle.innerHTML = `
+      <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#ubs-icon-filter"></use></svg>
+      Filtros${activeFilters ? ` (${activeFilters})` : ''}
+    `;
+    filterToggle.setAttribute('aria-expanded', filterPanel && !filterPanel.hidden ? 'true' : 'false');
+  }
+
+  if (clearButton) {
+    clearButton.hidden = !activeFilters;
+  }
 }
 
 function renderUbsFollowupTab() {

@@ -9525,10 +9525,6 @@ body[data-page="home"] .home-operational-status-dot {
   box-shadow: 0 0 0 3px rgba(51, 212, 119, 0.12);
 }
 
-body[data-page="home"] .home-current-date {
-  display: none !important;
-}
-
 body[data-page="home"] .home-dashboard,
 html.is-embedded body[data-page="home"] .home-dashboard {
   width: calc(100% - 44px) !important;
@@ -13323,8 +13319,293 @@ body[data-page="cadh"] .cadh-specialty-card span:last-child {
   font-weight: 800;
 }
 
+/* UBS page aligned to the CADH workspace pattern. */
+body[data-page="ubs"] {
+  --ubs-sidebar-width: 240px;
+  --ubs-sidebar-collapsed-width: 88px;
+  --ubs-blue: #0b4f88;
+  --ubs-blue-dark: #073f73;
+  --ubs-green: #139681;
+  --ubs-border: #cdd9e4;
+  --ubs-shadow: 0 12px 26px rgba(24, 43, 65, 0.07);
+  background: #edf3f7;
+}
+
+body[data-page="ubs"] .ubs-main-shell {
+  margin-left: var(--ubs-sidebar-width);
+}
+
+body[data-page="ubs"] .ubs-page-header {
+  min-height: 66px;
+  padding: 10px 26px 10px 30px;
+  border-bottom-color: #d5e0e8;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 2px 10px rgba(24, 43, 65, 0.04);
+}
+
+body[data-page="ubs"] .cadh-breadcrumb-heading p {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #60758b;
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+
+body[data-page="ubs"] .cadh-breadcrumb-heading h1 {
+  color: #182536;
+  font-size: 1rem;
+  font-weight: 900;
+  line-height: 1.25;
+}
+
+body[data-page="ubs"] .home-current-date {
+  min-height: 30px;
+  min-width: 148px;
+  justify-content: center;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: #e3ebf2;
+  color: #526983;
+}
+
+body[data-page="ubs"] .ubs-dashboard,
+html.is-embedded body[data-page="ubs"] .ubs-dashboard {
+  width: calc(100% - 48px) !important;
+  max-width: none !important;
+  margin: 0 auto 28px;
+  padding: 26px 0 0;
+  display: grid;
+  gap: 28px;
+}
+
+body[data-page="ubs"] .ubs-dashboard::before {
+  inset: 66px 0 0 var(--ubs-sidebar-width);
+  background-color: transparent;
+  background-image: radial-gradient(circle, rgba(12, 77, 134, 0.16) 1px, transparent 1.2px);
+  background-size: 35px 35px;
+}
+
+body[data-page="ubs"].home-sidebar-is-collapsed .ubs-dashboard::before {
+  left: var(--ubs-sidebar-collapsed-width);
+}
+
+body[data-page="ubs"] .ubs-module-hero {
+  display: none;
+}
+
+body[data-page="ubs"] .ubs-primary-grid {
+  display: grid;
+  grid-template-columns: 368px minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+  margin: 0;
+}
+
+body[data-page="ubs"] .ubs-search-column,
+body[data-page="ubs"] .ubs-management-section {
+  min-width: 0;
+}
+
+body[data-page="ubs"] .ubs-management-section > .cadh-block-title {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+body[data-page="ubs"] .ubs-patient-search {
+  min-height: 205px;
+  padding: 24px 22px;
+  border: 1px solid var(--ubs-border);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 4px 10px rgba(24, 43, 65, 0.07);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+body[data-page="ubs"] .cadh-block-title {
+  min-height: 18px;
+  margin: 0;
+  padding-left: 11px;
+  border-left: 4px solid var(--ubs-blue);
+  color: #142033;
+  font-size: 0.82rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+body[data-page="ubs"] .ubs-search-label {
+  margin: 6px 0 -3px;
+  color: #66788f;
+  font-size: 0.82rem;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+body[data-page="ubs"] .ubs-patient-search .ubs-search-shell {
+  width: 100%;
+}
+
+body[data-page="ubs"] .ubs-patient-search .ubs-search-shell input {
+  min-height: 45px;
+  height: 45px;
+  padding: 10px 14px 10px 46px;
+  border-color: #cbd8e3;
+  border-radius: 10px;
+  background-color: #edf2f6;
+  color: #21324a;
+  font-size: 0.96rem;
+}
+
+body[data-page="ubs"] .ubs-patient-search .ubs-search-shell .search-input-icon {
+  left: 14px;
+  color: #61748b;
+}
+
+body[data-page="ubs"] .ubs-patient-search .ubs-search-shell input:focus {
+  border-color: var(--ubs-blue);
+  background-color: #fff;
+  box-shadow: 0 0 0 4px rgba(11, 79, 136, 0.13);
+}
+
+body[data-page="ubs"] .ubs-patient-search .cadh-search-button,
+body[data-page="ubs"] .ubs-patient-search .ubs-filter-button {
+  width: 100%;
+  min-height: 41px;
+  height: 41px;
+  border: 0;
+  border-radius: 9px;
+  background: var(--ubs-blue);
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 900;
+  box-shadow: none;
+}
+
+body[data-page="ubs"] .ubs-patient-search .cadh-search-button:hover,
+body[data-page="ubs"] .ubs-patient-search .cadh-search-button:focus-visible,
+body[data-page="ubs"] .ubs-patient-search .ubs-filter-button:hover,
+body[data-page="ubs"] .ubs-patient-search .ubs-filter-button:focus-visible {
+  outline: none;
+  background: var(--ubs-blue-dark);
+  box-shadow: 0 0 0 4px rgba(11, 79, 136, 0.13);
+  transform: none;
+}
+
+body[data-page="ubs"] .ubs-patient-search .ubs-filter-panel {
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+body[data-page="ubs"] .ubs-patient-search .ubs-filter-panel[hidden] {
+  display: none !important;
+}
+
+body[data-page="ubs"] .ubs-patient-search .ubs-filter-clear {
+  width: 100%;
+  min-height: 36px;
+  border-radius: 9px;
+  background: #eef3f7;
+}
+
+body[data-page="ubs"] .ubs-workspace {
+  min-height: 306px;
+  overflow: hidden;
+  border: 1px solid var(--ubs-border);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 4px 10px rgba(24, 43, 65, 0.07);
+}
+
+body[data-page="ubs"] .ubs-tabs {
+  min-height: 50px;
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding: 0;
+  border-bottom: 1px solid var(--ubs-border);
+  background: #f8fafc;
+}
+
+body[data-page="ubs"] .ubs-tab {
+  min-height: 50px;
+  flex: 0 0 auto;
+  padding: 0 20px;
+  gap: 9px;
+  border: 0;
+  border-right: 1px solid rgba(205, 217, 228, 0.55);
+  border-radius: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: #5d7089;
+  font-size: 0.82rem;
+  font-weight: 900;
+  box-shadow: none;
+}
+
+body[data-page="ubs"] .ubs-tab.active {
+  color: var(--ubs-blue);
+  border-bottom-color: var(--ubs-blue);
+  background: #fff;
+}
+
+body[data-page="ubs"] .ubs-tab.active::after {
+  display: none;
+}
+
+body[data-page="ubs"] .ubs-tab:hover,
+body[data-page="ubs"] .ubs-tab:focus-visible {
+  outline: none;
+  background: #fff;
+  color: var(--ubs-blue);
+  box-shadow: none;
+  transform: none;
+}
+
+body[data-page="ubs"] .ubs-tab-panel {
+  min-height: 254px;
+  padding: 24px;
+}
+
+body[data-page="ubs"] .ubs-table-card {
+  overflow-x: auto;
+  border-radius: 11px;
+}
+
+body[data-page="ubs"] .ubs-table {
+  min-width: 760px;
+}
+
+body[data-page="ubs"] .ubs-table th:nth-child(5),
+body[data-page="ubs"] .ubs-table td:nth-child(5) {
+  width: 136px;
+  padding-right: 18px;
+  text-align: right;
+}
+
+body[data-page="ubs"] .ubs-row-action {
+  min-width: 106px;
+  white-space: nowrap;
+}
+
 @media (max-width: 1180px) {
   body[data-page="cadh"] .cadh-primary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  body[data-page="ubs"] .ubs-primary-grid {
     grid-template-columns: 1fr;
   }
 
@@ -14474,6 +14755,34 @@ body[data-page="ubs"].home-sidebar-is-collapsed .ubs-main-shell,
 body[data-page="care-plans-form"].home-sidebar-is-collapsed .care-plan-main-shell,
 body[data-page="cadh-specialty-form"].home-sidebar-is-collapsed .clinical-specialty-main {
   margin-left: var(--siselo-sidebar-closed) !important;
+}
+
+@media (max-width: 760px) {
+  body[data-page="ubs"] .ubs-main-shell,
+  body[data-page="ubs"].home-sidebar-is-collapsed .ubs-main-shell {
+    margin-left: 0 !important;
+  }
+
+  body[data-page="ubs"] .ubs-page-header {
+    position: static;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+    min-height: auto;
+    padding: 14px 16px;
+  }
+
+  body[data-page="ubs"] .ubs-dashboard,
+  html.is-embedded body[data-page="ubs"] .ubs-dashboard {
+    width: calc(100% - 22px) !important;
+    margin: 14px auto 20px;
+    gap: 18px;
+  }
+
+  body[data-page="ubs"] .ubs-dashboard::before {
+    inset: 110px 0 0;
+    background-size: 28px 28px;
+  }
 }
 
 body[data-page="cadh"] .cadh-specialty-card {
