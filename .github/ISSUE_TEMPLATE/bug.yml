@@ -1,0 +1,84 @@
+name: Bug SISELO
+title: "fix: "
+description: "Reportar um problema encontrado no sistema"
+labels: ["bug"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        🤗 Obrigado por contribuir! Preencha os campos abaixo para documentar o problema encontrado no SISELO.
+
+  - type: textarea
+    id: descricao-bug
+    attributes:
+      label: "🐞 Descrição do bug"
+      description: "Explique o que aconteceu no sistema e qual funcionalidade foi afetada."
+      placeholder: "Ex.: Ao tentar visualizar o prontuário do paciente, a página fica em branco."
+    validations:
+      required: true
+
+  - type: textarea
+    id: contexto
+    attributes:
+      label: "🏥 Contexto"
+      description: "Informe em qual módulo ou fluxo o problema ocorreu."
+      placeholder: "Ex.: Cadastro de paciente, histórico clínico, integração entre sistemas."
+    validations:
+      required: true
+
+  - type: textarea
+    id: passos-reproducao
+    attributes:
+      label: "🧪 Passos para reproduzir"
+      description: "Descreva o passo a passo para reproduzir o erro."
+      placeholder: |
+        1. Acessar a tela de prontuário
+        2. Buscar um paciente
+        3. Clicar em visualizar
+    validations:
+      required: true
+
+  - type: textarea
+    id: comportamento-esperado
+    attributes:
+      label: "✅ Comportamento esperado"
+      description: "Descreva o que deveria acontecer."
+      placeholder: "O sistema deveria exibir corretamente os dados."
+    validations:
+      required: true
+
+  - type: textarea
+    id: comportamento-atual
+    attributes:
+      label: "⚠️ Comportamento atual"
+      description: "Descreva o que acontece atualmente."
+      placeholder: "A tela fica em branco."
+    validations:
+      required: true
+
+  - type: input
+    id: ambiente
+    attributes:
+      label: "💻 Ambiente"
+      description: "Informe navegador ou sistema operacional."
+      placeholder: "Ex.: Chrome, Windows 11"
+    validations:
+      required: false
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: "📋 Logs ou erros"
+      description: "Cole logs ou mensagens de erro."
+      render: shell
+    validations:
+      required: false
+
+  - type: textarea
+    id: observacoes
+    attributes:
+      label: "📎 Observações"
+      description: "Informações adicionais."
+    validations:
+      required: false

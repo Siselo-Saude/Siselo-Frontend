@@ -1,0 +1,71 @@
+name: Feature SISELO
+title: "feat: "
+description: "Documentar nova funcionalidade do sistema"
+labels: ["feature"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        🤗 Obrigado por contribuir! Preencha os campos abaixo para documentar a funcionalidade no SISELO.
+
+  - type: textarea
+    id: user-story
+    attributes:
+      label: "🧩 História de Usuário"
+      description: "Descreva no formato de história de usuário."
+      placeholder: "Como [usuário], quero [objetivo], para [benefício]."
+    validations:
+      required: true
+
+  - type: textarea
+    id: descricao-funcionalidade
+    attributes:
+      label: "📌 Descrição da funcionalidade"
+      description: "Explique o que será desenvolvido."
+      placeholder: "Ex.: Integração de dados clínicos entre sistemas."
+    validations:
+      required: true
+
+  - type: textarea
+    id: contexto
+    attributes:
+      label: "🏥 Contexto"
+      description: "Qual problema isso resolve?"
+      placeholder: "Dados estão separados em sistemas diferentes."
+    validations:
+      required: true
+
+  - type: textarea
+    id: criterios-aceitacao
+    attributes:
+      label: "✅ Critérios de aceitação"
+      description: "Liste critérios de validação."
+      placeholder: |
+        - [ ] Dados exibidos corretamente
+        - [ ] Integração funcionando
+    validations:
+      required: true
+
+  - type: textarea
+    id: dor
+    attributes:
+      label: "🟡 DoR (Ready)"
+      description: "Checklist para iniciar desenvolvimento."
+      placeholder: |
+        - [ ] Escopo claro
+        - [ ] Critérios definidos
+        - [ ] Dependências identificadas
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: dod
+    attributes:
+      label: "🟢 DoD (Done)"
+      description: "Critérios de conclusão."
+      options:
+        - label: "Funcionalidade implementada"
+        - label: "Código revisado"
+        - label: "Testes realizados"
+        - label: "Sem regressões"
