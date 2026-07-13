@@ -21,7 +21,7 @@ const CADH_DEFAULT_CARE_PLAN_ITEMS = [
   { item_type: 'meta', title: 'Prioridades e recomendações da equipe especializada', situation: '', difficulty: '', recommendation: '', goal: '', sort_order: 11 },
 ];
 
-const CADH_TRANSITION_ORIGIN = 'CADH — Centro de Atenção Domiciliar Hospitalar';
+const CADH_TRANSITION_ORIGIN = 'CADH — Centro de Atenção ao Diabetes e Hipertensão';
 
 const CADH_UBS_TEAM_GROUPS = [
   { ubs: 'UBS 01 PARANOÁ', teams: ['ESF EQUIPE 08 - BRANCA', 'ESF EQUIPE 09 - AMARELA', 'ESF EQUIPE 10 - AZUL', 'ESF EQUIPE 11 - VERDE', 'ESF EQUIPE 12 - ROSA', 'ESF EQUIPE 13 - LILÁS', 'ESF EQUIPE 14 - MARROM', 'ESF EQUIPE 15 - DOURADA', 'ESF EQUIPE 16 - LARANJA', 'ESF EQUIPE 17 - PRATA', 'EMULTI AROEIRA', 'ECR MESTRE DAMIÃO'] },

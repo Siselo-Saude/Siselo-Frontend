@@ -236,7 +236,7 @@
               </a>
               <a id="nav-cadh" href="/cadh/index.html">
                 <span class="home-sidebar-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 13h4l2-7 4 14 2-7h6"/></svg></span>
-                <span class="home-sidebar-nav-copy"><strong>CADH</strong><small>Atenção Domiciliar</small></span>
+                <span class="home-sidebar-nav-copy"><strong>CADH</strong><small>Atenção Secundária</small></span>
                 <svg class="home-sidebar-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
               </a>
               <a id="nav-ubs" href="/ubs/index.html">
