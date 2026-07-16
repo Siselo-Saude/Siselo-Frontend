@@ -51,6 +51,8 @@ const server = http.createServer((request, response) => {
     response.writeHead(200, {
       'Content-Type': contentTypes[extension] || 'application/octet-stream',
       'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+      'Content-Security-Policy': "frame-ancestors 'self' https://coopere.sds.unb.br",
+      'Referrer-Policy': 'strict-origin-when-cross-origin',
       Pragma: 'no-cache',
       Expires: '0',
     });

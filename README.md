@@ -95,3 +95,26 @@ Não devem ser incluídos no repositório:
 - dados reais de pacientes
 - credenciais de acesso
 - informações sensíveis do sistema
+
+---
+
+## Integração com o portal COOPERE
+
+Para abrir o Siselo dentro de um iframe/portlet, use a URL com o modo incorporado:
+
+```html
+<iframe
+  src="https://SEU-DOMINIO-SISELO/index.html?embed=1"
+  title="Siselo"
+  style="width: 100%; min-height: 760px; border: 0;"
+  loading="lazy">
+</iframe>
+```
+
+O layout segue os breakpoints usados pelo portal (1264 px, 960 px e 600 px), detecta automaticamente quando está dentro de um iframe e evita largura baseada em `100vw`.
+
+No ambiente de produção:
+
+- publique o frontend em HTTPS;
+- replique no servidor web a diretiva `frame-ancestors 'self' https://coopere.sds.unb.br`;
+- prefira servir frontend e API sob o mesmo site/reverse proxy. Cookies de sessão de terceiros podem ser bloqueados pelo Safari/iOS quando o Siselo esta em outro domínio.

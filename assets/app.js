@@ -5,7 +5,6 @@
   const NAVIGATION_KEY = 'siselo_navigation';
   const CADH_SEARCH_KEY = 'siselo_cadh_search';
   const FLASH_ALERT_KEY = 'siselo_flash_alert';
-  const THEME_KEY = 'siselo_theme';
   const TEAM_LABELS = {
     safira: 'Safira',
     ametista: 'Ametista',
@@ -29,6 +28,109 @@
     { color: '#0369a1', border: '#bae6fd', bg: '#f0f9ff', text: '#075985' },
     { color: '#4d7c0f', border: '#d9f99d', bg: '#f7fee7', text: '#3f6212' },
   ];
+  let currentDateTickerBound = false;
+
+  function applyRuntimeLayoutContext() {
+    const params = new URLSearchParams(window.location.search);
+    let isEmbedded = params.get('embed') === '1' || params.get('embedded') === '1';
+
+    try {
+      isEmbedded = isEmbedded || window.self !== window.top;
+    } catch (error) {
+      isEmbedded = true;
+    }
+
+    document.documentElement.classList.toggle('is-embedded', isEmbedded);
+    document.documentElement.style.setProperty('--app-viewport-height', `${window.innerHeight}px`);
+  }
+
+  function getResponsiveTableLabels(table) {
+    const headerRows = Array.from(table.querySelectorAll('thead tr'));
+    if (headerRows.length === 0) {
+      return [];
+    }
+
+    const headerCells = Array.from(headerRows[headerRows.length - 1].querySelectorAll('th'));
+    return headerCells.map((cell, index) => {
+      const label = String(cell.getAttribute('aria-label') || cell.textContent || '')
+        .replace(/\s+/g, ' ')
+        .trim();
+      return label || (index === headerCells.length - 1 ? 'Ações' : '');
+    });
+  }
+
+  function labelResponsiveTable(table) {
+    if (!(table instanceof HTMLTableElement)) {
+      return;
+    }
+
+    const labels = getResponsiveTableLabels(table);
+    if (labels.length === 0) {
+      return;
+    }
+
+    table.querySelectorAll('tbody tr').forEach((row) => {
+      if (row.classList.contains('table-empty-row')) {
+        return;
+      }
+
+      const cells = Array.from(row.children).filter((cell) => cell instanceof HTMLTableCellElement);
+      if (cells.length !== labels.length || cells.some((cell) => Number(cell.colSpan || 1) > 1)) {
+        return;
+      }
+
+      cells.forEach((cell, index) => {
+        const label = labels[index];
+        if (label) {
+          cell.dataset.label = label;
+        } else {
+          delete cell.dataset.label;
+        }
+      });
+    });
+  }
+
+  function enhanceResponsiveTables(root = document) {
+    const scope = root instanceof Document || root instanceof Element ? root : document;
+    scope.querySelectorAll('table').forEach(labelResponsiveTable);
+
+    if (!document.body || document.documentElement.dataset.responsiveTablesBound === 'true') {
+      return;
+    }
+
+    document.documentElement.dataset.responsiveTablesBound = 'true';
+    const observer = new MutationObserver((mutations) => {
+      const tables = new Set();
+
+      mutations.forEach((mutation) => {
+        const targetTable = mutation.target instanceof Element
+          ? mutation.target.closest('table')
+          : null;
+        if (targetTable) {
+          tables.add(targetTable);
+        }
+
+        mutation.addedNodes.forEach((node) => {
+          if (!(node instanceof Element)) {
+            return;
+          }
+
+          if (node.matches('table')) {
+            tables.add(node);
+          }
+          node.querySelectorAll('table').forEach((table) => tables.add(table));
+        });
+      });
+
+      tables.forEach(labelResponsiveTable);
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+  }
+
+  applyRuntimeLayoutContext();
+  window.addEventListener('resize', applyRuntimeLayoutContext, { passive: true });
+  window.addEventListener('orientationchange', applyRuntimeLayoutContext, { passive: true });
 
   function escapeHtml(value) {
     return String(value ?? '')
@@ -39,8 +141,571 @@
       .replace(/'/g, '&#39;');
   }
 
+  const UI_SELECTORS = {
+    button: [
+      '.btn',
+      '.icon-btn',
+      '.topbar-logout',
+      '.topbar-account',
+      '.topbar-icon-btn',
+      '.cadh-search-button',
+      '.cadh-new-patient-link',
+      '.cadh-tab-link',
+      '.cadh-specialty-card',
+      '.cadh-transition-cta',
+      '.ubs-tab',
+      '.ubs-row-action',
+      '.ubs-filter-button',
+      '.date-picker-trigger',
+      '.choice-select-trigger',
+      '.choice-select-option',
+      '.team-picker-trigger',
+      '.team-picker-option',
+      '.care-plan-repeat-button',
+      '.confirmation-modal-actions button',
+      '[data-ui-button]',
+    ].join(', '),
+    card: [
+      '.card',
+      '.home-metric-card',
+      '.home-environment-card',
+      '.home-pillar-card',
+      '.home-direction-card',
+      '.cadh-management-card',
+      '.cadh-patient-search',
+      '.cadh-patient-detail',
+      '.cadh-specialty-card',
+      '.cadh-tab-link',
+      '.cadh-care-plan-card',
+      '.cadh-transition-card',
+      '.clinical-specialty-section',
+      '.patient360-card',
+      '.ubs-card',
+      '.ubs-followup-card',
+      '.care-plan-section',
+      '.care-plan-static-field',
+      '.care-plan-patient-picker',
+      '.care-plan-row-title',
+      '[data-ui-card]',
+    ].join(', '),
+    input: [
+      'input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"])',
+      'textarea',
+      'select',
+      '[data-ui-input]',
+    ].join(', '),
+    checkbox: 'input[type="checkbox"], [data-ui-checkbox]',
+    radio: 'input[type="radio"], [data-ui-radio]',
+    range: 'input[type="range"], [data-ui-slider]',
+    badge: [
+      '.badge',
+      '.team-badge',
+      '.status-badge',
+      '.cadh-module-badge',
+      '.home-operational-status',
+      '[data-ui-badge]',
+    ].join(', '),
+    table: 'table, [data-ui-table]',
+    tableShell: '.table-scroll, [data-ui-table-shell]',
+    toolbar: '.toolbar, .actions, .form-actions, .transition-form-actions, [data-ui-toolbar]',
+    alert: '.alert, [data-ui-alert]',
+    dialogOverlay: '.confirmation-modal-overlay, [data-ui-dialog-overlay]',
+    dialog: '.confirmation-modal, [data-ui-dialog]',
+    popover: '.search-suggestions, .date-picker-popover, .choice-select-menu, .team-picker-menu, [data-ui-popover]',
+    tabs: '.cadh-module-tabs, .tabs, [data-ui-tabs]',
+    progress: 'progress, [data-ui-progress]',
+    skeleton: '.skeleton, [data-ui-skeleton]',
+  };
+
+  let uiMutationObserverBound = false;
+
+  function forEachUiMatch(root, selector, callback) {
+    const scope = root instanceof Document || root instanceof Element ? root : document;
+    const matches = [];
+
+    if (scope instanceof Element && scope.matches(selector)) {
+      matches.push(scope);
+    }
+
+    if (typeof scope.querySelectorAll === 'function') {
+      scope.querySelectorAll(selector).forEach((element) => matches.push(element));
+    }
+
+    matches.forEach((element) => {
+      if (element instanceof HTMLElement || element instanceof SVGElement) {
+        callback(element);
+      }
+    });
+  }
+
+  function setUiComponent(element, name, classes = []) {
+    if (!(element instanceof HTMLElement)) {
+      return;
+    }
+
+    element.dataset.uiComponent = element.dataset.uiComponent || name;
+    classes.filter(Boolean).forEach((className) => element.classList.add(className));
+  }
+
+  function getButtonVariant(element) {
+    const className = String(element.className || '').toLowerCase();
+    const text = String(element.textContent || '').toLowerCase();
+
+    if (
+      className.includes('danger') ||
+      className.includes('delete') ||
+      className.includes('destructive') ||
+      text.includes('excluir') ||
+      text.includes('inativar')
+    ) {
+      return 'destructive';
+    }
+
+    if (
+      className.includes('primary') ||
+      className.includes('confirm') ||
+      className.includes('search') ||
+      className.includes('new') ||
+      className.includes('save') ||
+      text.includes('salvar') ||
+      text.includes('buscar') ||
+      text.includes('novo')
+    ) {
+      return 'default';
+    }
+
+    if (className.includes('link') || element.hasAttribute('data-back-link')) {
+      return 'ghost';
+    }
+
+    if (className.includes('icon') || (element.querySelector('svg') && String(element.textContent || '').trim().length <= 2)) {
+      return 'icon';
+    }
+
+    return 'outline';
+  }
+
+  function enhanceUiButtons(root = document) {
+    forEachUiMatch(root, UI_SELECTORS.button, (element) => {
+      if (!(element instanceof HTMLElement)) {
+        return;
+      }
+
+      const variant = element.dataset.uiVariant || getButtonVariant(element);
+      setUiComponent(element, 'button', ['ui-button', `ui-button-${variant}`]);
+      element.dataset.uiVariant = variant;
+    });
+  }
+
+  function enhanceUiCards(root = document) {
+    forEachUiMatch(root, UI_SELECTORS.card, (element) => {
+      if (!(element instanceof HTMLElement)) {
+        return;
+      }
+
+      const classes = ['ui-card'];
+      if (element instanceof HTMLAnchorElement || element instanceof HTMLButtonElement) {
+        classes.push('ui-card-action');
+      }
+      setUiComponent(element, 'card', classes);
+    });
+  }
+
+  function enhanceUiInputs(root = document) {
+    forEachUiMatch(root, UI_SELECTORS.input, (element) => {
+      if (!(element instanceof HTMLElement)) {
+        return;
+      }
+
+      if (element instanceof HTMLTextAreaElement) {
+        setUiComponent(element, 'textarea', ['ui-textarea']);
+        return;
+      }
+
+      if (element instanceof HTMLSelectElement) {
+        setUiComponent(element, 'select', ['ui-select']);
+        return;
+      }
+
+      setUiComponent(element, 'input', ['ui-input']);
+    });
+
+    forEachUiMatch(root, UI_SELECTORS.checkbox, (element) => {
+      if (element instanceof HTMLElement) {
+        setUiComponent(element, 'checkbox', ['ui-checkbox']);
+      }
+    });
+
+    forEachUiMatch(root, UI_SELECTORS.radio, (element) => {
+      if (element instanceof HTMLElement) {
+        setUiComponent(element, 'radio', ['ui-radio']);
+      }
+    });
+
+    forEachUiMatch(root, UI_SELECTORS.range, (element) => {
+      if (element instanceof HTMLElement) {
+        setUiComponent(element, 'slider', ['ui-slider']);
+      }
+    });
+  }
+
+  function enhanceUiBadges(root = document) {
+    forEachUiMatch(root, UI_SELECTORS.badge, (element) => {
+      if (element instanceof HTMLElement) {
+        setUiComponent(element, 'badge', ['ui-badge']);
+      }
+    });
+  }
+
+  function enhanceUiTables(root = document) {
+    forEachUiMatch(root, UI_SELECTORS.tableShell, (element) => {
+      if (element instanceof HTMLElement) {
+        setUiComponent(element, 'table-shell', ['ui-table-shell']);
+      }
+    });
+
+    forEachUiMatch(root, UI_SELECTORS.table, (element) => {
+      if (element instanceof HTMLElement) {
+        setUiComponent(element, 'table', ['ui-table']);
+      }
+    });
+  }
+
+  function enhanceUiOverlays(root = document) {
+    forEachUiMatch(root, UI_SELECTORS.alert, (element) => {
+      if (element instanceof HTMLElement) {
+        setUiComponent(element, 'alert', ['ui-alert']);
+        if (!element.getAttribute('role')) {
+          element.setAttribute('role', 'alert');
+        }
+      }
+    });
+
+    forEachUiMatch(root, UI_SELECTORS.dialogOverlay, (element) => {
+      if (element instanceof HTMLElement) {
+        setUiComponent(element, 'dialog-overlay', ['ui-dialog-overlay']);
+      }
+    });
+
+    forEachUiMatch(root, UI_SELECTORS.dialog, (element) => {
+      if (element instanceof HTMLElement) {
+        setUiComponent(element, 'dialog', ['ui-dialog']);
+      }
+    });
+
+    forEachUiMatch(root, UI_SELECTORS.popover, (element) => {
+      if (element instanceof HTMLElement) {
+        setUiComponent(element, 'popover', ['ui-popover']);
+      }
+    });
+  }
+
+  function enhanceUiStructure(root = document) {
+    forEachUiMatch(root, UI_SELECTORS.toolbar, (element) => {
+      if (element instanceof HTMLElement) {
+        setUiComponent(element, 'toolbar', ['ui-toolbar']);
+      }
+    });
+
+    forEachUiMatch(root, UI_SELECTORS.tabs, (element) => {
+      if (element instanceof HTMLElement) {
+        setUiComponent(element, 'tabs', ['ui-tabs']);
+      }
+    });
+
+    forEachUiMatch(root, UI_SELECTORS.progress, (element) => {
+      if (element instanceof HTMLElement) {
+        setUiComponent(element, 'progress', ['ui-progress']);
+      }
+    });
+
+    forEachUiMatch(root, UI_SELECTORS.skeleton, (element) => {
+      if (element instanceof HTMLElement) {
+        setUiComponent(element, 'skeleton', ['ui-skeleton']);
+      }
+    });
+  }
+
+  function applyUiComponents(root = document) {
+    if (document.body) {
+      document.body.classList.add('siselo-ui-ready');
+    }
+
+    enhanceUiCards(root);
+    enhanceUiButtons(root);
+    enhanceUiInputs(root);
+    enhanceUiBadges(root);
+    enhanceUiTables(root);
+    enhanceUiOverlays(root);
+    enhanceUiStructure(root);
+  }
+
+  function bindUiComponentObserver() {
+    if (!document.body || uiMutationObserverBound) {
+      return;
+    }
+
+    uiMutationObserverBound = true;
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        mutation.addedNodes.forEach((node) => {
+          if (node instanceof Element) {
+            applyUiComponents(node);
+          }
+        });
+      });
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+  }
+
+  function createUiElement(tagName, options = {}) {
+    const element = document.createElement(tagName);
+    const className = String(options.className || '').trim();
+
+    if (className) {
+      element.className = className;
+    }
+
+    Object.entries(options.attrs || {}).forEach(([name, value]) => {
+      if (value === false || value === null || value === undefined) {
+        return;
+      }
+      if (value === true) {
+        element.setAttribute(name, '');
+        return;
+      }
+      element.setAttribute(name, String(value));
+    });
+
+    if (options.html !== undefined) {
+      element.innerHTML = String(options.html);
+    } else if (options.text !== undefined) {
+      element.textContent = String(options.text);
+    }
+
+    (Array.isArray(options.children) ? options.children : []).forEach((child) => {
+      if (child instanceof Node) {
+        element.appendChild(child);
+      }
+    });
+
+    applyUiComponents(element);
+    return element;
+  }
+
+  function createUiButton(options = {}) {
+    const tagName = options.href ? 'a' : 'button';
+    const element = createUiElement(tagName, {
+      className: ['ui-button', options.className].filter(Boolean).join(' '),
+      attrs: {
+        href: options.href,
+        type: tagName === 'button' ? (options.type || 'button') : undefined,
+        'data-ui-button': 'true',
+        'data-ui-variant': options.variant || undefined,
+        'aria-label': options.ariaLabel,
+      },
+      html: options.html,
+      text: options.html === undefined ? options.label : undefined,
+      children: options.children,
+    });
+
+    if (options.variant) {
+      element.dataset.uiVariant = options.variant;
+      element.classList.add(`ui-button-${options.variant}`);
+    }
+
+    return element;
+  }
+
+  function createUiCard(options = {}) {
+    return createUiElement('section', {
+      className: ['ui-card', options.className].filter(Boolean).join(' '),
+      attrs: { 'data-ui-card': 'true', ...options.attrs },
+      html: options.html,
+      children: options.children,
+    });
+  }
+
+  function createUiBadge(options = {}) {
+    return createUiElement('span', {
+      className: ['ui-badge', options.className].filter(Boolean).join(' '),
+      attrs: { 'data-ui-badge': 'true', ...options.attrs },
+      text: options.label,
+      html: options.html,
+    });
+  }
+
+  function createUiAlert(options = {}) {
+    return createUiElement('div', {
+      className: ['ui-alert', options.type ? `ui-alert-${options.type}` : '', options.className].filter(Boolean).join(' '),
+      attrs: { role: 'alert', 'data-ui-alert': 'true', ...options.attrs },
+      text: options.message,
+      html: options.html,
+    });
+  }
+
+  function ensureToastViewport() {
+    let viewport = document.getElementById('siselo-toast-viewport');
+    if (!viewport) {
+      viewport = document.createElement('ol');
+      viewport.id = 'siselo-toast-viewport';
+      viewport.className = 'ui-toast-viewport';
+      viewport.setAttribute('aria-live', 'polite');
+      viewport.setAttribute('aria-relevant', 'additions text');
+      document.body.appendChild(viewport);
+    }
+    applyUiComponents(viewport);
+    return viewport;
+  }
+
+  function showToast(message, type = 'info', options = {}) {
+    const normalizedMessage = String(message || '').trim();
+    if (!normalizedMessage || !document.body) {
+      return null;
+    }
+
+    const viewport = ensureToastViewport();
+    const toast = document.createElement('li');
+    const normalizedType = String(type || 'info').trim() || 'info';
+    const title = String(options.title || '').trim();
+    toast.className = `ui-toast ui-toast-${normalizedType}`;
+    toast.dataset.uiComponent = 'toast';
+    toast.innerHTML = `
+      <div class="ui-toast-copy">
+        ${title ? `<strong>${escapeHtml(title)}</strong>` : ''}
+        <span>${escapeHtml(normalizedMessage)}</span>
+      </div>
+      <button type="button" class="ui-toast-close" aria-label="Fechar aviso">x</button>
+    `;
+    viewport.appendChild(toast);
+    applyUiComponents(toast);
+
+    const close = () => {
+      toast.classList.add('is-leaving');
+      window.setTimeout(() => toast.remove(), 180);
+    };
+
+    toast.querySelector('.ui-toast-close')?.addEventListener('click', close);
+    window.setTimeout(close, Number(options.duration || 3800));
+    return { element: toast, close };
+  }
+
+  const SiseloUI = {
+    alert: createUiAlert,
+    apply: applyUiComponents,
+    badge: createUiBadge,
+    button: createUiButton,
+    card: createUiCard,
+    create: createUiElement,
+    toast: showToast,
+  };
+
+  window.SiseloUI = SiseloUI;
+
+  const initUiComponents = () => {
+    applyUiComponents(document);
+    bindUiComponentObserver();
+    bindStaticTextSelectionGuard();
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initUiComponents, { once: true });
+  } else {
+    initUiComponents();
+  }
+
   function digitsOnly(value) {
     return String(value ?? '').replace(/\D+/g, '');
+  }
+
+  const STATIC_TEXT_UI_SELECTOR = [
+    'a',
+    'button',
+    '[role="button"]',
+    '[role="tab"]',
+    '.btn',
+    '.icon-btn',
+    '.topbar',
+    '.home-sidebar',
+    '.home-page-header',
+    '.siselo-page-header',
+    '.cadh-module-tabs',
+    '.tabs',
+    '.ui-tabs',
+    '.ui-button',
+    '.ui-card',
+    '.card',
+    '.status-badge',
+    '.team-badge',
+    '.badge',
+    '.home-system-status',
+    '.home-operational-status',
+    '.patient360-tabs',
+    '.patient360-name',
+    '.cadh-specialty-card',
+    '.ubs-tab',
+  ].join(', ');
+
+  const EDITABLE_TEXT_SELECTOR = [
+    'input:not([type="button"]):not([type="submit"]):not([type="reset"])',
+    'textarea',
+    '[contenteditable="true"]',
+  ].join(', ');
+
+  function isEditableTextTarget(target) {
+    return target instanceof HTMLElement && (
+      target.isContentEditable ||
+      Boolean(target.closest(EDITABLE_TEXT_SELECTOR))
+    );
+  }
+
+  function isStaticTextUiTarget(target) {
+    return target instanceof HTMLElement &&
+      !isEditableTextTarget(target) &&
+      Boolean(target.closest(STATIC_TEXT_UI_SELECTOR));
+  }
+
+  function clearStaticTextSelection() {
+    if (isEditableTextTarget(document.activeElement)) {
+      return;
+    }
+
+    const selection = window.getSelection ? window.getSelection() : null;
+    if (selection && selection.rangeCount > 0) {
+      selection.removeAllRanges();
+    }
+  }
+
+  function bindStaticTextSelectionGuard() {
+    if (document.documentElement.dataset.staticTextSelectionGuardBound === 'true') {
+      return;
+    }
+
+    document.documentElement.dataset.staticTextSelectionGuardBound = 'true';
+    let lastStaticUiPointerAt = 0;
+
+    const markStaticUiPointer = (event) => {
+      if (!isStaticTextUiTarget(event.target)) {
+        return;
+      }
+
+      lastStaticUiPointerAt = Date.now();
+      window.requestAnimationFrame(clearStaticTextSelection);
+    };
+
+    document.addEventListener('pointerdown', markStaticUiPointer, true);
+    document.addEventListener('mousedown', markStaticUiPointer, true);
+    document.addEventListener('click', (event) => {
+      if (isStaticTextUiTarget(event.target)) {
+        clearStaticTextSelection();
+      }
+    }, true);
+    document.addEventListener('selectionchange', () => {
+      if (Date.now() - lastStaticUiPointerAt < 700) {
+        clearStaticTextSelection();
+      }
+    });
   }
 
   function normalizeSearchText(value) {
@@ -506,9 +1171,24 @@
     return normalizeAppPath(state.previous);
   }
 
+  function isSamePathGroup(firstPath, secondPath) {
+    const first = normalizeAppPath(firstPath);
+    const second = normalizeAppPath(secondPath);
+    if (!first || !second) {
+      return false;
+    }
+
+    const firstSegment = new URL(first, location.origin).pathname.split('/').filter(Boolean)[0] || '';
+    const secondSegment = new URL(second, location.origin).pathname.split('/').filter(Boolean)[0] || '';
+    return firstSegment !== '' && firstSegment === secondSegment;
+  }
+
   function resolvePreviousScreenTarget(link) {
     const fallback = link?.dataset?.fallback || link?.getAttribute?.('href') || '';
-    return getSameOriginReferrerPath() || getNavigationPreviousPath() || resolveBackTarget(fallback);
+    const scopedFallback = resolveBackTarget(fallback);
+    const previousPath = getSameOriginReferrerPath() || getNavigationPreviousPath();
+
+    return isSamePathGroup(previousPath, scopedFallback) ? previousPath : scopedFallback;
   }
 
   function navigatePreviousScreen(link) {
@@ -571,6 +1251,8 @@
 
   function bindBackLinks() {
     document.querySelectorAll('[data-back-link]').forEach((link) => {
+      enhanceBackLink(link);
+
       if (link.dataset.backLinkBound === 'true') {
         return;
       }
@@ -584,6 +1266,32 @@
     });
 
     bindBackShortcut();
+  }
+
+  function enhanceBackLink(link) {
+    if (!(link instanceof HTMLElement) || link.dataset.backLinkEnhanced === 'true') {
+      return;
+    }
+
+    link.dataset.backLinkEnhanced = 'true';
+    link.classList.add('back-link');
+    link.title = link.title || 'Voltar para a tela anterior';
+    link.setAttribute('aria-label', link.getAttribute('aria-label') || 'Voltar para a tela anterior');
+
+    if (!link.querySelector('svg')) {
+      const text = String(link.textContent || 'Voltar')
+        .replace(/^[←\u2190\-\s]+/, '')
+        .replace(/\s+/g, ' ')
+        .trim() || 'Voltar';
+
+      link.innerHTML = `
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M15 5 8 12l7 7"/>
+          <path d="M9 12h11"/>
+        </svg>
+        <span>${escapeHtml(text)}</span>
+      `;
+    }
   }
 
   function enhanceSearchInput(input) {
@@ -604,7 +1312,12 @@
       icon = document.createElement('span');
       icon.className = 'search-input-icon';
       icon.setAttribute('aria-hidden', 'true');
-      icon.innerHTML = actionIcon('search');
+      icon.innerHTML = `
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <circle cx="11" cy="11" r="6.5"></circle>
+          <path d="m16.2 16.2 3.8 3.8"></path>
+        </svg>
+      `;
       wrapper.prepend(icon);
     }
 
@@ -1012,6 +1725,29 @@
     element.style.setProperty('--team-text', theme.text);
   }
 
+  function closeOpenPopovers(exceptElement = null) {
+    const except = exceptElement instanceof Element ? exceptElement : null;
+
+    document.querySelectorAll('.choice-select.is-open, .team-picker.is-open').forEach((wrapper) => {
+      if (except && wrapper === except) {
+        return;
+      }
+
+      wrapper.classList.remove('is-open');
+      wrapper.querySelector('.choice-select-trigger, .team-picker-trigger')?.setAttribute('aria-expanded', 'false');
+      const menu = wrapper.querySelector('.choice-select-menu, .team-picker-menu');
+      if (menu instanceof HTMLElement) {
+        menu.hidden = true;
+      }
+    });
+
+    if (activeDatePicker && (!except || activeDatePicker.wrapper !== except)) {
+      closeDatePicker(activeDatePicker, false);
+    }
+
+    hideFieldGuidanceTooltip();
+  }
+
   function setupTeamFieldPicker(options = {}) {
     const select = options.select instanceof HTMLSelectElement
       ? options.select
@@ -1055,11 +1791,6 @@
       }))
       .filter((option) => option.value !== '');
 
-    const defaultOption = getOptions().find((option) => option.value === 'sem_equipe') || getOptions()[0];
-    if (!select.value && defaultOption) {
-      select.value = defaultOption.value;
-    }
-
     const close = () => {
       container.classList.remove('is-open');
       trigger.setAttribute('aria-expanded', 'false');
@@ -1067,6 +1798,7 @@
     };
 
     const open = () => {
+      closeOpenPopovers(container);
       container.classList.add('is-open');
       trigger.setAttribute('aria-expanded', 'true');
       menu.hidden = false;
@@ -1079,7 +1811,18 @@
     };
 
     const sync = () => {
-      const selectedOption = getOptions().find((option) => option.value === select.value) || getOptions()[0];
+      const selectedOption = getOptions().find((option) => option.value === select.value) || null;
+
+      if (!select.value || !selectedOption) {
+        trigger.disabled = select.disabled;
+        trigger.innerHTML = '<span class="team-field-display is-empty">Selecione a equipe...</span>';
+        menu.querySelectorAll('.team-picker-option').forEach((button) => {
+          button.classList.remove('is-selected');
+          button.setAttribute('aria-selected', 'false');
+        });
+        return;
+      }
+
       const selectedLabel = selectedOption
         ? formatTeamName(selectedOption.label || selectedOption.value)
         : 'Sem equipe';
@@ -1087,6 +1830,7 @@
         ? 'Sem equipe'
         : `Equipe: ${selectedLabel}`;
 
+      trigger.disabled = select.disabled;
       applyTeamTheme(trigger, selectedOption ? selectedOption.value : selectedLabel);
       trigger.innerHTML = `<span class="team-badge" style="${escapeHtml(getTeamStyle(selectedLabel))}">${escapeHtml(triggerLabel)}</span>`;
 
@@ -1159,11 +1903,18 @@
       return false;
     }
 
+    if (document.body && document.body.dataset.page === 'cadh-specialty-form') {
+      return false;
+    }
+
     if (
       select.classList.contains('visually-hidden') ||
       select.classList.contains('date-picker-select') ||
       select.classList.contains('status-select-native') ||
+      select.classList.contains('clinical-specialty-native-select') ||
+      select.classList.contains('patient-native-select') ||
       select.classList.contains('endocrino-native-select-hidden') ||
+      select.dataset.nativeSelect === 'true' ||
       select.id === 'team_reference'
     ) {
       return false;
@@ -1259,6 +2010,7 @@
     };
 
     const open = () => {
+      closeOpenPopovers(wrapper);
       renderMenu();
       wrapper.classList.add('is-open');
       trigger.setAttribute('aria-expanded', 'true');
@@ -1448,52 +2200,175 @@
     }
   }
 
-  function getStoredTheme() {
+  function removeAppThemePreference() {
+    document.documentElement.removeAttribute('data-theme');
     try {
-      const value = localStorage.getItem(THEME_KEY);
-      return value === 'dark' ? 'dark' : 'light';
-    } catch (error) {
-      return 'light';
-    }
-  }
-
-  function setAppTheme(theme) {
-    const nextTheme = theme === 'dark' ? 'dark' : 'light';
-    document.documentElement.dataset.theme = nextTheme;
-    try {
-      localStorage.setItem(THEME_KEY, nextTheme);
+      localStorage.removeItem('siselo_theme');
     } catch (error) {
     }
-    syncThemeToggleButton();
   }
 
-  function getThemeToggleIcon(theme) {
-    return theme === 'dark'
-      ? '<svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2"/><path d="M12 19.3v2.2"/><path d="m5.4 5.4 1.5 1.5"/><path d="m17.1 17.1 1.5 1.5"/><path d="M2.5 12h2.2"/><path d="M19.3 12h2.2"/><path d="m5.4 18.6 1.5-1.5"/><path d="m17.1 6.9 1.5-1.5"/></svg>'
-      : '<svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20.7 14.2A7.4 7.4 0 0 1 9.8 3.3a8.7 8.7 0 1 0 10.9 10.9Z"/><circle cx="16.4" cy="8.2" r="1.1"/></svg>';
+  removeAppThemePreference();
+
+  function normalizeRoleName(value) {
+    return String(value || '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .trim();
   }
 
-  function syncThemeToggleButton() {
-    const button = document.getElementById('topbar-theme-toggle');
-    if (!(button instanceof HTMLButtonElement)) {
-      return;
+  function normalizeDisplayName(value) {
+    return String(value || '').replace(/\s+/g, ' ').trim();
+  }
+
+  function userHasAdminAccess(user, permissions = getUiPermissions(user)) {
+    const roles = Array.isArray(user && user.roles)
+      ? user.roles.map(normalizeRoleName)
+      : [];
+    const profileValues = [
+      user && user.role,
+      user && user.profile,
+      user && user.perfil,
+      user && user.user_role,
+      user && user.access_level,
+      user && user.type,
+      user && user.user_type,
+    ].map(normalizeRoleName);
+
+    return Boolean(
+      permissions.has('admin.manage') ||
+      roles.some((role) => role === 'admin' || role === 'administrador') ||
+      profileValues.some((value) => value === 'admin' || value === 'administrador') ||
+      (user && (user.is_admin === true || user.is_admin === 1 || user.admin === true || user.admin === 1))
+    );
+  }
+
+  function getUserRoleMeta(user, permissions = getUiPermissions(user)) {
+    const roles = Array.isArray(user && user.roles)
+      ? user.roles.map(normalizeRoleName)
+      : [];
+    const specialty = String((user && user.specialty) || '').trim();
+    const userType = String((user && user.user_type) || '').trim().toUpperCase();
+    const name = normalizeDisplayName(user && user.name);
+
+    if (userHasAdminAccess(user, permissions)) {
+      return { kind: 'admin', label: 'Administrador', detail: '' };
     }
 
-    const theme = document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
-    const nextThemeLabel = theme === 'dark' ? 'modo claro' : 'modo escuro';
-    button.setAttribute('aria-pressed', theme === 'dark' ? 'true' : 'false');
-    button.title = `Alternar para ${nextThemeLabel}`;
-    button.setAttribute('aria-label', `Alternar para ${nextThemeLabel}`);
-    button.innerHTML = `
-      <span class="topbar-theme-icon">${getThemeToggleIcon(theme)}</span>
+    if (roles.includes('alimentador')) {
+      return { kind: 'editor', label: specialty || 'Alimentador', detail: name || 'Profissional' };
+    }
+
+    if (roles.includes('visualizador')) {
+      return { kind: 'viewer', label: 'Visualizador', detail: name || '' };
+    }
+
+    if (specialty) {
+      return { kind: 'clinical', label: specialty, detail: name || '' };
+    }
+
+    if (userType) {
+      return { kind: userType === 'CADH' ? 'clinical' : 'viewer', label: userType, detail: name || '' };
+    }
+
+    if (name) {
+      return { kind: 'user', label: name, detail: '' };
+    }
+
+    return { kind: 'user', label: 'Usuário' };
+  }
+
+  function getUserRoleIcon(kind) {
+    const icons = {
+      admin: '<path d="M12 3 20 7v5c0 5-3.4 8-8 9-4.6-1-8-4-8-9V7l8-4Z"/><path d="M9 12l2 2 4-5"/>',
+      editor: '<path d="M4 20h4l10.5-10.5a2.1 2.1 0 0 0-3-3L5 17v3Z"/><path d="m13.5 7.5 3 3"/>',
+      clinical: '<path d="M4 14h4l2-7 4 14 2-7h4"/>',
+      viewer: '<path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="3"/>',
+      user: '<circle cx="12" cy="8" r="3"/><path d="M5 20a7 7 0 0 1 14 0"/>',
+    };
+
+    return `
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        ${icons[kind] || icons.user}
+      </svg>
     `;
   }
 
-  function toggleAppTheme() {
-    setAppTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
+  function getCurrentDateParts() {
+    const now = new Date();
+    return {
+      iso: [
+        now.getFullYear(),
+        String(now.getMonth() + 1).padStart(2, '0'),
+        String(now.getDate()).padStart(2, '0'),
+      ].join('-'),
+      label: new Intl.DateTimeFormat('pt-BR', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+      }).format(now),
+    };
   }
 
-  setAppTheme(getStoredTheme());
+  function syncCurrentDateElements() {
+    const currentDate = getCurrentDateParts();
+    document.querySelectorAll('.home-current-date, [data-shell-current-date]').forEach((element) => {
+      if (!(element instanceof HTMLElement)) {
+        return;
+      }
+
+      if (element instanceof HTMLTimeElement) {
+        element.dateTime = currentDate.iso;
+      } else {
+        element.setAttribute('datetime', currentDate.iso);
+      }
+      element.hidden = false;
+      element.removeAttribute('hidden');
+      element.textContent = currentDate.label;
+    });
+  }
+
+  function bindCurrentDateTicker() {
+    syncCurrentDateElements();
+    if (currentDateTickerBound) {
+      return;
+    }
+
+    currentDateTickerBound = true;
+    window.setInterval(syncCurrentDateElements, 60 * 1000);
+  }
+
+  function syncUserRoleStatus(user, permissions) {
+    const meta = getUserRoleMeta(user, permissions);
+    const title = [meta.detail, meta.label].filter(Boolean).join(' - ') || meta.label;
+    document.querySelectorAll('.home-system-status, .home-operational-status').forEach((status) => {
+      if (!(status instanceof HTMLElement)) {
+        return;
+      }
+
+      status.classList.remove(
+        'home-operational-status',
+        'cadh-operational-status',
+        'home-user-role-status',
+        'home-user-role-admin',
+        'home-user-role-editor',
+        'home-user-role-clinical',
+        'home-user-role-viewer',
+        'home-user-role-user'
+      );
+      status.classList.add('home-system-status', 'home-user-role-status', `home-user-role-${meta.kind}`);
+      status.title = title;
+      status.setAttribute('aria-label', title);
+      status.innerHTML = `
+        <span class="home-system-status-icon" aria-hidden="true">${getUserRoleIcon(meta.kind)}</span>
+        <span class="home-system-status-copy">
+          ${meta.detail ? `<span class="home-system-status-name">${escapeHtml(meta.detail)}</span>` : ''}
+          <span class="home-system-status-role">${escapeHtml(meta.label)}</span>
+        </span>
+      `;
+    });
+  }
 
   function ensureTopbarActions(user, permissions) {
     const topbar = document.querySelector('.topbar');
@@ -1501,6 +2376,7 @@
       return;
     }
 
+    const isSidebarShell = topbar.classList.contains('home-sidebar');
     const brand = topbar.querySelector('.topbar-brand');
     let left = topbar.querySelector('.topbar-left');
     if (!left) {
@@ -1515,14 +2391,24 @@
       }
     }
 
-    let logoutButton = left.querySelector('#logout-button');
+    let actions = topbar.querySelector('.topbar-actions');
+    if (!actions) {
+      actions = document.createElement('div');
+      actions.className = 'topbar-actions';
+      topbar.appendChild(actions);
+    }
+
+    const logoutContainer = isSidebarShell ? actions : left;
+    let logoutButton = topbar.querySelector('#logout-button');
     if (!logoutButton) {
       logoutButton = document.createElement('a');
       logoutButton.id = 'logout-button';
       logoutButton.className = 'topbar-logout';
       logoutButton.href = '/login.html';
       logoutButton.textContent = 'Sair';
-      left.insertBefore(logoutButton, left.firstChild);
+      logoutContainer.insertBefore(logoutButton, logoutContainer.firstChild);
+    } else if (logoutButton.parentElement !== logoutContainer && isSidebarShell) {
+      logoutContainer.appendChild(logoutButton);
     }
 
     if (logoutButton.dataset.bound !== 'true') {
@@ -1531,13 +2417,6 @@
         event.preventDefault();
         logout();
       });
-    }
-
-    let actions = topbar.querySelector('.topbar-actions');
-    if (!actions) {
-      actions = document.createElement('div');
-      actions.className = 'topbar-actions';
-      topbar.appendChild(actions);
     }
 
     let settingsLink = actions.querySelector('#topbar-settings-link');
@@ -1555,28 +2434,9 @@
       actions.appendChild(settingsLink);
     }
 
-    settingsLink.href = permissions.has('admin.manage')
-      ? '/admin/users/list.html'
-      : '/change_password.html';
     settingsLink.title = 'Configurações';
     settingsLink.setAttribute('aria-label', 'Configurações');
     settingsLink.hidden = !user;
-
-    let themeButton = actions.querySelector('#topbar-theme-toggle');
-    if (!themeButton) {
-      themeButton = document.createElement('button');
-      themeButton.id = 'topbar-theme-toggle';
-      themeButton.className = 'topbar-theme-toggle';
-      themeButton.type = 'button';
-      actions.appendChild(themeButton);
-    }
-
-    if (themeButton.dataset.bound !== 'true') {
-      themeButton.dataset.bound = 'true';
-      themeButton.addEventListener('click', toggleAppTheme);
-    }
-    themeButton.hidden = !user;
-    syncThemeToggleButton();
 
     let accountLink = actions.querySelector('#topbar-account-link');
     if (!accountLink) {
@@ -1586,13 +2446,367 @@
       actions.appendChild(accountLink);
     }
 
-    accountLink.href = permissions.has('admin.manage')
+    const hasAdminAccess = userHasAdminAccess(user, permissions);
+    settingsLink.href = hasAdminAccess
+      ? '/admin/users/list.html'
+      : '/change_password.html';
+
+    accountLink.href = hasAdminAccess
       ? '/admin/users/list.html'
       : '/admin/users/list.html?self=1';
     accountLink.textContent = user && user.name ? user.name : 'Meu perfil';
-    accountLink.title = permissions.has('admin.manage') ? 'Admin' : 'Meu perfil';
-    accountLink.setAttribute('aria-label', permissions.has('admin.manage') ? 'Admin' : 'Meu perfil');
+    accountLink.title = hasAdminAccess ? 'Admin' : 'Meu perfil';
+    accountLink.setAttribute('aria-label', hasAdminAccess ? 'Admin' : 'Meu perfil');
     accountLink.hidden = !user;
+    syncUserRoleStatus(user, permissions);
+  }
+
+  const SIDEBAR_NAV_META = {
+    home: {
+      label: 'Início',
+      description: 'Painel geral',
+      icon: '<path d="m4 10 8-6 8 6v10H4V10Z"/><path d="M9 20v-6h6v6"/>',
+    },
+    cadh: {
+      label: 'CADH',
+      description: 'Atenção Domiciliar',
+      icon: '<path d="M3 13h4l2-7 4 14 2-7h6"/>',
+    },
+    ubs: {
+      label: 'UBS',
+      description: 'Atenção primária',
+      icon: '<path d="M12 21s7-5.2 7-12a7 7 0 1 0-14 0c0 6.8 7 12 7 12Z"/><circle cx="12" cy="9" r="2.5"/>',
+    },
+  };
+
+  const SHELL_PAGE_META = {
+    home: { section: 'Início', title: 'Painel de Controle' },
+    cadh: { section: 'CADH', title: 'Centro de Atenção Domiciliar Hospitalar' },
+    ubs: { section: 'UBS', title: 'Unidade Básica de Saúde' },
+    patients: { section: 'CADH', title: 'Usuários' },
+    careplans: { section: 'CADH', title: 'Planos de Cuidado' },
+    encounters: { section: 'CADH', title: 'Atendimentos' },
+    transitions: { section: 'CADH', title: 'Transições do Cuidado' },
+    admin: { section: 'Configurações', title: 'Usuários do Sistema' },
+  };
+
+  function sidebarNavMarkup(key) {
+    const meta = SIDEBAR_NAV_META[key] || SIDEBAR_NAV_META.home;
+    return `
+      <span class="home-sidebar-nav-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24">${meta.icon}</svg>
+      </span>
+      <span class="home-sidebar-nav-copy">
+        <strong>${escapeHtml(meta.label)}</strong>
+        <small>${escapeHtml(meta.description)}</small>
+      </span>
+      <svg class="home-sidebar-chevron" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="m9 5 7 7-7 7"/>
+      </svg>
+    `;
+  }
+
+  function ensureSidebarBrand(topbar) {
+    let left = topbar.querySelector('.topbar-left');
+    if (!left) {
+      left = document.createElement('div');
+      left.className = 'topbar-left';
+      topbar.prepend(left);
+    }
+
+    let brand = topbar.querySelector('.topbar-brand');
+    if (!brand) {
+      brand = document.createElement('div');
+      left.appendChild(brand);
+    } else if (brand.parentElement !== left) {
+      left.appendChild(brand);
+    }
+
+    brand.className = 'topbar-brand home-sidebar-brand';
+    brand.innerHTML = `
+      <span class="home-sidebar-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" focusable="false">
+          <circle cx="12" cy="12" r="7"/>
+          <path d="M5 12h14M12 5c2 2.1 3 4.4 3 7s-1 4.9-3 7M12 5c-2 2.1-3 4.4-3 7s1 4.9 3 7"/>
+        </svg>
+      </span>
+      <span class="home-sidebar-brand-copy">
+        <strong>SISELO</strong>
+        <small>Sistema de Saúde</small>
+      </span>
+    `;
+  }
+
+  function ensureSidebarNavigation(topbar) {
+    let nav = topbar.querySelector('nav.menu');
+    if (!nav) {
+      nav = document.createElement('nav');
+      nav.className = 'menu';
+      nav.setAttribute('aria-label', 'Módulos principais');
+    }
+
+    let navShell = topbar.querySelector('.home-sidebar-nav');
+    if (!navShell) {
+      navShell = document.createElement('div');
+      navShell.className = 'home-sidebar-nav';
+      const left = topbar.querySelector('.topbar-left');
+      if (left && left.nextSibling) {
+        topbar.insertBefore(navShell, left.nextSibling);
+      } else {
+        topbar.appendChild(navShell);
+      }
+    }
+
+    if (!navShell.querySelector('.home-sidebar-label')) {
+      const label = document.createElement('p');
+      label.className = 'home-sidebar-label';
+      label.textContent = 'Módulos';
+      navShell.prepend(label);
+    }
+
+    if (nav.parentElement !== navShell) {
+      navShell.appendChild(nav);
+    }
+
+    Object.keys(SIDEBAR_NAV_META).forEach((key) => {
+      const link = document.getElementById(`nav-${key}`);
+      if (link) {
+        link.innerHTML = sidebarNavMarkup(key);
+      }
+    });
+  }
+
+  function ensureSidebarActionsContainer(topbar) {
+    let actions = topbar.querySelector('.topbar-actions');
+    if (!actions) {
+      actions = document.createElement('div');
+      topbar.appendChild(actions);
+    }
+    actions.classList.add('topbar-actions', 'home-sidebar-footer');
+    return actions;
+  }
+
+  function getShellPageMeta(activeKey) {
+    const page = document.body ? document.body.dataset.page || '' : '';
+    if (page.startsWith('admin-')) {
+      return SHELL_PAGE_META.admin;
+    }
+    return SHELL_PAGE_META[activeKey] || { section: 'SISELO', title: 'Sistema de Saúde' };
+  }
+
+  function cleanShellTitle(value) {
+    return String(value || '')
+      .replace(/\s+/g, ' ')
+      .replace(/\s+\|\s+SISELO$/i, '')
+      .trim();
+  }
+
+  function getCurrentPageTitle(activeKey) {
+    const selectors = [
+      '#form-title',
+      '.page-heading .page-title',
+      '.patient360-name',
+      '.page-title',
+      'h1',
+    ];
+
+    for (const selector of selectors) {
+      const element = document.querySelector(selector);
+      const text = cleanShellTitle(element && element.textContent);
+      if (text) {
+        return text;
+      }
+    }
+
+    const documentTitle = cleanShellTitle(document.title);
+    if (documentTitle) {
+      return documentTitle.split('|')[0].trim();
+    }
+
+    return getShellPageMeta(activeKey).title;
+  }
+
+  function createUnifiedPageHeader(activeKey) {
+    const meta = getShellPageMeta(activeKey);
+    const header = document.createElement('header');
+    header.className = 'home-page-header siselo-page-header';
+    header.innerHTML = `
+      <div class="siselo-page-heading">
+        <span data-shell-section>${escapeHtml(meta.section)}</span>
+        <strong data-shell-title>${escapeHtml(getCurrentPageTitle(activeKey) || meta.title)}</strong>
+      </div>
+      <div class="home-page-status">
+        <span class="home-system-status home-user-role-status home-user-role-user">
+          <span class="home-system-status-icon" aria-hidden="true">${getUserRoleIcon('user')}</span>
+          <span>Usuário</span>
+        </span>
+        <time class="home-current-date" data-shell-current-date></time>
+      </div>
+    `;
+    return header;
+  }
+
+  function setupUnifiedHeaderDate(header) {
+    const dateElement = header && header.querySelector('[data-shell-current-date]');
+    if (!(dateElement instanceof HTMLTimeElement)) {
+      return;
+    }
+
+    bindCurrentDateTicker();
+  }
+
+  function bindUnifiedHeaderTitleSync(header, activeKey) {
+    const titleElement = header && header.querySelector('[data-shell-title]');
+    if (!(titleElement instanceof HTMLElement)) {
+      return;
+    }
+
+    const syncTitle = () => {
+      titleElement.textContent = getCurrentPageTitle(activeKey) || getShellPageMeta(activeKey).title;
+    };
+
+    syncTitle();
+    document.querySelectorAll('#form-title, .page-title, .patient360-name, h1').forEach((source) => {
+      if (!(source instanceof HTMLElement) || source.dataset.shellTitleObserved === 'true') {
+        return;
+      }
+      source.dataset.shellTitleObserved = 'true';
+      new MutationObserver(syncTitle).observe(source, {
+        childList: true,
+        characterData: true,
+        subtree: true,
+      });
+    });
+  }
+
+  function ensureUnifiedSidebarToggle(topbar) {
+    let toggle = topbar.querySelector('[data-unified-sidebar-toggle]');
+    if (!toggle) {
+      toggle = document.createElement('button');
+      toggle.id = 'siselo-sidebar-toggle';
+      toggle.className = 'home-sidebar-toggle siselo-sidebar-toggle';
+      toggle.type = 'button';
+      toggle.dataset.unifiedSidebarToggle = 'true';
+      toggle.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg>';
+      topbar.appendChild(toggle);
+    }
+    return toggle;
+  }
+
+  function ensureUnifiedSidebarShell(activeKey) {
+    const topbar = document.querySelector('.topbar');
+    const main = document.querySelector('main.container, body > main');
+    if (!topbar) {
+      return;
+    }
+
+    document.body.classList.add('siselo-sidebar-shell');
+    if (topbar.classList.contains('home-sidebar')) {
+      ensureSidebarBrand(topbar);
+      ensureSidebarNavigation(topbar);
+      ensureSidebarActionsContainer(topbar);
+      return;
+    }
+
+    if (!main || main.closest('.siselo-main-shell')) {
+      return;
+    }
+
+    document.body.classList.add('siselo-auto-shell');
+    topbar.classList.add('home-sidebar', 'siselo-sidebar');
+    ensureSidebarBrand(topbar);
+    ensureSidebarNavigation(topbar);
+    ensureSidebarActionsContainer(topbar);
+    ensureUnifiedSidebarToggle(topbar);
+
+    const shell = document.createElement('div');
+    shell.className = 'siselo-app-shell';
+    const mainShell = document.createElement('div');
+    mainShell.className = 'siselo-main-shell';
+    const pageHeader = createUnifiedPageHeader(activeKey);
+
+    topbar.parentNode.insertBefore(shell, topbar);
+    shell.appendChild(topbar);
+    shell.appendChild(mainShell);
+    mainShell.appendChild(pageHeader);
+    mainShell.appendChild(main);
+    setupUnifiedHeaderDate(pageHeader);
+    bindUnifiedHeaderTitleSync(pageHeader, activeKey);
+  }
+
+  function syncUnifiedSidebarFooter(user) {
+    if (!document.body.classList.contains('siselo-sidebar-shell')) {
+      return;
+    }
+
+    const topbar = document.querySelector('.home-sidebar');
+    const actions = topbar && topbar.querySelector('.topbar-actions');
+    if (!(actions instanceof HTMLElement)) {
+      return;
+    }
+
+    actions.classList.add('home-sidebar-footer');
+    const settingsLink = actions.querySelector('#topbar-settings-link');
+    const accountLink = actions.querySelector('#topbar-account-link');
+    const logoutButton = actions.querySelector('#logout-button');
+
+    [settingsLink, accountLink, logoutButton].forEach((item) => {
+      if (item) {
+        actions.appendChild(item);
+      }
+    });
+
+    if (logoutButton) {
+      logoutButton.innerHTML = '<svg aria-hidden="true" viewBox="0 0 24 24"><path d="M10 5H5v14h5M14 8l4 4-4 4M18 12H9"/></svg><span>Sair</span>';
+    }
+
+    if (accountLink) {
+      accountLink.textContent = '';
+      accountLink.innerHTML = `
+        <span class="home-sidebar-user-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>
+        </span>
+        <span class="home-sidebar-user-copy">
+          <strong>${escapeHtml(user && user.name ? user.name : 'Meu perfil')}</strong>
+          <small>${escapeHtml(user && user.email ? user.email : 'Acessar perfil')}</small>
+        </span>
+      `;
+    }
+  }
+
+  function bindUnifiedSidebarToggle() {
+    if (!document.body.classList.contains('siselo-auto-shell')) {
+      return;
+    }
+
+    const toggle = document.querySelector('[data-unified-sidebar-toggle]');
+    if (!(toggle instanceof HTMLButtonElement) || toggle.dataset.bound === 'true') {
+      return;
+    }
+
+    const collapsedKey = 'siselo_home_sidebar_collapsed';
+    const setSidebarCollapsed = (collapsed) => {
+      document.body.classList.toggle('home-sidebar-is-collapsed', collapsed);
+      toggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+      toggle.setAttribute('aria-label', collapsed ? 'Expandir menu lateral' : 'Recolher menu lateral');
+    };
+
+    let collapsed = false;
+    try {
+      collapsed = localStorage.getItem(collapsedKey) === 'true';
+    } catch (error) {
+    }
+    setSidebarCollapsed(collapsed);
+
+    toggle.dataset.bound = 'true';
+    toggle.addEventListener('click', () => {
+      collapsed = !document.body.classList.contains('home-sidebar-is-collapsed');
+      setSidebarCollapsed(collapsed);
+      try {
+        localStorage.setItem(collapsedKey, String(collapsed));
+      } catch (error) {
+      }
+    });
   }
 
   function bindShell(activeKey) {
@@ -1607,6 +2821,8 @@
       cadh: '/cadh/index.html',
       ubs: '/ubs/index.html',
     };
+
+    ensureUnifiedSidebarShell(activeKey);
 
     Object.keys(links).forEach((key) => {
       const link = document.getElementById(`nav-${key}`);
@@ -1623,12 +2839,18 @@
 
     setText('current-user-name', user ? user.name : '');
     ensureTopbarActions(user, permissions);
+    bindCurrentDateTicker();
+    syncUnifiedSidebarFooter(user);
+    bindUnifiedSidebarToggle();
 
     bindBackLinks();
     decorateSearchInputs(document);
     enhanceChoiceSelects(document);
+    enhanceResponsiveTables(document);
     bindFieldGuidanceTooltips();
     renderFlashAlert('page-alert');
+    applyUiComponents(document);
+    bindUiComponentObserver();
   }
 
   function queryParam(name) {
@@ -1672,27 +2894,23 @@
     }
 
     const key = normalizeSearchText(raw);
-    if (TEAM_LABELS[key] || TEAM_LABELS[key.replace(/\s+/g, '_')]) {
-      return TEAM_LABELS[key] || TEAM_LABELS[key.replace(/\s+/g, '_')];
-    }
-    return raw;
+    return TEAM_LABELS[key] || TEAM_LABELS[key.replace(/\s+/g, '_')] || raw;
   }
 
   function renderTeamBadge(value) {
     const label = formatTeamName(value);
-    const displayLabel = label === 'Sem equipe' ? label : label.startsWith('ESF') || label.startsWith('ESB') ? label : `Equipe: ${label}`;
+    const displayLabel = label === 'Sem equipe' ? label : `Equipe: ${label}`;
     const key = normalizeSearchText(label);
     const theme = getTeamTheme(label);
-    
     const className = theme.className || (
       key === 'sem equipe' || key === 'sem_equipe'
         ? 'team-badge-sem-equipe'
         : ['safira', 'ametista', 'esmeralda', 'diamante'].includes(key)
           ? `team-badge-${key}`
-          : 'team-badge-diamante'
+          : ''
     );
 
-    return `<span class="team-badge${className ? ` ${className}` : ''}" style="${escapeHtml(getTeamStyle(label))}">${escapeHtml(displayLabel)}</span>`;  
+    return `<span class="team-badge${className ? ` ${className}` : ''}" style="${escapeHtml(getTeamStyle(label))}">${escapeHtml(displayLabel)}</span>`;
   }
 
   function filterByEntityId(rows, key, value) {
@@ -1715,11 +2933,11 @@
   }
 
   function showUnavailableAction(message) {
-    window.alert(message || 'Nenhum registro carregado para esta ação.');
+    showToast(message || 'Nenhum registro carregado para esta ação.', 'info');
   }
 
   function showActionError(message) {
-    window.alert(message || 'Não foi possível concluir esta ação agora.');
+    showToast(message || 'Não foi possível concluir esta ação agora.', 'error');
   }
 
   function ensureConfirmationModal() {
@@ -1727,10 +2945,10 @@
     if (!overlay) {
       overlay = document.createElement('div');
       overlay.id = 'siselo-confirmation-modal';
-      overlay.className = 'confirmation-modal-overlay';
+      overlay.className = 'confirmation-modal-overlay ui-dialog-overlay';
       overlay.hidden = true;
       overlay.innerHTML = `
-        <div class="confirmation-modal" role="dialog" aria-modal="true" aria-labelledby="confirmation-modal-title" aria-describedby="confirmation-modal-message confirmation-modal-description" tabindex="-1">
+        <div class="confirmation-modal ui-dialog" role="dialog" aria-modal="true" aria-labelledby="confirmation-modal-title" aria-describedby="confirmation-modal-message confirmation-modal-description" tabindex="-1">
           <div class="confirmation-modal-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" focusable="false">
               <path d="M12 2 2 20h20L12 2Zm1 15h-2v-2h2v2Zm0-4h-2V8h2v5Z"/>
@@ -1742,12 +2960,13 @@
             <p id="confirmation-modal-description"></p>
           </div>
           <div class="confirmation-modal-actions">
-            <button type="button" class="btn confirmation-modal-cancel" data-confirm-cancel>Cancelar</button>
-            <button type="button" class="btn btn-danger confirmation-modal-confirm" data-confirm-ok>Inativar</button>
+            <button type="button" class="btn ui-button ui-button-outline confirmation-modal-cancel" data-confirm-cancel>Cancelar</button>
+            <button type="button" class="btn btn-danger ui-button ui-button-destructive confirmation-modal-confirm" data-confirm-ok>Inativar</button>
           </div>
         </div>
       `;
       document.body.appendChild(overlay);
+      applyUiComponents(overlay);
     }
 
     return {
@@ -1901,7 +3120,8 @@
 
     element.hidden = false;
     element.textContent = message;
-    element.className = `alert alert-${type || 'info'}`;
+    element.className = `alert alert-${type || 'info'} ui-alert ui-alert-${type || 'info'}`;
+    element.dataset.uiComponent = 'alert';
   }
 
   function setFlashAlert(message, type = 'success') {
@@ -1945,7 +3165,7 @@
   }
 
   const DATE_PICKER_MONTH_NAMES = Array.from({ length: 12 }, (_, index) => (
-    new Intl.DateTimeFormat('pt-BR', { month: 'long' }).format(new Date(2026, index, 1))
+    new Intl.DateTimeFormat('pt-BR', { month: 'long' }).format(new Date(new Date().getFullYear(), index, 1))
   ));
   const DATE_PICKER_WEEKDAY_NAMES = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
   const DATE_PICKER_DISPLAY_FORMATTER = new Intl.DateTimeFormat('pt-BR', {
@@ -2193,14 +3413,14 @@
         referenceDate || today || bounds.max || bounds.min,
         bounds.min,
         bounds.max
-      ) || referenceDate || today || bounds.min || bounds.max || createDateAtNoon(2026, 0, 1);
+      ) || referenceDate || today || bounds.min || bounds.max || createDateAtNoon(new Date().getFullYear(), 0, 1);
     }
 
     return clampDateObject(
       currentValue || today || bounds.max || bounds.min,
       bounds.min,
       bounds.max
-    ) || today || bounds.min || bounds.max || createDateAtNoon(2026, 0, 1);
+    ) || today || bounds.min || bounds.max || createDateAtNoon(new Date().getFullYear(), 0, 1);
   }
 
   function ensureDatePickerGlobalListeners() {
@@ -2318,31 +3538,35 @@
       return;
     }
 
-    if (window.matchMedia('(max-width: 860px)').matches) {
-      instance.popover.style.left = '';
-      instance.popover.style.right = '';
-      instance.popover.style.width = '';
-      instance.popover.style.minWidth = '';
-      return;
-    }
-
     const viewportPadding = 12;
-    const wrapperRect = instance.wrapper.getBoundingClientRect();
-    const width = Math.min(340, window.innerWidth - (viewportPadding * 2));
-    const minLeft = viewportPadding - wrapperRect.left;
-    const maxLeft = window.innerWidth - viewportPadding - width - wrapperRect.left;
-    const left = Math.max(minLeft, Math.min(0, maxLeft));
+    const triggerRect = instance.trigger.getBoundingClientRect();
+    const width = Math.min(360, window.innerWidth - (viewportPadding * 2));
+    const left = Math.max(
+      viewportPadding,
+      Math.min(triggerRect.left, window.innerWidth - viewportPadding - width)
+    );
+    const belowTop = triggerRect.bottom + 10;
+    const aboveTop = triggerRect.top - instance.popover.offsetHeight - 10;
+    const availableBelow = window.innerHeight - belowTop - viewportPadding;
+    const shouldOpenAbove =
+      instance.popover.offsetHeight > availableBelow && aboveTop >= viewportPadding;
+    const top = shouldOpenAbove ? aboveTop : belowTop;
 
+    instance.popover.style.position = 'fixed';
     instance.popover.style.width = `${width}px`;
-    instance.popover.style.minWidth = `${Math.min(312, width)}px`;
+    instance.popover.style.minWidth = `${Math.min(326, width)}px`;
     instance.popover.style.left = `${left}px`;
     instance.popover.style.right = 'auto';
+    instance.popover.style.top = `${Math.max(viewportPadding, top)}px`;
+    instance.popover.style.bottom = 'auto';
   }
 
   function openDatePicker(instance) {
     if (!instance) {
       return;
     }
+
+    closeOpenPopovers(instance.wrapper);
 
     if (activeDatePicker && activeDatePicker !== instance) {
       closeDatePicker(activeDatePicker, false);
@@ -2435,10 +3659,13 @@
 
     instance.state.viewDate = startOfCalendarMonth(nextViewDate);
 
-    const minYear = bounds.min ? bounds.min.getFullYear() : nextViewDate.getFullYear() - 130;
-    const maxYear = bounds.max ? bounds.max.getFullYear() : nextViewDate.getFullYear() + 20;
     const currentYear = instance.state.viewDate.getFullYear();
     const currentMonth = instance.state.viewDate.getMonth();
+    const currentSystemYear = today.getFullYear();
+    const minYearLimit = bounds.min ? bounds.min.getFullYear() : currentSystemYear - 130;
+    const maxYearLimit = bounds.max ? bounds.max.getFullYear() : currentSystemYear + 100;
+    const minYear = minYearLimit;
+    const maxYear = maxYearLimit;
 
     instance.monthSelect.innerHTML = DATE_PICKER_MONTH_NAMES.map((monthName, monthIndex) => {
       const monthDate = createDateAtNoon(currentYear, monthIndex, 1);
@@ -2947,7 +4174,7 @@
     return showConfirmationDialog({
       title: 'Excluir permanentemente',
       message: `Deseja excluir ${target}?`,
-      description: 'Esta aÃ§Ã£o nÃ£o poderÃ¡ ser desfeita.',
+      description: 'Esta ação não poderá ser desfeita.',
       confirmLabel: 'Excluir',
       cancelLabel: 'Cancelar',
     });
@@ -2969,9 +4196,12 @@
     });
   }
 
+  SiseloUI.confirm = showConfirmationDialog;
+
   window.SISELO = {
     apiRequest,
     bindShell,
+    applyUiComponents,
     clampDateInputValue,
     confirmDeletion,
     confirmPermanentDeletion: confirmPermanentDeletionSafe,
@@ -2981,6 +4211,7 @@
     digitsOnly,
     enhanceDateInput,
     enhanceChoiceSelects,
+    enhanceResponsiveTables,
     escapeHtml,
     filterPatientsForSearch,
     formatTeamName,
@@ -3008,11 +4239,14 @@
     setFlashAlert,
     setText,
     shiftDateInputValue,
+    showToast,
+    syncCurrentDate: syncCurrentDateElements,
     syncEnhancedDateInput,
     syncSearchUrl,
     showActionError,
     showUnavailableAction,
     showAlert,
+    ui: SiseloUI,
     bindFieldGuidanceTooltips,
     setupPatientFieldPicker,
     setupPatientSearchAutocomplete,
