@@ -2492,6 +2492,13 @@
 
   function sidebarNavMarkup(key) {
     const meta = SIDEBAR_NAV_META[key] || SIDEBAR_NAV_META.home;
+    const disclosureChevron = ['ubs', 'cadh'].includes(key)
+      ? `
+        <svg class="home-sidebar-chevron" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="m9 5 7 7-7 7"/>
+        </svg>
+      `
+      : '';
     return `
       <span class="home-sidebar-nav-icon" aria-hidden="true">
         <svg viewBox="0 0 24 24">${meta.icon}</svg>
@@ -2500,9 +2507,7 @@
         <strong>${escapeHtml(meta.label)}</strong>
         <small>${escapeHtml(meta.description)}</small>
       </span>
-      <svg class="home-sidebar-chevron" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="m9 5 7 7-7 7"/>
-      </svg>
+      ${disclosureChevron}
     `;
   }
 
@@ -2572,8 +2577,91 @@
       const link = document.getElementById(`nav-${key}`);
       if (link) {
         link.innerHTML = sidebarNavMarkup(key);
+        ensureModuleSubnavigation(link, key);
       }
     });
+  }
+
+  function ensureModuleSubnavigation(link, key) {
+    if (!link || !['ubs', 'cadh'].includes(key)) {
+      return;
+    }
+
+    const oldSubnav = link.nextElementSibling;
+    if (oldSubnav && oldSubnav.classList.contains('siselo-module-subnav')) {
+      oldSubnav.remove();
+    }
+
+    const items = key === 'ubs'
+      ? [
+          { label: 'Dados do Paciente', heading: true },
+          { label: 'Lista de usuários', href: '/ubs/index.html?tab=patients' },
+          { label: 'Cadastrar usuário', href: '/patients/form.html', ubsCreateOnly: true },
+          { label: 'Compartilhamentos UBS/CADH', href: '/ubs/index.html?tab=sharing' },
+        ]
+      : [
+          { label: 'Recebidos UBS', href: '/cadh/index.html?flow=received' },
+          { label: 'Acompanhamento', href: '/cadh/index.html?flow=followup' },
+          { label: 'Compartilhamentos UBS/CADH', href: '/cadh/index.html?flow=sharing' },
+          { label: 'Finalizados', href: '/cadh/index.html?flow=finalized' },
+        ];
+
+    const subnav = document.createElement('div');
+    const subnavId = `siselo-module-subnav-${key}`;
+    subnav.id = subnavId;
+    subnav.className = `siselo-module-subnav siselo-module-subnav-${key}`;
+    subnav.hidden = true;
+    subnav.innerHTML = items.map((item) => {
+      if (item.heading) {
+        return `<span class="siselo-module-subnav-heading">${escapeHtml(item.label)}</span>`;
+      }
+      const itemUrl = new URL(item.href, window.location.origin);
+      const active = location.pathname === itemUrl.pathname && (
+        itemUrl.searchParams.size === 0 ||
+        Array.from(itemUrl.searchParams).every(([name, value]) => new URLSearchParams(location.search).get(name) === value) ||
+        (item.href.includes('flow=received') && !new URLSearchParams(location.search).has('flow'))
+      );
+      return `<a href="${item.href}"${item.ubsCreateOnly ? ' data-ubs-create-link' : ''} class="${active ? 'active' : ''}"><span aria-hidden="true">＋</span>${escapeHtml(item.label)}</a>`;
+    }).join('');
+    link.insertAdjacentElement('afterend', subnav);
+
+    link.classList.add('siselo-module-toggle');
+    link.setAttribute('aria-controls', subnavId);
+    link.setAttribute('aria-expanded', 'false');
+
+    if (link.dataset.moduleToggleBound !== 'true') {
+      link.dataset.moduleToggleBound = 'true';
+      link.addEventListener('click', (event) => {
+        if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+          return;
+        }
+
+        event.preventDefault();
+        const controlledSubnav = document.getElementById(link.getAttribute('aria-controls') || '');
+        if (!(controlledSubnav instanceof HTMLElement)) {
+          return;
+        }
+
+        const willExpand = link.getAttribute('aria-expanded') !== 'true';
+        document.querySelectorAll('.siselo-module-toggle[aria-expanded="true"]').forEach((toggle) => {
+          if (toggle === link) {
+            return;
+          }
+          toggle.setAttribute('aria-expanded', 'false');
+          const otherSubnav = document.getElementById(toggle.getAttribute('aria-controls') || '');
+          if (otherSubnav instanceof HTMLElement) {
+            otherSubnav.hidden = true;
+          }
+        });
+
+        link.setAttribute('aria-expanded', String(willExpand));
+        controlledSubnav.hidden = !willExpand;
+        if (willExpand) {
+          const linkRect = link.getBoundingClientRect();
+          controlledSubnav.style.setProperty('--siselo-subnav-mobile-top', `${Math.round(linkRect.bottom + 6)}px`);
+        }
+      });
+    }
   }
 
   function ensureSidebarActionsContainer(topbar) {
@@ -2823,6 +2911,11 @@
     };
 
     ensureUnifiedSidebarShell(activeKey);
+    const canCreateUbsPatient = String(user && user.user_type || '').toUpperCase() === 'UBS' ||
+      permissions.has('admin.manage');
+    document.querySelectorAll('[data-ubs-create-link]').forEach((link) => {
+      link.hidden = !canCreateUbsPatient;
+    });
 
     Object.keys(links).forEach((key) => {
       const link = document.getElementById(`nav-${key}`);

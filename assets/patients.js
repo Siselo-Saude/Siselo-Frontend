@@ -241,7 +241,12 @@ async function setupPatientsListPage() {
   const searchInput = document.getElementById("search-input");
   const searchForm = document.getElementById("search-form");
   const newPatientLink = document.getElementById("new-patient-link");
-  const canCreatePatient = permissions.has("patients.create");
+  const canCreatePatient =
+    permissions.has("patients.create") &&
+    (
+      String(user.user_type || "").toUpperCase() === "UBS" ||
+      permissions.has("admin.manage")
+    );
   searchInput.value = query;
   newPatientLink.hidden = !canCreatePatient;
   document.getElementById("trash-link").hidden =
@@ -336,9 +341,23 @@ async function setupPatientFormPage() {
     return;
   }
 
-  SISELO.bindShell("patients");
-
   const id = SISELO.normalizeEntityId(SISELO.queryParam("id"));
+  SISELO.bindShell(id ? "patients" : "ubs");
+  if (
+    !id &&
+    String(user.user_type || "").toUpperCase() !== "UBS" &&
+    !SISELO.getUiPermissions(user).has("admin.manage")
+  ) {
+    SISELO.setFlashAlert("O cadastro de pacientes é exclusivo da UBS.", "error");
+    location.href = "/cadh/index.html";
+    return;
+  }
+  if (!id) {
+    document.querySelectorAll("[data-back-link]").forEach((link) => {
+      link.href = "/ubs/index.html";
+      link.dataset.fallback = "/ubs/index.html";
+    });
+  }
   const endpoint =
     "/patients/form.php" + (id ? "?id=" + encodeURIComponent(id) : "");
   let data = getEmptyPatientFormContext();
@@ -351,8 +370,8 @@ async function setupPatientFormPage() {
   const row = normalizePatientFormRow(data.row || getEmptyPatientFormContext().row, options);
 
   document.getElementById("form-title").textContent = data.editing
-    ? "Editar Usuário CADH"
-    : "Cadastro do Usuário CADH / CADHin";
+    ? "Editar Paciente"
+    : "Cadastro de Paciente pela UBS";
 
   fillSelect("gender", options.gender_options, row.sex, true, "Selecione...");
   fillSelect("race", options.race_options, row.race, true, "Selecione...");
@@ -1117,6 +1136,10 @@ function getPatientFormOptions(options) {
       outro: "Outro",
     },
     race_options: raceOptions,
+    risk_options: safeOptions.risk_options || {
+      alto_risco: "Alto Risco",
+      muito_alto_risco: "Muito Alto Risco",
+    },
     ubs_options: getPatientUbsOptions(),
     team_options: teamOptions,
   };
@@ -1155,6 +1178,8 @@ function getEmptyPatientFormContext() {
       allergies: "",
       chronic_conditions: "",
       status: "ativo",
+      risk_classification: "alto_risco",
+      care_status: "recebido",
       ubs_ref: "",
       team_ref: "",
     },
@@ -1193,6 +1218,7 @@ const PATIENT_FIELD_LABELS = {
   emergency_contact: "Contato de emergência",
   allergies: "Alergias",
   chronic_conditions: "Condições crônicas",
+  risk_classification: "Classificação de risco",
   ubs_ref: "UBS de referência",
   team_ref: "Equipe",
   status: "Status",
@@ -1225,6 +1251,11 @@ function normalizePatientFormRow(row, options) {
       ativo: "Ativo",
       inativo: "Inativo",
     }) || "ativo";
+  normalizedRow.risk_classification =
+    normalizePatientOptionValue(normalizedRow.risk_classification, {
+      alto_risco: "Alto Risco",
+      muito_alto_risco: "Muito Alto Risco",
+    }) || "alto_risco";
   normalizedRow.ubs_ref = normalizePatientLegacyUbsValue(normalizedRow.ubs_ref);
   normalizedRow.team_ref = normalizePatientTeamValue(
     normalizedRow.team_ref,

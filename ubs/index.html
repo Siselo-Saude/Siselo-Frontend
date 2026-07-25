@@ -30,7 +30,6 @@
           <a id="nav-home" href="/index.html">
             <span class="home-sidebar-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m4 10 8-6 8 6v10H4V10Z"/><path d="M9 20v-6h6v6"/></svg></span>
             <span class="home-sidebar-nav-copy"><strong>Início</strong><small>Painel geral</small></span>
-            <svg class="home-sidebar-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
           </a>
 
           <a id="nav-cadh" href="/cadh/index.html">
@@ -108,6 +107,7 @@
               <dd>Próx. 30 dias</dd>
             </div>
           </dl>
+          <a id="ubs-new-patient-link" class="btn btn-primary" href="/patients/form.html">+ Cadastrar paciente</a>
         </section>
 
         <div class="cadh-primary-grid ubs-primary-grid">
@@ -148,7 +148,11 @@
             <h2 id="ubs-management-title" class="cadh-block-title">Gestão UBS</h2>
             <section class="ubs-workspace" aria-label="Gestão UBS">
               <nav class="ubs-tabs" aria-label="Módulos da UBS">
-                <button id="ubs-tab-transitioned" class="ubs-tab active" type="button" data-ubs-tab="transitioned">
+                <button id="ubs-tab-patients" class="ubs-tab" type="button" data-ubs-tab="patients">
+                  <span class="ubs-tab-icon"><svg><use href="#ubs-icon-users"></use></svg></span>
+                  Lista de usuários
+                </button>
+                <button id="ubs-tab-transitioned" class="ubs-tab" type="button" data-ubs-tab="transitioned">
                   <span class="ubs-tab-icon"><svg><use href="#ubs-icon-users"></use></svg></span>
                   Usuários Transicionados
                 </button>
@@ -159,6 +163,10 @@
                 <button id="ubs-tab-next" class="ubs-tab" type="button" data-ubs-tab="next">
                   <span class="ubs-tab-icon"><svg><use href="#ubs-icon-calendar"></use></svg></span>
                   Próximos Contatos
+                </button>
+                <button id="ubs-tab-sharing" class="ubs-tab" type="button" data-ubs-tab="sharing">
+                  <span class="ubs-tab-icon"><svg><use href="#ubs-icon-clipboard"></use></svg></span>
+                  Compartilhamentos UBS/CADH
                 </button>
               </nav>
 

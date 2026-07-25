@@ -16768,3 +16768,2402 @@ body[data-page="care-plans-form"].home-sidebar-is-collapsed .home-sidebar-footer
 body[data-page="cadh-specialty-form"].home-sidebar-is-collapsed .home-sidebar-footer .topbar-account::before {
   display: none !important;
 }
+/* Fluxo assistencial CADH: Recebidos UBS, Kanban, compartilhamento e finalizados */
+.cadh-flow-workspace {
+  position: relative;
+  z-index: 1;
+  margin: 14px 0;
+  border: 1px solid #c8d7e6;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 8px 22px rgb(15 52 86 / 7%);
+  overflow: hidden;
+}
+
+.cadh-flow-header,
+.cadh-kanban-toolbar,
+.cadh-finalized-heading,
+.cadh-sharing-detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.cadh-flow-header {
+  padding: 18px 20px 14px;
+}
+
+.cadh-flow-header p,
+.cadh-kanban-toolbar strong,
+.cadh-kanban-toolbar span,
+.cadh-finalized-heading strong,
+.cadh-finalized-heading span {
+  margin: 0;
+}
+
+.cadh-flow-header p {
+  color: #087f6a;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.cadh-risk-alert-summary {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 12px;
+  border: 1px solid #fecaca;
+  border-radius: 999px;
+  background: #fff1f2;
+  color: #b42318;
+  font-size: 12px;
+}
+
+.cadh-flow-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 0 16px;
+  border-top: 1px solid #edf2f7;
+  border-bottom: 1px solid #d8e2ec;
+  overflow-x: auto;
+}
+
+.cadh-flow-tabs button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 48px;
+  padding: 0 12px;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: transparent;
+  color: #5a6d82;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 750;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.cadh-flow-tabs button:hover,
+.cadh-flow-tabs button.active {
+  color: #07589e;
+  border-bottom-color: #07589e;
+}
+
+.cadh-flow-tabs button span {
+  min-width: 20px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: #e8f0f8;
+  font-size: 10px;
+  text-align: center;
+}
+
+.cadh-flow-panel {
+  padding: 16px;
+  background: #f8fbfe;
+}
+
+.cadh-flow-filters {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(190px, 280px) auto;
+  align-items: end;
+  gap: 12px;
+  margin-bottom: 14px;
+  padding: 13px;
+  border: 1px solid #d6e1ec;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.cadh-flow-filters label,
+.cadh-flow-action-form label,
+.cadh-kanban-toolbar label,
+.cadh-sharing-layout aside label {
+  display: grid;
+  gap: 6px;
+  color: #40566e;
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.cadh-flow-filters input,
+.cadh-flow-filters select,
+.cadh-flow-action-form input,
+.cadh-flow-action-form select,
+.cadh-kanban-toolbar select,
+.cadh-sharing-layout select,
+.cadh-kanban-card select {
+  min-height: 38px;
+  border: 1px solid #bdccda;
+  border-radius: 7px;
+  background: #fff;
+  color: #18334f;
+  padding: 7px 10px;
+  font: inherit;
+}
+
+.cadh-received-list,
+.cadh-finalized-list,
+.cadh-sharing-records {
+  display: grid;
+  gap: 9px;
+}
+
+.cadh-received-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(190px, .7fr) auto;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 16px;
+  border: 1px solid #d5e0eb;
+  border-left: 4px solid #f59e0b;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.cadh-received-card.is-very-high-risk {
+  border-left-color: #dc2626;
+  background: linear-gradient(90deg, #fff7f7, #fff 24%);
+}
+
+.cadh-received-main,
+.cadh-received-main > div,
+.cadh-received-meta,
+.cadh-kanban-toolbar > div,
+.cadh-finalized-heading > div,
+.cadh-sharing-detail-header > div {
+  display: grid;
+  gap: 4px;
+}
+
+.cadh-received-main {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.cadh-received-main strong {
+  color: #0c4f8d;
+  font-size: 14px;
+}
+
+.cadh-received-main span,
+.cadh-received-meta,
+.cadh-finalized-list article span,
+.cadh-kanban-card > span,
+.cadh-kanban-card small {
+  color: #66798e;
+  font-size: 11px;
+}
+
+.cadh-risk-chip {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 10px !important;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.cadh-risk-chip.is-high {
+  background: #fff3d6;
+  color: #b45309;
+}
+
+.cadh-risk-chip.is-critical {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.cadh-care-status {
+  color: #16845d !important;
+  font-weight: 800;
+}
+
+.cadh-received-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.cadh-flow-action-form {
+  display: grid;
+  grid-template-columns: minmax(180px, .7fr) minmax(180px, .7fr) minmax(220px, 1fr) auto;
+  align-items: end;
+  gap: 12px;
+  margin: 0 0 14px;
+  padding: 14px;
+  border: 1px solid #8bb9df;
+  border-radius: 10px;
+  background: #eef7ff;
+}
+
+.cadh-flow-action-form header {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
+}
+
+.cadh-flow-action-form header div {
+  display: grid;
+  gap: 3px;
+}
+
+.cadh-flow-action-form header span {
+  color: #52708d;
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+.cadh-flow-action-form header button {
+  border: 0;
+  background: transparent;
+  color: #466077;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.cadh-kanban-toolbar {
+  margin-bottom: 14px;
+}
+
+.cadh-kanban-toolbar > div span,
+.cadh-finalized-heading > div span {
+  font-size: 11px;
+  color: #6d7f91;
+}
+
+.cadh-kanban {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(190px, 1fr));
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+
+.cadh-kanban-column {
+  min-width: 190px;
+  border: 1px solid #d5e0eb;
+  border-radius: 10px;
+  background: #eef3f8;
+  overflow: hidden;
+}
+
+.cadh-kanban-column > header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 42px;
+  padding: 9px 10px;
+  border-bottom: 1px solid #d4dee8;
+  background: #fff;
+  color: #183b5d;
+  font-size: 11px;
+}
+
+.cadh-kanban-column > header span {
+  min-width: 22px;
+  padding: 3px 6px;
+  border-radius: 999px;
+  background: #e7eff7;
+  text-align: center;
+}
+
+.cadh-kanban-column > div {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  min-height: 210px;
+  padding: 8px;
+}
+
+.cadh-kanban-card {
+  display: grid;
+  gap: 7px;
+  padding: 10px;
+  border: 1px solid #d2deea;
+  border-left: 3px solid #e6a40a;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 3px 8px rgb(25 61 94 / 6%);
+}
+
+.cadh-kanban-card.is-critical {
+  border-left-color: #dc2626;
+}
+
+.cadh-kanban-card > strong {
+  color: #114f87;
+  font-size: 12px;
+}
+
+.cadh-kanban-card select {
+  width: 100%;
+  min-height: 32px;
+  font-size: 10px;
+}
+
+.cadh-kanban-empty {
+  margin: auto;
+  color: #8998a8;
+  font-size: 11px;
+  text-align: center;
+}
+
+.cadh-sharing-layout {
+  display: grid;
+  grid-template-columns: minmax(210px, 270px) minmax(0, 1fr);
+  gap: 14px;
+}
+
+.cadh-sharing-layout aside,
+#cadh-sharing-detail {
+  padding: 14px;
+  border: 1px solid #d6e1eb;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.cadh-sharing-layout aside p {
+  color: #61758a;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.cadh-sharing-detail-header {
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e0e8ef;
+}
+
+.cadh-sharing-detail-header span {
+  color: #12836e;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.cadh-sharing-detail-header strong {
+  color: #143b60;
+}
+
+.cadh-sharing-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.cadh-sharing-metrics span {
+  padding: 10px;
+  border-radius: 8px;
+  background: #eef5fb;
+  color: #50667d;
+  font-size: 11px;
+  text-align: center;
+}
+
+.cadh-sharing-metrics strong {
+  color: #07589e;
+  font-size: 17px;
+}
+
+.cadh-sharing-records article,
+.cadh-finalized-list article {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 5px 14px;
+  padding: 11px 13px;
+  border: 1px solid #d8e3ec;
+  border-radius: 8px;
+}
+
+.cadh-sharing-records article p {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: #60758a;
+  font-size: 11px;
+}
+
+.cadh-finalized-list article {
+  grid-template-columns: minmax(0, 1fr) auto auto auto;
+  align-items: center;
+  background: #fff;
+}
+
+.cadh-finalized-list article > div {
+  display: grid;
+  gap: 4px;
+}
+
+.cadh-finalized-list time {
+  color: #6c7f92;
+  font-size: 11px;
+}
+
+.cadh-flow-empty,
+.cadh-flow-error,
+.cadh-flow-context {
+  padding: 28px 18px;
+  border: 1px dashed #bccbd9;
+  border-radius: 9px;
+  background: #fff;
+  color: #5c7186;
+  text-align: center;
+}
+
+.cadh-flow-empty p,
+.cadh-flow-error p,
+.cadh-flow-context p {
+  margin: 5px 0 0;
+  font-size: 11px;
+}
+
+.cadh-flow-error {
+  border-color: #f1b8b8;
+  color: #a92b2b;
+}
+
+@media (max-width: 1100px) {
+  .cadh-received-card {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .cadh-received-actions {
+    grid-column: 1 / -1;
+  }
+
+  .cadh-flow-action-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .cadh-flow-header,
+  .cadh-kanban-toolbar,
+  .cadh-sharing-detail-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .cadh-flow-filters,
+  .cadh-flow-action-form,
+  .cadh-received-card,
+  .cadh-sharing-layout,
+  .cadh-sharing-metrics,
+  .cadh-finalized-list article {
+    grid-template-columns: 1fr;
+  }
+
+  .cadh-received-actions {
+    grid-column: auto;
+    justify-content: stretch;
+  }
+
+  .cadh-received-actions > * {
+    flex: 1;
+  }
+}
+.siselo-module-subnav {
+  display: grid;
+  gap: 2px;
+  margin: -4px 8px 8px 18px;
+  padding: 4px 0 4px 12px;
+  border-left: 1px solid rgb(151 190 221 / 35%);
+}
+
+.siselo-module-subnav a,
+.siselo-module-subnav-heading {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  color: #a9c1d7;
+  font-size: 10px;
+  line-height: 1.2;
+  text-decoration: none;
+}
+
+.siselo-module-subnav-heading {
+  color: #d4e4f2;
+  font-weight: 800;
+}
+
+.siselo-module-subnav a:hover,
+.siselo-module-subnav a.active {
+  background: rgb(255 255 255 / 12%);
+  color: #fff;
+}
+
+.siselo-module-subnav a span {
+  color: #79a9cf;
+}
+
+body.home-sidebar-is-collapsed .siselo-module-subnav {
+  display: none;
+}
+.clinical-home {
+  padding: 20px !important;
+}
+
+.clinical-home-heading p,
+.clinical-home-heading h1,
+.clinical-home-heading span,
+.clinical-home-section-label {
+  margin: 0;
+}
+
+.clinical-home-heading p,
+.clinical-home-section-label {
+  color: #07589e;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .18em;
+}
+
+.clinical-home-heading h1 {
+  margin: 4px 0;
+  color: #152536;
+  font-size: 26px;
+}
+
+.clinical-home-heading > span {
+  color: #667b91;
+  font-size: 12px;
+}
+
+.clinical-home-section-label {
+  margin: 24px 0 10px;
+  color: #465e76;
+}
+
+.clinical-home-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.clinical-home-metrics a {
+  display: grid;
+  grid-template-columns: 34px auto;
+  grid-template-rows: auto auto;
+  gap: 0 10px;
+  padding: 16px;
+  border: 1px solid #c7d3df;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 3px 8px rgb(25 61 94 / 8%);
+  color: #17324d;
+  text-decoration: none;
+}
+
+.clinical-home-metrics a > span {
+  grid-row: 1 / 3;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: #e7f0fa;
+  color: #07589e;
+}
+
+.clinical-home-metrics a:nth-child(2) > span {
+  background: #fff2c9;
+  color: #d17a00;
+}
+
+.clinical-home-metrics a:nth-child(3) > span {
+  background: #e1edff;
+  color: #2f6fd0;
+}
+
+.clinical-home-metrics a.is-alert > span {
+  background: #ffe4e4;
+  color: #df3030;
+}
+
+.clinical-home-metrics strong {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.clinical-home-metrics small {
+  color: #5d7186;
+  font-size: 10px;
+}
+
+.clinical-home-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.08fr;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.clinical-home-panel {
+  min-height: 265px;
+  border: 1px solid #c7d3df;
+  border-radius: 10px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.clinical-home-panel > header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 14px;
+  border-bottom: 1px solid #d4dde6;
+  color: #07589e;
+}
+
+.clinical-home-panel > header div {
+  display: grid;
+  gap: 2px;
+}
+
+.clinical-home-panel > header strong {
+  color: #24384d;
+  font-size: 12px;
+}
+
+.clinical-home-panel > header span {
+  color: #75889c;
+  font-size: 9px;
+}
+
+.clinical-home-panel > header > span.red {
+  color: #e33131;
+  font-size: 15px;
+}
+
+.clinical-home-list > a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 58px;
+  padding: 10px 14px;
+  border-bottom: 1px solid #dbe3eb;
+  color: inherit;
+  text-decoration: none;
+}
+
+.clinical-home-list > a time {
+  color: #07589e;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.clinical-home-list > a div {
+  display: grid;
+  gap: 3px;
+}
+
+.clinical-home-list > a strong {
+  color: #263a4e;
+  font-size: 11px;
+}
+
+.clinical-home-list > a span {
+  color: #718399;
+  font-size: 9px;
+}
+
+.clinical-home-list > a i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ef9300;
+}
+
+.clinical-home-empty {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 5px;
+  min-height: 200px;
+  color: #8b9aab;
+  text-align: center;
+}
+
+.clinical-home-empty strong {
+  color: #25394e;
+  font-size: 11px;
+}
+
+.clinical-home-empty small {
+  font-size: 9px;
+}
+
+@media (max-width: 900px) {
+  .clinical-home-metrics {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .clinical-home-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.ubs-patient-list-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.ubs-patient-list-heading > div {
+  display: grid;
+  gap: 3px;
+}
+
+.ubs-patient-list-heading span {
+  color: #07589e;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .08em;
+}
+
+.ubs-patient-list-heading strong {
+  color: #172f47;
+  font-size: 18px;
+}
+
+.ubs-patient-list-filters {
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) 150px 150px;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 12px;
+  border: 1px solid #d1dde8;
+  border-radius: 9px;
+  background: #fff;
+}
+
+.ubs-patient-list-filters label {
+  display: grid;
+  gap: 5px;
+  color: #435a72;
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.ubs-patient-list-filters input {
+  min-height: 38px;
+  border: 1px solid #bfcedd;
+  border-radius: 7px;
+  padding: 8px 10px;
+}
+
+.ubs-patient-data-table thead th {
+  background: #07589e;
+  color: #fff;
+  font-size: 9px;
+  text-transform: uppercase;
+}
+
+.ubs-patient-data-table td {
+  font-size: 10px;
+}
+.cadh-patient-option-status {
+  width: fit-content;
+  margin-top: 4px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: #d9f9e6;
+  color: #11804e;
+  font-size: 8px;
+  font-weight: 800;
+}
+
+/* Layout fidelity and responsive stability — references 24/07/2026 */
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) {
+  --siselo-sidebar-width: 216px;
+  --siselo-sidebar-collapsed-width: 72px;
+  overflow-x: hidden;
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar {
+  width: var(--siselo-sidebar-width) !important;
+  min-width: var(--siselo-sidebar-width) !important;
+  height: 100dvh;
+  min-height: 0 !important;
+  gap: 0 !important;
+  overflow: hidden !important;
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar .topbar-left,
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-brand,
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-footer {
+  flex: 0 0 auto;
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-brand {
+  min-height: 76px !important;
+  padding: 14px 16px !important;
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-mark {
+  inline-size: 36px !important;
+  block-size: 36px !important;
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-brand-copy strong {
+  font-size: 13px !important;
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-brand-copy small {
+  font-size: 7px !important;
+  letter-spacing: .18em !important;
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-nav {
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 16px 10px 12px !important;
+  scrollbar-width: thin;
+  scrollbar-color: rgb(255 255 255 / 18%) transparent;
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-label {
+  margin: 0 8px 10px !important;
+  font-size: 8px !important;
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar .menu {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 4px !important;
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar .menu > a {
+  min-height: 46px !important;
+  grid-template-columns: 22px minmax(0, 1fr) 12px !important;
+  gap: 9px !important;
+  padding: 7px 10px !important;
+  border-radius: 9px !important;
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-nav-icon,
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-nav-icon svg {
+  inline-size: 17px !important;
+  block-size: 17px !important;
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-nav-copy strong {
+  font-size: 13px !important;
+  line-height: 1.15 !important;
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-nav-copy small {
+  font-size: 9px !important;
+  line-height: 1.2 !important;
+}
+
+.siselo-module-subnav {
+  gap: 1px;
+  margin: -2px 6px 5px 26px;
+  padding: 3px 0 3px 9px;
+}
+
+.siselo-module-subnav a,
+.siselo-module-subnav-heading {
+  width: 100%;
+  display: flex !important;
+  grid-template-columns: none !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 7px !important;
+  min-height: 27px !important;
+  padding: 4px 6px !important;
+  font-size: 10px !important;
+  line-height: 1.15 !important;
+}
+
+.siselo-module-subnav a span {
+  flex: 0 0 12px;
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-footer,
+body[data-page="cadh"] .cadh-sidebar .topbar-actions.home-sidebar-footer,
+body[data-page="ubs"] .ubs-sidebar .topbar-actions.home-sidebar-footer {
+  width: 100%;
+  min-height: 72px;
+  margin-top: 0 !important;
+  gap: 4px !important;
+  padding: 6px !important;
+  background: #062c4f;
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-footer .topbar-settings {
+  min-height: 28px !important;
+  padding: 3px 7px !important;
+  font-size: 10px !important;
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-footer .topbar-account {
+  min-height: 39px !important;
+  padding: 4px 6px !important;
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-user-icon {
+  inline-size: 28px !important;
+  block-size: 28px !important;
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-user-copy strong {
+  font-size: 10px !important;
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-user-copy small {
+  font-size: 7px !important;
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-toggle {
+  left: calc(var(--siselo-sidebar-width) - 12px) !important;
+  bottom: 68px !important;
+}
+
+body[data-page="home"] .home-main-shell,
+body[data-page="cadh"] .cadh-main-shell,
+body[data-page="ubs"] .ubs-main-shell {
+  min-width: 0;
+  margin-left: var(--siselo-sidebar-width) !important;
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]).home-sidebar-is-collapsed .home-sidebar {
+  width: var(--siselo-sidebar-collapsed-width) !important;
+  min-width: var(--siselo-sidebar-collapsed-width) !important;
+}
+
+body[data-page="home"].home-sidebar-is-collapsed .home-main-shell,
+body[data-page="cadh"].home-sidebar-is-collapsed .cadh-main-shell,
+body[data-page="ubs"].home-sidebar-is-collapsed .ubs-main-shell {
+  margin-left: var(--siselo-sidebar-collapsed-width) !important;
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]).home-sidebar-is-collapsed .home-sidebar-toggle {
+  left: calc(var(--siselo-sidebar-collapsed-width) - 12px) !important;
+}
+
+/* CADH: one workspace at a time, with the density of the reference screens. */
+body[data-page="cadh"] .cadh-page-header,
+body[data-page="ubs"] .ubs-page-header {
+  min-height: 56px !important;
+  padding: 7px 22px !important;
+}
+
+body[data-page="cadh"] .cadh-breadcrumb-heading h1,
+body[data-page="ubs"] .cadh-breadcrumb-heading h1 {
+  font-size: 13px !important;
+}
+
+body[data-page="cadh"] .cadh-dashboard,
+body[data-page="ubs"] .ubs-dashboard {
+  width: calc(100% - 34px) !important;
+  margin: 16px auto 20px !important;
+  gap: 14px !important;
+  align-content: start !important;
+  grid-auto-rows: max-content;
+}
+
+body[data-page="cadh"] .cadh-dashboard::before,
+body[data-page="ubs"] .ubs-dashboard::before {
+  inset: 56px 0 0 var(--siselo-sidebar-width) !important;
+  background-size: 24px 24px !important;
+}
+
+body[data-page="cadh"] .cadh-module-hero,
+body[data-page="ubs"] .ubs-module-hero {
+  display: flex !important;
+  min-height: 70px !important;
+  padding: 11px 14px !important;
+  gap: 12px !important;
+  border-radius: 10px !important;
+}
+
+:is(body[data-page="cadh"], body[data-page="ubs"]) #nav-home {
+  display: grid !important;
+}
+
+body[data-page="cadh"] .cadh-module-hero-icon,
+body[data-page="ubs"] .ubs-module-hero-icon {
+  inline-size: 40px !important;
+  block-size: 40px !important;
+  border-radius: 9px !important;
+}
+
+body[data-page="cadh"] .cadh-module-hero-icon svg,
+body[data-page="ubs"] .ubs-module-hero-icon svg {
+  inline-size: 22px !important;
+  block-size: 22px !important;
+}
+
+body[data-page="cadh"] .cadh-module-hero-copy {
+  gap: 2px !important;
+}
+
+body[data-page="cadh"] .cadh-module-hero-copy p,
+body[data-page="ubs"] .ubs-module-hero-copy p {
+  font-size: 8px !important;
+}
+
+body[data-page="cadh"] .cadh-module-hero-copy h2,
+body[data-page="ubs"] .ubs-module-hero-copy h2 {
+  font-size: 16px !important;
+}
+
+body[data-page="cadh"][data-cadh-view="followup"] .cadh-flow-workspace {
+  display: none !important;
+}
+
+body[data-page="cadh"] .cadh-primary-grid {
+  grid-template-columns: 266px minmax(0, 1fr) !important;
+  gap: 14px !important;
+  align-items: start !important;
+}
+
+body[data-page="cadh"] .cadh-patient-search {
+  max-height: calc(100dvh - 158px);
+  min-height: 342px !important;
+  padding: 13px !important;
+  gap: 8px !important;
+  overflow: hidden;
+  border-radius: 10px !important;
+}
+
+body[data-page="cadh"] .cadh-patient-search .cadh-block-title {
+  font-size: 10px !important;
+}
+
+body[data-page="cadh"] .cadh-patient-search label {
+  margin: 1px 0 0 !important;
+  font-size: 9px !important;
+}
+
+body[data-page="cadh"] .cadh-patient-search input {
+  height: 34px !important;
+  padding: 6px 10px 6px 34px !important;
+  border-radius: 7px !important;
+  font-size: 11px !important;
+}
+
+body[data-page="cadh"] .cadh-search-button {
+  display: none !important;
+}
+
+body[data-page="cadh"] .cadh-patient-result {
+  min-height: 0;
+  flex: 1 1 auto;
+  gap: 4px !important;
+  margin-top: 2px !important;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+body[data-page="cadh"] .cadh-patient-option {
+  min-height: 58px;
+  gap: 1px !important;
+  padding: 8px 10px !important;
+  border-radius: 8px !important;
+}
+
+body[data-page="cadh"] .cadh-patient-option-name {
+  font-size: 10px !important;
+}
+
+body[data-page="cadh"] .cadh-patient-option-meta {
+  font-size: 8px !important;
+}
+
+body[data-page="cadh"] .cadh-patient-option-status {
+  margin-top: 1px;
+}
+
+body[data-page="cadh"] .cadh-management-section {
+  display: block !important;
+}
+
+body[data-page="cadh"] .cadh-management-card {
+  min-height: 342px !important;
+  height: auto !important;
+  border-radius: 10px !important;
+}
+
+body[data-page="cadh"] .cadh-module-tabs {
+  min-height: 38px !important;
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  flex-wrap: nowrap !important;
+  overflow-x: auto;
+}
+
+body[data-page="cadh"] .cadh-tab-link {
+  min-height: 38px !important;
+  justify-content: center;
+  gap: 6px !important;
+  padding: 0 9px !important;
+  font-size: 10px !important;
+  white-space: nowrap;
+}
+
+body[data-page="cadh"] .cadh-tab-icon svg {
+  width: 14px !important;
+  height: 14px !important;
+}
+
+body[data-page="cadh"] .cadh-patient-detail {
+  min-height: 302px !important;
+  max-height: calc(100dvh - 196px);
+  overflow: auto;
+}
+
+body[data-page="cadh"] .cadh-empty-state {
+  margin: 76px auto !important;
+  gap: 8px !important;
+}
+
+body[data-page="cadh"] .cadh-empty-icon {
+  width: 42px !important;
+  height: 42px !important;
+}
+
+body[data-page="cadh"] .cadh-empty-state strong {
+  font-size: 12px !important;
+}
+
+body[data-page="cadh"] .cadh-empty-state p {
+  font-size: 10px !important;
+}
+
+body[data-page="cadh"] > * .cadh-specialties-section {
+  display: none;
+}
+
+body[data-page="cadh"] .cadh-inline-panel {
+  min-height: 300px !important;
+  padding: 16px !important;
+}
+
+body[data-page="cadh"] .cadh-modules-screen .cadh-screen-header {
+  margin-bottom: 10px;
+}
+
+body[data-page="cadh"] .cadh-modules-screen .cadh-screen-header h3 {
+  font-size: 12px;
+}
+
+body[data-page="cadh"] .cadh-guidance-alert {
+  min-height: 34px;
+  margin: 0 0 10px;
+  padding: 9px 10px;
+  font-size: 9px;
+}
+
+body[data-page="cadh"] .cadh-specialty-grid-inline {
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 9px !important;
+}
+
+body[data-page="cadh"] .cadh-specialty-grid-inline .cadh-specialty-card {
+  min-height: 66px !important;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 5px !important;
+  padding: 9px !important;
+  border-radius: 8px !important;
+}
+
+body[data-page="cadh"] .cadh-specialty-grid-inline .cadh-specialty-icon {
+  width: fit-content !important;
+  height: 20px !important;
+  padding: 3px 7px;
+  border-radius: 999px !important;
+}
+
+body[data-page="cadh"] .cadh-specialty-grid-inline .cadh-specialty-icon svg {
+  width: 12px !important;
+  height: 12px !important;
+}
+
+body[data-page="cadh"] .cadh-specialty-grid-inline .cadh-specialty-card span:last-child {
+  font-size: 9px !important;
+}
+
+body[data-page="cadh"] .cadh-specialty-label {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+body[data-page="cadh"] .cadh-specialty-label strong {
+  overflow: hidden;
+  color: #10243b;
+  font-size: 8px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+body[data-page="cadh"] .cadh-specialty-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px;
+}
+
+body[data-page="cadh"] .cadh-specialty-actions a {
+  min-height: 23px;
+  display: grid;
+  place-items: center;
+  padding: 4px 5px;
+  border-radius: 4px;
+  background: #eaf0f5;
+  color: #07589e;
+  font-size: 7px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+body[data-page="cadh"] .cadh-specialty-actions a[aria-disabled="true"] {
+  color: #9aa9b8;
+  cursor: not-allowed;
+  opacity: .72;
+}
+
+body[data-page="cadh"] .cadh-selected-patient-chip {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #07589e;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+/* CADH patient-list tab from the requested ambulatory layout. */
+.cadh-patient-list-screen {
+  min-height: 300px;
+  padding: 14px;
+}
+
+.cadh-patient-list-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.cadh-patient-list-toolbar > div:first-child {
+  display: grid;
+  gap: 1px;
+}
+
+.cadh-patient-list-toolbar strong {
+  font-size: 11px;
+}
+
+.cadh-patient-list-toolbar small {
+  color: #6b7e94;
+  font-size: 8px;
+}
+
+.cadh-patient-list-toolbar > div:last-child {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cadh-patient-list-toolbar .btn {
+  min-height: 29px;
+  padding: 5px 9px;
+  font-size: 9px;
+}
+
+.cadh-compact-filter {
+  position: relative;
+}
+
+.cadh-compact-filter span {
+  position: absolute;
+  inset: 7px auto auto 8px;
+  color: #466078;
+  font-size: 8px;
+  pointer-events: none;
+}
+
+.cadh-compact-filter input {
+  width: 92px;
+  min-height: 29px;
+  padding: 5px 7px 5px 34px;
+  border: 1px solid #cad7e3;
+  border-radius: 7px;
+  font-size: 8px;
+}
+
+.cadh-patient-status-tabs {
+  display: flex;
+  gap: 2px;
+  overflow-x: auto;
+  margin-bottom: 8px;
+}
+
+.cadh-patient-status-tabs button {
+  min-height: 28px;
+  padding: 5px 9px;
+  border: 0;
+  border-radius: 7px 7px 0 0;
+  background: #f0f3f6;
+  color: #62758d;
+  font-size: 8px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.cadh-patient-status-tabs button.active {
+  background: #fff;
+  color: #07589e;
+  border-bottom: 2px solid #07589e;
+}
+
+.cadh-patient-list-table-wrap {
+  overflow: auto;
+  border: 1px solid #ccd8e3;
+  border-radius: 9px 9px 0 0;
+}
+
+.cadh-patient-list-table {
+  width: 100%;
+  min-width: 720px;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.cadh-patient-list-table th {
+  height: 30px;
+  padding: 6px 8px;
+  background: #141f2e;
+  color: #fff;
+  font-size: 7px;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.cadh-patient-list-table td {
+  height: 34px;
+  padding: 5px 8px;
+  border-bottom: 1px solid #dbe3ea;
+  color: #30445a;
+  font-size: 8px;
+}
+
+.cadh-patient-list-table td strong {
+  color: #10243b;
+  font-size: 9px;
+}
+
+.cadh-patient-select-row,
+.cadh-patient-open-row {
+  padding: 3px 6px;
+  border: 1px solid #c7d5e1;
+  border-radius: 5px;
+  background: #fff;
+  color: #07589e;
+  font-size: 7px;
+  font-weight: 800;
+}
+
+.cadh-list-empty {
+  min-height: 88px;
+  display: grid;
+  place-content: center;
+  gap: 4px;
+  color: #61758e;
+  text-align: center;
+}
+
+.cadh-patient-list-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 7px 8px;
+  border: 1px solid #ccd8e3;
+  border-top: 0;
+  color: #64778e;
+  font-size: 7px;
+}
+
+.cadh-patient-list-footer i {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  margin-left: 5px;
+  border-radius: 3px;
+}
+
+.cadh-patient-list-footer .is-waiting { background: #ffd65a; }
+.cadh-patient-list-footer .is-care { background: #9ecbff; }
+.cadh-patient-list-footer .is-done { background: #84e3ae; }
+.cadh-patient-list-footer .is-pending { background: #ffc379; }
+.cadh-patient-list-footer .is-absent { background: #ffaaaa; }
+
+/* Flow pages keep the requested functionality without the duplicated clinical workspace. */
+body[data-page="cadh"] .cadh-flow-workspace {
+  border-radius: 10px;
+}
+
+body[data-page="cadh"] .cadh-flow-header {
+  padding: 12px 14px;
+}
+
+body[data-page="cadh"] .cadh-flow-tabs {
+  min-height: 38px;
+  overflow-x: auto;
+}
+
+body[data-page="cadh"] .cadh-flow-tabs button {
+  min-height: 38px;
+  padding: 7px 12px;
+  font-size: 9px;
+  white-space: nowrap;
+}
+
+body[data-page="cadh"] .cadh-flow-panel {
+  padding: 12px 14px;
+}
+
+/* UBS patient list: full-width, faithful to the reference table. */
+body[data-page="ubs"][data-ubs-view="patients"] .ubs-search-column,
+body[data-page="ubs"][data-ubs-view="sharing"] .ubs-search-column,
+body[data-page="ubs"][data-ubs-view="patients"] #ubs-management-title,
+body[data-page="ubs"][data-ubs-view="sharing"] #ubs-management-title {
+  display: none !important;
+}
+
+body[data-page="ubs"][data-ubs-view="patients"] .ubs-primary-grid,
+body[data-page="ubs"][data-ubs-view="sharing"] .ubs-primary-grid {
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+
+body[data-page="ubs"] .ubs-module-hero {
+  min-height: 66px !important;
+}
+
+body[data-page="ubs"] .ubs-module-metrics dt {
+  font-size: 15px !important;
+}
+
+body[data-page="ubs"] .ubs-module-metrics dd {
+  font-size: 7px !important;
+}
+
+body[data-page="ubs"] .ubs-workspace {
+  border-radius: 10px !important;
+}
+
+body[data-page="ubs"] .ubs-tabs {
+  min-height: 38px !important;
+  overflow-x: auto;
+}
+
+body[data-page="ubs"] .ubs-tab {
+  min-height: 38px !important;
+  padding: 7px 13px !important;
+  font-size: 9px !important;
+  white-space: nowrap;
+}
+
+body[data-page="ubs"][data-ubs-view="patients"] #ubs-tab-patients,
+body[data-page="ubs"][data-ubs-view="transitioned"] #ubs-tab-transitioned,
+body[data-page="ubs"][data-ubs-view="followup"] #ubs-tab-followup,
+body[data-page="ubs"][data-ubs-view="next"] #ubs-tab-next,
+body[data-page="ubs"][data-ubs-view="sharing"] #ubs-tab-sharing {
+  position: relative;
+  background: #fff !important;
+  color: var(--ubs-blue) !important;
+  box-shadow: inset 0 -2px 0 var(--ubs-blue) !important;
+}
+
+body[data-page="ubs"][data-ubs-view="patients"] #ubs-tab-patients::after,
+body[data-page="ubs"][data-ubs-view="transitioned"] #ubs-tab-transitioned::after,
+body[data-page="ubs"][data-ubs-view="followup"] #ubs-tab-followup::after,
+body[data-page="ubs"][data-ubs-view="next"] #ubs-tab-next::after,
+body[data-page="ubs"][data-ubs-view="sharing"] #ubs-tab-sharing::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 -1px;
+  height: 2px;
+  background: var(--ubs-blue);
+}
+
+body[data-page="ubs"] .ubs-tab-panel {
+  padding: 13px !important;
+}
+
+.ubs-patient-list-heading {
+  margin-bottom: 9px;
+}
+
+.ubs-patient-list-heading span {
+  font-size: 8px;
+}
+
+.ubs-patient-list-heading strong {
+  font-size: 15px;
+}
+
+.ubs-patient-list-heading .btn {
+  min-height: 28px;
+  padding: 5px 10px;
+  font-size: 8px;
+}
+
+.ubs-patient-list-filter-card {
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px solid #ccd9e4;
+  border-radius: 9px;
+  background: #fff;
+}
+
+.ubs-patient-list-filter-card > header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.ubs-patient-list-filter-card > header > span {
+  inline-size: 25px;
+  block-size: 25px;
+  display: grid;
+  place-items: center;
+  border-radius: 7px;
+  background: #e6f1fb;
+  color: #07589e;
+}
+
+.ubs-patient-list-filter-card header div {
+  display: grid;
+}
+
+.ubs-patient-list-filter-card header strong {
+  font-size: 9px;
+}
+
+.ubs-patient-list-filter-card header small {
+  color: #6b7f94;
+  font-size: 7px;
+}
+
+.ubs-patient-list-filters {
+  grid-template-columns: minmax(190px, 1fr) 140px 140px 180px 180px;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.ubs-patient-list-filters label {
+  font-size: 7px;
+}
+
+.ubs-patient-list-filters input,
+.ubs-patient-list-filters select {
+  min-width: 0;
+  min-height: 31px;
+  padding: 5px 8px;
+  border: 1px solid #c4d2df;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 8px;
+}
+
+.ubs-patient-table-shell {
+  overflow: hidden;
+  border: 1px solid #c9d6e2;
+  border-radius: 9px;
+}
+
+.ubs-patient-table-shell .table-scroll {
+  max-height: calc(100dvh - 280px);
+  overflow: auto;
+}
+
+.ubs-patient-data-table {
+  min-width: 850px;
+}
+
+.ubs-patient-data-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  height: 31px;
+  padding: 7px 9px;
+  font-size: 7px;
+}
+
+.ubs-patient-data-table td {
+  height: 38px;
+  padding: 8px 9px;
+  border-right: 1px solid #d1dce6;
+  font-size: 8px;
+}
+
+.ubs-patient-data-table tbody tr {
+  cursor: pointer;
+}
+
+.ubs-patient-data-table tbody tr:hover {
+  background: #f2f7fb;
+}
+
+.ubs-patient-data-table td strong {
+  font-size: 9px;
+}
+
+.ubs-patient-table-shell > footer {
+  display: flex;
+  justify-content: space-between;
+  padding: 7px 9px;
+  color: #65798e;
+  font-size: 7px;
+}
+
+/* Shared plan area available in both UBS and CADH. */
+.ubs-sharing-screen > header > div,
+.ubs-sharing-detail > header > div {
+  display: grid;
+  gap: 2px;
+}
+
+.ubs-sharing-screen > header span,
+.ubs-sharing-detail > header span {
+  color: #078873;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: .08em;
+}
+
+.ubs-sharing-screen > header strong {
+  font-size: 15px;
+}
+
+.ubs-sharing-layout {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.ubs-sharing-layout > label {
+  display: grid;
+  align-content: start;
+  gap: 7px;
+  padding: 12px;
+  border: 1px solid #ccd8e3;
+  border-radius: 9px;
+}
+
+.ubs-sharing-layout > label > span {
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.ubs-sharing-layout > label select {
+  min-height: 34px;
+  border: 1px solid #c5d2df;
+  border-radius: 7px;
+  font-size: 9px;
+}
+
+.ubs-sharing-layout > label small {
+  color: #667a8e;
+  font-size: 8px;
+  line-height: 1.4;
+}
+
+.ubs-sharing-detail {
+  min-height: 170px;
+  padding: 14px;
+  border: 1px dashed #b9cada;
+  border-radius: 9px;
+}
+
+.ubs-sharing-detail > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.ubs-sharing-detail p {
+  color: #687c90;
+  font-size: 9px;
+}
+
+.ubs-sharing-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.ubs-sharing-summary span {
+  padding: 9px;
+  border-radius: 7px;
+  background: #eef5f7;
+  color: #587086;
+  font-size: 8px;
+}
+
+.ubs-sharing-records {
+  display: grid;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.ubs-sharing-records article {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2px 10px;
+  padding: 8px;
+  border: 1px solid #d5e0e8;
+  border-radius: 7px;
+}
+
+.ubs-sharing-records article strong,
+.ubs-sharing-records article span,
+.ubs-sharing-records article p {
+  font-size: 8px;
+}
+
+.ubs-sharing-records article p {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+@media (max-width: 1180px) {
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) {
+    --siselo-sidebar-width: 196px;
+  }
+
+  body[data-page="cadh"] .cadh-primary-grid {
+    grid-template-columns: 238px minmax(0, 1fr) !important;
+  }
+
+  .ubs-patient-list-filters {
+    grid-template-columns: minmax(180px, 1fr) repeat(2, 110px) repeat(2, minmax(145px, .7fr));
+  }
+}
+
+/*
+ * Browser zoom at 125% reduces a 1366px viewport to roughly 1093 CSS pixels.
+ * Keep the desktop sidebar complete in that range instead of applying the
+ * legacy icon-only breakpoint.
+ */
+@media (min-width: 921px) and (max-width: 1180px) {
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-brand {
+    justify-content: flex-start !important;
+    padding-inline: 16px !important;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-brand-copy,
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-nav-copy,
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-user-copy {
+    display: grid !important;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-label {
+    display: block !important;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-chevron {
+    display: block !important;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-footer .topbar-settings span {
+    display: inline !important;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar .menu > a {
+    grid-template-columns: 22px minmax(0, 1fr) 12px !important;
+    place-items: initial !important;
+    align-items: center !important;
+    padding-inline: 10px !important;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-footer {
+    grid-template-columns: minmax(0, 1fr) 40px !important;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-footer .topbar-settings {
+    grid-column: 1 / -1 !important;
+    justify-content: flex-start !important;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-footer .topbar-account {
+    grid-template-columns: 28px minmax(0, 1fr) !important;
+    place-items: initial !important;
+    align-items: center !important;
+  }
+}
+
+@media (max-width: 920px) {
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) {
+    --siselo-sidebar-width: 72px;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-brand-copy,
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-label,
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-nav-copy,
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-chevron,
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-user-copy,
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .siselo-module-subnav {
+    display: none !important;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-brand {
+    justify-content: center;
+    padding-inline: 8px !important;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar .menu > a {
+    grid-template-columns: 1fr !important;
+    place-items: center;
+    padding-inline: 8px !important;
+  }
+
+  body[data-page="cadh"] .cadh-primary-grid {
+    grid-template-columns: 220px minmax(0, 1fr) !important;
+  }
+
+  body[data-page="cadh"] .cadh-specialty-grid-inline {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  .ubs-patient-list-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar {
+    position: sticky !important;
+    inset: 0 0 auto !important;
+    width: 100% !important;
+    height: auto;
+    min-height: 58px !important;
+    display: grid;
+    grid-template-columns: 58px minmax(0, 1fr);
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-brand {
+    min-height: 58px !important;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-nav {
+    padding: 6px !important;
+    overflow-x: auto;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar .menu {
+    display: flex !important;
+    grid-template-columns: none !important;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar .menu > a {
+    min-width: 44px;
+    min-height: 44px !important;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-footer,
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-toggle {
+    display: none !important;
+  }
+
+  body[data-page="home"] .home-main-shell,
+  body[data-page="cadh"] .cadh-main-shell,
+  body[data-page="ubs"] .ubs-main-shell {
+    margin-left: 0 !important;
+  }
+
+  body[data-page="cadh"] .cadh-page-header,
+  body[data-page="ubs"] .ubs-page-header {
+    position: static;
+    padding-inline: 12px !important;
+  }
+
+  body[data-page="cadh"] .cadh-dashboard,
+  body[data-page="ubs"] .ubs-dashboard {
+    width: calc(100% - 18px) !important;
+    margin-top: 9px !important;
+  }
+
+  body[data-page="cadh"] .cadh-primary-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  body[data-page="cadh"] .cadh-patient-search {
+    max-height: 240px;
+    min-height: 0 !important;
+  }
+
+  body[data-page="cadh"] .cadh-module-tabs {
+    grid-template-columns: repeat(4, max-content);
+  }
+
+  body[data-page="cadh"] .cadh-specialty-grid-inline {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .cadh-patient-list-toolbar,
+  .cadh-patient-list-footer,
+  .ubs-sharing-detail > header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .cadh-patient-list-toolbar > div:last-child {
+    flex-wrap: wrap;
+  }
+
+  .ubs-patient-list-filters,
+  .ubs-sharing-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/*
+ * Settings and legacy pages are mounted in `.siselo-auto-shell` at runtime.
+ * Keep that shell on the same responsive contract as Home/CADH/UBS: the
+ * navigation owns only the free vertical space and the account footer always
+ * remains inside the viewport.
+ */
+body.siselo-auto-shell {
+  --siselo-sidebar-width: 216px;
+  --siselo-sidebar-collapsed-width: 72px;
+  overflow-x: hidden;
+}
+
+body.siselo-auto-shell .siselo-app-shell {
+  min-height: 100dvh;
+}
+
+body.siselo-auto-shell .home-sidebar {
+  width: var(--siselo-sidebar-width) !important;
+  min-width: var(--siselo-sidebar-width) !important;
+  height: 100dvh !important;
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0 !important;
+  overflow: hidden !important;
+}
+
+body.siselo-auto-shell .home-sidebar .topbar-left,
+body.siselo-auto-shell .home-sidebar-brand,
+body.siselo-auto-shell .home-sidebar-footer {
+  flex: 0 0 auto !important;
+}
+
+body.siselo-auto-shell .home-sidebar-brand {
+  min-height: 76px !important;
+  padding: 14px 16px !important;
+}
+
+body.siselo-auto-shell .home-sidebar-mark {
+  inline-size: 36px !important;
+  block-size: 36px !important;
+}
+
+body.siselo-auto-shell .home-sidebar-nav {
+  min-height: 0 !important;
+  flex: 1 1 auto !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  padding: 16px 10px 12px !important;
+  scrollbar-width: thin;
+  scrollbar-color: rgb(255 255 255 / 18%) transparent;
+}
+
+body.siselo-auto-shell .home-sidebar-label {
+  margin: 0 8px 10px !important;
+  font-size: 8px !important;
+}
+
+body.siselo-auto-shell .home-sidebar .menu {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 4px !important;
+}
+
+body.siselo-auto-shell .home-sidebar .menu > a {
+  width: 100% !important;
+  min-height: 46px !important;
+  grid-template-columns: 22px minmax(0, 1fr) 12px !important;
+  place-items: initial !important;
+  align-items: center !important;
+  gap: 9px !important;
+  padding: 7px 10px !important;
+  border-radius: 9px !important;
+}
+
+body.siselo-auto-shell .home-sidebar-nav-icon,
+body.siselo-auto-shell .home-sidebar-nav-icon svg {
+  inline-size: 17px !important;
+  block-size: 17px !important;
+}
+
+body.siselo-auto-shell .home-sidebar-nav-copy strong {
+  font-size: 13px !important;
+  line-height: 1.15 !important;
+}
+
+body.siselo-auto-shell .home-sidebar-nav-copy small {
+  font-size: 9px !important;
+  line-height: 1.2 !important;
+}
+
+body.siselo-auto-shell .home-sidebar-footer {
+  width: 100% !important;
+  min-height: 72px !important;
+  margin-top: 0 !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 40px !important;
+  gap: 4px !important;
+  padding: 6px !important;
+  background: #062c4f !important;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 10%) !important;
+}
+
+body.siselo-auto-shell .home-sidebar-footer .topbar-settings {
+  grid-column: 1 / -1 !important;
+  min-height: 28px !important;
+  justify-content: flex-start !important;
+  padding: 3px 7px !important;
+  font-size: 10px !important;
+}
+
+body.siselo-auto-shell .home-sidebar-footer .topbar-account {
+  min-height: 39px !important;
+  grid-template-columns: 28px minmax(0, 1fr) !important;
+  place-items: initial !important;
+  align-items: center !important;
+  padding: 4px 6px !important;
+}
+
+body.siselo-auto-shell .home-sidebar-user-icon {
+  inline-size: 28px !important;
+  block-size: 28px !important;
+}
+
+body.siselo-auto-shell .home-sidebar-user-copy strong {
+  font-size: 10px !important;
+}
+
+body.siselo-auto-shell .home-sidebar-user-copy small {
+  font-size: 7px !important;
+}
+
+body.siselo-auto-shell .home-sidebar-footer .topbar-logout {
+  inline-size: 40px !important;
+  block-size: 39px !important;
+  min-inline-size: 40px !important;
+}
+
+body.siselo-auto-shell .siselo-main-shell {
+  min-width: 0 !important;
+  margin-left: var(--siselo-sidebar-width) !important;
+}
+
+body.siselo-auto-shell .siselo-sidebar-toggle {
+  left: calc(var(--siselo-sidebar-width) - 12px) !important;
+  bottom: 68px !important;
+}
+
+body.siselo-auto-shell.home-sidebar-is-collapsed .home-sidebar {
+  width: var(--siselo-sidebar-collapsed-width) !important;
+  min-width: var(--siselo-sidebar-collapsed-width) !important;
+}
+
+body.siselo-auto-shell.home-sidebar-is-collapsed .siselo-main-shell {
+  margin-left: var(--siselo-sidebar-collapsed-width) !important;
+}
+
+body.siselo-auto-shell.home-sidebar-is-collapsed .siselo-sidebar-toggle {
+  left: calc(var(--siselo-sidebar-collapsed-width) - 12px) !important;
+}
+
+body[data-page="admin-users-list"] .table-scroll,
+body[data-page="admin-users-form"] .table-scroll {
+  max-width: 100%;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+}
+
+body[data-page="admin-users-list"] .admin-table {
+  min-width: 1060px !important;
+  table-layout: auto !important;
+}
+
+body[data-page="admin-users-list"] .admin-table th {
+  white-space: nowrap;
+}
+
+body[data-page="admin-users-list"] .admin-table :is(th, td):nth-child(2),
+body[data-page="admin-users-list"] .admin-table :is(th, td):nth-child(3),
+body[data-page="admin-users-list"] .admin-table :is(th, td):nth-child(5),
+body[data-page="admin-users-list"] .admin-table :is(th, td):nth-child(6) {
+  overflow-wrap: anywhere;
+}
+
+body[data-page="admin-users-list"] .admin-table th:first-child,
+body[data-page="admin-users-list"] .admin-table td:first-child {
+  width: 62px;
+}
+
+body[data-page="admin-users-list"] .admin-table th:last-child,
+body[data-page="admin-users-list"] .admin-table td:last-child {
+  width: 120px;
+  white-space: nowrap;
+}
+
+body[data-page="admin-users-list"] .admin-table :is(th, td):nth-child(4),
+body[data-page="admin-users-list"] .admin-table :is(th, td):nth-child(7),
+body[data-page="admin-users-list"] .admin-table :is(th, td):nth-child(8) {
+  white-space: nowrap;
+}
+
+@media (max-width: 1180px) {
+  body.siselo-auto-shell {
+    --siselo-sidebar-width: 196px;
+  }
+}
+
+/*
+ * At 125–175% browser zoom the CSS viewport enters the old tablet
+ * breakpoint. Preserve the complete sidebar while there is still enough
+ * room for a desktop workspace.
+ */
+@media (min-width: 701px) and (max-width: 1180px) {
+  body.siselo-auto-shell .home-sidebar {
+    display: flex !important;
+    grid-template-columns: none !important;
+  }
+
+  body.siselo-auto-shell .home-sidebar-brand {
+    justify-content: flex-start !important;
+    padding-inline: 16px !important;
+  }
+
+  body.siselo-auto-shell .home-sidebar-brand-copy,
+  body.siselo-auto-shell .home-sidebar-nav-copy,
+  body.siselo-auto-shell .home-sidebar-user-copy {
+    display: grid !important;
+  }
+
+  body.siselo-auto-shell .home-sidebar-label,
+  body.siselo-auto-shell .home-sidebar-chevron {
+    display: block !important;
+  }
+
+  body.siselo-auto-shell .siselo-module-subnav {
+    display: grid !important;
+  }
+
+  body.siselo-auto-shell .home-sidebar-footer {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 40px !important;
+    padding: 6px !important;
+  }
+
+  body.siselo-auto-shell .home-sidebar-footer .topbar-settings {
+    grid-column: 1 / -1 !important;
+    inline-size: auto !important;
+    min-inline-size: 0 !important;
+  }
+
+  body.siselo-auto-shell .home-sidebar-footer .topbar-settings span {
+    display: inline !important;
+  }
+
+  body.siselo-auto-shell .home-sidebar-footer .topbar-account {
+    inline-size: auto !important;
+    min-inline-size: 0 !important;
+  }
+
+  body.siselo-auto-shell .home-sidebar-footer .topbar-logout {
+    display: grid !important;
+    inline-size: 40px !important;
+    min-inline-size: 40px !important;
+  }
+}
+
+@media (max-width: 700px) {
+  body.siselo-auto-shell {
+    --siselo-sidebar-width: 72px;
+  }
+
+  body.siselo-auto-shell .siselo-app-shell {
+    display: block !important;
+  }
+
+  body.siselo-auto-shell .home-sidebar {
+    position: fixed !important;
+    inset: 0 auto 0 0 !important;
+    width: var(--siselo-sidebar-width) !important;
+    min-width: var(--siselo-sidebar-width) !important;
+    height: 100dvh !important;
+    display: flex !important;
+    grid-template-columns: none !important;
+    padding: 0 !important;
+  }
+
+  body.siselo-auto-shell .home-sidebar .topbar-left {
+    width: 100% !important;
+  }
+
+  body.siselo-auto-shell .home-sidebar-brand {
+    min-height: 62px !important;
+    justify-content: center !important;
+    padding: 10px 8px !important;
+  }
+
+  body.siselo-auto-shell .home-sidebar-brand-copy,
+  body.siselo-auto-shell .home-sidebar-label,
+  body.siselo-auto-shell .home-sidebar-nav-copy,
+  body.siselo-auto-shell .home-sidebar-chevron,
+  body.siselo-auto-shell .home-sidebar-user-copy,
+  body.siselo-auto-shell .siselo-module-subnav,
+  body.siselo-auto-shell .home-sidebar-footer .topbar-settings span {
+    display: none !important;
+  }
+
+  body.siselo-auto-shell .home-sidebar-nav {
+    padding: 8px !important;
+  }
+
+  body.siselo-auto-shell .home-sidebar .menu {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+  }
+
+  body.siselo-auto-shell .home-sidebar .menu > a {
+    width: 52px !important;
+    min-height: 48px !important;
+    grid-template-columns: 1fr !important;
+    place-items: center !important;
+    justify-self: center !important;
+    padding: 0 !important;
+  }
+
+  body.siselo-auto-shell .home-sidebar-footer {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    justify-items: center !important;
+    gap: 4px !important;
+    padding: 6px !important;
+  }
+
+  body.siselo-auto-shell .home-sidebar-footer .topbar-settings,
+  body.siselo-auto-shell .home-sidebar-footer .topbar-account,
+  body.siselo-auto-shell .home-sidebar-footer .topbar-logout {
+    grid-column: auto !important;
+    inline-size: 40px !important;
+    block-size: 40px !important;
+    min-inline-size: 40px !important;
+    min-block-size: 40px !important;
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    place-items: center !important;
+    justify-self: center !important;
+    padding: 0 !important;
+  }
+
+  body.siselo-auto-shell .home-sidebar-user-icon {
+    inline-size: 28px !important;
+    block-size: 28px !important;
+  }
+
+  body.siselo-auto-shell .siselo-main-shell,
+  body.siselo-auto-shell.home-sidebar-is-collapsed .siselo-main-shell {
+    margin-left: var(--siselo-sidebar-width) !important;
+  }
+
+  body.siselo-auto-shell .siselo-sidebar-toggle {
+    display: none !important;
+  }
+
+  body.siselo-auto-shell .siselo-page-header {
+    position: sticky !important;
+    min-height: 54px !important;
+    padding: 8px 10px !important;
+  }
+
+  body.siselo-auto-shell .container {
+    width: calc(100% - 16px) !important;
+    margin: 8px auto 18px !important;
+  }
+}
+
+/* Collapsible UBS/CADH module groups. */
+.siselo-module-subnav[hidden] {
+  display: none !important;
+}
+
+.siselo-module-toggle .home-sidebar-chevron {
+  display: block !important;
+  opacity: 0.58 !important;
+  visibility: visible !important;
+  transform: rotate(0deg) !important;
+  transition: transform 160ms ease, opacity 160ms ease !important;
+}
+
+.siselo-module-toggle[aria-expanded="true"] .home-sidebar-chevron {
+  opacity: 0.9 !important;
+  transform: rotate(90deg) !important;
+}
+
+#nav-home .home-sidebar-chevron {
+  display: none !important;
+}
+
+@media (max-width: 700px) {
+  .siselo-module-toggle .home-sidebar-chevron {
+    display: none !important;
+  }
+
+  :is(
+    body.siselo-sidebar-shell,
+    body.siselo-auto-shell,
+    body[data-page="home"],
+    body[data-page="cadh"],
+    body[data-page="ubs"]
+  ) .siselo-module-toggle[aria-expanded="true"] + .siselo-module-subnav:not([hidden]) {
+    display: grid !important;
+    position: fixed !important;
+    z-index: 1200 !important;
+    top: var(--siselo-subnav-mobile-top, 68px) !important;
+    right: 8px !important;
+    left: 80px !important;
+    max-height: calc(100dvh - var(--siselo-subnav-mobile-top, 68px) - 8px) !important;
+    margin: 0 !important;
+    padding: 8px !important;
+    overflow-y: auto !important;
+    border: 1px solid rgb(255 255 255 / 12%) !important;
+    border-radius: 10px !important;
+    background: #062f55 !important;
+    box-shadow: 0 14px 30px rgb(1 25 47 / 28%) !important;
+  }
+}
