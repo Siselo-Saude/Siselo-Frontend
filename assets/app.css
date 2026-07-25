@@ -17904,7 +17904,7 @@ body[data-page="cadh"] .cadh-management-card {
 body[data-page="cadh"] .cadh-module-tabs {
   min-height: 38px !important;
   display: grid !important;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   flex-wrap: nowrap !important;
   overflow-x: auto;
 }
@@ -18049,173 +18049,6 @@ body[data-page="cadh"] .cadh-selected-patient-chip {
   font-size: 9px;
   font-weight: 800;
 }
-
-/* CADH patient-list tab from the requested ambulatory layout. */
-.cadh-patient-list-screen {
-  min-height: 300px;
-  padding: 14px;
-}
-
-.cadh-patient-list-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 8px;
-}
-
-.cadh-patient-list-toolbar > div:first-child {
-  display: grid;
-  gap: 1px;
-}
-
-.cadh-patient-list-toolbar strong {
-  font-size: 11px;
-}
-
-.cadh-patient-list-toolbar small {
-  color: #6b7e94;
-  font-size: 8px;
-}
-
-.cadh-patient-list-toolbar > div:last-child {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.cadh-patient-list-toolbar .btn {
-  min-height: 29px;
-  padding: 5px 9px;
-  font-size: 9px;
-}
-
-.cadh-compact-filter {
-  position: relative;
-}
-
-.cadh-compact-filter span {
-  position: absolute;
-  inset: 7px auto auto 8px;
-  color: #466078;
-  font-size: 8px;
-  pointer-events: none;
-}
-
-.cadh-compact-filter input {
-  width: 92px;
-  min-height: 29px;
-  padding: 5px 7px 5px 34px;
-  border: 1px solid #cad7e3;
-  border-radius: 7px;
-  font-size: 8px;
-}
-
-.cadh-patient-status-tabs {
-  display: flex;
-  gap: 2px;
-  overflow-x: auto;
-  margin-bottom: 8px;
-}
-
-.cadh-patient-status-tabs button {
-  min-height: 28px;
-  padding: 5px 9px;
-  border: 0;
-  border-radius: 7px 7px 0 0;
-  background: #f0f3f6;
-  color: #62758d;
-  font-size: 8px;
-  font-weight: 800;
-  white-space: nowrap;
-}
-
-.cadh-patient-status-tabs button.active {
-  background: #fff;
-  color: #07589e;
-  border-bottom: 2px solid #07589e;
-}
-
-.cadh-patient-list-table-wrap {
-  overflow: auto;
-  border: 1px solid #ccd8e3;
-  border-radius: 9px 9px 0 0;
-}
-
-.cadh-patient-list-table {
-  width: 100%;
-  min-width: 720px;
-  border-collapse: collapse;
-  table-layout: fixed;
-}
-
-.cadh-patient-list-table th {
-  height: 30px;
-  padding: 6px 8px;
-  background: #141f2e;
-  color: #fff;
-  font-size: 7px;
-  text-align: left;
-  text-transform: uppercase;
-}
-
-.cadh-patient-list-table td {
-  height: 34px;
-  padding: 5px 8px;
-  border-bottom: 1px solid #dbe3ea;
-  color: #30445a;
-  font-size: 8px;
-}
-
-.cadh-patient-list-table td strong {
-  color: #10243b;
-  font-size: 9px;
-}
-
-.cadh-patient-select-row,
-.cadh-patient-open-row {
-  padding: 3px 6px;
-  border: 1px solid #c7d5e1;
-  border-radius: 5px;
-  background: #fff;
-  color: #07589e;
-  font-size: 7px;
-  font-weight: 800;
-}
-
-.cadh-list-empty {
-  min-height: 88px;
-  display: grid;
-  place-content: center;
-  gap: 4px;
-  color: #61758e;
-  text-align: center;
-}
-
-.cadh-patient-list-footer {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 7px 8px;
-  border: 1px solid #ccd8e3;
-  border-top: 0;
-  color: #64778e;
-  font-size: 7px;
-}
-
-.cadh-patient-list-footer i {
-  display: inline-block;
-  width: 9px;
-  height: 9px;
-  margin-left: 5px;
-  border-radius: 3px;
-}
-
-.cadh-patient-list-footer .is-waiting { background: #ffd65a; }
-.cadh-patient-list-footer .is-care { background: #9ecbff; }
-.cadh-patient-list-footer .is-done { background: #84e3ae; }
-.cadh-patient-list-footer .is-pending { background: #ffc379; }
-.cadh-patient-list-footer .is-absent { background: #ffaaaa; }
 
 /* Flow pages keep the requested functionality without the duplicated clinical workspace. */
 body[data-page="cadh"] .cadh-flow-workspace {
@@ -18720,22 +18553,16 @@ body[data-page="ubs"] .ubs-tab-panel {
   }
 
   body[data-page="cadh"] .cadh-module-tabs {
-    grid-template-columns: repeat(4, max-content);
+    grid-template-columns: repeat(3, max-content);
   }
 
   body[data-page="cadh"] .cadh-specialty-grid-inline {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   }
 
-  .cadh-patient-list-toolbar,
-  .cadh-patient-list-footer,
   .ubs-sharing-detail > header {
     align-items: stretch;
     flex-direction: column;
-  }
-
-  .cadh-patient-list-toolbar > div:last-child {
-    flex-wrap: wrap;
   }
 
   .ubs-patient-list-filters,

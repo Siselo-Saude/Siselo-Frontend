@@ -1,7 +1,6 @@
 const CADH_SEARCH_KEY = 'siselo_cadh_search';
 
 const CADH_MANAGEMENT_TABS = {
-  list: 'cadh-list-card',
   users: 'cadh-patients-card',
   encounters: 'cadh-encounters-card',
   transitions: 'cadh-transitions-card',
@@ -21,7 +20,7 @@ const CADH_DEFAULT_CARE_PLAN_ITEMS = [
   { item_type: 'meta', title: 'Prioridades e recomendações da equipe especializada', situation: '', difficulty: '', recommendation: '', goal: '', sort_order: 11 },
 ];
 
-const CADH_TRANSITION_ORIGIN = 'CADH — Centro de Atenção Domiciliar Hospitalar';
+const CADH_TRANSITION_ORIGIN = 'CADH — Centro de Atenção ao Diabetes e Hipertensão';
 
 const CADH_UBS_TEAM_GROUPS = [
   { ubs: 'UBS 01 PARANOÁ', teams: ['ESF EQUIPE 08 - BRANCA', 'ESF EQUIPE 09 - AMARELA', 'ESF EQUIPE 10 - AZUL', 'ESF EQUIPE 11 - VERDE', 'ESF EQUIPE 12 - ROSA', 'ESF EQUIPE 13 - LILÁS', 'ESF EQUIPE 14 - MARROM', 'ESF EQUIPE 15 - DOURADA', 'ESF EQUIPE 16 - LARANJA', 'ESF EQUIPE 17 - PRATA', 'EMULTI AROEIRA', 'ECR MESTRE DAMIÃO'] },
@@ -71,8 +70,7 @@ const CADH_ESF_OPTIONS = [
 let cadhPermissions = new Set();
 let cadhCurrentPatient = null;
 let cadhClinicalContext = null;
-let cadhPatientRows = [];
-let cadhActiveTab = 'list';
+let cadhActiveTab = 'users';
 
 document.addEventListener('DOMContentLoaded', () => {
   if (!['cadh', 'ubs'].includes(document.body.dataset.page)) {
@@ -97,7 +95,7 @@ async function setupCadhPage() {
   if (!await restoreCadhPatientSearch(cadhPermissions)) {
     setCadhPatientCardsUnlocked(false);
     syncCadhPendingIndicators([]);
-    await activateCadhManagementTab(SISELO.queryParam('view') || 'list');
+    await activateCadhManagementTab(SISELO.queryParam('view') || 'users');
   }
 }
 
@@ -224,14 +222,9 @@ function bindCadhPatientSearch(permissions) {
 
   SISELO.apiRequest('/patients/list.php').then((data) => {
     currentPatients = Array.isArray(data.rows) ? data.rows : [];
-    cadhPatientRows = currentPatients;
     renderPatientSuggestions('');
-    if (cadhActiveTab === 'list') {
-      renderCadhPatientListTab();
-    }
   }).catch(() => {
     currentPatients = [];
-    cadhPatientRows = [];
   });
 
   input.addEventListener('input', () => {
@@ -248,7 +241,6 @@ function bindCadhPatientSearch(permissions) {
       try {
         const data = await SISELO.apiRequest('/patients/list.php?q=' + encodeURIComponent(query));
         currentPatients = Array.isArray(data.rows) ? data.rows : [];
-        cadhPatientRows = currentPatients;
         renderPatientSuggestions(query);
       } catch (error) {
         currentPatients = [];
@@ -343,7 +335,7 @@ function clearCadhSearchState() {
 function clearCadhSelectedPatient(options = {}) {
   cadhCurrentPatient = null;
   cadhClinicalContext = null;
-  cadhActiveTab = 'list';
+  cadhActiveTab = 'users';
   clearCadhSearchState();
   setCadhPatientCardPatient('');
   setCadhPatientCardsUnlocked(false);
@@ -359,7 +351,7 @@ function clearCadhSelectedPatient(options = {}) {
     input.value = '';
   }
 
-  activateCadhManagementTab('list');
+  activateCadhManagementTab('users');
 }
 
 function setCadhPatientCardsUnlocked(unlocked) {
@@ -411,10 +403,10 @@ async function renderCadhPatientFromContext(patient, permissions) {
 }
 
 async function activateCadhManagementTab(tabKey) {
-  const normalizedTab = CADH_MANAGEMENT_TABS[tabKey] ? tabKey : 'list';
+  const normalizedTab = CADH_MANAGEMENT_TABS[tabKey] ? tabKey : 'users';
   cadhActiveTab = normalizedTab;
   const url = new URL(window.location.href);
-  if (normalizedTab === 'list') {
+  if (normalizedTab === 'users') {
     url.searchParams.delete('view');
   } else {
     url.searchParams.set('view', normalizedTab);
@@ -432,11 +424,6 @@ async function activateCadhManagementTab(tabKey) {
       tab.removeAttribute('aria-current');
     }
   });
-
-  if (normalizedTab === 'list') {
-    renderCadhPatientListTab();
-    return;
-  }
 
   if (normalizedTab === 'encounters') {
     renderCadhEncountersTab(cadhCurrentPatient);
@@ -468,87 +455,6 @@ function renderCadhEmptyManagementState(tabKey = 'users') {
     </div>
   `;
   SISELO.applyUiComponents(detail);
-}
-
-function renderCadhPatientListTab() {
-  const detail = document.getElementById('cadh-patient-detail');
-  if (!detail) return;
-
-  detail.innerHTML = `
-    <section class="cadh-patient-list-screen">
-      <header class="cadh-patient-list-toolbar">
-        <div>
-          <strong>Lista de Pacientes do Ambulatório</strong>
-          <small>Filtros | Data: ${SISELO.escapeHtml(new Intl.DateTimeFormat('pt-BR').format(new Date()))}</small>
-        </div>
-        <div>
-          <label class="cadh-compact-filter"><span>Filtros</span><input id="cadh-list-filter" placeholder="Nome ou CPF"></label>
-          <button class="btn" id="cadh-list-refresh" type="button">Atualizar</button>
-          <button class="btn" id="cadh-list-print" type="button">Imprimir documentos</button>
-          <a class="btn btn-primary" href="/cadh/index.html?flow=schedule">Agendar</a>
-        </div>
-      </header>
-      <nav class="cadh-patient-status-tabs" aria-label="Situação dos pacientes">
-        <button class="active" type="button">Agendados</button>
-        <button type="button">Aguardando Atendimento</button>
-        <button type="button">Em atendimento</button>
-        <button type="button">Atendidos</button>
-        <button type="button">Pendentes</button>
-        <button type="button">Ausentes</button>
-      </nav>
-      <div class="cadh-patient-list-table-wrap">
-        <table class="cadh-patient-list-table">
-          <thead><tr><th>Sel./Chegada</th><th>Hora</th><th>Paciente</th><th>Pront.</th><th>Especialidade</th><th>Profissional</th><th>Ação</th></tr></thead>
-          <tbody id="cadh-patient-list-body"></tbody>
-        </table>
-      </div>
-      <footer class="cadh-patient-list-footer"><span id="cadh-patient-list-count">0 paciente(s) encontrado(s)</span><span>Legenda: <i class="is-waiting"></i> Aguardando <i class="is-care"></i> Em Atendimento <i class="is-done"></i> Atendido <i class="is-pending"></i> Pendente <i class="is-absent"></i> Ausente</span></footer>
-    </section>
-  `;
-
-  const renderRows = () => {
-    const query = String(document.getElementById('cadh-list-filter')?.value || '').trim();
-    const rows = query ? SISELO.filterPatientsForSearch(cadhPatientRows, query) : cadhPatientRows;
-    const body = document.getElementById('cadh-patient-list-body');
-    const count = document.getElementById('cadh-patient-list-count');
-    if (count) count.textContent = `${rows.length} paciente(s) encontrado(s)`;
-    if (!body) return;
-    body.innerHTML = rows.length
-      ? rows.slice(0, 12).map((patient) => `
-          <tr>
-            <td><button class="cadh-patient-select-row" type="button" data-cadh-list-patient="${patient.id}">Selecionar</button></td>
-            <td>${SISELO.escapeHtml(patient.appointment_time || '—')}</td>
-            <td><strong>${SISELO.escapeHtml(patient.full_name || '-')}</strong></td>
-            <td>${SISELO.escapeHtml(patient.ses || patient.cpf || '-')}</td>
-            <td>${SISELO.escapeHtml(patient.specialty || '—')}</td>
-            <td>${SISELO.escapeHtml(patient.professional_name || '—')}</td>
-            <td><button class="cadh-patient-open-row" type="button" data-cadh-list-patient="${patient.id}">Abrir</button></td>
-          </tr>
-        `).join('')
-      : '<tr><td colspan="7"><div class="cadh-list-empty"><strong>Nenhum registro encontrado!</strong><span>0 paciente(s) encontrado(s)</span></div></td></tr>';
-    bindCadhListPatientActions();
-  };
-
-  document.getElementById('cadh-list-filter')?.addEventListener('input', renderRows);
-  document.getElementById('cadh-list-refresh')?.addEventListener('click', renderRows);
-  document.getElementById('cadh-list-print')?.addEventListener('click', () => window.print());
-  renderRows();
-}
-
-function bindCadhListPatientActions() {
-  document.querySelectorAll('[data-cadh-list-patient]').forEach((button) => {
-    button.addEventListener('click', async () => {
-      const patient = cadhPatientRows.find((row) => String(row.id) === String(button.dataset.cadhListPatient));
-      if (!patient) return;
-      saveCadhSearchState(patient, patient.cpf);
-      setCadhPatientCardPatient(patient.id);
-      setCadhPatientCardsUnlocked(true);
-      const input = document.getElementById('cadh-cpf-input');
-      if (input) input.value = patient.full_name || '';
-      cadhActiveTab = 'users';
-      await renderCadhPatientFromContext(patient, cadhPermissions);
-    });
-  });
 }
 
 function renderCadhSelectedPatientSummary(patient) {

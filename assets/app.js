@@ -2469,7 +2469,7 @@
     },
     cadh: {
       label: 'CADH',
-      description: 'Atenção Domiciliar',
+      description: 'Atenção secundária',
       icon: '<path d="M3 13h4l2-7 4 14 2-7h6"/>',
     },
     ubs: {
@@ -2481,7 +2481,7 @@
 
   const SHELL_PAGE_META = {
     home: { section: 'Início', title: 'Painel de Controle' },
-    cadh: { section: 'CADH', title: 'Centro de Atenção Domiciliar Hospitalar' },
+    cadh: { section: 'CADH', title: 'Centro de Atenção ao Diabetes e Hipertensão' },
     ubs: { section: 'UBS', title: 'Unidade Básica de Saúde' },
     patients: { section: 'CADH', title: 'Usuários' },
     careplans: { section: 'CADH', title: 'Planos de Cuidado' },
