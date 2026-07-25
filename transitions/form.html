@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Transição</title>
+  <title>Encaminhamento</title>
   <link rel="stylesheet" href="/assets/app.css">
 </head>
 <body data-page="transitions-form">
@@ -19,7 +19,7 @@
   <main class="container">
     <section class="card transition-card">
       <a class="btn" href="/transitions/list.html" data-back-link data-fallback="/transitions/list.html">&larr; Voltar</a>
-      <h1 id="form-title" class="page-title" style="margin-top:14px;">Nova Transição</h1>
+      <h1 id="form-title" class="page-title" style="margin-top:14px;">Novo Encaminhamento</h1>
       <div id="page-alert" class="alert" hidden></div>
 
       <form id="transition-form" class="transition-form-shell">
@@ -86,12 +86,12 @@
 
         <section class="transition-panel transition-panel-details">
           <div class="transition-panel-header">
-            <h2 class="transition-panel-title">Dados da Transição</h2>
+            <h2 class="transition-panel-title">Dados do Encaminhamento</h2>
           </div>
 
           <div class="transition-panel-grid">
             <div class="field">
-              <label for="transition_date">Data da Transição</label>
+              <label for="transition_date">Data do Encaminhamento</label>
               <input id="transition_date" name="transition_date" type="date" placeholder="dd/mm/aaaa">
             </div>
 
@@ -112,7 +112,7 @@
 
             <div class="field-full">
               <label for="notes">Motivo clínico e observações</label>
-              <textarea id="notes" name="notes" placeholder="Descreva a transição"></textarea>
+              <textarea id="notes" name="notes" placeholder="Descreva o encaminhamento"></textarea>
             </div>
 
             <p id="transition-specialty-hint" class="transition-field-hint field-full" hidden></p>
@@ -121,7 +121,7 @@
 
         <div class="form-actions transition-form-actions">
           <a class="btn" href="/transitions/list.html" data-back-link data-fallback="/transitions/list.html">Cancelar</a>
-          <button class="btn btn-primary" type="submit">Salvar transição</button>
+          <button class="btn btn-primary" type="submit">Salvar encaminhamento</button>
         </div>
       </form>
     </section>

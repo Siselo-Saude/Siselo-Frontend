@@ -1054,8 +1054,8 @@
         emptyDescription: '',
       },
       transitions: {
-        singular: 'transição do cuidado',
-        emptyTitle: 'Usuário sem transição do cuidado registrada.',
+        singular: 'encaminhamento do cuidado',
+        emptyTitle: 'Paciente sem encaminhamento do cuidado registrado.',
         emptyDescription: '',
       },
     };
@@ -2486,7 +2486,7 @@
     patients: { section: 'CADH', title: 'Usuários' },
     careplans: { section: 'CADH', title: 'Planos de Cuidado' },
     encounters: { section: 'CADH', title: 'Atendimentos' },
-    transitions: { section: 'CADH', title: 'Transições do Cuidado' },
+    transitions: { section: 'CADH', title: 'Encaminhamentos do Cuidado' },
     admin: { section: 'Configurações', title: 'Usuários do Sistema' },
   };
 
@@ -2616,18 +2616,38 @@
         return `<span class="siselo-module-subnav-heading">${escapeHtml(item.label)}</span>`;
       }
       const itemUrl = new URL(item.href, window.location.origin);
-      const active = location.pathname === itemUrl.pathname && (
+      const currentParams = new URLSearchParams(location.search);
+      const currentFlow = currentParams.get('flow') || 'received';
+      const currentUbsTab = currentParams.get('tab') || 'patients';
+      const samePath = location.pathname === itemUrl.pathname;
+      const hasMatchingParams = Array.from(itemUrl.searchParams)
+        .every(([name, value]) => currentParams.get(name) === value);
+      const isCadhReceivedArea = item.href.includes('flow=received') &&
+        ['received', 'schedule'].includes(currentFlow);
+      const isUbsPatientArea = item.href.includes('tab=patients') &&
+        ['patients', 'transitioned', 'followup', 'next'].includes(currentUbsTab);
+      const isUbsPatientDetails = key === 'ubs' &&
+        item.href.includes('tab=patients') &&
+        location.pathname === '/ubs/patient.html';
+      const isCadhClinicalPage = key === 'cadh' &&
+        item.href.includes('flow=followup') &&
+        location.pathname.startsWith('/cadh/') &&
+        !['/cadh/', '/cadh/index.html'].includes(location.pathname);
+      const active = (samePath && (
         itemUrl.searchParams.size === 0 ||
-        Array.from(itemUrl.searchParams).every(([name, value]) => new URLSearchParams(location.search).get(name) === value) ||
-        (item.href.includes('flow=received') && !new URLSearchParams(location.search).has('flow'))
-      );
+        hasMatchingParams ||
+        isCadhReceivedArea ||
+        isUbsPatientArea
+      )) || isCadhClinicalPage || isUbsPatientDetails;
       return `<a href="${item.href}"${item.ubsCreateOnly ? ' data-ubs-create-link' : ''} class="${active ? 'active' : ''}"><span aria-hidden="true">＋</span>${escapeHtml(item.label)}</a>`;
     }).join('');
     link.insertAdjacentElement('afterend', subnav);
 
+    const hasActiveItem = Boolean(subnav.querySelector('a.active'));
     link.classList.add('siselo-module-toggle');
     link.setAttribute('aria-controls', subnavId);
-    link.setAttribute('aria-expanded', 'false');
+    link.setAttribute('aria-expanded', String(hasActiveItem));
+    subnav.hidden = !hasActiveItem;
 
     if (link.dataset.moduleToggleBound !== 'true') {
       link.dataset.moduleToggleBound = 'true';

@@ -16880,6 +16880,10 @@ body[data-page="cadh-specialty-form"].home-sidebar-is-collapsed .home-sidebar-fo
   background: #fff;
 }
 
+.cadh-flow-tabs[hidden] {
+  display: none !important;
+}
+
 .cadh-flow-filters label,
 .cadh-flow-action-form label,
 .cadh-kanban-toolbar label,
@@ -17297,9 +17301,18 @@ body[data-page="cadh-specialty-form"].home-sidebar-is-collapsed .home-sidebar-fo
   font-weight: 800;
 }
 
-.siselo-module-subnav a:hover,
-.siselo-module-subnav a.active {
+.siselo-module-subnav a:hover {
   background: rgb(255 255 255 / 12%);
+  color: #fff;
+}
+
+.siselo-module-subnav a.active {
+  background: #315f86;
+  color: #fff;
+  font-weight: 800;
+}
+
+.siselo-module-subnav a.active span {
   color: #fff;
 }
 
@@ -18571,6 +18584,909 @@ body[data-page="ubs"] .ubs-tab-panel {
   }
 }
 
+/* UBS patient workspace: patient information, clinical follow-up and referral. */
+body[data-page="ubs-patient"].siselo-auto-shell {
+  --ubs-patient-blue: #075795;
+  --ubs-patient-blue-dark: #064878;
+  --ubs-patient-teal: #078878;
+  --ubs-patient-copy: #172536;
+  --ubs-patient-muted: #667c92;
+  --ubs-patient-border: #cbd9e4;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-page {
+  width: min(1380px, calc(100% - 32px));
+  max-width: 1380px;
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+  margin-block: 16px 32px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-page :is(button, input, select, textarea) {
+  font: inherit;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-module-hero,
+body[data-page="ubs-patient"] .ubs-patient-info-card,
+body[data-page="ubs-patient"] .ubs-patient-followup-card {
+  min-width: 0;
+  border: 1px solid var(--ubs-patient-border);
+  border-radius: 14px;
+  background: rgb(255 255 255 / 97%);
+  box-shadow: 0 8px 22px rgb(32 67 98 / 7%);
+}
+
+body[data-page="ubs-patient"] .ubs-patient-module-hero {
+  min-height: 76px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  background:
+    linear-gradient(100deg, rgb(219 244 240 / 92%), rgb(242 249 250 / 96%)),
+    radial-gradient(#a9d7d0 1px, transparent 1px);
+  background-size: auto, 24px 24px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-module-icon {
+  inline-size: 44px;
+  block-size: 44px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 12px;
+  background: var(--ubs-patient-teal);
+  color: #fff;
+  box-shadow: 0 5px 12px rgb(7 136 120 / 22%);
+}
+
+body[data-page="ubs-patient"] .ubs-patient-module-icon svg {
+  inline-size: 23px;
+  block-size: 23px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-module-hero p,
+body[data-page="ubs-patient"] .ubs-patient-section-heading p,
+body[data-page="ubs-patient"] .ubs-patient-history-section > header p,
+body[data-page="ubs-patient"] .ubs-patient-referral-section > header p,
+body[data-page="ubs-patient"] .ubs-patient-subview-heading p,
+body[data-page="ubs-patient"] .ubs-patient-record-header p {
+  margin: 0 0 3px;
+  color: var(--ubs-patient-teal);
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-module-hero strong {
+  color: var(--ubs-patient-copy);
+  font-size: 1.08rem;
+  font-weight: 900;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-section-heading {
+  min-width: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 18px;
+  border-bottom: 1px solid #dde6ed;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-section-heading h1,
+body[data-page="ubs-patient"] .ubs-patient-section-heading h2,
+body[data-page="ubs-patient"] .ubs-patient-history-section h3,
+body[data-page="ubs-patient"] .ubs-patient-referral-section h3,
+body[data-page="ubs-patient"] .ubs-patient-subview-heading h3,
+body[data-page="ubs-patient"] .ubs-patient-record-header h3 {
+  margin: 0;
+  color: var(--ubs-patient-copy);
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-section-heading h1 {
+  font-size: 1.26rem;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-section-heading h2 {
+  font-size: 1.18rem;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-section-heading > div > span,
+body[data-page="ubs-patient"] .ubs-patient-referral-section > header > div > span {
+  display: block;
+  margin-top: 4px;
+  color: var(--ubs-patient-muted);
+  font-size: 0.76rem;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-back-link {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 10px;
+  color: var(--ubs-patient-blue);
+  font-size: 0.76rem;
+  font-weight: 850;
+  text-decoration: none;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-back-link:hover {
+  text-decoration: underline;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-back-link svg {
+  inline-size: 16px;
+  block-size: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-summary-hero {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 68px minmax(0, 1fr);
+  gap: 16px;
+  padding: 18px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-avatar {
+  inline-size: 68px;
+  block-size: 68px;
+  display: grid;
+  place-items: center;
+  border-radius: 18px;
+  background: #c8efe8;
+  color: #075f56;
+  font-size: 1.25rem;
+  font-weight: 900;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-summary-copy {
+  min-width: 0;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-name-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-name-row h2 {
+  min-width: 0;
+  margin: 0;
+  color: var(--ubs-patient-copy);
+  font-size: 1.45rem;
+  font-weight: 900;
+  overflow-wrap: anywhere;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 9px;
+  border-radius: 999px;
+  font-size: 0.66rem;
+  font-weight: 900;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-status.is-active {
+  background: #dcf8e9;
+  color: #087b48;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-status.is-inactive {
+  background: #ffe5e5;
+  color: #ba2b2b;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-meta-grid {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(120px, 1fr));
+  gap: 9px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-meta-grid > div {
+  min-width: 0;
+  display: grid;
+  align-content: center;
+  gap: 4px;
+  min-height: 58px;
+  padding: 9px 11px;
+  border: 1px solid #d8e2ea;
+  border-radius: 10px;
+  background: #fbfdfe;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-meta-grid span,
+body[data-page="ubs-patient"] .ubs-patient-clinical-summary article > span {
+  color: #667b91;
+  font-size: 0.63rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-meta-grid strong {
+  min-width: 0;
+  color: #243346;
+  font-size: 0.78rem;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-clinical-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  padding: 0 18px 18px 102px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-clinical-summary article {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #d8e2ea;
+  border-radius: 10px;
+  background: #fff;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-clinical-summary p {
+  margin: 5px 0 0;
+  color: #3b4d61;
+  font-size: 0.78rem;
+  overflow-wrap: anywhere;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-followup-heading .btn {
+  flex: 0 0 auto;
+}
+
+body[data-page="ubs-patient"] #ubs-patient-overview {
+  display: grid;
+  gap: 14px;
+  padding: 16px 18px 18px;
+}
+
+body[data-page="ubs-patient"] #ubs-patient-overview[hidden],
+body[data-page="ubs-patient"] .ubs-patient-specialty-view[hidden],
+body[data-page="ubs-patient"] .ubs-patient-record-view[hidden] {
+  display: none !important;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-history-section,
+body[data-page="ubs-patient"] .ubs-patient-referral-section,
+body[data-page="ubs-patient"] .ubs-patient-specialty-view,
+body[data-page="ubs-patient"] .ubs-patient-record-view {
+  min-width: 0;
+  border: 1px solid #d6e1e9;
+  border-radius: 12px;
+  background: #fff;
+  overflow: hidden;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-history-section > header,
+body[data-page="ubs-patient"] .ubs-patient-referral-section > header,
+body[data-page="ubs-patient"] .ubs-patient-subview-heading,
+body[data-page="ubs-patient"] .ubs-patient-record-header {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 16px;
+  border-bottom: 1px solid #dde6ed;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-history-section h3,
+body[data-page="ubs-patient"] .ubs-patient-referral-section h3,
+body[data-page="ubs-patient"] .ubs-patient-subview-heading h3,
+body[data-page="ubs-patient"] .ubs-patient-record-header h3 {
+  font-size: 0.98rem;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-count-badge,
+body[data-page="ubs-patient"] .ubs-patient-specialty-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: #e9f0f7;
+  color: #3f6689;
+  font-size: 0.67rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-history-list {
+  padding: 5px 16px 14px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-history-item {
+  position: relative;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr);
+  gap: 10px;
+  padding: 11px 0;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-history-item:not(:last-child) {
+  border-bottom: 1px solid #e3eaf0;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-history-marker {
+  inline-size: 10px;
+  block-size: 10px;
+  margin-top: 6px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: #0b8a7d;
+  box-shadow: 0 0 0 2px #98d8d1;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-history-marker.is-blue {
+  background: #2374ba;
+  box-shadow: 0 0 0 2px #abd0ef;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-history-marker.is-rose {
+  background: #d84d5b;
+  box-shadow: 0 0 0 2px #f4b9c0;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-history-content {
+  min-width: 0;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-history-content > header {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-history-content > header > div {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-history-content strong {
+  color: #23364b;
+  font-size: 0.8rem;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-history-content time,
+body[data-page="ubs-patient"] .ubs-patient-history-content small {
+  color: #71869a;
+  font-size: 0.68rem;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-history-content p {
+  margin: 7px 0 5px;
+  color: #42566b;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-record-type {
+  display: inline-flex;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #dff7f2;
+  color: #087a6d;
+  font-size: 0.63rem;
+  font-weight: 900;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-record-type.is-blue {
+  background: #e1effc;
+  color: #1d68a7;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-record-type.is-rose {
+  background: #ffe8eb;
+  color: #bd3a4c;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-empty-state,
+body[data-page="ubs-patient"] .ubs-patient-loading {
+  min-height: 126px;
+  display: grid;
+  place-content: center;
+  gap: 5px;
+  padding: 20px;
+  color: #768a9e;
+  text-align: center;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-empty-state strong {
+  color: #354b61;
+  font-size: 0.84rem;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-empty-state p {
+  margin: 0;
+  font-size: 0.74rem;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-referral-section > form {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(210px, 300px) minmax(180px, auto);
+  align-items: end;
+  gap: 12px;
+  padding: 14px 16px 16px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-referral-person {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+  align-content: center;
+  min-height: 54px;
+  padding: 8px 12px;
+  border-left: 3px solid var(--ubs-patient-teal);
+  background: #f5fbfa;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-referral-person strong {
+  color: #16314a;
+  font-size: 0.82rem;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-referral-person span {
+  color: #6b8195;
+  font-size: 0.69rem;
+  overflow-wrap: anywhere;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-referral-section label {
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+  color: #536b82;
+  font-size: 0.68rem;
+  font-weight: 900;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-referral-section select,
+body[data-page="ubs-patient"] .ubs-patient-record-specialty input {
+  min-width: 0;
+  width: 100%;
+  min-height: 40px;
+  padding: 8px 11px;
+  border: 1px solid #bfd0de;
+  border-radius: 8px;
+  background: #fff;
+  color: #22364b;
+  font-weight: 750;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-referral-action {
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-referral-action > span {
+  min-height: 14px;
+  color: #708498;
+  font-size: 0.64rem;
+  font-weight: 800;
+  text-align: right;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-referral-action > span.is-referred {
+  color: #07835a;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-referral-action .btn {
+  width: 100%;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-specialty-view,
+body[data-page="ubs-patient"] .ubs-patient-record-view {
+  margin: 16px 18px 18px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-specialty-list {
+  min-width: 0;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-specialty-table-header,
+body[data-page="ubs-patient"] .ubs-patient-specialty-row {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) 170px 130px;
+  align-items: center;
+  gap: 12px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-specialty-table-header {
+  padding: 10px 14px;
+  background: var(--ubs-patient-blue);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-specialty-row {
+  min-height: 58px;
+  padding: 9px 14px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-specialty-row:not(:last-child) {
+  border-bottom: 1px solid #d9e3eb;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-specialty-row > div {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-specialty-row strong {
+  color: #23364a;
+  font-size: 0.78rem;
+  overflow-wrap: anywhere;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-specialty-icon {
+  inline-size: 28px;
+  block-size: 28px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 8px;
+  background: #dff7f2;
+  color: #08796c;
+  font-weight: 900;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-specialty-icon.is-blue {
+  background: #e1effc;
+  color: #236ca8;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-specialty-icon.is-amber {
+  background: #fff0cf;
+  color: #a56b05;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-specialty-icon.is-rose {
+  background: #ffe6e9;
+  color: #bd3e4c;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-specialty-row .btn {
+  min-height: 34px;
+  padding: 6px 10px;
+  border-color: #9bbada;
+  color: var(--ubs-patient-blue);
+  font-size: 0.7rem;
+  font-weight: 900;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-record-view > form {
+  display: grid;
+  gap: 16px;
+  padding: 16px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-record-types {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-record-types legend,
+body[data-page="ubs-patient"] .ubs-patient-record-specialty > span,
+body[data-page="ubs-patient"] .ubs-patient-record-description > span {
+  width: 100%;
+  margin-bottom: 2px;
+  color: #526b82;
+  font-size: 0.65rem;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-record-types label {
+  cursor: pointer;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-record-types input {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  opacity: 0;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-record-types label span {
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border: 1px solid #c5d4df;
+  border-radius: 8px;
+  background: #fff;
+  color: #30485f;
+  font-size: 0.72rem;
+  font-weight: 850;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-record-types input:checked + span {
+  border-color: var(--ubs-patient-blue);
+  background: var(--ubs-patient-blue);
+  color: #fff;
+  box-shadow: 0 3px 8px rgb(7 87 149 / 18%);
+}
+
+body[data-page="ubs-patient"] .ubs-patient-record-specialty,
+body[data-page="ubs-patient"] .ubs-patient-record-description {
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-record-specialty input {
+  background: #e8eef3;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-record-description textarea {
+  width: 100%;
+  min-height: 220px;
+  resize: vertical;
+  padding: 12px;
+  border: 1px solid #bfd0de;
+  border-radius: 9px;
+  background: #f3f7fa;
+  color: #24364a;
+  line-height: 1.5;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-record-description textarea:focus,
+body[data-page="ubs-patient"] .ubs-patient-referral-section select:focus {
+  outline: 3px solid rgb(20 116 181 / 16%);
+  border-color: #297bb5;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-record-view form > footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding-top: 12px;
+  border-top: 1px solid #dce5ec;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-record-view form > footer small {
+  color: #6b8094;
+  font-size: 0.66rem;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-record-view form > footer > div {
+  display: flex;
+  gap: 8px;
+}
+
+body[data-page="ubs-patient"] .btn.btn-primary {
+  border-color: var(--ubs-patient-blue);
+  background: var(--ubs-patient-blue);
+  color: #fff;
+}
+
+body[data-page="ubs-patient"] .btn.btn-primary:hover:not(:disabled) {
+  border-color: var(--ubs-patient-blue-dark);
+  background: var(--ubs-patient-blue-dark);
+}
+
+body[data-page="ubs-patient"] .btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+@media (max-width: 1180px) {
+  body[data-page="ubs-patient"] .ubs-patient-meta-grid {
+    grid-template-columns: repeat(3, minmax(120px, 1fr));
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-referral-section > form {
+    grid-template-columns: minmax(180px, 1fr) minmax(190px, 260px);
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-referral-action {
+    grid-column: 1 / -1;
+    grid-template-columns: minmax(0, 1fr) 180px;
+    align-items: center;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-referral-action > span {
+    text-align: left;
+  }
+}
+
+@media (max-width: 820px) {
+  body[data-page="ubs-patient"] .ubs-patient-page {
+    width: calc(100% - 20px);
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-summary-hero {
+    grid-template-columns: 52px minmax(0, 1fr);
+    gap: 12px;
+    padding: 14px;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-avatar {
+    inline-size: 52px;
+    block-size: 52px;
+    border-radius: 14px;
+    font-size: 1rem;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-name-row h2 {
+    font-size: 1.15rem;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-meta-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-clinical-summary {
+    grid-template-columns: 1fr;
+    padding: 0 14px 14px;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-specialty-table-header {
+    display: none;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-specialty-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-specialty-count {
+    grid-column: 1;
+    width: fit-content;
+    margin-left: 38px;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-specialty-row .btn {
+    grid-column: 2;
+    grid-row: 1 / 3;
+  }
+}
+
+@media (max-width: 620px) {
+  body[data-page="ubs-patient"] .ubs-patient-module-hero {
+    min-height: 64px;
+    padding: 10px 12px;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-module-icon {
+    inline-size: 38px;
+    block-size: 38px;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-module-hero strong {
+    font-size: 0.9rem;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-section-heading,
+  body[data-page="ubs-patient"] .ubs-patient-history-section > header,
+  body[data-page="ubs-patient"] .ubs-patient-referral-section > header,
+  body[data-page="ubs-patient"] .ubs-patient-subview-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-section-heading .btn,
+  body[data-page="ubs-patient"] .ubs-patient-subview-heading .btn {
+    width: 100%;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-summary-hero {
+    grid-template-columns: 1fr;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-meta-grid {
+    grid-template-columns: 1fr;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-referral-section > form {
+    grid-template-columns: 1fr;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-referral-action {
+    grid-column: auto;
+    grid-template-columns: 1fr;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-specialty-view,
+  body[data-page="ubs-patient"] .ubs-patient-record-view {
+    margin: 12px;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-specialty-row {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-specialty-count,
+  body[data-page="ubs-patient"] .ubs-patient-specialty-row .btn {
+    grid-column: auto;
+    grid-row: auto;
+    width: 100%;
+    margin-left: 0;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-history-content > header,
+  body[data-page="ubs-patient"] .ubs-patient-record-view form > footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-record-view form > footer > div {
+    flex-direction: column;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-record-view form > footer .btn {
+    width: 100%;
+  }
+}
+
+/* Keep the current CADH/UBS subsection visibly selected after navigation. */
+:is(
+  body.siselo-sidebar-shell,
+  body.siselo-auto-shell,
+  body[data-page="home"],
+  body[data-page="cadh"],
+  body[data-page="ubs"]
+) .home-sidebar .menu .siselo-module-subnav a.active {
+  background: #315f86 !important;
+  color: #fff !important;
+  font-weight: 800 !important;
+}
+
+:is(
+  body.siselo-sidebar-shell,
+  body.siselo-auto-shell,
+  body[data-page="home"],
+  body[data-page="cadh"],
+  body[data-page="ubs"]
+) .home-sidebar .menu .siselo-module-subnav a.active span {
+  color: #fff !important;
+}
+
 /*
  * Settings and legacy pages are mounted in `.siselo-auto-shell` at runtime.
  * Keep that shell on the same responsive contract as Home/CADH/UBS: the
@@ -18945,6 +19861,7 @@ body[data-page="admin-users-list"] .admin-table :is(th, td):nth-child(8) {
 }
 
 /* Collapsible UBS/CADH module groups. */
+body.siselo-auto-shell .siselo-module-subnav[hidden],
 .siselo-module-subnav[hidden] {
   display: none !important;
 }
@@ -18964,6 +19881,340 @@ body[data-page="admin-users-list"] .admin-table :is(th, td):nth-child(8) {
 
 #nav-home .home-sidebar-chevron {
   display: none !important;
+}
+
+/* Patient chart workspace: one follow-up group with isolated module views. */
+body[data-page="ubs-patient"] .ubs-patient-workspace {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 270px minmax(0, 1fr);
+  align-items: stretch;
+  gap: 16px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--ubs-patient-border);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 8px 22px rgb(32 67 98 / 7%);
+  overflow: hidden;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-heading {
+  padding: 16px 16px 10px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-heading p {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+  color: var(--ubs-patient-teal);
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-heading svg,
+body[data-page="ubs-patient"] .ubs-patient-context-area svg,
+body[data-page="ubs-patient"] .ubs-patient-context-group > strong svg,
+body[data-page="ubs-patient"] .ubs-patient-context-exit svg {
+  inline-size: 17px;
+  block-size: 17px;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context #ubs-patient-summary {
+  min-width: 0;
+  padding: 0 16px 16px;
+  border-bottom: 1px solid #dde6ed;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-profile {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr);
+  align-items: center;
+  gap: 11px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context .ubs-patient-avatar {
+  inline-size: 54px;
+  block-size: 54px;
+  border-radius: 15px;
+  font-size: 1rem;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context .ubs-patient-name-row {
+  gap: 6px;
+  margin: 0 0 3px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context .ubs-patient-name-row h2 {
+  font-size: 0.92rem;
+  line-height: 1.2;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context .ubs-patient-status {
+  padding: 3px 6px;
+  font-size: 0.56rem;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-cpf {
+  display: block;
+  color: #70869a;
+  font-size: 0.68rem;
+  overflow-wrap: anywhere;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-selected {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 11px;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: #e3f5f1;
+  color: #087b6d;
+  font-size: 0.62rem;
+  font-weight: 850;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-selected::before {
+  content: "⌕";
+  font-size: 0.75rem;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-details {
+  margin-top: 11px;
+  border: 1px solid #d7e2ea;
+  border-radius: 9px;
+  background: #fbfdfe;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-details summary {
+  padding: 9px 10px;
+  color: #37526c;
+  cursor: pointer;
+  font-size: 0.67rem;
+  font-weight: 850;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-meta {
+  max-height: 250px;
+  display: grid;
+  gap: 8px;
+  padding: 0 10px 10px;
+  overflow-y: auto;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-meta > div {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+  padding-top: 7px;
+  border-top: 1px solid #e3eaf0;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-meta span {
+  color: #6a8095;
+  font-size: 0.56rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-meta strong {
+  color: #2b4055;
+  font-size: 0.66rem;
+  font-weight: 750;
+  overflow-wrap: anywhere;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-area {
+  display: grid;
+  gap: 8px;
+  padding: 15px 16px 11px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-area p {
+  margin: 0;
+  color: #647b91;
+  font-size: 0.61rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-area strong,
+body[data-page="ubs-patient"] .ubs-patient-context-group > strong {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #20364c;
+  font-size: 0.76rem;
+  font-weight: 900;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-nav {
+  padding: 0 10px 14px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-group {
+  display: grid;
+  gap: 3px;
+  padding: 10px 7px 7px;
+  border: 1px solid #cad8e4;
+  border-radius: 11px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-group > strong {
+  padding: 0 6px 7px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-group button {
+  width: 100%;
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 9px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #63788d;
+  cursor: pointer;
+  font-size: 0.68rem;
+  font-weight: 800;
+  line-height: 1.25;
+  text-align: left;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-group button:hover {
+  background: #edf4f8;
+  color: #174c78;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-group button.active {
+  background: var(--ubs-patient-blue);
+  color: #fff;
+  box-shadow: 0 4px 10px rgb(7 87 149 / 18%);
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-group button[hidden] {
+  display: none !important;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-group button > span {
+  flex: 0 0 auto;
+  font-size: 0.86rem;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-exit {
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin: auto 10px 10px;
+  padding: 8px 10px;
+  border: 1px solid #f1a8a8;
+  border-radius: 9px;
+  color: #dc3030;
+  font-size: 0.68rem;
+  font-weight: 850;
+  text-decoration: none;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-exit:hover {
+  background: #fff5f5;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-followup-card {
+  min-height: 560px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-followup-card > .ubs-patient-section-heading {
+  align-items: center;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-followup-card > .ubs-patient-section-heading h1 {
+  font-size: 1.18rem;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-module-view[hidden] {
+  display: none !important;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-module-view {
+  min-width: 0;
+}
+
+body[data-page="ubs-patient"] #ubs-patient-history-view,
+body[data-page="ubs-patient"] #ubs-patient-referral-view {
+  padding: 16px 18px 18px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-module-view .ubs-patient-history-section,
+body[data-page="ubs-patient"] .ubs-patient-module-view .ubs-patient-referral-section {
+  margin: 0;
+}
+
+@media (max-width: 980px) {
+  body[data-page="ubs-patient"] .ubs-patient-workspace {
+    grid-template-columns: 1fr;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-context-nav {
+    padding-bottom: 10px;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-context-group {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-context-group > strong {
+    grid-column: 1 / -1;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-context-exit {
+    width: fit-content;
+    margin-top: 0;
+    align-self: flex-end;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-context-meta {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 620px) {
+  body[data-page="ubs-patient"] .ubs-patient-context-group {
+    grid-template-columns: 1fr;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-context-group > strong {
+    grid-column: auto;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-context-meta {
+    grid-template-columns: 1fr;
+  }
+
+  body[data-page="ubs-patient"] #ubs-patient-history-view,
+  body[data-page="ubs-patient"] #ubs-patient-referral-view {
+    padding: 12px;
+  }
 }
 
 @media (max-width: 700px) {

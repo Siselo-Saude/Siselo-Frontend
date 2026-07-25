@@ -354,8 +354,8 @@ async function setupPatientFormPage() {
   }
   if (!id) {
     document.querySelectorAll("[data-back-link]").forEach((link) => {
-      link.href = "/ubs/index.html";
-      link.dataset.fallback = "/ubs/index.html";
+      link.href = "/ubs/index.html?tab=patients";
+      link.dataset.fallback = "/ubs/index.html?tab=patients";
     });
   }
   const endpoint =
@@ -430,7 +430,9 @@ async function setupPatientFormPage() {
           "success",
         );
         setTimeout(() => {
-          location.href = SISELO.resolveBackTarget("/patients/list.html");
+          location.href = id
+            ? SISELO.resolveBackTarget("/patients/list.html")
+            : "/ubs/index.html?tab=patients";
         }, 2000);
       } catch (error) {
         const payloadErrors =
@@ -505,7 +507,7 @@ async function setupPatientShowPage() {
   document.getElementById("patient-actions").innerHTML = `
     ${permissions.has("careplans.create") ? `<a class="btn" href="${buildPatientModuleActionHref("/care-plans/form.html", { patient_id: actionPatientId, return_to: returnTargets.planos })}">+ Novo plano</a>` : ""}
     ${permissions.has("encounters.create") ? `<a class="btn" href="${buildPatientModuleActionHref("/encounters/form.html", { patient_id: actionPatientId, return_to: returnTargets.atendimentos })}">+ Novo atendimento</a>` : ""}
-    ${permissions.has("transitions.create") ? `<a class="btn" href="${buildPatientModuleActionHref("/transitions/form.html", { patient_id: actionPatientId, return_to: returnTargets.transicoes })}">+ Nova transição</a>` : ""}
+    ${permissions.has("transitions.create") ? `<a class="btn" href="${buildPatientModuleActionHref("/transitions/form.html", { patient_id: actionPatientId, return_to: returnTargets.transicoes })}">+ Novo encaminhamento</a>` : ""}
   `;
 
   renderCarePlanRows(
@@ -745,7 +747,7 @@ function renderTransitionRows(targetId, rows, permissions, returnTo = "") {
   const tbody = document.getElementById(targetId);
 
   if (!Array.isArray(rows) || rows.length === 0) {
-    tbody.innerHTML = SISELO.emptyTableRow(6, "Nenhuma transição encontrada.");
+    tbody.innerHTML = SISELO.emptyTableRow(6, "Nenhum encaminhamento encontrado.");
     return;
   }
 
@@ -760,7 +762,7 @@ function renderTransitionRows(targetId, rows, permissions, returnTo = "") {
       <td>${SISELO.escapeHtml(row.notes || "")}</td>
       <td>
         <div class="table-actions">
-          ${permissions.has("transitions.update") ? SISELO.iconLink("edit", buildPatientModuleActionHref("/transitions/form.html", { id: row.id, patient_id: row.patient_id, return_to: returnTo }), "Editar transição") : ""}
+          ${permissions.has("transitions.update") ? SISELO.iconLink("edit", buildPatientModuleActionHref("/transitions/form.html", { id: row.id, patient_id: row.patient_id, return_to: returnTo }), "Editar encaminhamento") : ""}
         </div>
       </td>
     </tr>
@@ -1027,7 +1029,7 @@ function getPatientTabLabel(key) {
   const labels = {
     planos: "Planos de Cuidado",
     atendimentos: "Atendimentos",
-    transicoes: "Transições",
+    transicoes: "Encaminhamentos",
   };
 
   return labels[key] || key;

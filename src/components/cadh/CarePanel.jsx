@@ -29,7 +29,7 @@ const DEFAULT_MODULES = [
   { key: "users", label: "Usuarios", description: "Dados cadastrais e situacao assistencial", count: 1, status: "ativo" },
   { key: "careplans", label: "Plano de Cuidado", description: "Metas, dificuldades e recomendacoes", count: 0, status: "pendente" },
   { key: "encounters", label: "Atendimentos", description: "Historico multiprofissional", count: 2, status: "ok" },
-  { key: "transitions", label: "Transicao do Cuidado", description: "Fluxo CADH, UBS e especialidades", count: 1, status: "ok" },
+  { key: "transitions", label: "Encaminhamento do Cuidado", description: "Fluxo CADH, UBS e especialidades", count: 1, status: "ok" },
 ];
 
 const DEFAULT_SPECIALTIES = [

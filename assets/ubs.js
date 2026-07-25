@@ -134,12 +134,24 @@ function setupUbsSidebar(user) {
 async function loadUbsTransitions() {
   try {
     const data = await SISELO.apiRequest('/transitions/list.php');
-    ubsTransitions = (Array.isArray(data.rows) ? data.rows : [])
+    const rows = (Array.isArray(data.rows) ? data.rows : [])
       .filter((row) => (
         normalizeUbsText(row.status) !== 'cancelada' &&
-        normalizeUbsText(row.care_status) !== 'finalizado'
+        normalizeUbsText(row.care_status) !== 'finalizado' &&
+        isUbsReferralToCadh(row)
       ))
-      .sort((first, second) => compareUbsDateDesc(first.transition_date, second.transition_date));
+      .sort((first, second) => (
+        compareUbsDateDesc(first.transition_date, second.transition_date) ||
+        Number(second.id || 0) - Number(first.id || 0)
+      ));
+    const latestByPatient = new Map();
+    rows.forEach((row) => {
+      const patientKey = String(row.patient_id || row.cpf || row.id || '');
+      if (patientKey && !latestByPatient.has(patientKey)) {
+        latestByPatient.set(patientKey, row);
+      }
+    });
+    ubsTransitions = Array.from(latestByPatient.values());
   } catch (error) {
     ubsTransitions = [];
   }
@@ -263,7 +275,7 @@ function renderUbsPatientsTab() {
       : '<tr><td colspan="6">Nenhum usuário encontrado.</td></tr>';
     panel.querySelectorAll('[data-ubs-patient-row]').forEach((row) => {
       const open = () => {
-        window.location.href = `/patients/show.html?id=${encodeURIComponent(row.dataset.ubsPatientRow)}`;
+        window.location.href = `/ubs/patient.html?id=${encodeURIComponent(row.dataset.ubsPatientRow)}`;
       };
       row.addEventListener('click', open);
       row.addEventListener('keydown', (event) => {
@@ -352,7 +364,7 @@ function renderUbsTransitionedTab() {
 
   panel.innerHTML = `
     <div class="ubs-table-card">
-      ${rows.length ? renderUbsTransitionedTable(rows) : renderUbsEmptyState('transition', 'Nenhuma transição do cuidado registrada.', 'Ajuste os filtros ou registre uma transição no CADH.')}
+      ${rows.length ? renderUbsTransitionedTable(rows) : renderUbsEmptyState('transition', 'Nenhum encaminhamento ao CADH registrado.', 'Ajuste os filtros ou encaminhe um paciente para o CADH.')}
     </div>
   `;
 
@@ -364,9 +376,9 @@ function renderUbsTransitionedTable(rows) {
     <table class="ubs-table">
       <thead>
         <tr>
-          <th>Usuário</th>
-          <th>UBS / ESF</th>
-          <th>Transição</th>
+          <th>Paciente</th>
+          <th>Destino</th>
+          <th>Encaminhamento</th>
           <th>Acompanhamentos</th>
           <th></th>
         </tr>
@@ -728,7 +740,14 @@ function getSelectedUbsTransition() {
 
 function getUbsFollowupsForTransition(row) {
   return ubsFollowups
-    .filter((record) => String(record.transition_id) === String(row.id))
+    .filter((record) => (
+      String(record.transition_id) === String(row.id) ||
+      (
+        record.patient_id &&
+        row.patient_id &&
+        String(record.patient_id) === String(row.patient_id)
+      )
+    ))
     .sort((first, second) => compareUbsDateDesc(first.date, second.date));
 }
 
@@ -739,7 +758,14 @@ function getUbsNextContacts() {
 
   return ubsFollowups
     .filter((record) => {
-      const stillActive = ubsTransitions.some((row) => String(row.id) === String(record.transition_id));
+      const stillActive = ubsTransitions.some((row) => (
+        String(row.id) === String(record.transition_id) ||
+        (
+          record.patient_id &&
+          row.patient_id &&
+          String(record.patient_id) === String(row.patient_id)
+        )
+      ));
       const date = SISELO.parseDateInputValue(record.next_contact);
       return stillActive && date && date >= today && date <= limit;
     })
@@ -826,4 +852,9 @@ function normalizeUbsText(value) {
     .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .trim();
+}
+
+function isUbsReferralToCadh(row) {
+  const destination = normalizeUbsText(row && row.to_service);
+  return destination === 'cadh' || destination.startsWith('cadh -');
 }

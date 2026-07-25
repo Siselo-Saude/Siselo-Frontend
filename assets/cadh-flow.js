@@ -59,11 +59,15 @@ function activateCadhFlowTab(tab) {
 
   const clinicalWorkspace = document.getElementById('cadh-clinical-workspace');
   const flowWorkspace = document.getElementById('cadh-flow-workspace');
+  const flowTabs = document.querySelector('.cadh-flow-tabs');
   if (clinicalWorkspace) {
     clinicalWorkspace.hidden = cadhFlowTab !== 'followup';
   }
   if (flowWorkspace) {
     flowWorkspace.hidden = cadhFlowTab === 'followup';
+  }
+  if (flowTabs) {
+    flowTabs.hidden = !['received', 'schedule'].includes(cadhFlowTab);
   }
   document.body.dataset.cadhView = cadhFlowTab;
   renderCadhFlowPanel();
@@ -416,7 +420,7 @@ async function loadCadhSharingDetail(patient) {
       <div class="cadh-sharing-metrics">
         <span><strong>${plans.length}</strong> plano(s) de cuidado</span>
         <span><strong>${encounters.length}</strong> acompanhamento(s)</span>
-        <span><strong>${transitions.length}</strong> transição(ões)</span>
+        <span><strong>${transitions.length}</strong> ${transitions.length === 1 ? 'encaminhamento' : 'encaminhamentos'}</span>
       </div>
       <div class="cadh-sharing-records">
         ${encounters.map((row) => `
