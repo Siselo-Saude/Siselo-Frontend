@@ -16,30 +16,41 @@
     </nav>
   </header>
 
-  <main class="container">
-    <section class="card">
-      <h1 class="page-title">Inativos: Planos de Cuidado</h1>
-      <form id="search-form" class="toolbar search-toolbar">
-        <input id="search-input" name="q" placeholder="Busca por NOME ou CPF">
-        <div class="actions">
-          <a class="btn" href="/care-plans/list.html" data-back-link data-fallback="/care-plans/list.html">Voltar</a>
-        </div>
-      </form>
+  <main class="container care-plans-overview-page care-plans-trash-page">
+    <section class="cadh-module-hero care-plans-module-hero" aria-labelledby="care-plans-trash-module-title">
+      <span class="cadh-module-hero-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path d="M7 3h10v18H7z"/>
+          <path d="M9 3V2h6v1M10 8h4M10 12h4M10 16h4"/>
+        </svg>
+      </span>
+      <div class="cadh-module-hero-copy">
+        <p>Prontuário CADH — atenção secundária</p>
+        <h2 id="care-plans-trash-module-title">Centro de Atenção ao Diabetes e Hipertensão — CADH</h2>
+      </div>
+    </section>
 
-      <div class="table-scroll">
-        <table class="data-table care-plans-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Usuário</th>
-              <th>Início</th>
-              <th>Fim</th>
-              <th>Inativado em</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody id="care-plans-table-body"></tbody>
-        </table>
+    <section class="care-plans-overview-panel" aria-labelledby="care-plans-trash-title">
+      <header class="care-plans-overview-heading">
+        <div class="care-plans-overview-copy">
+          <a class="care-plans-back-link" href="/care-plans/list.html" data-back-link data-fallback="/care-plans/list.html">← Voltar para Planos de Cuidado ativos</a>
+          <p>Histórico de planos inativados</p>
+          <h1 id="care-plans-trash-title">Planos de Cuidado inativos</h1>
+          <span>Consulte, restaure ou exclua definitivamente os planos inativos do paciente selecionado.</span>
+        </div>
+        <div class="care-plans-overview-actions">
+          <span id="care-plans-trash-count" class="care-plans-count">0 planos inativos</span>
+        </div>
+      </header>
+
+      <div id="page-alert" class="alert" hidden></div>
+
+      <section id="care-plans-patient-summary" class="care-plans-patient-summary" aria-label="Paciente selecionado">
+        <div class="care-plans-loading">Carregando informações do paciente...</div>
+      </section>
+
+      <div id="care-plans-trash-list" class="care-plans-list" aria-live="polite">
+        <div class="care-plans-loading">Carregando planos inativos...</div>
       </div>
     </section>
   </main>

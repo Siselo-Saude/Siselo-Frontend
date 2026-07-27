@@ -29,9 +29,13 @@ async function setupCadhFlow() {
   if (!user) return;
 
   cadhFlowPermissions = SISELO.getUiPermissions(user);
+  const initialFlow = SISELO.queryParam('flow') || 'received';
+  if (initialFlow === 'sharing') {
+    cadhFlowSharingPatientId = SISELO.normalizeEntityId(SISELO.queryParam('patient_id'));
+  }
   bindCadhFlowTabs();
   await loadCadhFlow();
-  activateCadhFlowTab(SISELO.queryParam('flow') || 'received');
+  activateCadhFlowTab(initialFlow);
 }
 
 function bindCadhFlowTabs() {
@@ -392,6 +396,13 @@ function renderCadhSharing(panel) {
   `;
   panel.querySelector('#cadh-sharing-patient')?.addEventListener('change', (event) => {
     cadhFlowSharingPatientId = event.currentTarget.value;
+    const url = new URL(window.location.href);
+    if (cadhFlowSharingPatientId) {
+      url.searchParams.set('patient_id', cadhFlowSharingPatientId);
+    } else {
+      url.searchParams.delete('patient_id');
+    }
+    window.history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`);
     renderCadhSharing(panel);
   });
   if (selected) {
@@ -405,32 +416,44 @@ async function loadCadhSharingDetail(patient) {
   try {
     const data = await SISELO.apiRequest(`/patients/show.php?id=${encodeURIComponent(patient.id)}`);
     const plans = Array.isArray(data.care_plans) ? data.care_plans : [];
-    const encounters = Array.isArray(data.encounters) ? data.encounters : [];
     const transitions = Array.isArray(data.transitions) ? data.transitions : [];
+    const sharingReturnTarget = `/cadh/index.html?flow=sharing&patient_id=${encodeURIComponent(patient.id)}`;
+    const plansHref = `/care-plans/list.html?patient_id=${encodeURIComponent(patient.id)}&return_to=${encodeURIComponent(sharingReturnTarget)}`;
+    const newPlanHref = `/care-plans/form.html?patient_id=${encodeURIComponent(patient.id)}&return_to=${encodeURIComponent(sharingReturnTarget)}`;
     target.innerHTML = `
       <header class="cadh-sharing-detail-header">
         <div>
           <span>Compartilhamentos UBS/CADH</span>
           <strong>${SISELO.escapeHtml(patient.full_name || '-')}</strong>
         </div>
-        <a class="btn btn-primary" href="/care-plans/form.html?patient_id=${encodeURIComponent(patient.id)}${plans[0] ? `&id=${encodeURIComponent(plans[0].id)}` : ''}">
-          ${plans.length ? 'Abrir Plano de Cuidado' : 'Iniciar Plano de Cuidado'}
+        <a class="btn btn-primary" href="${plans.length ? SISELO.escapeHtml(plansHref) : SISELO.escapeHtml(newPlanHref)}">
+          ${plans.length ? 'Visualizar planos ativos' : 'Iniciar Plano de Cuidado'}
         </a>
       </header>
       <div class="cadh-sharing-metrics">
-        <span><strong>${plans.length}</strong> plano(s) de cuidado</span>
-        <span><strong>${encounters.length}</strong> acompanhamento(s)</span>
+        <span><strong>${plans.length}</strong> ${plans.length === 1 ? 'plano ativo' : 'planos ativos'}</span>
+        <span><strong>${plans.length ? 'Ativo' : '—'}</strong> situação do plano</span>
         <span><strong>${transitions.length}</strong> ${transitions.length === 1 ? 'encaminhamento' : 'encaminhamentos'}</span>
       </div>
-      <div class="cadh-sharing-records">
-        ${encounters.map((row) => `
-          <article>
-            <strong>${SISELO.escapeHtml(row.specialty || 'Acompanhamento')}</strong>
-            <span>${SISELO.escapeHtml(formatCadhFlowDate(row.encounter_date))}</span>
-            <p>${SISELO.escapeHtml(row.summary || 'Registro clínico compartilhado.')}</p>
-          </article>
-        `).join('') || renderCadhFlowEmpty('Ainda não há acompanhamentos registrados para este paciente.')}
-      </div>
+      <section class="cadh-sharing-care-plans" aria-label="Planos de Cuidado ativos">
+        <header>
+          <strong>Planos de Cuidado ativos</strong>
+          <span>${plans.length} ${plans.length === 1 ? 'plano disponível' : 'planos disponíveis'}</span>
+        </header>
+        ${plans.length ? plans.map((plan) => `
+          <a class="cadh-sharing-care-plan" href="${SISELO.escapeHtml(plansHref)}">
+            <div>
+              <span>Plano ativo</span>
+              <strong>Plano de Cuidado nº ${SISELO.escapeHtml(plan.id)}</strong>
+              <p>
+                Início: ${SISELO.escapeHtml(formatCadhFlowDate(plan.start_date) || 'não informado')}
+                ${plan.end_date ? ` · Revisão: ${SISELO.escapeHtml(formatCadhFlowDate(plan.end_date))}` : ''}
+              </p>
+            </div>
+            <span>Visualizar plano →</span>
+          </a>
+        `).join('') : renderCadhFlowEmpty('Este paciente ainda não possui Plano de Cuidado ativo.')}
+      </section>
     `;
   } catch (error) {
     target.innerHTML = renderCadhFlowEmpty(error.message || 'Não foi possível carregar o compartilhamento.');
@@ -567,7 +590,7 @@ function formatCadhFlowDateTime(value) {
 
 function formatCadhFlowDate(value) {
   if (!value) return '—';
-  const date = new Date(String(value).replace(' ', 'T'));
+  const date = SISELO.parseDateInputValue(value) || new Date(String(value).replace(' ', 'T'));
   return Number.isNaN(date.getTime())
     ? value
     : new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short' }).format(date);

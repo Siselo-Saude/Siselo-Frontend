@@ -16,34 +16,43 @@
     </nav>
   </header>
 
-  <main class="container">
-    <section class="card">
-      <div class="page-heading">
-        <h1 class="page-title">Planos de Cuidado</h1>
-        <a class="btn" href="/cadh/index.html" data-back-link data-fallback="/cadh/index.html">&larr; Voltar</a>
+  <main class="container care-plans-overview-page">
+    <section class="cadh-module-hero care-plans-module-hero" aria-labelledby="care-plans-module-title">
+      <span class="cadh-module-hero-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path d="M7 3h10v18H7z"/>
+          <path d="M9 3V2h6v1M10 8h4M10 12h4M10 16h4"/>
+        </svg>
+      </span>
+      <div class="cadh-module-hero-copy">
+        <p>Prontuário CADH — atenção secundária</p>
+        <h2 id="care-plans-module-title">Centro de Atenção ao Diabetes e Hipertensão — CADH</h2>
       </div>
+    </section>
 
-      <form id="search-form" class="toolbar search-toolbar">
-        <input id="search-input" name="q" placeholder="Busca por NOME ou CPF">
-        <div class="actions">
-          <a id="new-plan-link" class="btn" href="/care-plans/form.html">+ Novo plano</a>
-          <a id="trash-link" class="btn" href="/care-plans/trash.html">Inativos</a>
+    <section class="care-plans-overview-panel" aria-labelledby="care-plans-title">
+      <header class="care-plans-overview-heading">
+        <div class="care-plans-overview-copy">
+          <a class="care-plans-back-link" href="/cadh/index.html?flow=sharing" data-back-link data-fallback="/cadh/index.html?flow=sharing">← Voltar para Compartilhamentos UBS/CADH</a>
+          <p>Plano assistencial do paciente</p>
+          <h1 id="care-plans-title">Plano de Cuidado</h1>
+          <span>Consulte e gerencie os planos vinculados ao paciente selecionado.</span>
         </div>
-      </form>
+        <div class="care-plans-overview-actions">
+          <span id="care-plans-count" class="care-plans-count">0 planos</span>
+          <a id="new-plan-link" class="btn btn-primary" href="/care-plans/form.html">+ Novo plano</a>
+          <a id="trash-link" class="btn" href="/care-plans/trash.html">Planos inativos</a>
+        </div>
+      </header>
 
-      <div class="table-scroll">
-        <table class="data-table care-plans-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Usuário</th>
-              <th>Início</th>
-              <th>Fim</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody id="care-plans-table-body"></tbody>
-        </table>
+      <div id="page-alert" class="alert" hidden></div>
+
+      <section id="care-plans-patient-summary" class="care-plans-patient-summary" aria-label="Paciente selecionado">
+        <div class="care-plans-loading">Carregando informações do paciente...</div>
+      </section>
+
+      <div id="care-plans-list" class="care-plans-list" aria-live="polite">
+        <div class="care-plans-loading">Carregando Plano de Cuidado...</div>
       </div>
     </section>
   </main>

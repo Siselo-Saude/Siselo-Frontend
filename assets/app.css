@@ -21013,3 +21013,1003 @@ body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-empty p {
     grid-template-columns: 1fr;
   }
 }
+
+/* Plano de Cuidado vinculado ao paciente selecionado */
+body[data-page="care-plans-list"] .care-plans-overview-page,
+html.is-embedded body[data-page="care-plans-list"] .care-plans-overview-page {
+  width: min(1240px, calc(100% - 36px)) !important;
+  max-width: 1240px !important;
+  display: grid;
+  align-content: start;
+  gap: 16px;
+  margin: 20px auto 38px !important;
+}
+
+body[data-page="care-plans-list"] .care-plans-module-hero {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 15px 17px;
+  border: 1px solid #bcd5e5;
+  border-radius: 12px;
+  background: rgba(235, 246, 251, .9);
+}
+
+body[data-page="care-plans-list"] .care-plans-module-hero .cadh-module-hero-icon {
+  inline-size: 44px;
+  block-size: 44px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+  background: #075c9e;
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(7, 92, 158, .2);
+}
+
+body[data-page="care-plans-list"] .care-plans-module-hero .cadh-module-hero-icon svg {
+  inline-size: 23px;
+  block-size: 23px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+body[data-page="care-plans-list"] .care-plans-module-hero .cadh-module-hero-copy {
+  min-width: 0;
+}
+
+body[data-page="care-plans-list"] .care-plans-module-hero .cadh-module-hero-copy p {
+  margin: 0 0 3px;
+  color: #075c9e;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+body[data-page="care-plans-list"] .care-plans-module-hero .cadh-module-hero-copy h2 {
+  margin: 0;
+  color: #14293e;
+  font-size: 17px;
+  line-height: 1.25;
+  overflow-wrap: break-word;
+}
+
+body[data-page="care-plans-list"] .care-plans-overview-panel {
+  min-width: 0;
+  overflow: hidden;
+  padding: 20px;
+  border: 1px solid #c9d9e6;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(18, 45, 68, .07);
+}
+
+body[data-page="care-plans-list"] .care-plans-overview-heading {
+  min-width: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  padding-bottom: 17px;
+  border-bottom: 1px solid #d7e2eb;
+}
+
+body[data-page="care-plans-list"] .care-plans-overview-copy {
+  min-width: 0;
+}
+
+body[data-page="care-plans-list"] .care-plans-back-link {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 13px;
+  color: #075c9e;
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+body[data-page="care-plans-list"] .care-plans-back-link:hover {
+  text-decoration: underline;
+}
+
+body[data-page="care-plans-list"] .care-plans-overview-copy > p {
+  margin: 0 0 3px;
+  color: #078372;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+body[data-page="care-plans-list"] .care-plans-overview-copy h1 {
+  margin: 0;
+  color: #13273c;
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+body[data-page="care-plans-list"] .care-plans-overview-copy > span {
+  display: block;
+  margin-top: 5px;
+  color: #657c92;
+  font-size: 13px;
+}
+
+body[data-page="care-plans-list"] .care-plans-overview-actions {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+body[data-page="care-plans-list"] .care-plans-count {
+  padding: 7px 11px;
+  border-radius: 999px;
+  background: #e9f1f7;
+  color: #3f5c75;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+body[data-page="care-plans-list"] .care-plans-overview-actions .btn,
+body[data-page="care-plans-list"] .care-plan-record-action,
+body[data-page="care-plans-list"] .care-plans-empty .btn {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border: 1px solid #b9ccda;
+  border-radius: 8px;
+  background: #fff;
+  color: #173149;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.2;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+body[data-page="care-plans-list"] .care-plans-overview-actions .btn-primary,
+body[data-page="care-plans-list"] .care-plans-empty .btn-primary {
+  border-color: #087f72;
+  background: #087f72;
+  color: #fff;
+}
+
+body[data-page="care-plans-list"] .care-plans-patient-summary {
+  min-width: 0;
+  margin: 16px 0 14px;
+  padding: 14px;
+  border: 1px solid #bfe0dc;
+  border-radius: 10px;
+  background: #f0faf8;
+}
+
+body[data-page="care-plans-list"] .care-plans-patient-summary[hidden] {
+  display: none;
+}
+
+body[data-page="care-plans-list"] .care-plans-patient-identity {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+}
+
+body[data-page="care-plans-list"] .care-plans-patient-avatar {
+  inline-size: 48px;
+  block-size: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  background: #c7eee7;
+  color: #087064;
+  font-size: 15px;
+  font-weight: 900;
+}
+
+body[data-page="care-plans-list"] .care-plans-patient-identity > div {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+body[data-page="care-plans-list"] .care-plans-patient-identity div > span {
+  color: #078372;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+body[data-page="care-plans-list"] .care-plans-patient-identity strong {
+  color: #13273c;
+  font-size: 16px;
+  line-height: 1.25;
+  overflow-wrap: break-word;
+}
+
+body[data-page="care-plans-list"] .care-plans-patient-identity small {
+  color: #617990;
+  font-size: 12px;
+}
+
+body[data-page="care-plans-list"] .care-plans-patient-status,
+body[data-page="care-plans-list"] .care-plan-record-status {
+  padding: 6px 9px;
+  border-radius: 999px;
+  background: #dff8ea;
+  color: #07814a;
+  font-size: 11px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+body[data-page="care-plans-list"] .care-plans-patient-status.is-inactive {
+  background: #f1f4f6;
+  color: #667b8e;
+}
+
+body[data-page="care-plans-list"] .care-plans-patient-details {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 9px;
+  margin: 13px 0 0 60px;
+}
+
+body[data-page="care-plans-list"] .care-plans-patient-details > div {
+  min-width: 0;
+  padding: 9px 10px;
+  border: 1px solid #d4e4e3;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .8);
+}
+
+body[data-page="care-plans-list"] .care-plans-patient-details dt {
+  margin-bottom: 4px;
+  color: #587087;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+body[data-page="care-plans-list"] .care-plans-patient-details dd {
+  min-width: 0;
+  margin: 0;
+  color: #172c40;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.35;
+  overflow-wrap: break-word;
+}
+
+body[data-page="care-plans-list"] .care-plans-list {
+  min-width: 0;
+  display: grid;
+  gap: 11px;
+}
+
+body[data-page="care-plans-list"] .care-plan-record {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #ccdae5;
+  border-left: 4px solid #149887;
+  border-radius: 10px;
+  background: #fff;
+}
+
+body[data-page="care-plans-list"] .care-plan-record > header {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 13px 14px 11px;
+}
+
+body[data-page="care-plans-list"] .care-plan-record header div {
+  min-width: 0;
+}
+
+body[data-page="care-plans-list"] .care-plan-record header div > span {
+  color: #078372;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+body[data-page="care-plans-list"] .care-plan-record h2 {
+  margin: 3px 0 0;
+  color: #075b9d;
+  font-size: 16px;
+  line-height: 1.25;
+}
+
+body[data-page="care-plans-list"] .care-plan-record dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0 14px 14px;
+}
+
+body[data-page="care-plans-list"] .care-plan-record dl > div {
+  min-width: 0;
+  padding: 11px;
+  border: 1px solid #dbe5ed;
+  border-radius: 8px;
+  background: #f8fbfd;
+}
+
+body[data-page="care-plans-list"] .care-plan-record dt {
+  margin-bottom: 5px;
+  color: #5b7288;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+body[data-page="care-plans-list"] .care-plan-record dd {
+  margin: 0;
+  color: #172c40;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+body[data-page="care-plans-list"] .care-plan-record > footer {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px 14px;
+  border-top: 1px solid #e0e8ef;
+  background: #f8fbfd;
+}
+
+body[data-page="care-plans-list"] .care-plan-record-action.is-danger {
+  border-color: #f3bebe;
+  color: #c52c2c;
+}
+
+body[data-page="care-plans-list"] .care-plans-loading,
+body[data-page="care-plans-list"] .care-plans-empty {
+  min-height: 190px;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 6px;
+  padding: 24px;
+  border: 1px dashed #bfd0de;
+  border-radius: 10px;
+  color: #536c83;
+  text-align: center;
+}
+
+body[data-page="care-plans-list"] .care-plans-patient-summary .care-plans-loading {
+  min-height: 72px;
+  border: 0;
+}
+
+body[data-page="care-plans-list"] .care-plans-empty-icon {
+  inline-size: 38px;
+  block-size: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #e1f6ef;
+  color: #078372;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+body[data-page="care-plans-list"] .care-plans-empty strong {
+  color: #182d42;
+  font-size: 15px;
+}
+
+body[data-page="care-plans-list"] .care-plans-empty p {
+  max-width: 520px;
+  margin: 0 0 6px;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+body[data-page="care-plans-list"] .care-plans-empty.is-error {
+  border-color: #efb4b4;
+  background: #fff8f8;
+}
+
+@media (max-width: 760px) {
+  body[data-page="care-plans-list"] .care-plans-overview-page,
+  html.is-embedded body[data-page="care-plans-list"] .care-plans-overview-page {
+    width: calc(100% - 22px) !important;
+    margin-top: 14px !important;
+  }
+
+  body[data-page="care-plans-list"] .care-plans-overview-panel {
+    padding: 15px;
+  }
+
+  body[data-page="care-plans-list"] .care-plans-overview-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  body[data-page="care-plans-list"] .care-plans-overview-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  body[data-page="care-plans-list"] .care-plans-patient-identity {
+    grid-template-columns: 48px minmax(0, 1fr);
+  }
+
+  body[data-page="care-plans-list"] .care-plans-patient-status {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  body[data-page="care-plans-list"] .care-plans-patient-details {
+    grid-template-columns: 1fr;
+    margin-left: 0;
+  }
+
+  body[data-page="care-plans-list"] .care-plan-record dl {
+    grid-template-columns: 1fr;
+  }
+
+  body[data-page="care-plans-list"] .care-plan-record > footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  body[data-page="care-plans-list"] .care-plan-record-action {
+    width: 100%;
+  }
+}
+
+/* Planos ativos dentro de Compartilhamentos UBS/CADH */
+body[data-page="cadh"] .cadh-sharing-care-plans {
+  min-width: 0;
+  display: grid;
+  gap: 8px;
+}
+
+body[data-page="cadh"] .cadh-sharing-care-plans > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 2px 2px 4px;
+}
+
+body[data-page="cadh"] .cadh-sharing-care-plans > header strong {
+  color: #173b5d;
+  font-size: 13px;
+}
+
+body[data-page="cadh"] .cadh-sharing-care-plans > header span {
+  color: #657b90;
+  font-size: 11px;
+}
+
+body[data-page="cadh"] .cadh-sharing-care-plan {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 13px;
+  border: 1px solid #c9dbe7;
+  border-left: 4px solid #149887;
+  border-radius: 9px;
+  background: #fff;
+  color: inherit;
+  text-decoration: none;
+  transition: border-color .16s ease, background-color .16s ease, box-shadow .16s ease;
+}
+
+body[data-page="cadh"] .cadh-sharing-care-plan:hover,
+body[data-page="cadh"] .cadh-sharing-care-plan:focus-visible {
+  border-color: #75bdb2;
+  background: #f4fbfa;
+  box-shadow: 0 4px 12px rgba(14, 105, 94, .1);
+  outline: none;
+}
+
+body[data-page="cadh"] .cadh-sharing-care-plan > div {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+body[data-page="cadh"] .cadh-sharing-care-plan div > span {
+  color: #078372;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+body[data-page="cadh"] .cadh-sharing-care-plan div > strong {
+  color: #075b9d;
+  font-size: 13px;
+  line-height: 1.3;
+}
+
+body[data-page="cadh"] .cadh-sharing-care-plan p {
+  margin: 0;
+  color: #60768b;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+body[data-page="cadh"] .cadh-sharing-care-plan > span {
+  flex: 0 0 auto;
+  color: #087f72;
+  font-size: 11px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+  body[data-page="cadh"] .cadh-sharing-care-plans > header,
+  body[data-page="cadh"] .cadh-sharing-care-plan {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  body[data-page="cadh"] .cadh-sharing-care-plan > span {
+    white-space: normal;
+  }
+}
+
+/* Lixeira de Planos de Cuidado vinculada ao paciente */
+body[data-page="care-plans-trash"] {
+  min-height: 100vh;
+  background-color: #eef5f8;
+  background-image: radial-gradient(circle, rgba(11, 79, 136, .18) 1px, transparent 1.4px);
+  background-size: 26px 26px;
+}
+
+body[data-page="care-plans-trash"] .care-plans-overview-page,
+html.is-embedded body[data-page="care-plans-trash"] .care-plans-overview-page {
+  width: min(1240px, calc(100% - 36px)) !important;
+  max-width: 1240px !important;
+  display: grid;
+  align-content: start;
+  gap: 16px;
+  margin: 20px auto 38px !important;
+}
+
+body[data-page="care-plans-trash"] .care-plans-module-hero {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 15px 17px;
+  border: 1px solid #bcd5e5;
+  border-radius: 12px;
+  background: rgba(235, 246, 251, .9);
+}
+
+body[data-page="care-plans-trash"] .care-plans-module-hero .cadh-module-hero-icon {
+  inline-size: 44px;
+  block-size: 44px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+  background: #075c9e;
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(7, 92, 158, .2);
+}
+
+body[data-page="care-plans-trash"] .care-plans-module-hero .cadh-module-hero-icon svg {
+  inline-size: 23px;
+  block-size: 23px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+body[data-page="care-plans-trash"] .care-plans-module-hero .cadh-module-hero-copy {
+  min-width: 0;
+}
+
+body[data-page="care-plans-trash"] .care-plans-module-hero .cadh-module-hero-copy p {
+  margin: 0 0 3px;
+  color: #075c9e;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+body[data-page="care-plans-trash"] .care-plans-module-hero .cadh-module-hero-copy h2 {
+  margin: 0;
+  color: #14293e;
+  font-size: 17px;
+  line-height: 1.25;
+  overflow-wrap: break-word;
+}
+
+body[data-page="care-plans-trash"] .care-plans-overview-panel {
+  min-width: 0;
+  overflow: hidden;
+  padding: 20px;
+  border: 1px solid #c9d9e6;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(18, 45, 68, .07);
+}
+
+body[data-page="care-plans-trash"] .care-plans-overview-heading {
+  min-width: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  padding-bottom: 17px;
+  border-bottom: 1px solid #d7e2eb;
+}
+
+body[data-page="care-plans-trash"] .care-plans-overview-copy {
+  min-width: 0;
+}
+
+body[data-page="care-plans-trash"] .care-plans-back-link {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 13px;
+  color: #075c9e;
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+body[data-page="care-plans-trash"] .care-plans-overview-copy > p {
+  margin: 0 0 3px;
+  color: #8b5e14;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+body[data-page="care-plans-trash"] .care-plans-overview-copy h1 {
+  margin: 0;
+  color: #13273c;
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+body[data-page="care-plans-trash"] .care-plans-overview-copy > span {
+  display: block;
+  margin-top: 5px;
+  color: #657c92;
+  font-size: 13px;
+}
+
+body[data-page="care-plans-trash"] .care-plans-overview-actions {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+}
+
+body[data-page="care-plans-trash"] .care-plans-count {
+  padding: 7px 11px;
+  border-radius: 999px;
+  background: #f1f4f6;
+  color: #566b7f;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+body[data-page="care-plans-trash"] .care-plans-patient-summary {
+  min-width: 0;
+  margin: 16px 0 14px;
+  padding: 14px;
+  border: 1px solid #bfe0dc;
+  border-radius: 10px;
+  background: #f0faf8;
+}
+
+body[data-page="care-plans-trash"] .care-plans-patient-summary[hidden] {
+  display: none;
+}
+
+body[data-page="care-plans-trash"] .care-plans-patient-identity {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+}
+
+body[data-page="care-plans-trash"] .care-plans-patient-avatar {
+  inline-size: 48px;
+  block-size: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  background: #c7eee7;
+  color: #087064;
+  font-size: 15px;
+  font-weight: 900;
+}
+
+body[data-page="care-plans-trash"] .care-plans-patient-identity > div {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+body[data-page="care-plans-trash"] .care-plans-patient-identity div > span {
+  color: #078372;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+body[data-page="care-plans-trash"] .care-plans-patient-identity strong {
+  color: #13273c;
+  font-size: 16px;
+}
+
+body[data-page="care-plans-trash"] .care-plans-patient-identity small {
+  color: #617990;
+  font-size: 12px;
+}
+
+body[data-page="care-plans-trash"] .care-plans-patient-status {
+  padding: 6px 9px;
+  border-radius: 999px;
+  background: #dff8ea;
+  color: #07814a;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+body[data-page="care-plans-trash"] .care-plans-patient-details {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 9px;
+  margin: 13px 0 0 60px;
+}
+
+body[data-page="care-plans-trash"] .care-plans-patient-details > div {
+  min-width: 0;
+  padding: 9px 10px;
+  border: 1px solid #d4e4e3;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .8);
+}
+
+body[data-page="care-plans-trash"] .care-plans-patient-details dt,
+body[data-page="care-plans-trash"] .care-plan-record dt {
+  margin-bottom: 4px;
+  color: #587087;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+body[data-page="care-plans-trash"] .care-plans-patient-details dd,
+body[data-page="care-plans-trash"] .care-plan-record dd {
+  min-width: 0;
+  margin: 0;
+  color: #172c40;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.35;
+  overflow-wrap: break-word;
+}
+
+body[data-page="care-plans-trash"] .care-plans-list {
+  min-width: 0;
+  display: grid;
+  gap: 11px;
+}
+
+body[data-page="care-plans-trash"] .care-plan-record {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #d3dce4;
+  border-left: 4px solid #8b9aaa;
+  border-radius: 10px;
+  background: #fff;
+}
+
+body[data-page="care-plans-trash"] .care-plan-record > header {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 13px 14px 11px;
+}
+
+body[data-page="care-plans-trash"] .care-plan-record header div > span {
+  color: #7a5a26;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+body[data-page="care-plans-trash"] .care-plan-record h2 {
+  margin: 3px 0 0;
+  color: #405b73;
+  font-size: 16px;
+}
+
+body[data-page="care-plans-trash"] .care-plan-record-status {
+  padding: 6px 9px;
+  border-radius: 999px;
+  background: #eef1f4;
+  color: #5e7182;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+body[data-page="care-plans-trash"] .care-plan-trash-dates {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0 14px 14px;
+}
+
+body[data-page="care-plans-trash"] .care-plan-trash-dates > div {
+  min-width: 0;
+  padding: 11px;
+  border: 1px solid #dbe5ed;
+  border-radius: 8px;
+  background: #f8fbfd;
+}
+
+body[data-page="care-plans-trash"] .care-plan-record > footer {
+  min-width: 0;
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px 14px;
+  border-top: 1px solid #e0e8ef;
+  background: #f8fbfd;
+}
+
+body[data-page="care-plans-trash"] .care-plan-record-action,
+body[data-page="care-plans-trash"] .care-plans-empty .btn {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border: 1px solid #b9ccda;
+  border-radius: 8px;
+  background: #fff;
+  color: #173149;
+  font-size: 12px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+body[data-page="care-plans-trash"] .care-plan-record-action.is-restore {
+  border-color: #82c9bb;
+  background: #effaf7;
+  color: #087f72;
+}
+
+body[data-page="care-plans-trash"] .care-plan-record-action.is-danger {
+  border-color: #f3bebe;
+  color: #c52c2c;
+}
+
+body[data-page="care-plans-trash"] .care-plans-loading,
+body[data-page="care-plans-trash"] .care-plans-empty {
+  min-height: 190px;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 6px;
+  padding: 24px;
+  border: 1px dashed #bfd0de;
+  border-radius: 10px;
+  color: #536c83;
+  text-align: center;
+}
+
+body[data-page="care-plans-trash"] .care-plans-patient-summary .care-plans-loading {
+  min-height: 72px;
+  border: 0;
+}
+
+body[data-page="care-plans-trash"] .care-plans-empty-icon {
+  inline-size: 38px;
+  block-size: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #e1f6ef;
+  color: #078372;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+body[data-page="care-plans-trash"] .care-plans-empty strong {
+  color: #182d42;
+  font-size: 15px;
+}
+
+body[data-page="care-plans-trash"] .care-plans-empty p {
+  max-width: 520px;
+  margin: 0 0 6px;
+  font-size: 12px;
+}
+
+@media (max-width: 760px) {
+  body[data-page="care-plans-trash"] .care-plans-overview-page,
+  html.is-embedded body[data-page="care-plans-trash"] .care-plans-overview-page {
+    width: calc(100% - 22px) !important;
+    margin-top: 14px !important;
+  }
+
+  body[data-page="care-plans-trash"] .care-plans-overview-panel {
+    padding: 15px;
+  }
+
+  body[data-page="care-plans-trash"] .care-plans-overview-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  body[data-page="care-plans-trash"] .care-plans-patient-identity {
+    grid-template-columns: 48px minmax(0, 1fr);
+  }
+
+  body[data-page="care-plans-trash"] .care-plans-patient-status {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  body[data-page="care-plans-trash"] .care-plans-patient-details,
+  body[data-page="care-plans-trash"] .care-plan-trash-dates {
+    grid-template-columns: 1fr;
+    margin-left: 0;
+  }
+
+  body[data-page="care-plans-trash"] .care-plan-record > footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  body[data-page="care-plans-trash"] .care-plan-record-action {
+    width: 100%;
+  }
+}
