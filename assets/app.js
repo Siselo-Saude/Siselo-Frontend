@@ -2573,6 +2573,17 @@
       navShell.appendChild(nav);
     }
 
+    const ubsLink = document.getElementById('nav-ubs');
+    const cadhLink = document.getElementById('nav-cadh');
+    if (
+      ubsLink &&
+      cadhLink &&
+      ubsLink.parentElement === nav &&
+      cadhLink.parentElement === nav
+    ) {
+      nav.insertBefore(ubsLink, cadhLink);
+    }
+
     Object.keys(SIDEBAR_NAV_META).forEach((key) => {
       const link = document.getElementById(`nav-${key}`);
       if (link) {

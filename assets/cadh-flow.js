@@ -1,11 +1,12 @@
 const CADH_FLOW_COLUMNS = [
+  { key: 'aguardando_agendamento', label: 'Aguardando Agendamento', withoutAppointment: true },
   { key: 'agendado', label: 'Agendados' },
-  { key: 'aguardando', label: 'Aguardando Atendimento' },
-  { key: 'em_atendimento', label: 'Em Atendimento' },
   { key: 'atendido', label: 'Atendidos' },
   { key: 'pendente', label: 'Pendentes' },
   { key: 'ausente', label: 'Ausentes' },
 ];
+
+const CADH_APPOINTMENT_COLUMNS = CADH_FLOW_COLUMNS.filter((column) => !column.withoutAppointment);
 
 let cadhFlowRows = [];
 let cadhFinalizedRows = [];
@@ -14,8 +15,7 @@ let cadhFlowTab = 'received';
 let cadhFlowQuery = '';
 let cadhFlowRisk = '';
 let cadhFlowWeekday = 'all';
-let cadhFlowSchedulingPatientId = '';
-let cadhFlowFinalizingPatientId = '';
+let cadhFlowReferralDetailPatientId = '';
 let cadhFlowSharingPatientId = '';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -134,18 +134,19 @@ function renderCadhReceived(panel) {
       <button class="btn" type="button" data-cadh-clear-filters>Limpar</button>
     </form>
 
-    ${cadhFlowSchedulingPatientId ? renderCadhScheduleForm(findCadhFlowPatient(cadhFlowSchedulingPatientId)) : ''}
-    ${cadhFlowFinalizingPatientId ? renderCadhFinalizeForm(findCadhFlowPatient(cadhFlowFinalizingPatientId)) : ''}
-
     <div class="cadh-received-list">
       ${rows.length ? rows.map(renderCadhReceivedCard).join('') : renderCadhFlowEmpty('Nenhum paciente corresponde aos filtros informados.')}
     </div>
+    ${cadhFlowReferralDetailPatientId
+      ? renderCadhReferralDetail(findCadhFlowPatient(cadhFlowReferralDetailPatientId))
+      : ''}
   `;
   bindCadhReceivedControls(panel);
 }
 
 function renderCadhReceivedCard(row) {
   const veryHigh = row.risk_classification === 'muito_alto_risco';
+  const received = Boolean(row.referral_received_at);
   return `
     <article class="cadh-received-card ${veryHigh ? 'is-very-high-risk' : ''}">
       <div class="cadh-received-main">
@@ -157,78 +158,77 @@ function renderCadhReceivedCard(row) {
           ${veryHigh ? '⚠ ' : ''}${SISELO.escapeHtml(row.risk_label || 'Alto Risco')}
         </span>
       </div>
-      <div class="cadh-received-meta">
-        ${row.scheduled_at
-          ? `<span>Agendado: <strong>${SISELO.escapeHtml(formatCadhFlowDateTime(row.scheduled_at))}</strong></span>`
-          : '<span>Aguardando agendamento</span>'}
-        <span class="cadh-care-status">${SISELO.escapeHtml(row.care_status_label || 'Recebido da UBS')}</span>
-      </div>
       <div class="cadh-received-actions">
-        ${canCadhFlow('careflow.schedule') ? `<button class="btn btn-primary" type="button" data-cadh-schedule="${row.id}">${row.scheduled_at ? 'Reagendar' : 'Agendar consulta'}</button>` : ''}
-        <a class="btn" href="/patients/show.html?id=${encodeURIComponent(row.id)}">Prontuário</a>
-        ${canCadhFlow('careflow.finalize') ? `<button class="btn" type="button" data-cadh-finalize="${row.id}">Finalizar</button>` : ''}
+        ${received
+          ? `<span class="cadh-receipt-status"><span aria-hidden="true">✓</span>Recebido</span>`
+          : canCadhFlow('careflow.update')
+            ? `<button class="btn btn-primary cadh-confirm-receipt" type="button" data-cadh-confirm-receipt="${row.id}">Confirmar recebimento</button>`
+            : '<span class="cadh-receipt-pending">Aguardando confirmação</span>'}
+        <button class="btn cadh-referral-view" type="button" data-cadh-referral-detail="${row.id}" aria-label="Visualizar informações do encaminhamento de ${SISELO.escapeHtml(row.full_name || 'paciente')}">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+        </button>
       </div>
     </article>
   `;
 }
 
-function renderCadhScheduleForm(row) {
+function renderCadhReferralDetail(row) {
   if (!row) return '';
+  const received = Boolean(row.referral_received_at);
+  const origin = row.referral_from_service || row.ubs_ref || 'UBS não informada';
+  const destination = row.referral_to_service || 'CADH';
   return `
-    <form id="cadh-schedule-form" class="cadh-flow-action-form">
-      <header>
-        <div>
-          <span>Agendamento de consulta</span>
-          <strong>${SISELO.escapeHtml(row.full_name || '-')}</strong>
-        </div>
-        <button type="button" aria-label="Fechar" data-cadh-close-schedule>×</button>
-      </header>
-      <input type="hidden" name="patient_id" value="${row.id}">
-      <label>
-        <span>Data e hora *</span>
-        <input name="scheduled_at" type="datetime-local" min="${getCadhFlowLocalDateTime()}" required>
-      </label>
-      <label>
-        <span>Especialidade</span>
-        <input name="specialty" placeholder="Ex.: Enfermagem">
-      </label>
-      <label class="is-wide">
-        <span>Observações</span>
-        <input name="notes" placeholder="Informações para o atendimento">
-      </label>
-      <button class="btn btn-primary" type="submit">Confirmar agendamento</button>
-    </form>
-  `;
-}
+    <div class="cadh-referral-modal-backdrop" data-cadh-close-referral>
+      <section
+        class="cadh-referral-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="cadh-referral-modal-title"
+        tabindex="-1"
+      >
+        <header>
+          <div>
+            <span>Encaminhamento UBS → CADH</span>
+            <h3 id="cadh-referral-modal-title">${SISELO.escapeHtml(row.full_name || 'Paciente')}</h3>
+          </div>
+          <button type="button" data-cadh-close-referral aria-label="Fechar detalhes do encaminhamento">×</button>
+        </header>
 
-function renderCadhFinalizeForm(row) {
-  if (!row) return '';
-  return `
-    <form id="cadh-finalize-form" class="cadh-flow-action-form cadh-finalize-form">
-      <header>
-        <div>
-          <span>Finalizar acompanhamento</span>
-          <strong>${SISELO.escapeHtml(row.full_name || '-')}</strong>
+        <div class="cadh-referral-route">
+          <strong>${SISELO.escapeHtml(origin)}</strong>
+          <span aria-hidden="true">→</span>
+          <strong>${SISELO.escapeHtml(destination)}</strong>
         </div>
-        <button type="button" aria-label="Fechar" data-cadh-close-finalize>×</button>
-      </header>
-      <input type="hidden" name="patient_id" value="${row.id}">
-      <label>
-        <span>Motivo *</span>
-        <select name="reason" required>
-          <option value="">Selecione...</option>
-          <option value="obito">Óbito</option>
-          <option value="ausencia">Ausência</option>
-          <option value="tratamento_finalizado">Tratamento finalizado</option>
-          <option value="outro">Outro</option>
-        </select>
-      </label>
-      <label class="is-wide">
-        <span>Observações</span>
-        <input name="notes" placeholder="Informações complementares">
-      </label>
-      <button class="btn btn-primary" type="submit">Confirmar finalização</button>
-    </form>
+
+        <dl class="cadh-referral-detail-grid">
+          <div>
+            <dt>Equipe de origem</dt>
+            <dd>${SISELO.escapeHtml(SISELO.formatTeamName(row.team_ref) || 'Não informada')}</dd>
+          </div>
+          <div>
+            <dt>Data do encaminhamento</dt>
+            <dd>${SISELO.escapeHtml(formatCadhFlowDate(row.referral_date || row.first_cadh_date))}</dd>
+          </div>
+          <div>
+            <dt>Classificação de risco</dt>
+            <dd>${SISELO.escapeHtml(row.risk_label || 'Não informada')}</dd>
+          </div>
+          <div>
+            <dt>Situação</dt>
+            <dd>${received ? 'Recebido pelo CADH' : 'Aguardando recebimento'}</dd>
+          </div>
+          ${received ? `
+            <div>
+              <dt>Data de recebimento pelo CADH</dt>
+              <dd>${SISELO.escapeHtml(formatCadhFlowDate(row.referral_received_at))}</dd>
+            </div>
+          ` : ''}
+        </dl>
+      </section>
+    </div>
   `;
 }
 
@@ -248,49 +248,59 @@ function bindCadhReceivedControls(panel) {
     renderCadhReceived(panel);
   });
 
-  panel.querySelectorAll('[data-cadh-schedule]').forEach((button) => {
+  panel.querySelectorAll('[data-cadh-confirm-receipt]').forEach((button) => {
+    button.addEventListener('click', () => confirmCadhReceipt(button.dataset.cadhConfirmReceipt, button));
+  });
+  panel.querySelectorAll('[data-cadh-referral-detail]').forEach((button) => {
     button.addEventListener('click', () => {
-      cadhFlowSchedulingPatientId = button.dataset.cadhSchedule;
-      cadhFlowFinalizingPatientId = '';
+      cadhFlowReferralDetailPatientId = button.dataset.cadhReferralDetail;
       renderCadhReceived(panel);
-      panel.querySelector('#cadh-schedule-form')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      panel.querySelector('.cadh-referral-modal')?.focus();
     });
   });
-  panel.querySelector('[data-cadh-close-schedule]')?.addEventListener('click', () => {
-    cadhFlowSchedulingPatientId = '';
-    renderCadhReceived(panel);
-  });
-  panel.querySelector('#cadh-schedule-form')?.addEventListener('submit', saveCadhSchedule);
-  panel.querySelectorAll('[data-cadh-finalize]').forEach((button) => {
-    button.addEventListener('click', () => {
-      cadhFlowFinalizingPatientId = button.dataset.cadhFinalize;
-      cadhFlowSchedulingPatientId = '';
+  panel.querySelectorAll('[data-cadh-close-referral]').forEach((control) => {
+    control.addEventListener('click', (event) => {
+      if (control.classList.contains('cadh-referral-modal-backdrop') && event.target !== control) {
+        return;
+      }
+      cadhFlowReferralDetailPatientId = '';
       renderCadhReceived(panel);
     });
   });
-  panel.querySelector('[data-cadh-close-finalize]')?.addEventListener('click', () => {
-    cadhFlowFinalizingPatientId = '';
-    renderCadhReceived(panel);
+  panel.querySelector('.cadh-referral-modal')?.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      cadhFlowReferralDetailPatientId = '';
+      renderCadhReceived(panel);
+    }
   });
-  panel.querySelector('#cadh-finalize-form')?.addEventListener('submit', submitCadhFinalization);
 }
 
-async function saveCadhSchedule(event) {
-  event.preventDefault();
-  const payload = Object.fromEntries(new FormData(event.currentTarget).entries());
-  payload.action = 'schedule';
+async function confirmCadhReceipt(patientId, button) {
+  const previousLabel = button.textContent;
+  button.disabled = true;
+  button.textContent = 'Confirmando...';
   try {
-    await SISELO.apiRequest('/care_flow/action.php', { method: 'POST', body: payload });
-    cadhFlowSchedulingPatientId = '';
-    showCadhFlowAlert('Consulta agendada com sucesso.', 'success');
+    await SISELO.apiRequest('/care_flow/action.php', {
+      method: 'POST',
+      body: {
+        action: 'confirm_receipt',
+        patient_id: Number(patientId),
+      },
+    });
+    showCadhFlowAlert('Recebimento confirmado com sucesso.', 'success');
     await loadCadhFlow();
+    activateCadhFlowTab('schedule');
   } catch (error) {
-    showCadhFlowAlert(error.message || 'Não foi possível agendar a consulta.', 'error');
+    button.disabled = false;
+    button.textContent = previousLabel;
+    showCadhFlowAlert(error.message || 'Não foi possível confirmar o recebimento.', 'error');
   }
 }
 
 function renderCadhKanban(panel) {
-  const rows = cadhFlowRows.filter(matchesCadhFlowWeekday);
+  const rows = cadhFlowRows
+    .filter((row) => Boolean(row.referral_received_at))
+    .filter(matchesCadhFlowWeekday);
   panel.innerHTML = `
     <div class="cadh-kanban-toolbar">
       <div>
@@ -324,16 +334,17 @@ function renderCadhKanban(panel) {
   });
   panel.querySelectorAll('[data-cadh-kanban-schedule]').forEach((button) => {
     button.addEventListener('click', () => {
-      cadhFlowSchedulingPatientId = button.dataset.cadhKanbanSchedule;
-      activateCadhFlowTab('received');
+      openCadhClinicalScheduling(button.dataset.cadhKanbanSchedule);
     });
   });
 }
 
 function renderCadhKanbanColumn(column, rows) {
   const columnRows = rows.filter((row) => {
-    const status = row.appointment_status || 'agendado';
-    return status === column.key;
+    if (column.withoutAppointment) {
+      return !row.appointment_id;
+    }
+    return Boolean(row.appointment_id) && row.appointment_status === column.key;
   });
   return `
     <section class="cadh-kanban-column" data-kanban-column="${column.key}">
@@ -355,11 +366,26 @@ function renderCadhKanbanCard(row, status) {
       <span class="cadh-risk-chip ${veryHigh ? 'is-critical' : 'is-high'}">${SISELO.escapeHtml(row.risk_label || 'Alto Risco')}</span>
       ${row.appointment_id && canCadhFlow('careflow.update') ? `
         <select data-cadh-move-appointment="${row.appointment_id}" aria-label="Mover paciente no fluxo">
-          ${CADH_FLOW_COLUMNS.map((column) => `<option value="${column.key}" ${column.key === status ? 'selected' : ''}>${column.label}</option>`).join('')}
+          ${CADH_APPOINTMENT_COLUMNS.map((column) => `<option value="${column.key}" ${column.key === status ? 'selected' : ''}>${column.label}</option>`).join('')}
         </select>
       ` : canCadhFlow('careflow.schedule') ? `<button class="btn" type="button" data-cadh-kanban-schedule="${row.id}">Definir data</button>` : ''}
     </article>
   `;
+}
+
+function openCadhClinicalScheduling(patientId) {
+  const patient = findCadhFlowPatient(patientId);
+  if (!patient) {
+    showCadhFlowAlert('Paciente não encontrado para agendamento.', 'error');
+    return;
+  }
+
+  saveCadhSearchState(patient, patient.cpf);
+  const url = new URL('/cadh/index.html', window.location.origin);
+  url.searchParams.set('flow', 'followup');
+  url.searchParams.set('view', 'encounters');
+  url.searchParams.set('patient_id', String(patient.id));
+  window.location.assign(`${url.pathname}${url.search}`);
 }
 
 async function moveCadhAppointment(appointmentId, status) {
@@ -484,26 +510,6 @@ function renderCadhFinalized(panel) {
   });
 }
 
-async function submitCadhFinalization(event) {
-  event.preventDefault();
-  const payload = Object.fromEntries(new FormData(event.currentTarget).entries());
-  if (payload.reason === 'outro' && !String(payload.notes || '').trim()) {
-    showCadhFlowAlert('Descreva o motivo da finalização.', 'error');
-    return;
-  }
-  try {
-    await SISELO.apiRequest('/care_flow/action.php', {
-      method: 'POST',
-      body: { action: 'finalize', ...payload },
-    });
-    cadhFlowFinalizingPatientId = '';
-    showCadhFlowAlert('Paciente movido para Finalizados.', 'success');
-    await loadCadhFlow();
-  } catch (error) {
-    showCadhFlowAlert(error.message || 'Não foi possível finalizar o acompanhamento.', 'error');
-  }
-}
-
 async function reopenCadhPatient(patientId) {
   const confirmed = await SISELO.ui.confirm({
     title: 'Reabrir acompanhamento',
@@ -572,7 +578,7 @@ function showCadhFlowAlert(message, type = 'info') {
 function renderCadhFlowError(message) {
   const panel = document.getElementById('cadh-flow-panel');
   if (panel) {
-    panel.innerHTML = `<div class="cadh-flow-error"><strong>Fluxo assistencial indisponível</strong><p>${SISELO.escapeHtml(message)}</p><small>Confirme a aplicação do arquivo database_patch_006.sql.</small></div>`;
+    panel.innerHTML = `<div class="cadh-flow-error"><strong>Fluxo assistencial indisponível</strong><p>${SISELO.escapeHtml(message)}</p><small>Confirme a aplicação das migrações do banco de dados.</small></div>`;
   }
 }
 
@@ -594,10 +600,4 @@ function formatCadhFlowDate(value) {
   return Number.isNaN(date.getTime())
     ? value
     : new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short' }).format(date);
-}
-
-function getCadhFlowLocalDateTime() {
-  const now = new Date();
-  now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-  return now.toISOString().slice(0, 16);
 }

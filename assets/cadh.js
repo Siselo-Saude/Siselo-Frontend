@@ -72,6 +72,7 @@ let cadhCurrentPatient = null;
 let cadhClinicalContext = null;
 let cadhActiveTab = 'users';
 let cadhFollowupPatients = [];
+let cadhSchedulingSpecialty = '';
 
 document.addEventListener('DOMContentLoaded', () => {
   if (!['cadh', 'ubs'].includes(document.body.dataset.page)) {
@@ -348,6 +349,7 @@ function clearCadhSelectedPatient(options = {}) {
   cadhCurrentPatient = null;
   cadhClinicalContext = null;
   cadhActiveTab = 'users';
+  cadhSchedulingSpecialty = '';
   clearCadhSearchState();
   setCadhPatientCardPatient('');
   setCadhPatientCardsUnlocked(false);
@@ -903,7 +905,7 @@ function renderCadhEncountersTab(patient) {
             <div class="cadh-specialty-label">${icon}<strong>${SISELO.escapeHtml(label)}</strong></div>
             <div class="cadh-specialty-actions">
               <a href="${SISELO.escapeHtml(href)}" ${patientId ? '' : 'aria-disabled="true" tabindex="-1"'}>Registrar</a>
-              <a href="${patientId ? `/cadh/index.html?flow=schedule&patient_id=${encodeURIComponent(patientId)}` : '#'}" ${patientId ? '' : 'aria-disabled="true" tabindex="-1"'}>Agendar</a>
+              <button type="button" data-cadh-schedule-specialty="${SISELO.escapeHtml(label)}" ${patientId ? '' : 'disabled'}>Agendar</button>
             </div>
           </article>
         `;
@@ -920,6 +922,9 @@ function renderCadhEncountersTab(patient) {
         ? ''
         : '<p class="cadh-guidance-alert">Selecione um paciente na lista ao lado para registrar atendimentos ou agendar consultas.</p>'}
       <div class="cadh-specialty-grid cadh-specialty-grid-inline">${specialtyMarkup}</div>
+      ${patientId && cadhSchedulingSpecialty
+        ? renderCadhSpecialtyScheduleForm(patient, cadhSchedulingSpecialty)
+        : ''}
       ${patientId ? `<div class="cadh-tab-actions"><a class="btn" href="/cadh/history.html?patient_id=${encodeURIComponent(patientId)}">Histórico de atendimentos</a></div>` : ''}
     </section>
   `;
@@ -927,6 +932,164 @@ function renderCadhEncountersTab(patient) {
   detail.querySelectorAll('a[aria-disabled="true"]').forEach((link) => {
     link.addEventListener('click', (event) => event.preventDefault());
   });
+  detail.querySelectorAll('[data-cadh-schedule-specialty]').forEach((button) => {
+    button.addEventListener('click', () => {
+      cadhSchedulingSpecialty = button.dataset.cadhScheduleSpecialty || '';
+      renderCadhEncountersTab(patient);
+      detail.querySelector('#cadh-specialty-schedule-form')?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+      });
+    });
+  });
+  detail.querySelector('[data-cadh-cancel-schedule]')?.addEventListener('click', () => {
+    cadhSchedulingSpecialty = '';
+    renderCadhEncountersTab(patient);
+  });
+  detail.querySelector('#cadh-specialty-schedule-form')?.addEventListener('submit', (event) => {
+    saveCadhSpecialtySchedule(event, patient);
+  });
+  enhanceCadhScheduleDateTime(detail.querySelector('#cadh-specialty-schedule-form'));
+}
+
+function renderCadhSpecialtyScheduleForm(patient, specialty) {
+  const today = getCadhScheduleLocalDate();
+  return `
+    <form id="cadh-specialty-schedule-form" class="cadh-specialty-schedule-form">
+      <header>
+        <strong>Agendar — ${SISELO.escapeHtml(specialty)} — ${SISELO.escapeHtml(patient.full_name || '-')}</strong>
+      </header>
+      <div class="cadh-specialty-schedule-fields">
+        <label>
+          <span>Data</span>
+          <input id="cadh-schedule-date" name="schedule_date" type="date" min="${today}" required>
+        </label>
+        <label>
+          <span>Hora</span>
+          <div class="cadh-time-picker" role="group" aria-label="Horário do agendamento">
+            <select data-cadh-schedule-hour aria-label="Hora" required>
+              <option value="">Hora</option>
+              ${renderCadhTimeOptions(23)}
+            </select>
+            <span class="cadh-time-picker-separator" aria-hidden="true">:</span>
+            <select data-cadh-schedule-minute aria-label="Minuto" required>
+              <option value="">Min.</option>
+              ${renderCadhTimeOptions(59)}
+            </select>
+            <span class="cadh-time-picker-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="9"/>
+                <path d="M12 7v5l3 2"/>
+              </svg>
+            </span>
+            <input name="schedule_time" type="hidden">
+          </div>
+        </label>
+        <label>
+          <span>Modalidade</span>
+          <select name="modality">
+            <option value="Presencial">Presencial</option>
+            <option value="Teleatendimento">Teleatendimento</option>
+          </select>
+        </label>
+        <label>
+          <span>Profissional</span>
+          <input name="professional" placeholder="Nome do profissional...">
+        </label>
+        <label>
+          <span>Equipe</span>
+          <input name="team" value="${SISELO.escapeHtml(formatCadhTeamName(patient.team_ref) || patient.team_ref || '')}">
+        </label>
+        <label>
+          <span>Prioridade</span>
+          <select name="priority">
+            <option value="nao">Não</option>
+            <option value="sim">Sim</option>
+          </select>
+        </label>
+      </div>
+      <div id="cadh-specialty-schedule-alert" class="alert" hidden></div>
+      <footer>
+        <button class="btn btn-primary" type="submit">Confirmar Agendamento</button>
+        <button class="btn" type="button" data-cadh-cancel-schedule>Cancelar</button>
+      </footer>
+    </form>
+  `;
+}
+
+function enhanceCadhScheduleDateTime(form) {
+  if (!form) return;
+
+  const dateInput = form.querySelector('[name="schedule_date"]');
+  if (dateInput) {
+    dateInput.dataset.dateLabel = 'Data';
+    SISELO.enhanceDateInput(dateInput, { min: getCadhScheduleLocalDate() });
+  }
+
+  const hourSelect = form.querySelector('[data-cadh-schedule-hour]');
+  const minuteSelect = form.querySelector('[data-cadh-schedule-minute]');
+  const timeInput = form.querySelector('[name="schedule_time"]');
+  const syncTime = () => {
+    timeInput.value = hourSelect.value && minuteSelect.value
+      ? `${hourSelect.value}:${minuteSelect.value}`
+      : '';
+  };
+  hourSelect?.addEventListener('change', syncTime);
+  minuteSelect?.addEventListener('change', syncTime);
+  syncTime();
+}
+
+function renderCadhTimeOptions(maximum) {
+  return Array.from({ length: maximum + 1 }, (_, value) => {
+    const label = String(value).padStart(2, '0');
+    return `<option value="${label}">${label}</option>`;
+  }).join('');
+}
+
+async function saveCadhSpecialtySchedule(event, patient) {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const submit = form.querySelector('button[type="submit"]');
+  const formData = new FormData(form);
+  const scheduleDate = String(formData.get('schedule_date') || '');
+  const scheduleTime = String(formData.get('schedule_time') || '');
+  const alert = form.querySelector('#cadh-specialty-schedule-alert');
+
+  if (!SISELO.validateEnhancedDateInputs(form, { alertId: 'cadh-specialty-schedule-alert' })) {
+    return;
+  }
+
+  submit.disabled = true;
+  try {
+    await SISELO.apiRequest('/care_flow/action.php', {
+      method: 'POST',
+      body: {
+        action: 'schedule',
+        patient_id: Number(patient.id),
+        scheduled_at: `${scheduleDate}T${scheduleTime}`,
+        specialty: cadhSchedulingSpecialty,
+        modality: String(formData.get('modality') || ''),
+        professional: String(formData.get('professional') || ''),
+        team: String(formData.get('team') || ''),
+        priority: String(formData.get('priority') || 'nao'),
+      },
+    });
+    cadhSchedulingSpecialty = '';
+    window.location.assign('/cadh/index.html?flow=schedule');
+  } catch (error) {
+    submit.disabled = false;
+    if (alert) {
+      alert.hidden = false;
+      alert.className = 'alert alert-error';
+      alert.textContent = error.message || 'Não foi possível salvar o agendamento.';
+    }
+  }
+}
+
+function getCadhScheduleLocalDate() {
+  const now = new Date();
+  now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+  return now.toISOString().slice(0, 10);
 }
 
 function renderCadhEncounterCard(row, options = {}) {

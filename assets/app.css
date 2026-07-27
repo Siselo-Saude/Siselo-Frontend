@@ -16920,7 +16920,7 @@ body[data-page="cadh-specialty-form"].home-sidebar-is-collapsed .home-sidebar-fo
 
 .cadh-received-card {
   display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(190px, .7fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 16px;
   padding: 14px 16px;
@@ -16992,9 +16992,185 @@ body[data-page="cadh-specialty-form"].home-sidebar-is-collapsed .home-sidebar-fo
 
 .cadh-received-actions {
   display: flex;
+  align-items: center;
   justify-content: flex-end;
   gap: 7px;
   flex-wrap: wrap;
+}
+
+.cadh-confirm-receipt {
+  min-width: 148px;
+}
+
+.cadh-receipt-status,
+.cadh-receipt-pending {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 36px;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.cadh-receipt-status {
+  color: #16845d;
+}
+
+.cadh-receipt-status > span {
+  display: inline-grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+  font-size: 10px;
+  line-height: 1;
+}
+
+.cadh-receipt-pending {
+  color: #6c7f92;
+}
+
+.cadh-referral-view {
+  display: inline-grid;
+  flex: 0 0 38px !important;
+  place-items: center;
+  width: 38px;
+  min-width: 38px;
+  height: 38px;
+  padding: 0 !important;
+  color: #07589e;
+}
+
+.cadh-referral-view svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+}
+
+.cadh-referral-modal-backdrop {
+  position: fixed;
+  z-index: 1600;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgb(15 35 54 / 48%);
+  backdrop-filter: blur(2px);
+}
+
+.cadh-referral-modal {
+  width: min(560px, 100%);
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  padding: 22px;
+  border: 1px solid #cad8e5;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 24px 70px rgb(15 35 54 / 28%);
+}
+
+.cadh-referral-modal:focus {
+  outline: none;
+}
+
+.cadh-referral-modal > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.cadh-referral-modal > header div {
+  display: grid;
+  gap: 4px;
+}
+
+.cadh-referral-modal > header span {
+  color: #087b68;
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.cadh-referral-modal > header h3 {
+  margin: 0;
+  color: #15283b;
+  font-size: 20px;
+}
+
+.cadh-referral-modal > header button {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #1c2d3f;
+  font-size: 23px;
+  cursor: pointer;
+}
+
+.cadh-referral-modal > header button:hover {
+  background: #eef4f8;
+}
+
+.cadh-referral-route {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(90px, auto);
+  align-items: center;
+  gap: 10px;
+  margin: 18px 0 14px;
+  padding: 13px 14px;
+  border: 1px solid #cad8e5;
+  border-radius: 9px;
+  background: #f6f9fc;
+  color: #203c58;
+  font-size: 12px;
+}
+
+.cadh-referral-route span {
+  color: #07589e;
+  font-size: 18px;
+}
+
+.cadh-referral-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+}
+
+.cadh-referral-detail-grid > div {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #d3dfeb;
+  border-radius: 9px;
+  background: #fff;
+}
+
+.cadh-referral-detail-grid dt {
+  margin: 0 0 6px;
+  color: #587089;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .025em;
+  text-transform: uppercase;
+}
+
+.cadh-referral-detail-grid dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: #172c41;
+  font-size: 13px;
+  font-weight: 750;
 }
 
 .cadh-flow-action-form {
@@ -17046,7 +17222,7 @@ body[data-page="cadh-specialty-form"].home-sidebar-is-collapsed .home-sidebar-fo
 
 .cadh-kanban {
   display: grid;
-  grid-template-columns: repeat(6, minmax(190px, 1fr));
+  grid-template-columns: repeat(5, minmax(190px, 1fr));
   gap: 10px;
   overflow-x: auto;
   padding-bottom: 8px;
@@ -17272,6 +17448,26 @@ body[data-page="cadh-specialty-form"].home-sidebar-is-collapsed .home-sidebar-fo
 
   .cadh-received-actions > * {
     flex: 1;
+  }
+
+  .cadh-referral-modal-backdrop {
+    align-items: end;
+    padding: 12px;
+  }
+
+  .cadh-referral-modal {
+    max-height: calc(100vh - 24px);
+    padding: 18px;
+  }
+
+  .cadh-referral-route,
+  .cadh-referral-detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cadh-referral-route span {
+    transform: rotate(90deg);
+    justify-self: start;
   }
 }
 .siselo-module-subnav {
@@ -18035,23 +18231,156 @@ body[data-page="cadh"] .cadh-specialty-actions {
   gap: 5px;
 }
 
-body[data-page="cadh"] .cadh-specialty-actions a {
+body[data-page="cadh"] .cadh-specialty-actions :is(a, button) {
   min-height: 23px;
   display: grid;
   place-items: center;
   padding: 4px 5px;
+  border: 0;
   border-radius: 4px;
   background: #eaf0f5;
   color: #07589e;
   font-size: 7px;
   font-weight: 800;
   text-decoration: none;
+  cursor: pointer;
 }
 
-body[data-page="cadh"] .cadh-specialty-actions a[aria-disabled="true"] {
+body[data-page="cadh"] .cadh-specialty-actions :is(a[aria-disabled="true"], button:disabled) {
   color: #9aa9b8;
   cursor: not-allowed;
   opacity: .72;
+}
+
+body[data-page="cadh"] .cadh-specialty-schedule-form {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+  padding: 15px;
+  border: 1px solid #cbd8e4;
+  border-radius: 10px;
+  background: #f7f9fb;
+}
+
+body[data-page="cadh"] .cadh-specialty-schedule-form > header strong {
+  color: #17324d;
+  font-size: 13px;
+}
+
+body[data-page="cadh"] .cadh-specialty-schedule-fields {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 11px;
+}
+
+body[data-page="cadh"] .cadh-specialty-schedule-fields label {
+  min-width: 0;
+  display: grid;
+  gap: 6px;
+}
+
+body[data-page="cadh"] .cadh-specialty-schedule-fields label > span {
+  color: #62778c;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+body[data-page="cadh"] .cadh-specialty-schedule-fields :is(input, select) {
+  width: 100%;
+  min-height: 38px;
+  padding: 7px 10px;
+  border: 1px solid #c9d6e2;
+  border-radius: 7px;
+  background: #fff;
+  color: #1b3045;
+  font-size: 12px;
+}
+
+body[data-page="cadh"] .cadh-specialty-schedule-form .date-picker-trigger {
+  min-height: 38px !important;
+  padding: 5px 7px 5px 10px !important;
+  border: 1px solid #c9d6e2 !important;
+  border-radius: 7px !important;
+  background: #fff !important;
+  font-size: 12px;
+}
+
+body[data-page="cadh"] .cadh-specialty-schedule-form .date-picker-trigger-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: #e7f0f8 !important;
+  color: #07589e !important;
+}
+
+body[data-page="cadh"] .cadh-time-picker {
+  min-height: 38px;
+  display: grid;
+  grid-template-columns: minmax(62px, 1fr) auto minmax(62px, 1fr) 30px;
+  align-items: center;
+  gap: 4px;
+  padding: 0 5px;
+  border: 1px solid #c9d6e2;
+  border-radius: 7px;
+  background: #fff;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+body[data-page="cadh"] .cadh-time-picker:focus-within {
+  border-color: #0b67a8;
+  box-shadow: 0 0 0 3px rgb(11 103 168 / 12%);
+}
+
+body[data-page="cadh"] .cadh-time-picker select {
+  min-height: 36px;
+  padding: 5px 22px 5px 7px;
+  border: 0;
+  background-color: transparent;
+  font-weight: 700;
+  text-align: center;
+  box-shadow: none;
+}
+
+body[data-page="cadh"] .cadh-time-picker select:focus {
+  outline: none;
+}
+
+body[data-page="cadh"] .cadh-time-picker-separator {
+  color: #183b5d;
+  font-size: 17px;
+  font-weight: 900;
+}
+
+body[data-page="cadh"] .cadh-time-picker-icon {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+  background: #e7f0f8;
+  color: #07589e;
+}
+
+body[data-page="cadh"] .cadh-time-picker-icon svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+body[data-page="cadh"] .cadh-specialty-schedule-form > footer {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+body[data-page="cadh"] .cadh-specialty-schedule-form > footer .btn {
+  min-height: 36px;
+  font-size: 11px;
 }
 
 body[data-page="cadh"] .cadh-selected-patient-chip {
@@ -20321,7 +20650,7 @@ body[data-page="cadh"] .cadh-specialty-label strong {
   font-size: 11px;
 }
 
-body[data-page="cadh"] .cadh-specialty-actions a {
+body[data-page="cadh"] .cadh-specialty-actions :is(a, button) {
   font-size: 9px;
 }
 
@@ -20411,7 +20740,7 @@ body[data-page="cadh"] #cadh-clinical-workspace .cadh-specialty-label strong {
   word-break: normal;
 }
 
-body[data-page="cadh"] #cadh-clinical-workspace .cadh-specialty-actions a {
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-specialty-actions :is(a, button) {
   min-height: 30px;
   font-size: 10px;
 }
@@ -20419,6 +20748,16 @@ body[data-page="cadh"] #cadh-clinical-workspace .cadh-specialty-actions a {
 @media (max-width: 1180px) {
   body[data-page="cadh"] #cadh-clinical-workspace .cadh-specialty-grid-inline {
     grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  body[data-page="cadh"] .cadh-specialty-schedule-fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 620px) {
+  body[data-page="cadh"] .cadh-specialty-schedule-fields {
+    grid-template-columns: 1fr;
   }
 }
 
