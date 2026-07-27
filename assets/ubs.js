@@ -175,7 +175,7 @@ function bindUbsTabs() {
 }
 
 function activateUbsTab(tabKey) {
-  ubsActiveTab = ['patients', 'transitioned', 'followup', 'next', 'sharing'].includes(tabKey) ? tabKey : 'patients';
+  ubsActiveTab = ['patients', 'transitioned', 'next', 'sharing'].includes(tabKey) ? tabKey : 'patients';
   document.body.dataset.ubsView = ubsActiveTab;
 
   const url = new URL(window.location.href);
@@ -195,11 +195,6 @@ function activateUbsTab(tabKey) {
       button.removeAttribute('aria-current');
     }
   });
-
-  if (ubsActiveTab === 'followup') {
-    renderUbsFollowupTab();
-    return;
-  }
 
   if (ubsActiveTab === 'patients') {
     renderUbsPatientsTab();
@@ -368,7 +363,6 @@ function renderUbsTransitionedTab() {
     </div>
   `;
 
-  bindUbsTransitionedControls();
 }
 
 function renderUbsTransitionedTable(rows) {
@@ -379,14 +373,11 @@ function renderUbsTransitionedTable(rows) {
           <th>Paciente</th>
           <th>Destino</th>
           <th>Encaminhamento</th>
-          <th>Acompanhamentos</th>
-          <th></th>
         </tr>
       </thead>
       <tbody>
         ${rows.map((row) => {
           const destination = parseUbsDestination(row);
-          const count = getUbsFollowupsForTransition(row).length;
           return `
             <tr>
               <td>
@@ -398,24 +389,12 @@ function renderUbsTransitionedTable(rows) {
                 <small>${SISELO.escapeHtml(destination.esf || row.notes || '')}</small>
               </td>
               <td>${SISELO.escapeHtml(formatUbsDate(row.transition_date))}</td>
-              <td>${renderUbsCountBadge(count)}</td>
-              <td><button class="ubs-row-action" type="button" data-ubs-follow="${SISELO.escapeHtml(row.id)}">Acompanhar</button></td>
             </tr>
           `;
         }).join('')}
       </tbody>
     </table>
   `;
-}
-
-function bindUbsTransitionedControls() {
-  document.querySelectorAll('[data-ubs-follow]').forEach((button) => {
-    button.addEventListener('click', () => {
-      ubsSelectedTransitionId = button.dataset.ubsFollow || '';
-      ubsFollowupFormOpen = true;
-      activateUbsTab('followup');
-    });
-  });
 }
 
 function bindUbsFilterControls() {

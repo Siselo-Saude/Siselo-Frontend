@@ -20245,3 +20245,771 @@ body[data-page="ubs-patient"] .ubs-patient-module-view .ubs-patient-referral-sec
     box-shadow: 0 14px 30px rgb(1 25 47 / 28%) !important;
   }
 }
+
+/* Medium typography shared by every UBS workspace tab. */
+body[data-page="ubs"] .siselo-module-subnav a,
+body[data-page="ubs"] .siselo-module-subnav-heading {
+  font-size: 11px;
+}
+
+body[data-page="ubs"] .ubs-module-metrics dd,
+body[data-page="ubs"] .ubs-patient-list-heading span,
+body[data-page="ubs"] .ubs-patient-list-filter-card header small,
+body[data-page="ubs"] .ubs-patient-list-filters label,
+body[data-page="ubs"] .ubs-patient-table-shell > footer,
+body[data-page="ubs"] .ubs-sharing-screen > header span,
+body[data-page="ubs"] .ubs-sharing-detail > header span,
+body[data-page="ubs"] .ubs-sharing-layout > label small {
+  font-size: 10px !important;
+}
+
+body[data-page="ubs"] .ubs-tab,
+body[data-page="ubs"] .ubs-patient-list-heading .btn,
+body[data-page="ubs"] .ubs-patient-list-filter-card header strong,
+body[data-page="ubs"] .ubs-patient-list-filters input,
+body[data-page="ubs"] .ubs-patient-list-filters select,
+body[data-page="ubs"] .ubs-patient-data-table thead th,
+body[data-page="ubs"] .ubs-sharing-layout > label > span,
+body[data-page="ubs"] .ubs-sharing-summary span,
+body[data-page="ubs"] .ubs-sharing-records article strong,
+body[data-page="ubs"] .ubs-sharing-records article span,
+body[data-page="ubs"] .ubs-sharing-records article p {
+  font-size: 11px !important;
+}
+
+body[data-page="ubs"] .ubs-search-label,
+body[data-page="ubs"] .ubs-table th,
+body[data-page="ubs"] .ubs-sharing-detail p,
+body[data-page="ubs"] .ubs-sharing-layout > label select {
+  font-size: 12px;
+}
+
+body[data-page="ubs"] .ubs-patient-search .cadh-block-title,
+body[data-page="ubs"] .ubs-patient-search .ubs-search-shell input,
+body[data-page="ubs"] .ubs-patient-search .cadh-search-button,
+body[data-page="ubs"] .ubs-patient-search .ubs-filter-button,
+body[data-page="ubs"] .ubs-patient-data-table td,
+body[data-page="ubs"] .ubs-table td,
+body[data-page="ubs"] .ubs-empty-state p {
+  font-size: 13px;
+}
+
+body[data-page="ubs"] .ubs-patient-data-table td strong,
+body[data-page="ubs"] .ubs-table td strong,
+body[data-page="ubs"] .ubs-empty-state strong {
+  font-size: 14px;
+}
+
+body[data-page="ubs"] .ubs-table td small {
+  font-size: 11px;
+}
+
+body[data-page="ubs"] .ubs-patient-list-heading strong,
+body[data-page="ubs"] .ubs-sharing-screen > header strong {
+  font-size: 17px;
+}
+
+body[data-page="cadh"] .cadh-received-actions .btn {
+  font-size: 12px;
+}
+
+body[data-page="cadh"] .cadh-modules-screen .cadh-screen-header h3 {
+  font-size: 15px;
+}
+
+body[data-page="cadh"] .cadh-specialty-label strong {
+  font-size: 11px;
+}
+
+body[data-page="cadh"] .cadh-specialty-actions a {
+  font-size: 9px;
+}
+
+/* CADH clinical workspace: readable sizing and complete specialty names. */
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-search .cadh-block-title {
+  font-size: 13px !important;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-search label {
+  font-size: 11px !important;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-search input {
+  height: 40px !important;
+  font-size: 13px !important;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-option {
+  min-height: 68px;
+  padding: 10px 12px !important;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-option-name {
+  font-size: 13px !important;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-option-meta {
+  font-size: 10px !important;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-option-status {
+  font-size: 9px !important;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-module-tabs,
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-tab-link {
+  min-height: 44px !important;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-tab-link {
+  font-size: 12px !important;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-tab-icon svg {
+  width: 16px !important;
+  height: 16px !important;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-inline-panel {
+  padding: 22px !important;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-modules-screen .cadh-screen-header h3 {
+  font-size: 17px;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-guidance-alert {
+  min-height: 40px;
+  padding: 11px 12px;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-specialty-grid-inline .cadh-specialty-card {
+  min-height: 92px !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-rows: auto auto;
+  align-content: space-between;
+  gap: 9px !important;
+  padding: 12px !important;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-specialty-label {
+  min-width: 0;
+  align-items: flex-start;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-specialty-label strong {
+  min-width: 0;
+  overflow: visible;
+  font-size: 12px;
+  line-height: 1.3;
+  overflow-wrap: normal;
+  text-overflow: clip;
+  white-space: normal;
+  word-break: normal;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-specialty-actions a {
+  min-height: 30px;
+  font-size: 10px;
+}
+
+@media (max-width: 1180px) {
+  body[data-page="cadh"] #cadh-clinical-workspace .cadh-specialty-grid-inline {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+/* CADH selected patient: current visual pattern without legacy profile actions. */
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-result {
+  overflow-x: hidden;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-selected-patient-card {
+  width: 100%;
+  min-width: 0;
+  flex: 0 0 auto;
+  border-radius: 10px;
+  box-shadow: none;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-selected-patient-header {
+  grid-template-columns: 36px minmax(0, 1fr) 30px;
+  gap: 8px;
+  min-height: 60px;
+  padding: 11px 12px;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-selected-patient-header > div,
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-transition-cta > span {
+  min-width: 0;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-selected-patient-header strong {
+  overflow: visible;
+  font-size: 13px;
+  line-height: 1.25;
+  overflow-wrap: break-word;
+  text-overflow: clip;
+  white-space: normal;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-selected-patient-list {
+  padding: 8px 12px 10px;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-selected-patient-list > div {
+  grid-template-columns: 1fr;
+  gap: 3px;
+  min-height: 0;
+  padding: 8px 0;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-selected-patient-list dt {
+  font-size: 10px;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-selected-patient-list dd {
+  font-size: 12px;
+  line-height: 1.3;
+  text-align: left;
+  overflow-wrap: break-word;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-transition-cta {
+  width: 100%;
+  min-width: 0;
+  grid-template-columns: 36px minmax(0, 1fr) 18px;
+  gap: 8px;
+  min-height: 60px;
+  margin-top: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-transition-cta strong {
+  font-size: 12px;
+  line-height: 1.25;
+  overflow-wrap: break-word;
+  white-space: normal;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-transition-cta small {
+  font-size: 10px;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-overview {
+  min-width: 0;
+  padding: 22px !important;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-overview-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #d8e3ec;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-overview-heading p {
+  margin: 0 0 3px;
+  color: #078573;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-overview-heading h3 {
+  margin: 0;
+  color: #14263a;
+  font-size: 18px;
+  line-height: 1.25;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-overview-identity {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+  padding: 14px;
+  border: 1px solid #cfe0eb;
+  border-radius: 11px;
+  background: #f3faf9;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-overview-avatar {
+  inline-size: 52px;
+  block-size: 52px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: #c9f0e8;
+  color: #086f64;
+  font-size: 16px;
+  font-weight: 900;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-overview-identity h4 {
+  margin: 0 0 3px;
+  color: #12273c;
+  font-size: 18px;
+  line-height: 1.25;
+  overflow-wrap: break-word;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-overview-identity div > span {
+  color: #647b91;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-overview-grid {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 10px;
+  margin: 0;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-overview-grid > div {
+  min-width: 0;
+  min-height: 68px;
+  display: grid;
+  align-content: center;
+  gap: 5px;
+  padding: 11px 12px;
+  border: 1px solid #d6e1ea;
+  border-radius: 9px;
+  background: #fff;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-overview-grid dt,
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-overview-clinical span {
+  color: #587087;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-overview-grid dd {
+  min-width: 0;
+  margin: 0;
+  color: #14283d;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.35;
+  text-align: left;
+  overflow-wrap: break-word;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-overview-clinical {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-overview-clinical article {
+  min-width: 0;
+  min-height: 76px;
+  padding: 12px;
+  border: 1px solid #cfe0eb;
+  border-radius: 9px;
+  background: #f8fbfd;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-overview-clinical p {
+  margin: 7px 0 0;
+  color: #31495f;
+  font-size: 13px;
+  line-height: 1.4;
+  overflow-wrap: break-word;
+}
+
+@media (max-width: 700px) {
+  body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-overview {
+    padding: 16px !important;
+  }
+
+  body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-overview-heading {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-overview-grid,
+  body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-overview-clinical {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Histórico unificado de atendimentos do CADH */
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-dashboard {
+  display: grid;
+  align-content: start;
+  gap: 16px;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-panel {
+  min-width: 0;
+  overflow: hidden;
+  padding: 20px;
+  border: 1px solid #c9d9e6;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(18, 45, 68, .06);
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-heading {
+  min-width: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #d7e2eb;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-heading > div {
+  min-width: 0;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] #cadh-history-back {
+  display: inline-flex;
+  margin-bottom: 13px;
+  color: #075c9e;
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] #cadh-history-back:hover {
+  text-decoration: underline;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-heading p {
+  margin: 0 0 3px;
+  color: #078372;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-heading h2 {
+  margin: 0;
+  color: #13273c;
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-heading div > span {
+  display: block;
+  margin-top: 5px;
+  color: #657c92;
+  font-size: 13px;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] #cadh-history-count {
+  flex: 0 0 auto;
+  padding: 7px 11px;
+  border-radius: 999px;
+  background: #e9f1f7;
+  color: #3f5c75;
+  font-size: 12px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-patient {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 13px 14px;
+  border: 1px solid #bfe0dc;
+  border-radius: 10px;
+  background: #f0faf8;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-patient:empty {
+  display: none;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-avatar {
+  inline-size: 48px;
+  block-size: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  background: #c7eee7;
+  color: #087064;
+  font-size: 15px;
+  font-weight: 900;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-patient div {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-patient div > span {
+  color: #078372;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-patient strong {
+  color: #13273c;
+  font-size: 16px;
+  line-height: 1.25;
+  overflow-wrap: break-word;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-patient small {
+  color: #617990;
+  font-size: 12px;
+  line-height: 1.35;
+  overflow-wrap: break-word;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-filters {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(210px, 300px);
+  gap: 12px;
+  margin: 14px 0;
+  padding: 13px;
+  border: 1px solid #d3e0e9;
+  border-radius: 10px;
+  background: #f8fbfd;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-filters label {
+  min-width: 0;
+  display: grid;
+  gap: 6px;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-filters label > span {
+  color: #4d667e;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-filters input,
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-filters select {
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  padding: 9px 11px;
+  border: 1px solid #bfd0df;
+  border-radius: 8px;
+  background: #fff;
+  color: #1d344a;
+  font: inherit;
+  font-size: 13px;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-list {
+  min-width: 0;
+  display: grid;
+  gap: 11px;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-card {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #ccdae5;
+  border-left: 4px solid #149887;
+  border-radius: 10px;
+  background: #fff;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-card > header {
+  min-width: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 13px 14px 8px;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-card-tags {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-card-tags span {
+  color: #075b9d;
+  font-size: 15px;
+  font-weight: 900;
+  overflow-wrap: break-word;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-card-tags small {
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: #eaf2f8;
+  color: #536c84;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-card time {
+  flex: 0 0 auto;
+  color: #405a72;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-card-summary {
+  margin: 0;
+  padding: 0 14px 11px;
+  color: #2d455c;
+  font-size: 13px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-card-meta {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 14px;
+  border-top: 1px solid #e0e8ef;
+  background: #f8fbfd;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-card-meta span {
+  color: #6a8094;
+  font-size: 11px;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-card-meta a {
+  flex: 0 0 auto;
+  padding: 7px 10px;
+  border: 1px solid #a9c0d3;
+  border-radius: 7px;
+  background: #fff;
+  color: #075c9e;
+  font-size: 12px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-details {
+  border-top: 1px solid #dce6ed;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-details summary {
+  padding: 11px 14px;
+  color: #075c9e;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-details dl {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 9px;
+  margin: 0;
+  padding: 0 14px 14px;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-details dl > div {
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid #d7e2ea;
+  border-radius: 8px;
+  background: #fbfdfe;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-details dt {
+  margin-bottom: 5px;
+  color: #557088;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-details dd {
+  margin: 0;
+  color: #172c40;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-loading,
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-empty {
+  min-height: 180px;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 5px;
+  padding: 24px;
+  border: 1px dashed #bfd0de;
+  border-radius: 10px;
+  color: #536c83;
+  text-align: center;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-empty strong {
+  color: #182d42;
+  font-size: 15px;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-empty p {
+  margin: 0;
+  font-size: 12px;
+}
+
+@media (max-width: 700px) {
+  body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-panel {
+    padding: 15px;
+  }
+
+  body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-heading,
+  body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-card > header,
+  body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-card-meta {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-filters {
+    grid-template-columns: 1fr;
+  }
+
+  body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-card time {
+    white-space: normal;
+  }
+
+  body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-details dl {
+    grid-template-columns: 1fr;
+  }
+}
