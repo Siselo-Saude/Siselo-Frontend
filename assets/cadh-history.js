@@ -17,6 +17,12 @@ const CADH_HISTORY_SPECIALTIES = [
 const CADH_HISTORY_METADATA_FIELDS = new Set([
   'id',
   'record_id',
+  'encounter_id',
+  'appointment_id',
+  'appointment_specialty',
+  'appointment_professional',
+  'appointment_team',
+  'scheduled_at',
   'patient_id',
   'full_name',
   'cpf',
@@ -48,9 +54,13 @@ const CADH_HISTORY_FIELD_LABELS = {
   avaliacao: 'Avaliação',
   conduct: 'Conduta',
   conduta: 'Conduta',
+  professional: 'Profissional',
+  team: 'Equipe',
   peso: 'Peso',
   altura: 'Altura',
   imc: 'IMC',
+  follow_up_date: 'Data da consulta subsequente',
+  follow_up_time: 'Horário da consulta subsequente',
   risk_correct: 'Estratificação de risco correta?',
   health_condition: 'Condição de saúde',
   risk_classification: 'Estratificação de risco',
@@ -105,7 +115,7 @@ async function setupCadhHistoryPage() {
     }
 
     const specialtyRecords = collectCadhSpecialtyRecords(patientId, fieldLabels);
-    const clinicalRecords = collectCadhClinicalRecords(context && context.encounters);
+    const clinicalRecords = collectCadhClinicalRecords(context && context.encounters, specialtyRecords, fieldLabels);
     cadhHistoryRecords = [...specialtyRecords, ...clinicalRecords].sort(compareCadhHistoryRecords);
 
     renderCadhHistoryPatient(cadhHistoryPatient);
@@ -161,9 +171,12 @@ function collectCadhSpecialtyRecords(patientId, fieldLabels) {
       .filter((record) => SISELO.normalizeEntityId(record && record.patient_id) === normalizedPatientId)
       .map((record) => {
         const details = buildCadhHistoryDetails(record, fieldLabels[specialty.key] || {});
+        const appointmentId = SISELO.normalizeEntityId(record.appointment_id);
+        const appointmentQuery = appointmentId ? `&appointment_id=${encodeURIComponent(appointmentId)}` : '';
         return {
           id: `${specialty.key}:${String(record.id || '')}`,
           recordId: String(record.id || ''),
+          encounterId: String(record.encounter_id || ''),
           source: 'specialty',
           specialtyKey: specialty.key,
           specialty: specialty.label,
@@ -172,30 +185,59 @@ function collectCadhSpecialtyRecords(patientId, fieldLabels) {
           updatedAt: String(record.updated_at || '').trim(),
           summary: getCadhHistorySummary(record, details),
           details,
-          editHref: `${specialty.path}?patient_id=${encodeURIComponent(normalizedPatientId)}&record_id=${encodeURIComponent(record.id || '')}&return=history`,
+          editHref: `${specialty.path}?patient_id=${encodeURIComponent(normalizedPatientId)}&record_id=${encodeURIComponent(record.id || '')}${appointmentQuery}&return=history`,
         };
       })
   ));
 }
 
-function collectCadhClinicalRecords(rows) {
-  return (Array.isArray(rows) ? rows : []).map((record) => {
-    const summary = String(record.summary || '').trim();
-    const details = summary ? [{ label: 'Resumo', value: summary }] : [];
-    return {
-      id: `clinical:${String(record.id || '')}`,
-      recordId: String(record.id || ''),
-      source: 'clinical',
-      specialtyKey: normalizeCadhHistoryText(record.specialty || 'registro-clinico'),
-      specialty: String(record.specialty || 'Registro clínico').trim(),
-      date: String(record.encounter_date || '').trim(),
-      consultation: formatCadhHistoryRecordType(record.record_type),
-      updatedAt: String(record.updated_at || record.created_at || '').trim(),
-      summary: summary || 'Registro clínico realizado.',
-      details,
-      editHref: '',
-    };
-  });
+function collectCadhClinicalRecords(rows, specialtyRecords = [], fieldLabels = {}) {
+  const linkedEncounterIds = new Set(
+    specialtyRecords.map((record) => String(record.encounterId || '')).filter(Boolean)
+  );
+  return (Array.isArray(rows) ? rows : [])
+    .filter((record) => !linkedEncounterIds.has(String(record.id || '')))
+    .map((record) => {
+      const specialtyConfig = findCadhHistorySpecialty(record.specialty);
+      const payload = parseCadhHistoryPayload(record.payload_json);
+      const summary = String(record.summary || '').trim();
+      const details = buildCadhHistoryDetails(payload, specialtyConfig ? fieldLabels[specialtyConfig.key] || {} : {});
+      if (summary && !details.some((detail) => detail.label === 'Resumo')) {
+        details.unshift({ label: 'Resumo', value: summary });
+      }
+      return {
+        id: `clinical:${String(record.id || '')}`,
+        recordId: String(record.id || ''),
+        source: 'clinical',
+        specialtyKey: normalizeCadhHistoryText(record.specialty || 'registro-clinico'),
+        specialty: String(record.specialty || 'Registro clínico').trim(),
+        date: String(record.appointment_scheduled_at || record.encounter_date || '').slice(0, 10),
+        consultation: String(payload.consultation_number || formatCadhHistoryRecordType(record.record_type)).trim(),
+        updatedAt: String(record.updated_at || record.created_at || '').trim(),
+        summary: summary || 'Registro clínico realizado.',
+        details,
+        editHref: '',
+      };
+    });
+}
+
+function findCadhHistorySpecialty(label) {
+  const normalized = normalizeCadhHistoryText(label);
+  return CADH_HISTORY_SPECIALTIES.find((specialty) => (
+    normalizeCadhHistoryText(specialty.label) === normalized ||
+    (specialty.key === 'psicologia' && normalized === 'psicologo')
+  )) || null;
+}
+
+function parseCadhHistoryPayload(value) {
+  if (!value) return {};
+  if (typeof value === 'object' && !Array.isArray(value)) return value;
+  try {
+    const parsed = JSON.parse(value);
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+  } catch (error) {
+    return {};
+  }
 }
 
 function buildCadhHistoryDetails(record, specialtyLabels) {

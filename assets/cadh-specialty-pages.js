@@ -59,7 +59,9 @@
     const config = {
       ...baseConfig,
       ...extractedConfig,
-      sections: extractedConfig && extractedConfig.sections.length ? extractedConfig.sections : baseConfig.sections,
+      sections: addFollowUpScheduleFields(
+        extractedConfig && extractedConfig.sections.length ? extractedConfig.sections : baseConfig.sections
+      ),
     };
 
     document.body.dataset.legacyPage = originalPage;
@@ -195,6 +197,59 @@
     return cleanText(submitButton ? submitButton.textContent : "");
   }
 
+  function addFollowUpScheduleFields(sections) {
+    const list = Array.isArray(sections) ? sections : [];
+    const hasFollowUpTime = list.some((item) => (
+      Array.isArray(item.fields) && item.fields.some((itemField) => itemField.name === "follow_up_time")
+    ));
+    let hasFollowUpDate = false;
+    let appended = false;
+    const enhancedSections = list.map((item) => ({
+      ...item,
+      fields: (item.fields || []).flatMap((itemField) => {
+        const normalized = SISELO.normalizeSearchText(`${itemField.name || ""} ${itemField.label || ""}`);
+        const isFollowUpDate = (
+          itemField.type === "date" &&
+          (
+            normalized.includes("data da consulta subsequente") ||
+            normalized.includes("next consult date")
+          )
+        );
+        if (!isFollowUpDate) return [itemField];
+
+        hasFollowUpDate = true;
+        if (hasFollowUpTime || appended) {
+          return [{ ...itemField, followUpDate: true }];
+        }
+        appended = true;
+        return [
+          { ...itemField, followUpDate: true },
+          field("follow_up_time", "Horário da consulta subsequente", "time", {
+            id: "clinical_follow_up_time",
+            required: false,
+          }),
+        ];
+      }),
+    }));
+
+    if (hasFollowUpDate) return enhancedSections;
+
+    return [
+      ...enhancedSections,
+      section("Consulta subsequente", [
+        field("follow_up_date", "Data da consulta subsequente", "date", {
+          id: "clinical_follow_up_date",
+          followUpDate: true,
+          required: false,
+        }),
+        field("follow_up_time", "Horário da consulta subsequente", "time", {
+          id: "clinical_follow_up_time",
+          required: false,
+        }),
+      ]),
+    ];
+  }
+
   async function setupSpecialtyPage(config) {
     const user = await SISELO.requireSession();
     if (!user) return;
@@ -206,9 +261,18 @@
     setupSidebar(user);
 
     const patient = await loadContextPatient();
-    renderSpecialtyContent(config, patient);
-    bindSpecialtyForm(config, patient);
+    const appointmentContext = await loadSpecialtyAppointment(patient);
+    renderSpecialtyContent(config, patient, appointmentContext.appointment);
+    bindSpecialtyForm(config, patient, appointmentContext.appointment);
     loadRequestedSpecialtyRecord(config, patient);
+    const specialtyForm = document.getElementById("clinical-specialty-form");
+    if (specialtyForm instanceof HTMLFormElement) {
+      applySpecialtyAppointmentContext(specialtyForm, appointmentContext.appointment);
+    }
+    if (appointmentContext.error) {
+      specialtyForm?.querySelector('button[type="submit"]')?.setAttribute("disabled", "disabled");
+      SISELO.showAlert("clinical-specialty-alert", appointmentContext.error, "error");
+    }
   }
 
   function renderShell(config) {
@@ -376,7 +440,34 @@
     };
   }
 
-  function renderSpecialtyContent(config, patient) {
+  async function loadSpecialtyAppointment(patient) {
+    const appointmentId = SISELO.normalizeEntityId(SISELO.queryParam("appointment_id"));
+    if (!appointmentId) {
+      return { appointment: null, error: "" };
+    }
+
+    try {
+      const data = await SISELO.apiRequest(`/care_flow/list.php?appointment_id=${encodeURIComponent(appointmentId)}`);
+      const appointment = data && data.appointment ? data.appointment : null;
+      if (!appointment) {
+        return { appointment: null, error: "O agendamento informado não foi encontrado." };
+      }
+      if (!patient || String(appointment.patient_id) !== String(patient.id)) {
+        return { appointment: null, error: "O agendamento não pertence ao paciente selecionado." };
+      }
+      if (!["agendado", "atendido"].includes(String(appointment.status || ""))) {
+        return { appointment: null, error: "Este agendamento foi encerrado sem atendimento e não aceita registro clínico." };
+      }
+      return { appointment, error: "" };
+    } catch (error) {
+      return {
+        appointment: null,
+        error: error.message || "Não foi possível carregar os dados do agendamento.",
+      };
+    }
+  }
+
+  function renderSpecialtyContent(config, patient, appointment = null) {
     const root = document.getElementById("clinical-specialty-root");
     if (!root) return;
 
@@ -398,7 +489,9 @@
       <form id="clinical-specialty-form" class="clinical-specialty-form" autocomplete="off" novalidate>
         <input type="hidden" name="record_id" value="">
         <input type="hidden" name="patient_id" value="${SISELO.escapeHtml(patient.id)}">
+        <input type="hidden" name="appointment_id" value="${SISELO.escapeHtml(appointment ? appointment.id : "")}">
         <div id="clinical-specialty-alert" class="alert" hidden></div>
+        ${appointment ? renderSpecialtyAppointmentContext(appointment) : ""}
         ${config.sections.map(renderSection).join("")}
         <div class="clinical-specialty-actions">
           <a class="btn clinical-secondary-action" href="${SISELO.escapeHtml(getSpecialtyReturnHref(patient))}">Cancelar</a>
@@ -408,6 +501,30 @@
           </button>
         </div>
       </form>
+    `;
+  }
+
+  function renderSpecialtyAppointmentContext(appointment) {
+    const scheduled = parseSpecialtyAppointmentDateTime(appointment.scheduled_at);
+    return `
+      <section class="clinical-appointment-context" aria-labelledby="clinical-appointment-context-title">
+        <header>
+          <div>
+            <span>Dados herdados do agendamento</span>
+            <strong id="clinical-appointment-context-title">Consulta agendada</strong>
+          </div>
+          <span class="clinical-appointment-status">Agendado</span>
+        </header>
+        <div class="clinical-appointment-context-grid">
+          <div><span>Paciente</span><strong>${SISELO.escapeHtml(appointment.full_name || "Não informado")}</strong></div>
+          <div><span>Módulo clínico</span><strong>${SISELO.escapeHtml(appointment.specialty || "Não informado")}</strong></div>
+          <div><span>Profissional</span><strong>${SISELO.escapeHtml(appointment.professional || "Não informado")}</strong></div>
+          <div><span>Data</span><strong>${SISELO.escapeHtml(scheduled.dateLabel)}</strong></div>
+          <div><span>Horário</span><strong>${SISELO.escapeHtml(scheduled.timeLabel)}</strong></div>
+          <div><span>Equipe</span><strong>${SISELO.escapeHtml(SISELO.formatTeamName(appointment.team) || "Não informada")}</strong></div>
+        </div>
+        <p>Paciente, módulo, profissional, data e horário vêm do agendamento e serão vinculados automaticamente a este registro.</p>
+      </section>
     `;
   }
 
@@ -707,6 +824,10 @@
   }
 
   function getSpecialtyReturnHref(patient) {
+    const requestedReturn = String(SISELO.queryParam("return_to") || "").trim();
+    if (requestedReturn.startsWith("/") && !requestedReturn.startsWith("//")) {
+      return requestedReturn;
+    }
     const patientId = SISELO.normalizeEntityId(patient && patient.id);
     if (SISELO.queryParam("return") === "history" && patientId) {
       return `/cadh/history.html?patient_id=${encodeURIComponent(patientId)}`;
@@ -752,11 +873,12 @@
         <input ${common} type="hidden">
       `;
     } else {
-      control = `<input ${common} type="${fieldConfig.type === "date" ? "date" : "text"}"${placeholder}${inputmode}${autocomplete}${required}>`;
+      const inputType = ["date", "time"].includes(fieldConfig.type) ? fieldConfig.type : "text";
+      control = `<input ${common} type="${inputType}"${placeholder}${inputmode}${autocomplete}${required}>`;
     }
 
     return `
-      <div class="clinical-specialty-field${wideClass}" data-field-name="${SISELO.escapeHtml(fieldConfig.name)}" data-legacy-container-id="${SISELO.escapeHtml(fieldConfig.legacyContainerId || "")}">
+      <div class="clinical-specialty-field${wideClass}" data-field-name="${SISELO.escapeHtml(fieldConfig.name)}" data-follow-up-date="${fieldConfig.followUpDate ? "true" : "false"}" data-legacy-container-id="${SISELO.escapeHtml(fieldConfig.legacyContainerId || "")}">
         <label for="${SISELO.escapeHtml(id)}">${SISELO.escapeHtml(stripRequiredStar(fieldConfig.label))}</label>
         ${control}
       </div>
@@ -777,12 +899,13 @@
     }).join("");
   }
 
-  function bindSpecialtyForm(config, patient) {
+  function bindSpecialtyForm(config, patient, appointment = null) {
     const form = document.getElementById("clinical-specialty-form");
     if (!(form instanceof HTMLFormElement) || !patient) return;
 
     hydrateConsultationOptions(form, config, patient);
     enhanceSpecialtyDateInputs(form);
+    applySpecialtyAppointmentContext(form, appointment);
     bindSpecialtyDerivedFields(form);
     syncConditionalSections(form, config);
 
@@ -793,7 +916,39 @@
 
     form.addEventListener("submit", (event) => {
       event.preventDefault();
-      saveSpecialtyRecord(form, config, patient);
+      saveSpecialtyRecord(form, config, patient, appointment);
+    });
+  }
+
+  function applySpecialtyAppointmentContext(form, appointment) {
+    if (!appointment) return;
+
+    const scheduled = parseSpecialtyAppointmentDateTime(appointment.scheduled_at);
+    setSpecialtyControlValue(form.elements.appointment_id, appointment.id || "");
+    const consultationDate = form.elements.consultation_date;
+    if (consultationDate instanceof HTMLInputElement) {
+      consultationDate.min = scheduled.dateValue;
+      consultationDate.max = scheduled.dateValue;
+      consultationDate.value = scheduled.dateValue;
+      consultationDate.readOnly = true;
+      consultationDate.dataset.inheritedFromAppointment = "true";
+      SISELO.syncEnhancedDateInput(consultationDate);
+      const datePicker = consultationDate.nextElementSibling;
+      if (datePicker?.classList.contains("date-picker")) {
+        datePicker.classList.add("is-inherited");
+        const trigger = datePicker.querySelector(".date-picker-trigger");
+        if (trigger instanceof HTMLButtonElement) {
+          trigger.disabled = true;
+          trigger.setAttribute("aria-label", "Data definida pelo agendamento");
+        }
+      }
+    }
+
+    ["professional", "profissional"].forEach((name) => {
+      const control = form.elements[name];
+      if (control && !String(control.value || "").trim() && appointment.professional) {
+        setSpecialtyControlValue(control, appointment.professional);
+      }
     });
   }
 
@@ -890,7 +1045,7 @@
     recalc();
   }
 
-  function saveSpecialtyRecord(form, config, patient) {
+  async function saveSpecialtyRecord(form, config, patient, appointment = null) {
     if (!SISELO.validateEnhancedDateInputs(form, { alertId: "clinical-specialty-alert" })) return;
 
     const invalid = getFirstInvalidField(form);
@@ -903,6 +1058,16 @@
     const formData = new FormData(form);
     const values = Object.fromEntries(formData.entries());
     const consultationNumber = values.consultation_number || INITIAL_CONSULTATION_LABEL;
+    const followUp = getFollowUpSchedule(form);
+    if (!followUp.valid) {
+      SISELO.showAlert(
+        "clinical-specialty-alert",
+        "Para agendar a consulta subsequente, informe a data e o horário.",
+        "error"
+      );
+      followUp.focusControl?.focus();
+      return;
+    }
 
     if (hasDuplicateInitial(config.storageKey, patient.id, values.record_id || "", consultationNumber)) {
       SISELO.showAlert("clinical-specialty-alert", "Este paciente já tem 1ª consulta. Escolha consulta subsequente.", "error");
@@ -911,6 +1076,7 @@
 
     const record = {
       id: values.record_id || createRecordId(config.slug),
+      encounter_id: "",
       patient_id: patient.id,
       full_name: patient.full_name,
       cpf: patient.cpf,
@@ -921,6 +1087,11 @@
       race: patient.race,
       consultation_date: values.consultation_date || "",
       consultation_number: consultationNumber,
+      appointment_id: appointment ? appointment.id : "",
+      scheduled_at: appointment ? appointment.scheduled_at : "",
+      appointment_specialty: appointment ? appointment.specialty : "",
+      appointment_professional: appointment ? appointment.professional : "",
+      appointment_team: appointment ? appointment.team : "",
       ...values,
       updated_at: new Date().toISOString(),
     };
@@ -928,6 +1099,55 @@
 
     const records = readRecords(config.storageKey);
     const existingIndex = records.findIndex((item) => item.id === record.id);
+    const existingRecord = existingIndex >= 0 ? records[existingIndex] : null;
+    if (existingRecord?.encounter_id) {
+      record.encounter_id = existingRecord.encounter_id;
+    }
+
+    if (appointment) {
+      const submitButton = form.querySelector('button[type="submit"]');
+      if (submitButton instanceof HTMLButtonElement) {
+        submitButton.disabled = true;
+      }
+      try {
+        const endpoint = record.encounter_id
+          ? `/encounters/form.php?id=${encodeURIComponent(record.encounter_id)}`
+          : "/encounters/form.php";
+        const response = await SISELO.apiRequest(endpoint, {
+          method: "POST",
+          body: {
+            patient_id: Number(patient.id),
+            appointment_id: Number(appointment.id),
+            encounter_date: parseSpecialtyAppointmentDateTime(appointment.scheduled_at).dateValue,
+            specialty: appointment.specialty || config.title,
+            record_type: "consulta",
+            schema_version: "1.0",
+            payload_json: JSON.stringify({
+              ...values,
+              scheduled_at: appointment.scheduled_at,
+              specialty: appointment.specialty || config.title,
+              professional: appointment.professional || "",
+              team: appointment.team || "",
+            }),
+            summary: buildSpecialtySummary(config, values),
+            follow_up_date: followUp.date,
+            follow_up_time: followUp.time,
+          },
+        });
+        record.encounter_id = response?.row?.id || record.encounter_id;
+      } catch (error) {
+        if (submitButton instanceof HTMLButtonElement) {
+          submitButton.disabled = false;
+        }
+        SISELO.showAlert(
+          "clinical-specialty-alert",
+          error.message || "Não foi possível concluir o atendimento vinculado ao agendamento.",
+          "error"
+        );
+        return;
+      }
+    }
+
     if (existingIndex >= 0) {
       records[existingIndex] = record;
     } else {
@@ -935,9 +1155,41 @@
     }
 
     writeRecords(config.storageKey, records);
+    if (appointment) {
+      renderSuccess(config, patient, Boolean(followUp.date && followUp.time));
+      return;
+    }
     renderSpecialtyContent(config, patient);
     bindSpecialtyForm(config, patient);
     SISELO.showAlert("clinical-specialty-alert", "Atendimento salvo com sucesso.", "success");
+  }
+
+  function buildSpecialtySummary(config, values) {
+    const consultation = String(values.consultation_number || INITIAL_CONSULTATION_LABEL).trim();
+    const notes = [
+      values.summary,
+      values.anamnese,
+      values.description,
+      values.descricao,
+      values.observations,
+      values.observacoes,
+    ].find((value) => String(value || "").trim());
+    const prefix = `${config.title} · ${consultation}`;
+    return notes ? `${prefix} · ${String(notes).trim().slice(0, 220)}` : prefix;
+  }
+
+  function getFollowUpSchedule(form) {
+    const dateControl = form.querySelector('[data-follow-up-date="true"] input[name]');
+    const timeControl = form.elements.follow_up_time;
+    const date = dateControl instanceof HTMLInputElement ? String(dateControl.value || "").trim() : "";
+    const time = timeControl instanceof HTMLInputElement ? String(timeControl.value || "").trim() : "";
+    const valid = (date === "" && time === "") || (date !== "" && time !== "");
+    return {
+      valid,
+      date,
+      time,
+      focusControl: date === "" ? dateControl : timeControl,
+    };
   }
 
   function getFirstInvalidField(form) {
@@ -1018,7 +1270,24 @@
     }).format(date);
   }
 
-  function renderSuccess(config) {
+  function parseSpecialtyAppointmentDateTime(value) {
+    const raw = String(value || "").trim().replace(" ", "T");
+    const match = raw.match(/^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})/);
+    if (!match) {
+      return {
+        dateValue: "",
+        dateLabel: "Não informada",
+        timeLabel: "Não informado",
+      };
+    }
+    return {
+      dateValue: match[1],
+      dateLabel: formatSpecialtyDate(match[1]),
+      timeLabel: match[2],
+    };
+  }
+
+  function renderSuccess(config, patient, followUpScheduled = false) {
     const root = document.getElementById("clinical-specialty-root");
     if (!root) return;
 
@@ -1028,8 +1297,8 @@
           <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8.5 12.5 2.2 2.2 4.8-5.4"/></svg>
         </span>
         <h1>Atendimento registrado!</h1>
-        <p>Registro de ${SISELO.escapeHtml(config.title)} salvo com sucesso.</p>
-        <a class="btn btn-primary" href="/cadh/index.html">Voltar ao CADH</a>
+        <p>O registro de ${SISELO.escapeHtml(config.title)} foi vinculado ao agendamento e o paciente foi movido automaticamente para Atendidos.${followUpScheduled ? " A consulta subsequente foi adicionada em Agendados." : ""}</p>
+        <a class="btn btn-primary" href="${SISELO.escapeHtml(getSpecialtyReturnHref(patient))}">Voltar aos Agendamentos</a>
       </section>
     `;
   }

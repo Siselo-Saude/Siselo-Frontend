@@ -6,9 +6,32 @@ const CADH_FLOW_COLUMNS = [
   { key: 'ausente', label: 'Ausentes' },
 ];
 
-const CADH_APPOINTMENT_COLUMNS = CADH_FLOW_COLUMNS.filter((column) => !column.withoutAppointment);
+const CADH_SPECIALTY_RECORD_ROUTES = {
+  'tecnico de enfermagem': '/cadh/tecnico.html',
+  'gestor do cuidado': '/cadh/gestor.html',
+  psicologia: '/cadh/psicologia.html',
+  psicologo: '/cadh/psicologia.html',
+  enfermagem: '/cadh/enfermagem.html',
+  enfermeiro: '/cadh/enfermagem.html',
+  nutricao: '/cadh/nutricao.html',
+  endocrinologia: '/cadh/endocrino.html',
+  cardiologia: '/cadh/cardiologia.html',
+  oftalmologia: '/cadh/oftalmologia.html',
+  fisioterapia: '/cadh/fisioterapia.html',
+  'servico social': '/cadh/servico-social.html',
+  'farmacia clinica': '/cadh/farmacia.html',
+};
+
+const CADH_DEFAULT_OUTCOME_REASONS = {
+  patient_absent: 'Ausência do paciente',
+  professional_absent: 'Ausência do profissional',
+  internal_cancellation: 'Cancelamento interno',
+  unit_impediment: 'Impedimento da unidade',
+  other: 'Outro impedimento',
+};
 
 let cadhFlowRows = [];
+let cadhScheduleRows = [];
 let cadhFinalizedRows = [];
 let cadhFlowPermissions = new Set();
 let cadhFlowTab = 'received';
@@ -17,6 +40,8 @@ let cadhFlowRisk = '';
 let cadhFlowWeekday = 'all';
 let cadhFlowReferralDetailPatientId = '';
 let cadhFlowSharingPatientId = '';
+let cadhFlowOutcomeAppointmentId = '';
+let cadhFlowOutcomeReasons = { ...CADH_DEFAULT_OUTCOME_REASONS };
 
 document.addEventListener('DOMContentLoaded', () => {
   if (document.body.dataset.page === 'cadh') {
@@ -79,12 +104,15 @@ function activateCadhFlowTab(tab) {
 
 async function loadCadhFlow() {
   try {
-    const [activeData, finalizedData] = await Promise.all([
+    const [activeData, scheduleData, finalizedData] = await Promise.all([
       SISELO.apiRequest('/care_flow/list.php?care_status=active'),
+      SISELO.apiRequest('/care_flow/list.php?care_status=active&appointment_scope=all'),
       SISELO.apiRequest('/care_flow/list.php?care_status=finalizado'),
     ]);
     cadhFlowRows = Array.isArray(activeData.rows) ? activeData.rows : [];
+    cadhScheduleRows = Array.isArray(scheduleData.rows) ? scheduleData.rows : [];
     cadhFinalizedRows = Array.isArray(finalizedData.rows) ? finalizedData.rows : [];
+    cadhFlowOutcomeReasons = activeData.options?.appointment_outcome_reasons || { ...CADH_DEFAULT_OUTCOME_REASONS };
     updateCadhFlowIndicators();
     renderCadhFlowPanel();
   } catch (error) {
@@ -298,7 +326,7 @@ async function confirmCadhReceipt(patientId, button) {
 }
 
 function renderCadhKanban(panel) {
-  const rows = cadhFlowRows
+  const rows = cadhScheduleRows
     .filter((row) => Boolean(row.referral_received_at))
     .filter(matchesCadhFlowWeekday);
   panel.innerHTML = `
@@ -324,19 +352,36 @@ function renderCadhKanban(panel) {
     <div class="cadh-kanban">
       ${CADH_FLOW_COLUMNS.map((column) => renderCadhKanbanColumn(column, rows)).join('')}
     </div>
+    ${cadhFlowOutcomeAppointmentId ? renderCadhAppointmentOutcomeModal(findCadhFlowAppointment(cadhFlowOutcomeAppointmentId)) : ''}
   `;
   panel.querySelector('#cadh-weekday-filter')?.addEventListener('change', (event) => {
     cadhFlowWeekday = event.currentTarget.value;
     renderCadhKanban(panel);
-  });
-  panel.querySelectorAll('[data-cadh-move-appointment]').forEach((select) => {
-    select.addEventListener('change', () => moveCadhAppointment(select.dataset.cadhMoveAppointment, select.value));
   });
   panel.querySelectorAll('[data-cadh-kanban-schedule]').forEach((button) => {
     button.addEventListener('click', () => {
       openCadhClinicalScheduling(button.dataset.cadhKanbanSchedule);
     });
   });
+  panel.querySelectorAll('[data-cadh-reschedule]').forEach((button) => {
+    button.addEventListener('click', () => {
+      openCadhClinicalScheduling(
+        button.dataset.cadhReschedule,
+        button.dataset.cadhRescheduleSpecialty || ''
+      );
+    });
+  });
+  panel.querySelectorAll('[data-cadh-register-appointment]').forEach((button) => {
+    button.addEventListener('click', () => openCadhAppointmentRecord(button.dataset.cadhRegisterAppointment));
+  });
+  panel.querySelectorAll('[data-cadh-open-outcome]').forEach((button) => {
+    button.addEventListener('click', () => {
+      cadhFlowOutcomeAppointmentId = button.dataset.cadhOpenOutcome;
+      renderCadhKanban(panel);
+      panel.querySelector('.cadh-outcome-modal')?.focus();
+    });
+  });
+  bindCadhAppointmentOutcomeModal(panel);
 }
 
 function renderCadhKanbanColumn(column, rows) {
@@ -344,7 +389,7 @@ function renderCadhKanbanColumn(column, rows) {
     if (column.withoutAppointment) {
       return !row.appointment_id;
     }
-    return Boolean(row.appointment_id) && row.appointment_status === column.key;
+    return Boolean(row.appointment_id) && normalizeCadhAppointmentStatus(row.appointment_status) === column.key;
   });
   return `
     <section class="cadh-kanban-column" data-kanban-column="${column.key}">
@@ -358,22 +403,45 @@ function renderCadhKanbanColumn(column, rows) {
 
 function renderCadhKanbanCard(row, status) {
   const veryHigh = row.risk_classification === 'muito_alto_risco';
+  const normalizedStatus = normalizeCadhAppointmentStatus(status);
+  const canRegister = normalizedStatus === 'agendado' && canCadhFlow('encounters.create');
+  const canResolve = normalizedStatus === 'agendado' && canCadhFlow('careflow.update');
+  const canReschedule = ['pendente', 'ausente'].includes(normalizedStatus)
+    && canCadhFlow('careflow.schedule');
+  const outcomeLabel = row.appointment_outcome_reason_label || '';
   return `
     <article class="cadh-kanban-card ${veryHigh ? 'is-critical' : ''}">
       <strong>${SISELO.escapeHtml(row.full_name || '-')}</strong>
       <span>${SISELO.escapeHtml(row.scheduled_at ? formatCadhFlowDateTime(row.scheduled_at) : 'Sem data definida')}</span>
       <small>${SISELO.escapeHtml(row.appointment_specialty || row.ubs_ref || '')}</small>
       <span class="cadh-risk-chip ${veryHigh ? 'is-critical' : 'is-high'}">${SISELO.escapeHtml(row.risk_label || 'Alto Risco')}</span>
-      ${row.appointment_id && canCadhFlow('careflow.update') ? `
-        <select data-cadh-move-appointment="${row.appointment_id}" aria-label="Mover paciente no fluxo">
-          ${CADH_APPOINTMENT_COLUMNS.map((column) => `<option value="${column.key}" ${column.key === status ? 'selected' : ''}>${column.label}</option>`).join('')}
-        </select>
+      ${normalizedStatus === 'agendado' ? `
+        <div class="cadh-kanban-card-actions">
+          ${canRegister ? `<button class="btn btn-primary" type="button" data-cadh-register-appointment="${row.appointment_id}">Registrar atendimento</button>` : ''}
+          ${canResolve ? `<button class="btn" type="button" data-cadh-open-outcome="${row.appointment_id}">Não realizado</button>` : ''}
+        </div>
+      ` : row.appointment_id ? `
+        <div class="cadh-kanban-outcome">
+          <strong>${SISELO.escapeHtml(outcomeLabel || row.appointment_status_label || CADH_FLOW_COLUMNS.find((column) => column.key === normalizedStatus)?.label || '')}</strong>
+          ${row.appointment_outcome_notes ? `<span>${SISELO.escapeHtml(row.appointment_outcome_notes)}</span>` : ''}
+          ${row.appointment_resolved_at ? `<time>${SISELO.escapeHtml(formatCadhFlowDateTime(row.appointment_resolved_at))}</time>` : ''}
+        </div>
+        ${canReschedule ? `
+          <div class="cadh-kanban-card-actions">
+            <button
+              class="btn btn-primary"
+              type="button"
+              data-cadh-reschedule="${row.id}"
+              data-cadh-reschedule-specialty="${SISELO.escapeHtml(row.appointment_specialty || '')}"
+            >Reagendar</button>
+          </div>
+        ` : ''}
       ` : canCadhFlow('careflow.schedule') ? `<button class="btn" type="button" data-cadh-kanban-schedule="${row.id}">Definir data</button>` : ''}
     </article>
   `;
 }
 
-function openCadhClinicalScheduling(patientId) {
+function openCadhClinicalScheduling(patientId, specialty = '') {
   const patient = findCadhFlowPatient(patientId);
   if (!patient) {
     showCadhFlowAlert('Paciente não encontrado para agendamento.', 'error');
@@ -385,19 +453,137 @@ function openCadhClinicalScheduling(patientId) {
   url.searchParams.set('flow', 'followup');
   url.searchParams.set('view', 'encounters');
   url.searchParams.set('patient_id', String(patient.id));
+  if (specialty) {
+    url.searchParams.set('schedule_specialty', specialty);
+  }
   window.location.assign(`${url.pathname}${url.search}`);
 }
 
-async function moveCadhAppointment(appointmentId, status) {
+function openCadhAppointmentRecord(appointmentId) {
+  const row = findCadhFlowAppointment(appointmentId);
+  if (!row) {
+    showCadhFlowAlert('Agendamento não encontrado.', 'error');
+    return;
+  }
+
+  const route = CADH_SPECIALTY_RECORD_ROUTES[normalizeCadhSpecialty(row.appointment_specialty)];
+  if (!route) {
+    showCadhFlowAlert('O módulo clínico deste agendamento não foi identificado.', 'error');
+    return;
+  }
+
+  saveCadhSearchState(row, row.cpf);
+  const url = new URL(route, window.location.origin);
+  url.searchParams.set('patient_id', String(row.id));
+  url.searchParams.set('appointment_id', String(row.appointment_id));
+  url.searchParams.set('return_to', '/cadh/index.html?flow=schedule');
+  window.location.assign(`${url.pathname}${url.search}`);
+}
+
+function renderCadhAppointmentOutcomeModal(row) {
+  if (!row) return '';
+  return `
+    <div class="cadh-outcome-modal-backdrop" data-cadh-close-outcome>
+      <section class="cadh-outcome-modal" role="dialog" aria-modal="true" aria-labelledby="cadh-outcome-title" tabindex="-1">
+        <header>
+          <div>
+            <span>Desfecho do agendamento</span>
+            <h3 id="cadh-outcome-title">${SISELO.escapeHtml(row.full_name || 'Paciente')}</h3>
+          </div>
+          <button type="button" data-cadh-close-outcome aria-label="Fechar">×</button>
+        </header>
+        <div class="cadh-outcome-appointment">
+          <div>
+            <span>Consulta agendada</span>
+            <strong>${SISELO.escapeHtml(formatCadhFlowDateTime(row.scheduled_at))}</strong>
+          </div>
+          <div>
+            <span>Módulo clínico</span>
+            <strong>${SISELO.escapeHtml(row.appointment_specialty || 'Não informado')}</strong>
+          </div>
+          <div>
+            <span>Profissional</span>
+            <strong>${SISELO.escapeHtml(row.appointment_professional || 'Não informado')}</strong>
+          </div>
+        </div>
+        <form id="cadh-outcome-form">
+          <label>
+            <span>Motivo da não realização</span>
+            <select name="reason" required>
+              <option value="">Selecione...</option>
+              ${Object.entries(cadhFlowOutcomeReasons).map(([value, label]) => `<option value="${SISELO.escapeHtml(value)}">${SISELO.escapeHtml(label)}</option>`).join('')}
+            </select>
+          </label>
+          <label>
+            <span>Observações</span>
+            <textarea name="notes" rows="3" placeholder="Informe detalhes relevantes para o histórico."></textarea>
+          </label>
+          <p class="cadh-outcome-hint">
+            Ausência do paciente será classificada como <strong>Ausente</strong>. Os demais impedimentos serão classificados como <strong>Pendente</strong>.
+          </p>
+          <div id="cadh-outcome-alert" class="alert" hidden></div>
+          <footer>
+            <button class="btn" type="button" data-cadh-close-outcome>Cancelar</button>
+            <button class="btn btn-primary" type="submit">Confirmar desfecho</button>
+          </footer>
+        </form>
+      </section>
+    </div>
+  `;
+}
+
+function bindCadhAppointmentOutcomeModal(panel) {
+  panel.querySelectorAll('[data-cadh-close-outcome]').forEach((control) => {
+    control.addEventListener('click', (event) => {
+      if (control.classList.contains('cadh-outcome-modal-backdrop') && event.target !== control) return;
+      cadhFlowOutcomeAppointmentId = '';
+      renderCadhKanban(panel);
+    });
+  });
+  panel.querySelector('.cadh-outcome-modal')?.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      cadhFlowOutcomeAppointmentId = '';
+      renderCadhKanban(panel);
+    }
+  });
+  panel.querySelector('#cadh-outcome-form')?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    saveCadhAppointmentOutcome(event.currentTarget);
+  });
+}
+
+async function saveCadhAppointmentOutcome(form) {
+  const submitButton = form.querySelector('button[type="submit"]');
+  const formData = new FormData(form);
+  const reason = String(formData.get('reason') || '');
+  const notes = String(formData.get('notes') || '').trim();
+  if (!reason) {
+    SISELO.showAlert('cadh-outcome-alert', 'Selecione o motivo da não realização.', 'error');
+    return;
+  }
+  if (reason === 'other' && !notes) {
+    SISELO.showAlert('cadh-outcome-alert', 'Descreva o impedimento ocorrido.', 'error');
+    return;
+  }
+
+  submitButton.disabled = true;
   try {
     await SISELO.apiRequest('/care_flow/action.php', {
       method: 'POST',
-      body: { action: 'move', appointment_id: appointmentId, status },
+      body: {
+        action: 'mark_not_performed',
+        appointment_id: Number(cadhFlowOutcomeAppointmentId),
+        reason,
+        notes,
+      },
     });
+    cadhFlowOutcomeAppointmentId = '';
+    showCadhFlowAlert('Desfecho registrado e Kanban atualizado.', 'success');
     await loadCadhFlow();
+    activateCadhFlowTab('schedule');
   } catch (error) {
-    showCadhFlowAlert(error.message || 'Não foi possível mover o agendamento.', 'error');
-    await loadCadhFlow();
+    submitButton.disabled = false;
+    SISELO.showAlert('cadh-outcome-alert', error.message || 'Não foi possível registrar o desfecho.', 'error');
   }
 }
 
@@ -565,6 +751,21 @@ function matchesCadhFlowWeekday(row) {
 
 function findCadhFlowPatient(patientId) {
   return cadhFlowRows.find((row) => String(row.id) === String(patientId)) || null;
+}
+
+function findCadhFlowAppointment(appointmentId) {
+  return cadhScheduleRows.find((row) => String(row.appointment_id) === String(appointmentId)) || null;
+}
+
+function normalizeCadhAppointmentStatus(status) {
+  if (status === 'aguardando' || status === 'em_atendimento') {
+    return 'agendado';
+  }
+  return status || '';
+}
+
+function normalizeCadhSpecialty(value) {
+  return SISELO.normalizeSearchText(String(value || '')).trim();
 }
 
 function canCadhFlow(permission) {

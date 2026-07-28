@@ -88,6 +88,7 @@ async function setupCadhPage() {
   cadhPermissions = SISELO.getUiPermissions(user);
   const requestedTab = SISELO.queryParam('view') || 'users';
   cadhActiveTab = CADH_MANAGEMENT_TABS[requestedTab] ? requestedTab : 'users';
+  cadhSchedulingSpecialty = String(SISELO.queryParam('schedule_specialty') || '').trim();
   const shellKey = document.body.dataset.page === 'ubs' ? 'ubs' : 'cadh';
   SISELO.bindShell(shellKey);
   applyCadhModulePermissions(cadhPermissions);
@@ -896,15 +897,13 @@ function renderCadhEncountersTab(patient) {
   const specialtySource = document.querySelector('.cadh-specialties-section .cadh-specialty-grid');
   const specialtyMarkup = specialtySource
     ? Array.from(specialtySource.children).map((card) => {
-        const href = patientId ? card.getAttribute('href') || '#' : '#';
         const icon = card.querySelector('.cadh-specialty-icon')?.outerHTML || '';
         const label = card.querySelector('span:last-child')?.textContent?.trim() || 'Especialidade';
         const themeClass = Array.from(card.classList).find((name) => name.startsWith('cadh-specialty-') && name !== 'cadh-specialty-card') || '';
         return `
           <article class="cadh-specialty-card ${themeClass} ${patientId ? '' : 'is-locked'}">
             <div class="cadh-specialty-label">${icon}<strong>${SISELO.escapeHtml(label)}</strong></div>
-            <div class="cadh-specialty-actions">
-              <a href="${SISELO.escapeHtml(href)}" ${patientId ? '' : 'aria-disabled="true" tabindex="-1"'}>Registrar</a>
+            <div class="cadh-specialty-actions is-scheduling-only">
               <button type="button" data-cadh-schedule-specialty="${SISELO.escapeHtml(label)}" ${patientId ? '' : 'disabled'}>Agendar</button>
             </div>
           </article>
@@ -920,7 +919,7 @@ function renderCadhEncountersTab(patient) {
       </div>
       ${patient
         ? ''
-        : '<p class="cadh-guidance-alert">Selecione um paciente na lista ao lado para registrar atendimentos ou agendar consultas.</p>'}
+        : '<p class="cadh-guidance-alert">Selecione um paciente na lista ao lado para agendar consultas.</p>'}
       <div class="cadh-specialty-grid cadh-specialty-grid-inline">${specialtyMarkup}</div>
       ${patientId && cadhSchedulingSpecialty
         ? renderCadhSpecialtyScheduleForm(patient, cadhSchedulingSpecialty)
