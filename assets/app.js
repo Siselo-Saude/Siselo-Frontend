@@ -1054,8 +1054,8 @@
         emptyDescription: '',
       },
       transitions: {
-        singular: 'transição do cuidado',
-        emptyTitle: 'Usuário sem transição do cuidado registrada.',
+        singular: 'encaminhamento do cuidado',
+        emptyTitle: 'Paciente sem encaminhamento do cuidado registrado.',
         emptyDescription: '',
       },
     };
@@ -2469,7 +2469,7 @@
     },
     cadh: {
       label: 'CADH',
-      description: 'Atenção Domiciliar',
+      description: 'Atenção secundária',
       icon: '<path d="M3 13h4l2-7 4 14 2-7h6"/>',
     },
     ubs: {
@@ -2481,17 +2481,24 @@
 
   const SHELL_PAGE_META = {
     home: { section: 'Início', title: 'Painel de Controle' },
-    cadh: { section: 'CADH', title: 'Centro de Atenção Domiciliar Hospitalar' },
+    cadh: { section: 'CADH', title: 'Centro de Atenção ao Diabetes e Hipertensão' },
     ubs: { section: 'UBS', title: 'Unidade Básica de Saúde' },
     patients: { section: 'CADH', title: 'Usuários' },
     careplans: { section: 'CADH', title: 'Planos de Cuidado' },
     encounters: { section: 'CADH', title: 'Atendimentos' },
-    transitions: { section: 'CADH', title: 'Transições do Cuidado' },
+    transitions: { section: 'CADH', title: 'Encaminhamentos do Cuidado' },
     admin: { section: 'Configurações', title: 'Usuários do Sistema' },
   };
 
   function sidebarNavMarkup(key) {
     const meta = SIDEBAR_NAV_META[key] || SIDEBAR_NAV_META.home;
+    const disclosureChevron = ['ubs', 'cadh'].includes(key)
+      ? `
+        <svg class="home-sidebar-chevron" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="m9 5 7 7-7 7"/>
+        </svg>
+      `
+      : '';
     return `
       <span class="home-sidebar-nav-icon" aria-hidden="true">
         <svg viewBox="0 0 24 24">${meta.icon}</svg>
@@ -2500,9 +2507,7 @@
         <strong>${escapeHtml(meta.label)}</strong>
         <small>${escapeHtml(meta.description)}</small>
       </span>
-      <svg class="home-sidebar-chevron" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="m9 5 7 7-7 7"/>
-      </svg>
+      ${disclosureChevron}
     `;
   }
 
@@ -2568,12 +2573,126 @@
       navShell.appendChild(nav);
     }
 
+    const ubsLink = document.getElementById('nav-ubs');
+    const cadhLink = document.getElementById('nav-cadh');
+    if (
+      ubsLink &&
+      cadhLink &&
+      ubsLink.parentElement === nav &&
+      cadhLink.parentElement === nav
+    ) {
+      nav.insertBefore(ubsLink, cadhLink);
+    }
+
     Object.keys(SIDEBAR_NAV_META).forEach((key) => {
       const link = document.getElementById(`nav-${key}`);
       if (link) {
         link.innerHTML = sidebarNavMarkup(key);
+        ensureModuleSubnavigation(link, key);
       }
     });
+  }
+
+  function ensureModuleSubnavigation(link, key) {
+    if (!link || !['ubs', 'cadh'].includes(key)) {
+      return;
+    }
+
+    const oldSubnav = link.nextElementSibling;
+    if (oldSubnav && oldSubnav.classList.contains('siselo-module-subnav')) {
+      oldSubnav.remove();
+    }
+
+    const items = key === 'ubs'
+      ? [
+          { label: 'Dados do Paciente', heading: true },
+          { label: 'Lista de usuários', href: '/ubs/index.html?tab=patients' },
+          { label: 'Cadastrar usuário', href: '/patients/form.html', ubsCreateOnly: true },
+          { label: 'Compartilhamentos UBS/CADH', href: '/ubs/index.html?tab=sharing' },
+        ]
+      : [
+          { label: 'Recebidos UBS', href: '/cadh/index.html?flow=received' },
+          { label: 'Acompanhamento', href: '/cadh/index.html?flow=followup' },
+          { label: 'Compartilhamentos UBS/CADH', href: '/cadh/index.html?flow=sharing' },
+          { label: 'Finalizados', href: '/cadh/index.html?flow=finalized' },
+        ];
+
+    const subnav = document.createElement('div');
+    const subnavId = `siselo-module-subnav-${key}`;
+    subnav.id = subnavId;
+    subnav.className = `siselo-module-subnav siselo-module-subnav-${key}`;
+    subnav.hidden = true;
+    subnav.innerHTML = items.map((item) => {
+      if (item.heading) {
+        return `<span class="siselo-module-subnav-heading">${escapeHtml(item.label)}</span>`;
+      }
+      const itemUrl = new URL(item.href, window.location.origin);
+      const currentParams = new URLSearchParams(location.search);
+      const currentFlow = currentParams.get('flow') || 'received';
+      const currentUbsTab = currentParams.get('tab') || 'patients';
+      const samePath = location.pathname === itemUrl.pathname;
+      const hasMatchingParams = Array.from(itemUrl.searchParams)
+        .every(([name, value]) => currentParams.get(name) === value);
+      const isCadhReceivedArea = item.href.includes('flow=received') &&
+        ['received', 'schedule'].includes(currentFlow);
+      const isUbsPatientArea = item.href.includes('tab=patients') &&
+        ['patients', 'transitioned', 'followup', 'next'].includes(currentUbsTab);
+      const isUbsPatientDetails = key === 'ubs' &&
+        item.href.includes('tab=patients') &&
+        location.pathname === '/ubs/patient.html';
+      const isCadhClinicalPage = key === 'cadh' &&
+        item.href.includes('flow=followup') &&
+        location.pathname.startsWith('/cadh/') &&
+        !['/cadh/', '/cadh/index.html'].includes(location.pathname);
+      const active = (samePath && (
+        itemUrl.searchParams.size === 0 ||
+        hasMatchingParams ||
+        isCadhReceivedArea ||
+        isUbsPatientArea
+      )) || isCadhClinicalPage || isUbsPatientDetails;
+      return `<a href="${item.href}"${item.ubsCreateOnly ? ' data-ubs-create-link' : ''} class="${active ? 'active' : ''}"><span aria-hidden="true">＋</span>${escapeHtml(item.label)}</a>`;
+    }).join('');
+    link.insertAdjacentElement('afterend', subnav);
+
+    const hasActiveItem = Boolean(subnav.querySelector('a.active'));
+    link.classList.add('siselo-module-toggle');
+    link.setAttribute('aria-controls', subnavId);
+    link.setAttribute('aria-expanded', String(hasActiveItem));
+    subnav.hidden = !hasActiveItem;
+
+    if (link.dataset.moduleToggleBound !== 'true') {
+      link.dataset.moduleToggleBound = 'true';
+      link.addEventListener('click', (event) => {
+        if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+          return;
+        }
+
+        event.preventDefault();
+        const controlledSubnav = document.getElementById(link.getAttribute('aria-controls') || '');
+        if (!(controlledSubnav instanceof HTMLElement)) {
+          return;
+        }
+
+        const willExpand = link.getAttribute('aria-expanded') !== 'true';
+        document.querySelectorAll('.siselo-module-toggle[aria-expanded="true"]').forEach((toggle) => {
+          if (toggle === link) {
+            return;
+          }
+          toggle.setAttribute('aria-expanded', 'false');
+          const otherSubnav = document.getElementById(toggle.getAttribute('aria-controls') || '');
+          if (otherSubnav instanceof HTMLElement) {
+            otherSubnav.hidden = true;
+          }
+        });
+
+        link.setAttribute('aria-expanded', String(willExpand));
+        controlledSubnav.hidden = !willExpand;
+        if (willExpand) {
+          const linkRect = link.getBoundingClientRect();
+          controlledSubnav.style.setProperty('--siselo-subnav-mobile-top', `${Math.round(linkRect.bottom + 6)}px`);
+        }
+      });
+    }
   }
 
   function ensureSidebarActionsContainer(topbar) {
@@ -2823,6 +2942,11 @@
     };
 
     ensureUnifiedSidebarShell(activeKey);
+    const canCreateUbsPatient = String(user && user.user_type || '').toUpperCase() === 'UBS' ||
+      permissions.has('admin.manage');
+    document.querySelectorAll('[data-ubs-create-link]').forEach((link) => {
+      link.hidden = !canCreateUbsPatient;
+    });
 
     Object.keys(links).forEach((key) => {
       const link = document.getElementById(`nav-${key}`);

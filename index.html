@@ -32,14 +32,13 @@
               <svg viewBox="0 0 24 24"><path d="m4 10 8-6 8 6v10H4V10Z"/><path d="M9 20v-6h6v6"/></svg>
             </span>
             <span class="home-sidebar-nav-copy"><strong>Início</strong><small>Painel geral</small></span>
-            <svg class="home-sidebar-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
           </a>
 
           <a id="nav-cadh" href="/cadh/index.html">
             <span class="home-sidebar-nav-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24"><path d="M3 13h4l2-7 4 14 2-7h6"/></svg>
             </span>
-            <span class="home-sidebar-nav-copy"><strong>CADH</strong><small>Atenção Domiciliar</small></span>
+            <span class="home-sidebar-nav-copy"><strong>CADH</strong><small>Atenção secundária</small></span>
             <svg class="home-sidebar-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
           </a>
 
@@ -75,89 +74,29 @@
         </div>
       </header>
 
-      <main class="container home-dashboard">
-        <section class="home-hero" aria-labelledby="home-title">
-          <div class="home-hero-content">
-            <p class="home-hero-eyebrow"><span aria-hidden="true"></span>Sistema operacional</p>
-            <h1 id="home-title">Bem-vindo ao SISELO</h1>
-            <p>Sistema Integrado de Saúde — gestão centralizada de compartilhamentos do cuidado, atenção domiciliar e atenção primária.</p>
-          </div>
-          <div class="home-hero-orbit" aria-hidden="true"></div>
+      <main class="container home-dashboard clinical-home">
+        <header class="clinical-home-heading">
+          <p>PAINEL DE CONTROLE</p>
+          <h1>Visão clínica de hoje</h1>
+          <span>Acompanhe rapidamente a agenda e as pendências que exigem atenção.</span>
+        </header>
+
+        <p class="clinical-home-section-label">RESUMO DO DIA</p>
+        <section class="clinical-home-metrics" aria-label="Resumo do dia">
+          <a href="/cadh/index.html?flow=schedule"><span>▣</span><strong id="home-scheduled-count">0</strong><small>Agendados hoje</small></a>
+          <a href="/cadh/index.html?flow=schedule"><span>◷</span><strong id="home-waiting-count">0</strong><small>Aguardando</small></a>
+          <a href="/cadh/index.html?flow=schedule"><span>♧</span><strong id="home-service-count">0</strong><small>Em atendimento</small></a>
+          <a href="/cadh/index.html?flow=received" class="is-alert"><span>⚠</span><strong id="home-alert-count">0</strong><small>Alertas pendentes</small></a>
         </section>
 
-        <section class="home-metrics" aria-label="Indicadores do sistema">
-          <a class="home-metric-card home-metric-blue" href="/transitions/list.html">
-            <span class="home-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m5 4 14 8-14 8 3-8-3-8Z"/><path d="M8 12h7"/></svg></span>
-            <strong id="home-total-users-count">00</strong>
-            <span>Compartilhamentos UBS → CADH</span>
-          </a>
-
-          <a class="home-metric-card home-metric-amber" href="/patients/list.html">
-            <span class="home-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 7v5l3 2"/></svg></span>
-            <strong id="home-active-users-count">00</strong>
-            <span>Ativos no CADH</span>
-          </a>
-
-          <a class="home-metric-card home-metric-green" href="/transitions/list.html">
-            <span class="home-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/><path d="m11 12 3 3 6-7"/></svg></span>
-            <strong id="home-inactive-users-count">00</strong>
-            <span>Transições do Cuidado</span>
-          </a>
-
-          <a class="home-metric-card home-metric-purple" href="/transitions/list.html">
-            <span class="home-metric-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 17 10 12l3 3 6-7"/><path d="M14 8h5v5"/></svg></span>
-            <strong id="home-records-count">00</strong>
-            <span>Total Registros</span>
-          </a>
-        </section>
-
-        <section class="home-environments" aria-label="Ambientes assistenciais">
-          <a id="home-cadh-card" class="home-environment-card home-environment-cadh" href="/cadh/index.html">
-            <div class="home-environment-topline">
-              <span class="home-environment-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 13h3l2-7 4 14 2-7h5"/></svg></span>
-              <span class="home-environment-tag">Atenção domiciliar</span>
-            </div>
-            <div class="home-environment-copy">
-              <h2>CADH</h2>
-              <strong>Centro de Atenção Domiciliar Hospitalar</strong>
-              <p>Gestão de pacientes em acompanhamento domiciliar, planos de cuidado, atendimentos e transições.</p>
-            </div>
-            <span class="home-environment-action">Acessar módulo <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M14 7l5 5-5 5"/></svg></span>
-          </a>
-
-          <a id="home-ubs-card" class="home-environment-card home-environment-ubs" href="/ubs/index.html">
-            <div class="home-environment-topline">
-              <span class="home-environment-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0M16 7a3 3 0 0 1 0 6M18 19a4 4 0 0 0-3-3.8"/></svg></span>
-              <span class="home-environment-tag">Atenção primária</span>
-            </div>
-            <div class="home-environment-copy">
-              <h2>UBS</h2>
-              <strong>Unidade Básica de Saúde</strong>
-              <p>Equipe multidisciplinar, fluxo de cuidado estruturado, encaminhamentos e atenção primária integral.</p>
-            </div>
-            <span class="home-environment-action">Acessar módulo <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M14 7l5 5-5 5"/></svg></span>
-          </a>
-        </section>
-        <section class="home-pillars" aria-label="Pilares do cuidado">
-          <article class="home-pillar-card home-pillar-care">
-            <span class="home-pillar-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><path d="M20.8 8.6c0 5.4-8.8 10.6-8.8 10.6S3.2 14 3.2 8.6A4.5 4.5 0 0 1 12 7a4.5 4.5 0 0 1 8.8 1.6Z"/></svg>
-            </span>
-            <div><strong>Cuidado Integral</strong><p>Acompanhamento longitudinal e multidisciplinar do paciente.</p></div>
+        <section class="clinical-home-grid">
+          <article class="clinical-home-panel">
+            <header><div><strong>Agenda de hoje</strong><span>Pacientes em ordem de horário</span></div><span>▣</span></header>
+            <div id="home-today-agenda" class="clinical-home-list"></div>
           </article>
-
-          <article class="home-pillar-card home-pillar-safety">
-            <span class="home-pillar-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><path d="M12 3 20 7v5c0 5-3.4 8-8 9-4.6-1-8-4-8-9V7l8-4Z"/></svg>
-            </span>
-            <div><strong>Segurança do Paciente</strong><p>Processos estruturados para garantir continuidade e qualidade.</p></div>
-          </article>
-
-          <article class="home-pillar-card home-pillar-attention">
-            <span class="home-pillar-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><path d="M12 3 2.8 20h18.4L12 3Z"/><path d="M12 9v5M12 17h.01"/></svg>
-            </span>
-            <div><strong>Ponto de Atenção</strong><p>Manter a dimensão integral do cuidado em todos os níveis de atenção.</p></div>
+          <article class="clinical-home-panel">
+            <header><div><strong>Alertas pendentes</strong><span>Prioridades que precisam de atenção</span></div><span class="red">⚠</span></header>
+            <div id="home-risk-alerts" class="clinical-home-list"></div>
           </article>
         </section>
       </main>
@@ -224,32 +163,41 @@
         accountLink.append(icon, copy);
       }
 
-      const permissions = SISELO.getUiPermissions(user);
-      const canViewPatients = permissions.has('patients.view');
-      const canViewPlans = permissions.has('careplans.view');
-      const canViewEncounters = permissions.has('encounters.view');
-      const canViewTransitions = permissions.has('transitions.view');
-      const canAccessCadh = canViewPatients || canViewPlans || canViewEncounters || canViewTransitions;
+      try {
+        const data = await SISELO.apiRequest('/care_flow/list.php?care_status=active');
+        const rows = Array.isArray(data.rows) ? data.rows : [];
+        const today = SISELO.todayDateInputValue();
+        const todayRows = rows.filter((row) => String(row.scheduled_at || '').startsWith(today));
+        const waiting = rows.filter((row) => row.appointment_status === 'aguardando');
+        const inService = rows.filter((row) => row.appointment_status === 'em_atendimento');
+        const alerts = rows.filter((row) => row.risk_classification === 'muito_alto_risco');
 
-      document.getElementById('home-cadh-card').hidden = !canAccessCadh;
+        document.getElementById('home-scheduled-count').textContent = String(todayRows.length);
+        document.getElementById('home-waiting-count').textContent = String(waiting.length);
+        document.getElementById('home-service-count').textContent = String(inService.length);
+        document.getElementById('home-alert-count').textContent = String(alerts.length);
 
-      if (canViewTransitions) {
-        try {
-          const data = await SISELO.apiRequest('/transitions/list.php');
-          const rows = Array.isArray(data.rows) ? data.rows : [];
-          const normalize = (value) => SISELO.normalizeSearchText(value || '');
-          const isCadhService = (value) => normalize(value).includes('cadh');
-          const fromUbsToCadh = rows.filter((row) => isCadhService(row.to_service) && !isCadhService(row.from_service)).length;
-          const inProgress = rows.filter((row) => normalize(row.status) === 'em_andamento').length;
-          const completedTransitions = rows.filter((row) => isCadhService(row.from_service) && !isCadhService(row.to_service)).length;
+        const agenda = document.getElementById('home-today-agenda');
+        agenda.innerHTML = todayRows.length
+          ? todayRows.sort((a, b) => String(a.scheduled_at).localeCompare(String(b.scheduled_at))).map((row) => `
+              <a href="/cadh/index.html?flow=schedule">
+                <time>${SISELO.escapeHtml(String(row.scheduled_at || '').slice(11, 16))}</time>
+                <div><strong>${SISELO.escapeHtml(row.full_name || '-')}</strong><span>${SISELO.escapeHtml(row.appointment_specialty || 'Atendimento CADH')}</span></div>
+              </a>
+            `).join('')
+          : '<div class="clinical-home-empty"><span>▣</span><strong>Nenhum paciente agendado hoje</strong><small>A agenda do dia está livre.</small></div>';
 
-          document.getElementById('home-total-users-count').textContent = String(fromUbsToCadh).padStart(2, '0');
-          document.getElementById('home-active-users-count').textContent = String(inProgress).padStart(2, '0');
-          document.getElementById('home-inactive-users-count').textContent = String(completedTransitions).padStart(2, '0');
-          document.getElementById('home-records-count').textContent = String(rows.length).padStart(2, '0');
-        } catch (error) {
-          // Mantém os indicadores zerados quando a API estiver indisponível.
-        }
+        const alertList = document.getElementById('home-risk-alerts');
+        alertList.innerHTML = alerts.length
+          ? alerts.map((row) => `
+              <a href="/cadh/index.html?flow=received">
+                <i></i><div><strong>${SISELO.escapeHtml(row.full_name || '-')}</strong><span>Paciente classificado como Muito Alto Risco</span></div>
+              </a>
+            `).join('')
+          : '<div class="clinical-home-empty"><span>✓</span><strong>Nenhum alerta pendente</strong><small>Não há pacientes de Muito Alto Risco aguardando atenção.</small></div>';
+      } catch (error) {
+        document.getElementById('home-today-agenda').innerHTML = '<div class="clinical-home-empty"><strong>Agenda indisponível</strong></div>';
+        document.getElementById('home-risk-alerts').innerHTML = '<div class="clinical-home-empty"><strong>Alertas indisponíveis</strong></div>';
       }
     });
   </script>

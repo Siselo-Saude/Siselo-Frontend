@@ -4,7 +4,7 @@ import { Button } from "../ui/button";
 
 const NAV_ITEMS = [
   { label: "Inicio", description: "Painel geral", href: "/index.html", key: "home" },
-  { label: "CADH", description: "Atencao domiciliar", href: "/cadh/index.html", key: "cadh" },
+  { label: "CADH", description: "Atenção secundária", href: "/cadh/index.html", key: "cadh" },
   { label: "UBS", description: "Atencao primaria", href: "/ubs/index.html", key: "ubs" },
 ];
 

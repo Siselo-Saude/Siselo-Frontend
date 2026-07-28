@@ -16768,3 +16768,5587 @@ body[data-page="care-plans-form"].home-sidebar-is-collapsed .home-sidebar-footer
 body[data-page="cadh-specialty-form"].home-sidebar-is-collapsed .home-sidebar-footer .topbar-account::before {
   display: none !important;
 }
+/* Fluxo assistencial CADH: Recebidos UBS, Kanban, compartilhamento e finalizados */
+.cadh-flow-workspace {
+  position: relative;
+  z-index: 1;
+  margin: 14px 0;
+  border: 1px solid #c8d7e6;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 8px 22px rgb(15 52 86 / 7%);
+  overflow: hidden;
+}
+
+.cadh-flow-header,
+.cadh-kanban-toolbar,
+.cadh-finalized-heading,
+.cadh-sharing-detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.cadh-flow-header {
+  padding: 18px 20px 14px;
+}
+
+.cadh-flow-header p,
+.cadh-kanban-toolbar strong,
+.cadh-kanban-toolbar span,
+.cadh-finalized-heading strong,
+.cadh-finalized-heading span {
+  margin: 0;
+}
+
+.cadh-flow-header p {
+  color: #087f6a;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.cadh-risk-alert-summary {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 12px;
+  border: 1px solid #fecaca;
+  border-radius: 999px;
+  background: #fff1f2;
+  color: #b42318;
+  font-size: 12px;
+}
+
+.cadh-flow-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 0 16px;
+  border-top: 1px solid #edf2f7;
+  border-bottom: 1px solid #d8e2ec;
+  overflow-x: auto;
+}
+
+.cadh-flow-tabs button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 48px;
+  padding: 0 12px;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: transparent;
+  color: #5a6d82;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 750;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.cadh-flow-tabs button:hover,
+.cadh-flow-tabs button.active {
+  color: #07589e;
+  border-bottom-color: #07589e;
+}
+
+.cadh-flow-tabs button span {
+  min-width: 20px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: #e8f0f8;
+  font-size: 10px;
+  text-align: center;
+}
+
+.cadh-flow-panel {
+  padding: 16px;
+  background: #f8fbfe;
+}
+
+.cadh-flow-filters {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(190px, 280px) auto;
+  align-items: end;
+  gap: 12px;
+  margin-bottom: 14px;
+  padding: 13px;
+  border: 1px solid #d6e1ec;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.cadh-flow-tabs[hidden] {
+  display: none !important;
+}
+
+.cadh-flow-filters label,
+.cadh-flow-action-form label,
+.cadh-kanban-toolbar label,
+.cadh-sharing-layout aside label {
+  display: grid;
+  gap: 6px;
+  color: #40566e;
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.cadh-flow-filters input,
+.cadh-flow-filters select,
+.cadh-flow-action-form input,
+.cadh-flow-action-form select,
+.cadh-kanban-toolbar select,
+.cadh-sharing-layout select,
+.cadh-kanban-card select {
+  min-height: 38px;
+  border: 1px solid #bdccda;
+  border-radius: 7px;
+  background: #fff;
+  color: #18334f;
+  padding: 7px 10px;
+  font: inherit;
+}
+
+.cadh-received-list,
+.cadh-finalized-list,
+.cadh-sharing-records {
+  display: grid;
+  gap: 9px;
+}
+
+.cadh-received-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 16px;
+  border: 1px solid #d5e0eb;
+  border-left: 4px solid #f59e0b;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.cadh-received-card.is-very-high-risk {
+  border-left-color: #dc2626;
+  background: linear-gradient(90deg, #fff7f7, #fff 24%);
+}
+
+.cadh-received-main,
+.cadh-received-main > div,
+.cadh-received-meta,
+.cadh-kanban-toolbar > div,
+.cadh-finalized-heading > div,
+.cadh-sharing-detail-header > div {
+  display: grid;
+  gap: 4px;
+}
+
+.cadh-received-main {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.cadh-received-main strong {
+  color: #0c4f8d;
+  font-size: 14px;
+}
+
+.cadh-received-main span,
+.cadh-received-meta,
+.cadh-finalized-list article span,
+.cadh-kanban-card > span,
+.cadh-kanban-card small {
+  color: #66798e;
+  font-size: 11px;
+}
+
+.cadh-risk-chip {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 10px !important;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.cadh-risk-chip.is-high {
+  background: #fff3d6;
+  color: #b45309;
+}
+
+.cadh-risk-chip.is-critical {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.cadh-care-status {
+  color: #16845d !important;
+  font-weight: 800;
+}
+
+.cadh-received-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.cadh-confirm-receipt {
+  min-width: 148px;
+}
+
+.cadh-receipt-status,
+.cadh-receipt-pending {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 36px;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.cadh-receipt-status {
+  color: #16845d;
+}
+
+.cadh-receipt-status > span {
+  display: inline-grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+  font-size: 10px;
+  line-height: 1;
+}
+
+.cadh-receipt-pending {
+  color: #6c7f92;
+}
+
+.cadh-referral-view {
+  display: inline-grid;
+  flex: 0 0 38px !important;
+  place-items: center;
+  width: 38px;
+  min-width: 38px;
+  height: 38px;
+  padding: 0 !important;
+  color: #07589e;
+}
+
+.cadh-referral-view svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+}
+
+.cadh-referral-modal-backdrop {
+  position: fixed;
+  z-index: 1600;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgb(15 35 54 / 48%);
+  backdrop-filter: blur(2px);
+}
+
+.cadh-referral-modal {
+  width: min(560px, 100%);
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  padding: 22px;
+  border: 1px solid #cad8e5;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 24px 70px rgb(15 35 54 / 28%);
+}
+
+.cadh-referral-modal:focus {
+  outline: none;
+}
+
+.cadh-referral-modal > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.cadh-referral-modal > header div {
+  display: grid;
+  gap: 4px;
+}
+
+.cadh-referral-modal > header span {
+  color: #087b68;
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.cadh-referral-modal > header h3 {
+  margin: 0;
+  color: #15283b;
+  font-size: 20px;
+}
+
+.cadh-referral-modal > header button {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #1c2d3f;
+  font-size: 23px;
+  cursor: pointer;
+}
+
+.cadh-referral-modal > header button:hover {
+  background: #eef4f8;
+}
+
+.cadh-referral-route {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(90px, auto);
+  align-items: center;
+  gap: 10px;
+  margin: 18px 0 14px;
+  padding: 13px 14px;
+  border: 1px solid #cad8e5;
+  border-radius: 9px;
+  background: #f6f9fc;
+  color: #203c58;
+  font-size: 12px;
+}
+
+.cadh-referral-route span {
+  color: #07589e;
+  font-size: 18px;
+}
+
+.cadh-referral-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+}
+
+.cadh-referral-detail-grid > div {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #d3dfeb;
+  border-radius: 9px;
+  background: #fff;
+}
+
+.cadh-referral-detail-grid dt {
+  margin: 0 0 6px;
+  color: #587089;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .025em;
+  text-transform: uppercase;
+}
+
+.cadh-referral-detail-grid dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: #172c41;
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.cadh-flow-action-form {
+  display: grid;
+  grid-template-columns: minmax(180px, .7fr) minmax(180px, .7fr) minmax(220px, 1fr) auto;
+  align-items: end;
+  gap: 12px;
+  margin: 0 0 14px;
+  padding: 14px;
+  border: 1px solid #8bb9df;
+  border-radius: 10px;
+  background: #eef7ff;
+}
+
+.cadh-flow-action-form header {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
+}
+
+.cadh-flow-action-form header div {
+  display: grid;
+  gap: 3px;
+}
+
+.cadh-flow-action-form header span {
+  color: #52708d;
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+.cadh-flow-action-form header button {
+  border: 0;
+  background: transparent;
+  color: #466077;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.cadh-kanban-toolbar {
+  margin-bottom: 14px;
+}
+
+.cadh-kanban-toolbar > div span,
+.cadh-finalized-heading > div span {
+  font-size: 11px;
+  color: #6d7f91;
+}
+
+.cadh-kanban {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(190px, 1fr));
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+
+.cadh-kanban-column {
+  min-width: 190px;
+  border: 1px solid #d5e0eb;
+  border-radius: 10px;
+  background: #eef3f8;
+  overflow: hidden;
+}
+
+.cadh-kanban-column > header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 42px;
+  padding: 9px 10px;
+  border-bottom: 1px solid #d4dee8;
+  background: #fff;
+  color: #183b5d;
+  font-size: 11px;
+}
+
+.cadh-kanban-column > header span {
+  min-width: 22px;
+  padding: 3px 6px;
+  border-radius: 999px;
+  background: #e7eff7;
+  text-align: center;
+}
+
+.cadh-kanban-column > div {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  min-height: 210px;
+  padding: 8px;
+}
+
+.cadh-kanban-card {
+  display: grid;
+  gap: 7px;
+  padding: 10px;
+  border: 1px solid #d2deea;
+  border-left: 3px solid #e6a40a;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 3px 8px rgb(25 61 94 / 6%);
+}
+
+.cadh-kanban-card.is-critical {
+  border-left-color: #dc2626;
+}
+
+.cadh-kanban-card > strong {
+  color: #114f87;
+  font-size: 12px;
+}
+
+.cadh-kanban-card select {
+  width: 100%;
+  min-height: 32px;
+  font-size: 10px;
+}
+
+.cadh-kanban-empty {
+  margin: auto;
+  color: #8998a8;
+  font-size: 11px;
+  text-align: center;
+}
+
+.cadh-sharing-layout {
+  display: grid;
+  grid-template-columns: minmax(210px, 270px) minmax(0, 1fr);
+  gap: 14px;
+}
+
+.cadh-sharing-layout aside,
+#cadh-sharing-detail {
+  padding: 14px;
+  border: 1px solid #d6e1eb;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.cadh-sharing-layout aside p {
+  color: #61758a;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.cadh-sharing-detail-header {
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e0e8ef;
+}
+
+.cadh-sharing-detail-header span {
+  color: #12836e;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.cadh-sharing-detail-header strong {
+  color: #143b60;
+}
+
+.cadh-sharing-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.cadh-sharing-metrics span {
+  padding: 10px;
+  border-radius: 8px;
+  background: #eef5fb;
+  color: #50667d;
+  font-size: 11px;
+  text-align: center;
+}
+
+.cadh-sharing-metrics strong {
+  color: #07589e;
+  font-size: 17px;
+}
+
+.cadh-sharing-records article,
+.cadh-finalized-list article {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 5px 14px;
+  padding: 11px 13px;
+  border: 1px solid #d8e3ec;
+  border-radius: 8px;
+}
+
+.cadh-sharing-records article p {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: #60758a;
+  font-size: 11px;
+}
+
+.cadh-finalized-list article {
+  grid-template-columns: minmax(0, 1fr) auto auto auto;
+  align-items: center;
+  background: #fff;
+}
+
+.cadh-finalized-list article > div {
+  display: grid;
+  gap: 4px;
+}
+
+.cadh-finalized-list time {
+  color: #6c7f92;
+  font-size: 11px;
+}
+
+.cadh-flow-empty,
+.cadh-flow-error,
+.cadh-flow-context {
+  padding: 28px 18px;
+  border: 1px dashed #bccbd9;
+  border-radius: 9px;
+  background: #fff;
+  color: #5c7186;
+  text-align: center;
+}
+
+.cadh-flow-empty p,
+.cadh-flow-error p,
+.cadh-flow-context p {
+  margin: 5px 0 0;
+  font-size: 11px;
+}
+
+.cadh-flow-error {
+  border-color: #f1b8b8;
+  color: #a92b2b;
+}
+
+@media (max-width: 1100px) {
+  .cadh-received-card {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .cadh-received-actions {
+    grid-column: 1 / -1;
+  }
+
+  .cadh-flow-action-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .cadh-flow-header,
+  .cadh-kanban-toolbar,
+  .cadh-sharing-detail-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .cadh-flow-filters,
+  .cadh-flow-action-form,
+  .cadh-received-card,
+  .cadh-sharing-layout,
+  .cadh-sharing-metrics,
+  .cadh-finalized-list article {
+    grid-template-columns: 1fr;
+  }
+
+  .cadh-received-actions {
+    grid-column: auto;
+    justify-content: stretch;
+  }
+
+  .cadh-received-actions > * {
+    flex: 1;
+  }
+
+  .cadh-referral-modal-backdrop {
+    align-items: end;
+    padding: 12px;
+  }
+
+  .cadh-referral-modal {
+    max-height: calc(100vh - 24px);
+    padding: 18px;
+  }
+
+  .cadh-referral-route,
+  .cadh-referral-detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cadh-referral-route span {
+    transform: rotate(90deg);
+    justify-self: start;
+  }
+}
+.siselo-module-subnav {
+  display: grid;
+  gap: 2px;
+  margin: -4px 8px 8px 18px;
+  padding: 4px 0 4px 12px;
+  border-left: 1px solid rgb(151 190 221 / 35%);
+}
+
+.siselo-module-subnav a,
+.siselo-module-subnav-heading {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  color: #a9c1d7;
+  font-size: 10px;
+  line-height: 1.2;
+  text-decoration: none;
+}
+
+.siselo-module-subnav-heading {
+  color: #d4e4f2;
+  font-weight: 800;
+}
+
+.siselo-module-subnav a:hover {
+  background: rgb(255 255 255 / 12%);
+  color: #fff;
+}
+
+.siselo-module-subnav a.active {
+  background: #315f86;
+  color: #fff;
+  font-weight: 800;
+}
+
+.siselo-module-subnav a.active span {
+  color: #fff;
+}
+
+.siselo-module-subnav a span {
+  color: #79a9cf;
+}
+
+body.home-sidebar-is-collapsed .siselo-module-subnav {
+  display: none;
+}
+.clinical-home {
+  padding: 20px !important;
+}
+
+.clinical-home-heading p,
+.clinical-home-heading h1,
+.clinical-home-heading span,
+.clinical-home-section-label {
+  margin: 0;
+}
+
+.clinical-home-heading p,
+.clinical-home-section-label {
+  color: #07589e;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .18em;
+}
+
+.clinical-home-heading h1 {
+  margin: 4px 0;
+  color: #152536;
+  font-size: 26px;
+}
+
+.clinical-home-heading > span {
+  color: #667b91;
+  font-size: 12px;
+}
+
+.clinical-home-section-label {
+  margin: 24px 0 10px;
+  color: #465e76;
+}
+
+.clinical-home-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.clinical-home-metrics a {
+  display: grid;
+  grid-template-columns: 34px auto;
+  grid-template-rows: auto auto;
+  gap: 0 10px;
+  padding: 16px;
+  border: 1px solid #c7d3df;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 3px 8px rgb(25 61 94 / 8%);
+  color: #17324d;
+  text-decoration: none;
+}
+
+.clinical-home-metrics a > span {
+  grid-row: 1 / 3;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: #e7f0fa;
+  color: #07589e;
+}
+
+.clinical-home-metrics a:nth-child(2) > span {
+  background: #fff2c9;
+  color: #d17a00;
+}
+
+.clinical-home-metrics a:nth-child(3) > span {
+  background: #e1edff;
+  color: #2f6fd0;
+}
+
+.clinical-home-metrics a.is-alert > span {
+  background: #ffe4e4;
+  color: #df3030;
+}
+
+.clinical-home-metrics strong {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.clinical-home-metrics small {
+  color: #5d7186;
+  font-size: 10px;
+}
+
+.clinical-home-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.08fr;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.clinical-home-panel {
+  min-height: 265px;
+  border: 1px solid #c7d3df;
+  border-radius: 10px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.clinical-home-panel > header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 14px;
+  border-bottom: 1px solid #d4dde6;
+  color: #07589e;
+}
+
+.clinical-home-panel > header div {
+  display: grid;
+  gap: 2px;
+}
+
+.clinical-home-panel > header strong {
+  color: #24384d;
+  font-size: 12px;
+}
+
+.clinical-home-panel > header span {
+  color: #75889c;
+  font-size: 9px;
+}
+
+.clinical-home-panel > header > span.red {
+  color: #e33131;
+  font-size: 15px;
+}
+
+.clinical-home-list > a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 58px;
+  padding: 10px 14px;
+  border-bottom: 1px solid #dbe3eb;
+  color: inherit;
+  text-decoration: none;
+}
+
+.clinical-home-list > a time {
+  color: #07589e;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.clinical-home-list > a div {
+  display: grid;
+  gap: 3px;
+}
+
+.clinical-home-list > a strong {
+  color: #263a4e;
+  font-size: 11px;
+}
+
+.clinical-home-list > a span {
+  color: #718399;
+  font-size: 9px;
+}
+
+.clinical-home-list > a i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ef9300;
+}
+
+.clinical-home-empty {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 5px;
+  min-height: 200px;
+  color: #8b9aab;
+  text-align: center;
+}
+
+.clinical-home-empty strong {
+  color: #25394e;
+  font-size: 11px;
+}
+
+.clinical-home-empty small {
+  font-size: 9px;
+}
+
+@media (max-width: 900px) {
+  .clinical-home-metrics {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .clinical-home-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.ubs-patient-list-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.ubs-patient-list-heading > div {
+  display: grid;
+  gap: 3px;
+}
+
+.ubs-patient-list-heading span {
+  color: #07589e;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .08em;
+}
+
+.ubs-patient-list-heading strong {
+  color: #172f47;
+  font-size: 18px;
+}
+
+.ubs-patient-list-filters {
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) 150px 150px;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 12px;
+  border: 1px solid #d1dde8;
+  border-radius: 9px;
+  background: #fff;
+}
+
+.ubs-patient-list-filters label {
+  display: grid;
+  gap: 5px;
+  color: #435a72;
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.ubs-patient-list-filters input {
+  min-height: 38px;
+  border: 1px solid #bfcedd;
+  border-radius: 7px;
+  padding: 8px 10px;
+}
+
+.ubs-patient-data-table thead th {
+  background: #07589e;
+  color: #fff;
+  font-size: 9px;
+  text-transform: uppercase;
+}
+
+.ubs-patient-data-table td {
+  font-size: 10px;
+}
+.cadh-patient-option-status {
+  width: fit-content;
+  margin-top: 4px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: #d9f9e6;
+  color: #11804e;
+  font-size: 8px;
+  font-weight: 800;
+}
+
+/* Layout fidelity and responsive stability — references 24/07/2026 */
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) {
+  --siselo-sidebar-width: 216px;
+  --siselo-sidebar-collapsed-width: 72px;
+  overflow-x: hidden;
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar {
+  width: var(--siselo-sidebar-width) !important;
+  min-width: var(--siselo-sidebar-width) !important;
+  height: 100dvh;
+  min-height: 0 !important;
+  gap: 0 !important;
+  overflow: hidden !important;
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar .topbar-left,
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-brand,
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-footer {
+  flex: 0 0 auto;
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-brand {
+  min-height: 76px !important;
+  padding: 14px 16px !important;
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-mark {
+  inline-size: 36px !important;
+  block-size: 36px !important;
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-brand-copy strong {
+  font-size: 13px !important;
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-brand-copy small {
+  font-size: 7px !important;
+  letter-spacing: .18em !important;
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-nav {
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 16px 10px 12px !important;
+  scrollbar-width: thin;
+  scrollbar-color: rgb(255 255 255 / 18%) transparent;
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-label {
+  margin: 0 8px 10px !important;
+  font-size: 8px !important;
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar .menu {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 4px !important;
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar .menu > a {
+  min-height: 46px !important;
+  grid-template-columns: 22px minmax(0, 1fr) 12px !important;
+  gap: 9px !important;
+  padding: 7px 10px !important;
+  border-radius: 9px !important;
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-nav-icon,
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-nav-icon svg {
+  inline-size: 17px !important;
+  block-size: 17px !important;
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-nav-copy strong {
+  font-size: 13px !important;
+  line-height: 1.15 !important;
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-nav-copy small {
+  font-size: 9px !important;
+  line-height: 1.2 !important;
+}
+
+.siselo-module-subnav {
+  gap: 1px;
+  margin: -2px 6px 5px 26px;
+  padding: 3px 0 3px 9px;
+}
+
+.siselo-module-subnav a,
+.siselo-module-subnav-heading {
+  width: 100%;
+  display: flex !important;
+  grid-template-columns: none !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 7px !important;
+  min-height: 27px !important;
+  padding: 4px 6px !important;
+  font-size: 10px !important;
+  line-height: 1.15 !important;
+}
+
+.siselo-module-subnav a span {
+  flex: 0 0 12px;
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-footer,
+body[data-page="cadh"] .cadh-sidebar .topbar-actions.home-sidebar-footer,
+body[data-page="ubs"] .ubs-sidebar .topbar-actions.home-sidebar-footer {
+  width: 100%;
+  min-height: 72px;
+  margin-top: 0 !important;
+  gap: 4px !important;
+  padding: 6px !important;
+  background: #062c4f;
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-footer .topbar-settings {
+  min-height: 28px !important;
+  padding: 3px 7px !important;
+  font-size: 10px !important;
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-footer .topbar-account {
+  min-height: 39px !important;
+  padding: 4px 6px !important;
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-user-icon {
+  inline-size: 28px !important;
+  block-size: 28px !important;
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-user-copy strong {
+  font-size: 10px !important;
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-user-copy small {
+  font-size: 7px !important;
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-toggle {
+  left: calc(var(--siselo-sidebar-width) - 12px) !important;
+  bottom: 68px !important;
+}
+
+body[data-page="home"] .home-main-shell,
+body[data-page="cadh"] .cadh-main-shell,
+body[data-page="ubs"] .ubs-main-shell {
+  min-width: 0;
+  margin-left: var(--siselo-sidebar-width) !important;
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]).home-sidebar-is-collapsed .home-sidebar {
+  width: var(--siselo-sidebar-collapsed-width) !important;
+  min-width: var(--siselo-sidebar-collapsed-width) !important;
+}
+
+body[data-page="home"].home-sidebar-is-collapsed .home-main-shell,
+body[data-page="cadh"].home-sidebar-is-collapsed .cadh-main-shell,
+body[data-page="ubs"].home-sidebar-is-collapsed .ubs-main-shell {
+  margin-left: var(--siselo-sidebar-collapsed-width) !important;
+}
+
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]).home-sidebar-is-collapsed .home-sidebar-toggle {
+  left: calc(var(--siselo-sidebar-collapsed-width) - 12px) !important;
+}
+
+/* CADH: one workspace at a time, with the density of the reference screens. */
+body[data-page="cadh"] .cadh-page-header,
+body[data-page="ubs"] .ubs-page-header {
+  min-height: 56px !important;
+  padding: 7px 22px !important;
+}
+
+body[data-page="cadh"] .cadh-breadcrumb-heading h1,
+body[data-page="ubs"] .cadh-breadcrumb-heading h1 {
+  font-size: 13px !important;
+}
+
+body[data-page="cadh"] .cadh-dashboard,
+body[data-page="ubs"] .ubs-dashboard {
+  width: calc(100% - 34px) !important;
+  margin: 16px auto 20px !important;
+  gap: 14px !important;
+  align-content: start !important;
+  grid-auto-rows: max-content;
+}
+
+body[data-page="cadh"] .cadh-dashboard::before,
+body[data-page="ubs"] .ubs-dashboard::before {
+  inset: 56px 0 0 var(--siselo-sidebar-width) !important;
+  background-size: 24px 24px !important;
+}
+
+body[data-page="cadh"] .cadh-module-hero,
+body[data-page="ubs"] .ubs-module-hero {
+  display: flex !important;
+  min-height: 70px !important;
+  padding: 11px 14px !important;
+  gap: 12px !important;
+  border-radius: 10px !important;
+}
+
+:is(body[data-page="cadh"], body[data-page="ubs"]) #nav-home {
+  display: grid !important;
+}
+
+body[data-page="cadh"] .cadh-module-hero-icon,
+body[data-page="ubs"] .ubs-module-hero-icon {
+  inline-size: 40px !important;
+  block-size: 40px !important;
+  border-radius: 9px !important;
+}
+
+body[data-page="cadh"] .cadh-module-hero-icon svg,
+body[data-page="ubs"] .ubs-module-hero-icon svg {
+  inline-size: 22px !important;
+  block-size: 22px !important;
+}
+
+body[data-page="cadh"] .cadh-module-hero-copy {
+  gap: 2px !important;
+}
+
+body[data-page="cadh"] .cadh-module-hero-copy p,
+body[data-page="ubs"] .ubs-module-hero-copy p {
+  font-size: 8px !important;
+}
+
+body[data-page="cadh"] .cadh-module-hero-copy h2,
+body[data-page="ubs"] .ubs-module-hero-copy h2 {
+  font-size: 16px !important;
+}
+
+body[data-page="cadh"][data-cadh-view="followup"] .cadh-flow-workspace {
+  display: none !important;
+}
+
+body[data-page="cadh"] .cadh-primary-grid {
+  grid-template-columns: 266px minmax(0, 1fr) !important;
+  gap: 14px !important;
+  align-items: start !important;
+}
+
+body[data-page="cadh"] .cadh-patient-search {
+  max-height: calc(100dvh - 158px);
+  min-height: 342px !important;
+  padding: 13px !important;
+  gap: 8px !important;
+  overflow: hidden;
+  border-radius: 10px !important;
+}
+
+body[data-page="cadh"] .cadh-patient-search .cadh-block-title {
+  font-size: 10px !important;
+}
+
+body[data-page="cadh"] .cadh-patient-search label {
+  margin: 1px 0 0 !important;
+  font-size: 9px !important;
+}
+
+body[data-page="cadh"] .cadh-patient-search input {
+  height: 34px !important;
+  padding: 6px 10px 6px 34px !important;
+  border-radius: 7px !important;
+  font-size: 11px !important;
+}
+
+body[data-page="cadh"] .cadh-search-button {
+  display: none !important;
+}
+
+body[data-page="cadh"] .cadh-patient-result {
+  min-height: 0;
+  flex: 1 1 auto;
+  gap: 4px !important;
+  margin-top: 2px !important;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+body[data-page="cadh"] .cadh-patient-option {
+  min-height: 58px;
+  gap: 1px !important;
+  padding: 8px 10px !important;
+  border-radius: 8px !important;
+}
+
+body[data-page="cadh"] .cadh-patient-option-name {
+  font-size: 10px !important;
+}
+
+body[data-page="cadh"] .cadh-patient-option-meta {
+  font-size: 8px !important;
+}
+
+body[data-page="cadh"] .cadh-patient-option-status {
+  margin-top: 1px;
+}
+
+body[data-page="cadh"] .cadh-management-section {
+  display: block !important;
+}
+
+body[data-page="cadh"] .cadh-management-card {
+  min-height: 342px !important;
+  height: auto !important;
+  border-radius: 10px !important;
+}
+
+body[data-page="cadh"] .cadh-module-tabs {
+  min-height: 38px !important;
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  flex-wrap: nowrap !important;
+  overflow-x: auto;
+}
+
+body[data-page="cadh"] .cadh-tab-link {
+  min-height: 38px !important;
+  justify-content: center;
+  gap: 6px !important;
+  padding: 0 9px !important;
+  font-size: 10px !important;
+  white-space: nowrap;
+}
+
+body[data-page="cadh"] .cadh-tab-icon svg {
+  width: 14px !important;
+  height: 14px !important;
+}
+
+body[data-page="cadh"] .cadh-patient-detail {
+  min-height: 302px !important;
+  max-height: calc(100dvh - 196px);
+  overflow: auto;
+}
+
+body[data-page="cadh"] .cadh-empty-state {
+  margin: 76px auto !important;
+  gap: 8px !important;
+}
+
+body[data-page="cadh"] .cadh-empty-icon {
+  width: 42px !important;
+  height: 42px !important;
+}
+
+body[data-page="cadh"] .cadh-empty-state strong {
+  font-size: 12px !important;
+}
+
+body[data-page="cadh"] .cadh-empty-state p {
+  font-size: 10px !important;
+}
+
+body[data-page="cadh"] > * .cadh-specialties-section {
+  display: none;
+}
+
+body[data-page="cadh"] .cadh-inline-panel {
+  min-height: 300px !important;
+  padding: 16px !important;
+}
+
+body[data-page="cadh"] .cadh-modules-screen .cadh-screen-header {
+  margin-bottom: 10px;
+}
+
+body[data-page="cadh"] .cadh-modules-screen .cadh-screen-header h3 {
+  font-size: 12px;
+}
+
+body[data-page="cadh"] .cadh-guidance-alert {
+  min-height: 34px;
+  margin: 0 0 10px;
+  padding: 9px 10px;
+  font-size: 9px;
+}
+
+body[data-page="cadh"] .cadh-specialty-grid-inline {
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 9px !important;
+}
+
+body[data-page="cadh"] .cadh-specialty-grid-inline .cadh-specialty-card {
+  min-height: 66px !important;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 5px !important;
+  padding: 9px !important;
+  border-radius: 8px !important;
+}
+
+body[data-page="cadh"] .cadh-specialty-grid-inline .cadh-specialty-icon {
+  width: fit-content !important;
+  height: 20px !important;
+  padding: 3px 7px;
+  border-radius: 999px !important;
+}
+
+body[data-page="cadh"] .cadh-specialty-grid-inline .cadh-specialty-icon svg {
+  width: 12px !important;
+  height: 12px !important;
+}
+
+body[data-page="cadh"] .cadh-specialty-grid-inline .cadh-specialty-card span:last-child {
+  font-size: 9px !important;
+}
+
+body[data-page="cadh"] .cadh-specialty-label {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+body[data-page="cadh"] .cadh-specialty-label strong {
+  overflow: hidden;
+  color: #10243b;
+  font-size: 8px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+body[data-page="cadh"] .cadh-specialty-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px;
+}
+
+body[data-page="cadh"] .cadh-specialty-actions :is(a, button) {
+  min-height: 23px;
+  display: grid;
+  place-items: center;
+  padding: 4px 5px;
+  border: 0;
+  border-radius: 4px;
+  background: #eaf0f5;
+  color: #07589e;
+  font-size: 7px;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+body[data-page="cadh"] .cadh-specialty-actions :is(a[aria-disabled="true"], button:disabled) {
+  color: #9aa9b8;
+  cursor: not-allowed;
+  opacity: .72;
+}
+
+body[data-page="cadh"] .cadh-specialty-schedule-form {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+  padding: 15px;
+  border: 1px solid #cbd8e4;
+  border-radius: 10px;
+  background: #f7f9fb;
+}
+
+body[data-page="cadh"] .cadh-specialty-schedule-form > header strong {
+  color: #17324d;
+  font-size: 13px;
+}
+
+body[data-page="cadh"] .cadh-specialty-schedule-fields {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 11px;
+}
+
+body[data-page="cadh"] .cadh-specialty-schedule-fields label {
+  min-width: 0;
+  display: grid;
+  gap: 6px;
+}
+
+body[data-page="cadh"] .cadh-specialty-schedule-fields label > span {
+  color: #62778c;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+body[data-page="cadh"] .cadh-specialty-schedule-fields :is(input, select) {
+  width: 100%;
+  min-height: 38px;
+  padding: 7px 10px;
+  border: 1px solid #c9d6e2;
+  border-radius: 7px;
+  background: #fff;
+  color: #1b3045;
+  font-size: 12px;
+}
+
+body[data-page="cadh"] .cadh-specialty-schedule-form .date-picker-trigger {
+  min-height: 38px !important;
+  padding: 5px 7px 5px 10px !important;
+  border: 1px solid #c9d6e2 !important;
+  border-radius: 7px !important;
+  background: #fff !important;
+  font-size: 12px;
+}
+
+body[data-page="cadh"] .cadh-specialty-schedule-form .date-picker-trigger-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: #e7f0f8 !important;
+  color: #07589e !important;
+}
+
+body[data-page="cadh"] .cadh-time-picker {
+  min-height: 38px;
+  display: grid;
+  grid-template-columns: minmax(62px, 1fr) auto minmax(62px, 1fr) 30px;
+  align-items: center;
+  gap: 4px;
+  padding: 0 5px;
+  border: 1px solid #c9d6e2;
+  border-radius: 7px;
+  background: #fff;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+body[data-page="cadh"] .cadh-time-picker:focus-within {
+  border-color: #0b67a8;
+  box-shadow: 0 0 0 3px rgb(11 103 168 / 12%);
+}
+
+body[data-page="cadh"] .cadh-time-picker select {
+  min-height: 36px;
+  padding: 5px 22px 5px 7px;
+  border: 0;
+  background-color: transparent;
+  font-weight: 700;
+  text-align: center;
+  box-shadow: none;
+}
+
+body[data-page="cadh"] .cadh-time-picker select:focus {
+  outline: none;
+}
+
+body[data-page="cadh"] .cadh-time-picker-separator {
+  color: #183b5d;
+  font-size: 17px;
+  font-weight: 900;
+}
+
+body[data-page="cadh"] .cadh-time-picker-icon {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+  background: #e7f0f8;
+  color: #07589e;
+}
+
+body[data-page="cadh"] .cadh-time-picker-icon svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+body[data-page="cadh"] .cadh-specialty-schedule-form > footer {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+body[data-page="cadh"] .cadh-specialty-schedule-form > footer .btn {
+  min-height: 36px;
+  font-size: 11px;
+}
+
+body[data-page="cadh"] .cadh-selected-patient-chip {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #07589e;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+/* Flow pages keep the requested functionality without the duplicated clinical workspace. */
+body[data-page="cadh"] .cadh-flow-workspace {
+  border-radius: 10px;
+}
+
+body[data-page="cadh"] .cadh-flow-header {
+  padding: 12px 14px;
+}
+
+body[data-page="cadh"] .cadh-flow-tabs {
+  min-height: 38px;
+  overflow-x: auto;
+}
+
+body[data-page="cadh"] .cadh-flow-tabs button {
+  min-height: 38px;
+  padding: 7px 12px;
+  font-size: 9px;
+  white-space: nowrap;
+}
+
+body[data-page="cadh"] .cadh-flow-panel {
+  padding: 12px 14px;
+}
+
+/* UBS patient list: full-width, faithful to the reference table. */
+body[data-page="ubs"][data-ubs-view="patients"] .ubs-search-column,
+body[data-page="ubs"][data-ubs-view="sharing"] .ubs-search-column,
+body[data-page="ubs"][data-ubs-view="patients"] #ubs-management-title,
+body[data-page="ubs"][data-ubs-view="sharing"] #ubs-management-title {
+  display: none !important;
+}
+
+body[data-page="ubs"][data-ubs-view="patients"] .ubs-primary-grid,
+body[data-page="ubs"][data-ubs-view="sharing"] .ubs-primary-grid {
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+
+body[data-page="ubs"] .ubs-module-hero {
+  min-height: 66px !important;
+}
+
+body[data-page="ubs"] .ubs-module-metrics dt {
+  font-size: 15px !important;
+}
+
+body[data-page="ubs"] .ubs-module-metrics dd {
+  font-size: 7px !important;
+}
+
+body[data-page="ubs"] .ubs-workspace {
+  border-radius: 10px !important;
+}
+
+body[data-page="ubs"] .ubs-tabs {
+  min-height: 38px !important;
+  overflow-x: auto;
+}
+
+body[data-page="ubs"] .ubs-tab {
+  min-height: 38px !important;
+  padding: 7px 13px !important;
+  font-size: 9px !important;
+  white-space: nowrap;
+}
+
+body[data-page="ubs"][data-ubs-view="patients"] #ubs-tab-patients,
+body[data-page="ubs"][data-ubs-view="transitioned"] #ubs-tab-transitioned,
+body[data-page="ubs"][data-ubs-view="followup"] #ubs-tab-followup,
+body[data-page="ubs"][data-ubs-view="next"] #ubs-tab-next,
+body[data-page="ubs"][data-ubs-view="sharing"] #ubs-tab-sharing {
+  position: relative;
+  background: #fff !important;
+  color: var(--ubs-blue) !important;
+  box-shadow: inset 0 -2px 0 var(--ubs-blue) !important;
+}
+
+body[data-page="ubs"][data-ubs-view="patients"] #ubs-tab-patients::after,
+body[data-page="ubs"][data-ubs-view="transitioned"] #ubs-tab-transitioned::after,
+body[data-page="ubs"][data-ubs-view="followup"] #ubs-tab-followup::after,
+body[data-page="ubs"][data-ubs-view="next"] #ubs-tab-next::after,
+body[data-page="ubs"][data-ubs-view="sharing"] #ubs-tab-sharing::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 -1px;
+  height: 2px;
+  background: var(--ubs-blue);
+}
+
+body[data-page="ubs"] .ubs-tab-panel {
+  padding: 13px !important;
+}
+
+.ubs-patient-list-heading {
+  margin-bottom: 9px;
+}
+
+.ubs-patient-list-heading span {
+  font-size: 8px;
+}
+
+.ubs-patient-list-heading strong {
+  font-size: 15px;
+}
+
+.ubs-patient-list-heading .btn {
+  min-height: 28px;
+  padding: 5px 10px;
+  font-size: 8px;
+}
+
+.ubs-patient-list-filter-card {
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px solid #ccd9e4;
+  border-radius: 9px;
+  background: #fff;
+}
+
+.ubs-patient-list-filter-card > header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.ubs-patient-list-filter-card > header > span {
+  inline-size: 25px;
+  block-size: 25px;
+  display: grid;
+  place-items: center;
+  border-radius: 7px;
+  background: #e6f1fb;
+  color: #07589e;
+}
+
+.ubs-patient-list-filter-card header div {
+  display: grid;
+}
+
+.ubs-patient-list-filter-card header strong {
+  font-size: 9px;
+}
+
+.ubs-patient-list-filter-card header small {
+  color: #6b7f94;
+  font-size: 7px;
+}
+
+.ubs-patient-list-filters {
+  grid-template-columns: minmax(190px, 1fr) 140px 140px 180px 180px;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.ubs-patient-list-filters label {
+  font-size: 7px;
+}
+
+.ubs-patient-list-filters input,
+.ubs-patient-list-filters select {
+  min-width: 0;
+  min-height: 31px;
+  padding: 5px 8px;
+  border: 1px solid #c4d2df;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 8px;
+}
+
+.ubs-patient-table-shell {
+  overflow: hidden;
+  border: 1px solid #c9d6e2;
+  border-radius: 9px;
+}
+
+.ubs-patient-table-shell .table-scroll {
+  max-height: calc(100dvh - 280px);
+  overflow: auto;
+}
+
+.ubs-patient-data-table {
+  min-width: 850px;
+}
+
+.ubs-patient-data-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  height: 31px;
+  padding: 7px 9px;
+  font-size: 7px;
+}
+
+.ubs-patient-data-table td {
+  height: 38px;
+  padding: 8px 9px;
+  border-right: 1px solid #d1dce6;
+  font-size: 8px;
+}
+
+.ubs-patient-data-table tbody tr {
+  cursor: pointer;
+}
+
+.ubs-patient-data-table tbody tr:hover {
+  background: #f2f7fb;
+}
+
+.ubs-patient-data-table td strong {
+  font-size: 9px;
+}
+
+.ubs-patient-table-shell > footer {
+  display: flex;
+  justify-content: space-between;
+  padding: 7px 9px;
+  color: #65798e;
+  font-size: 7px;
+}
+
+/* Shared plan area available in both UBS and CADH. */
+.ubs-sharing-screen > header > div,
+.ubs-sharing-detail > header > div {
+  display: grid;
+  gap: 2px;
+}
+
+.ubs-sharing-screen > header span,
+.ubs-sharing-detail > header span {
+  color: #078873;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: .08em;
+}
+
+.ubs-sharing-screen > header strong {
+  font-size: 15px;
+}
+
+.ubs-sharing-layout {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.ubs-sharing-layout > label {
+  display: grid;
+  align-content: start;
+  gap: 7px;
+  padding: 12px;
+  border: 1px solid #ccd8e3;
+  border-radius: 9px;
+}
+
+.ubs-sharing-layout > label > span {
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.ubs-sharing-layout > label select {
+  min-height: 34px;
+  border: 1px solid #c5d2df;
+  border-radius: 7px;
+  font-size: 9px;
+}
+
+.ubs-sharing-layout > label small {
+  color: #667a8e;
+  font-size: 8px;
+  line-height: 1.4;
+}
+
+.ubs-sharing-detail {
+  min-height: 170px;
+  padding: 14px;
+  border: 1px dashed #b9cada;
+  border-radius: 9px;
+}
+
+.ubs-sharing-detail > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.ubs-sharing-detail p {
+  color: #687c90;
+  font-size: 9px;
+}
+
+.ubs-sharing-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.ubs-sharing-summary span {
+  padding: 9px;
+  border-radius: 7px;
+  background: #eef5f7;
+  color: #587086;
+  font-size: 8px;
+}
+
+.ubs-sharing-records {
+  display: grid;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.ubs-sharing-records article {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2px 10px;
+  padding: 8px;
+  border: 1px solid #d5e0e8;
+  border-radius: 7px;
+}
+
+.ubs-sharing-records article strong,
+.ubs-sharing-records article span,
+.ubs-sharing-records article p {
+  font-size: 8px;
+}
+
+.ubs-sharing-records article p {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+@media (max-width: 1180px) {
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) {
+    --siselo-sidebar-width: 196px;
+  }
+
+  body[data-page="cadh"] .cadh-primary-grid {
+    grid-template-columns: 238px minmax(0, 1fr) !important;
+  }
+
+  .ubs-patient-list-filters {
+    grid-template-columns: minmax(180px, 1fr) repeat(2, 110px) repeat(2, minmax(145px, .7fr));
+  }
+}
+
+/*
+ * Browser zoom at 125% reduces a 1366px viewport to roughly 1093 CSS pixels.
+ * Keep the desktop sidebar complete in that range instead of applying the
+ * legacy icon-only breakpoint.
+ */
+@media (min-width: 921px) and (max-width: 1180px) {
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-brand {
+    justify-content: flex-start !important;
+    padding-inline: 16px !important;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-brand-copy,
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-nav-copy,
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-user-copy {
+    display: grid !important;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-label {
+    display: block !important;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-chevron {
+    display: block !important;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-footer .topbar-settings span {
+    display: inline !important;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar .menu > a {
+    grid-template-columns: 22px minmax(0, 1fr) 12px !important;
+    place-items: initial !important;
+    align-items: center !important;
+    padding-inline: 10px !important;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-footer {
+    grid-template-columns: minmax(0, 1fr) 40px !important;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-footer .topbar-settings {
+    grid-column: 1 / -1 !important;
+    justify-content: flex-start !important;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-footer .topbar-account {
+    grid-template-columns: 28px minmax(0, 1fr) !important;
+    place-items: initial !important;
+    align-items: center !important;
+  }
+}
+
+@media (max-width: 920px) {
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) {
+    --siselo-sidebar-width: 72px;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-brand-copy,
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-label,
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-nav-copy,
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-chevron,
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-user-copy,
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .siselo-module-subnav {
+    display: none !important;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-brand {
+    justify-content: center;
+    padding-inline: 8px !important;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar .menu > a {
+    grid-template-columns: 1fr !important;
+    place-items: center;
+    padding-inline: 8px !important;
+  }
+
+  body[data-page="cadh"] .cadh-primary-grid {
+    grid-template-columns: 220px minmax(0, 1fr) !important;
+  }
+
+  body[data-page="cadh"] .cadh-specialty-grid-inline {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  .ubs-patient-list-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar {
+    position: sticky !important;
+    inset: 0 0 auto !important;
+    width: 100% !important;
+    height: auto;
+    min-height: 58px !important;
+    display: grid;
+    grid-template-columns: 58px minmax(0, 1fr);
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-brand {
+    min-height: 58px !important;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-nav {
+    padding: 6px !important;
+    overflow-x: auto;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar .menu {
+    display: flex !important;
+    grid-template-columns: none !important;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar .menu > a {
+    min-width: 44px;
+    min-height: 44px !important;
+  }
+
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-footer,
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-toggle {
+    display: none !important;
+  }
+
+  body[data-page="home"] .home-main-shell,
+  body[data-page="cadh"] .cadh-main-shell,
+  body[data-page="ubs"] .ubs-main-shell {
+    margin-left: 0 !important;
+  }
+
+  body[data-page="cadh"] .cadh-page-header,
+  body[data-page="ubs"] .ubs-page-header {
+    position: static;
+    padding-inline: 12px !important;
+  }
+
+  body[data-page="cadh"] .cadh-dashboard,
+  body[data-page="ubs"] .ubs-dashboard {
+    width: calc(100% - 18px) !important;
+    margin-top: 9px !important;
+  }
+
+  body[data-page="cadh"] .cadh-primary-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  body[data-page="cadh"] .cadh-patient-search {
+    max-height: 240px;
+    min-height: 0 !important;
+  }
+
+  body[data-page="cadh"] .cadh-module-tabs {
+    grid-template-columns: repeat(3, max-content);
+  }
+
+  body[data-page="cadh"] .cadh-specialty-grid-inline {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .ubs-sharing-detail > header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .ubs-patient-list-filters,
+  .ubs-sharing-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* UBS patient workspace: patient information, clinical follow-up and referral. */
+body[data-page="ubs-patient"].siselo-auto-shell {
+  --ubs-patient-blue: #075795;
+  --ubs-patient-blue-dark: #064878;
+  --ubs-patient-teal: #078878;
+  --ubs-patient-copy: #172536;
+  --ubs-patient-muted: #667c92;
+  --ubs-patient-border: #cbd9e4;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-page {
+  width: min(1380px, calc(100% - 32px));
+  max-width: 1380px;
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+  margin-block: 16px 32px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-page :is(button, input, select, textarea) {
+  font: inherit;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-module-hero,
+body[data-page="ubs-patient"] .ubs-patient-info-card,
+body[data-page="ubs-patient"] .ubs-patient-followup-card {
+  min-width: 0;
+  border: 1px solid var(--ubs-patient-border);
+  border-radius: 14px;
+  background: rgb(255 255 255 / 97%);
+  box-shadow: 0 8px 22px rgb(32 67 98 / 7%);
+}
+
+body[data-page="ubs-patient"] .ubs-patient-module-hero {
+  min-height: 76px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  background:
+    linear-gradient(100deg, rgb(219 244 240 / 92%), rgb(242 249 250 / 96%)),
+    radial-gradient(#a9d7d0 1px, transparent 1px);
+  background-size: auto, 24px 24px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-module-icon {
+  inline-size: 44px;
+  block-size: 44px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 12px;
+  background: var(--ubs-patient-teal);
+  color: #fff;
+  box-shadow: 0 5px 12px rgb(7 136 120 / 22%);
+}
+
+body[data-page="ubs-patient"] .ubs-patient-module-icon svg {
+  inline-size: 23px;
+  block-size: 23px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-module-hero p,
+body[data-page="ubs-patient"] .ubs-patient-section-heading p,
+body[data-page="ubs-patient"] .ubs-patient-history-section > header p,
+body[data-page="ubs-patient"] .ubs-patient-referral-section > header p,
+body[data-page="ubs-patient"] .ubs-patient-subview-heading p,
+body[data-page="ubs-patient"] .ubs-patient-record-header p {
+  margin: 0 0 3px;
+  color: var(--ubs-patient-teal);
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-module-hero strong {
+  color: var(--ubs-patient-copy);
+  font-size: 1.08rem;
+  font-weight: 900;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-section-heading {
+  min-width: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 18px;
+  border-bottom: 1px solid #dde6ed;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-section-heading h1,
+body[data-page="ubs-patient"] .ubs-patient-section-heading h2,
+body[data-page="ubs-patient"] .ubs-patient-history-section h3,
+body[data-page="ubs-patient"] .ubs-patient-referral-section h3,
+body[data-page="ubs-patient"] .ubs-patient-subview-heading h3,
+body[data-page="ubs-patient"] .ubs-patient-record-header h3 {
+  margin: 0;
+  color: var(--ubs-patient-copy);
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-section-heading h1 {
+  font-size: 1.26rem;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-section-heading h2 {
+  font-size: 1.18rem;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-section-heading > div > span,
+body[data-page="ubs-patient"] .ubs-patient-referral-section > header > div > span {
+  display: block;
+  margin-top: 4px;
+  color: var(--ubs-patient-muted);
+  font-size: 0.76rem;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-back-link {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 10px;
+  color: var(--ubs-patient-blue);
+  font-size: 0.76rem;
+  font-weight: 850;
+  text-decoration: none;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-back-link:hover {
+  text-decoration: underline;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-back-link svg {
+  inline-size: 16px;
+  block-size: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-summary-hero {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 68px minmax(0, 1fr);
+  gap: 16px;
+  padding: 18px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-avatar {
+  inline-size: 68px;
+  block-size: 68px;
+  display: grid;
+  place-items: center;
+  border-radius: 18px;
+  background: #c8efe8;
+  color: #075f56;
+  font-size: 1.25rem;
+  font-weight: 900;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-summary-copy {
+  min-width: 0;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-name-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-name-row h2 {
+  min-width: 0;
+  margin: 0;
+  color: var(--ubs-patient-copy);
+  font-size: 1.45rem;
+  font-weight: 900;
+  overflow-wrap: anywhere;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 9px;
+  border-radius: 999px;
+  font-size: 0.66rem;
+  font-weight: 900;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-status.is-active {
+  background: #dcf8e9;
+  color: #087b48;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-status.is-inactive {
+  background: #ffe5e5;
+  color: #ba2b2b;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-meta-grid {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(120px, 1fr));
+  gap: 9px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-meta-grid > div {
+  min-width: 0;
+  display: grid;
+  align-content: center;
+  gap: 4px;
+  min-height: 58px;
+  padding: 9px 11px;
+  border: 1px solid #d8e2ea;
+  border-radius: 10px;
+  background: #fbfdfe;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-meta-grid span,
+body[data-page="ubs-patient"] .ubs-patient-clinical-summary article > span {
+  color: #667b91;
+  font-size: 0.63rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-meta-grid strong {
+  min-width: 0;
+  color: #243346;
+  font-size: 0.78rem;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-clinical-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  padding: 0 18px 18px 102px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-clinical-summary article {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #d8e2ea;
+  border-radius: 10px;
+  background: #fff;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-clinical-summary p {
+  margin: 5px 0 0;
+  color: #3b4d61;
+  font-size: 0.78rem;
+  overflow-wrap: anywhere;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-followup-heading .btn {
+  flex: 0 0 auto;
+}
+
+body[data-page="ubs-patient"] #ubs-patient-overview {
+  display: grid;
+  gap: 14px;
+  padding: 16px 18px 18px;
+}
+
+body[data-page="ubs-patient"] #ubs-patient-overview[hidden],
+body[data-page="ubs-patient"] .ubs-patient-specialty-view[hidden],
+body[data-page="ubs-patient"] .ubs-patient-record-view[hidden] {
+  display: none !important;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-history-section,
+body[data-page="ubs-patient"] .ubs-patient-referral-section,
+body[data-page="ubs-patient"] .ubs-patient-specialty-view,
+body[data-page="ubs-patient"] .ubs-patient-record-view {
+  min-width: 0;
+  border: 1px solid #d6e1e9;
+  border-radius: 12px;
+  background: #fff;
+  overflow: hidden;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-history-section > header,
+body[data-page="ubs-patient"] .ubs-patient-referral-section > header,
+body[data-page="ubs-patient"] .ubs-patient-subview-heading,
+body[data-page="ubs-patient"] .ubs-patient-record-header {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 16px;
+  border-bottom: 1px solid #dde6ed;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-history-section h3,
+body[data-page="ubs-patient"] .ubs-patient-referral-section h3,
+body[data-page="ubs-patient"] .ubs-patient-subview-heading h3,
+body[data-page="ubs-patient"] .ubs-patient-record-header h3 {
+  font-size: 0.98rem;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-count-badge,
+body[data-page="ubs-patient"] .ubs-patient-specialty-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: #e9f0f7;
+  color: #3f6689;
+  font-size: 0.67rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-history-list {
+  padding: 5px 16px 14px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-history-item {
+  position: relative;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr);
+  gap: 10px;
+  padding: 11px 0;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-history-item:not(:last-child) {
+  border-bottom: 1px solid #e3eaf0;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-history-marker {
+  inline-size: 10px;
+  block-size: 10px;
+  margin-top: 6px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: #0b8a7d;
+  box-shadow: 0 0 0 2px #98d8d1;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-history-marker.is-blue {
+  background: #2374ba;
+  box-shadow: 0 0 0 2px #abd0ef;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-history-marker.is-rose {
+  background: #d84d5b;
+  box-shadow: 0 0 0 2px #f4b9c0;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-history-content {
+  min-width: 0;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-history-content > header {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-history-content > header > div {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-history-content strong {
+  color: #23364b;
+  font-size: 0.8rem;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-history-content time,
+body[data-page="ubs-patient"] .ubs-patient-history-content small {
+  color: #71869a;
+  font-size: 0.68rem;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-history-content p {
+  margin: 7px 0 5px;
+  color: #42566b;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-record-type {
+  display: inline-flex;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #dff7f2;
+  color: #087a6d;
+  font-size: 0.63rem;
+  font-weight: 900;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-record-type.is-blue {
+  background: #e1effc;
+  color: #1d68a7;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-record-type.is-rose {
+  background: #ffe8eb;
+  color: #bd3a4c;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-empty-state,
+body[data-page="ubs-patient"] .ubs-patient-loading {
+  min-height: 126px;
+  display: grid;
+  place-content: center;
+  gap: 5px;
+  padding: 20px;
+  color: #768a9e;
+  text-align: center;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-empty-state strong {
+  color: #354b61;
+  font-size: 0.84rem;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-empty-state p {
+  margin: 0;
+  font-size: 0.74rem;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-referral-section > form {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(210px, 300px) minmax(180px, auto);
+  align-items: end;
+  gap: 12px;
+  padding: 14px 16px 16px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-referral-person {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+  align-content: center;
+  min-height: 54px;
+  padding: 8px 12px;
+  border-left: 3px solid var(--ubs-patient-teal);
+  background: #f5fbfa;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-referral-person strong {
+  color: #16314a;
+  font-size: 0.82rem;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-referral-person span {
+  color: #6b8195;
+  font-size: 0.69rem;
+  overflow-wrap: anywhere;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-referral-section label {
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+  color: #536b82;
+  font-size: 0.68rem;
+  font-weight: 900;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-referral-section select,
+body[data-page="ubs-patient"] .ubs-patient-record-specialty input {
+  min-width: 0;
+  width: 100%;
+  min-height: 40px;
+  padding: 8px 11px;
+  border: 1px solid #bfd0de;
+  border-radius: 8px;
+  background: #fff;
+  color: #22364b;
+  font-weight: 750;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-referral-action {
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-referral-action > span {
+  min-height: 14px;
+  color: #708498;
+  font-size: 0.64rem;
+  font-weight: 800;
+  text-align: right;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-referral-action > span.is-referred {
+  color: #07835a;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-referral-action .btn {
+  width: 100%;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-specialty-view,
+body[data-page="ubs-patient"] .ubs-patient-record-view {
+  margin: 16px 18px 18px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-specialty-list {
+  min-width: 0;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-specialty-table-header,
+body[data-page="ubs-patient"] .ubs-patient-specialty-row {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) 170px 130px;
+  align-items: center;
+  gap: 12px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-specialty-table-header {
+  padding: 10px 14px;
+  background: var(--ubs-patient-blue);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-specialty-row {
+  min-height: 58px;
+  padding: 9px 14px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-specialty-row:not(:last-child) {
+  border-bottom: 1px solid #d9e3eb;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-specialty-row > div {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-specialty-row strong {
+  color: #23364a;
+  font-size: 0.78rem;
+  overflow-wrap: anywhere;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-specialty-icon {
+  inline-size: 28px;
+  block-size: 28px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 8px;
+  background: #dff7f2;
+  color: #08796c;
+  font-weight: 900;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-specialty-icon.is-blue {
+  background: #e1effc;
+  color: #236ca8;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-specialty-icon.is-amber {
+  background: #fff0cf;
+  color: #a56b05;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-specialty-icon.is-rose {
+  background: #ffe6e9;
+  color: #bd3e4c;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-specialty-row .btn {
+  min-height: 34px;
+  padding: 6px 10px;
+  border-color: #9bbada;
+  color: var(--ubs-patient-blue);
+  font-size: 0.7rem;
+  font-weight: 900;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-record-view > form {
+  display: grid;
+  gap: 16px;
+  padding: 16px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-record-types {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-record-types legend,
+body[data-page="ubs-patient"] .ubs-patient-record-specialty > span,
+body[data-page="ubs-patient"] .ubs-patient-record-description > span {
+  width: 100%;
+  margin-bottom: 2px;
+  color: #526b82;
+  font-size: 0.65rem;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-record-types label {
+  cursor: pointer;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-record-types input {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  opacity: 0;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-record-types label span {
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border: 1px solid #c5d4df;
+  border-radius: 8px;
+  background: #fff;
+  color: #30485f;
+  font-size: 0.72rem;
+  font-weight: 850;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-record-types input:checked + span {
+  border-color: var(--ubs-patient-blue);
+  background: var(--ubs-patient-blue);
+  color: #fff;
+  box-shadow: 0 3px 8px rgb(7 87 149 / 18%);
+}
+
+body[data-page="ubs-patient"] .ubs-patient-record-specialty,
+body[data-page="ubs-patient"] .ubs-patient-record-description {
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-record-specialty input {
+  background: #e8eef3;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-record-description textarea {
+  width: 100%;
+  min-height: 220px;
+  resize: vertical;
+  padding: 12px;
+  border: 1px solid #bfd0de;
+  border-radius: 9px;
+  background: #f3f7fa;
+  color: #24364a;
+  line-height: 1.5;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-record-description textarea:focus,
+body[data-page="ubs-patient"] .ubs-patient-referral-section select:focus {
+  outline: 3px solid rgb(20 116 181 / 16%);
+  border-color: #297bb5;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-record-view form > footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding-top: 12px;
+  border-top: 1px solid #dce5ec;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-record-view form > footer small {
+  color: #6b8094;
+  font-size: 0.66rem;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-record-view form > footer > div {
+  display: flex;
+  gap: 8px;
+}
+
+body[data-page="ubs-patient"] .btn.btn-primary {
+  border-color: var(--ubs-patient-blue);
+  background: var(--ubs-patient-blue);
+  color: #fff;
+}
+
+body[data-page="ubs-patient"] .btn.btn-primary:hover:not(:disabled) {
+  border-color: var(--ubs-patient-blue-dark);
+  background: var(--ubs-patient-blue-dark);
+}
+
+body[data-page="ubs-patient"] .btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+@media (max-width: 1180px) {
+  body[data-page="ubs-patient"] .ubs-patient-meta-grid {
+    grid-template-columns: repeat(3, minmax(120px, 1fr));
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-referral-section > form {
+    grid-template-columns: minmax(180px, 1fr) minmax(190px, 260px);
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-referral-action {
+    grid-column: 1 / -1;
+    grid-template-columns: minmax(0, 1fr) 180px;
+    align-items: center;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-referral-action > span {
+    text-align: left;
+  }
+}
+
+@media (max-width: 820px) {
+  body[data-page="ubs-patient"] .ubs-patient-page {
+    width: calc(100% - 20px);
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-summary-hero {
+    grid-template-columns: 52px minmax(0, 1fr);
+    gap: 12px;
+    padding: 14px;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-avatar {
+    inline-size: 52px;
+    block-size: 52px;
+    border-radius: 14px;
+    font-size: 1rem;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-name-row h2 {
+    font-size: 1.15rem;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-meta-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-clinical-summary {
+    grid-template-columns: 1fr;
+    padding: 0 14px 14px;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-specialty-table-header {
+    display: none;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-specialty-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-specialty-count {
+    grid-column: 1;
+    width: fit-content;
+    margin-left: 38px;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-specialty-row .btn {
+    grid-column: 2;
+    grid-row: 1 / 3;
+  }
+}
+
+@media (max-width: 620px) {
+  body[data-page="ubs-patient"] .ubs-patient-module-hero {
+    min-height: 64px;
+    padding: 10px 12px;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-module-icon {
+    inline-size: 38px;
+    block-size: 38px;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-module-hero strong {
+    font-size: 0.9rem;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-section-heading,
+  body[data-page="ubs-patient"] .ubs-patient-history-section > header,
+  body[data-page="ubs-patient"] .ubs-patient-referral-section > header,
+  body[data-page="ubs-patient"] .ubs-patient-subview-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-section-heading .btn,
+  body[data-page="ubs-patient"] .ubs-patient-subview-heading .btn {
+    width: 100%;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-summary-hero {
+    grid-template-columns: 1fr;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-meta-grid {
+    grid-template-columns: 1fr;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-referral-section > form {
+    grid-template-columns: 1fr;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-referral-action {
+    grid-column: auto;
+    grid-template-columns: 1fr;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-specialty-view,
+  body[data-page="ubs-patient"] .ubs-patient-record-view {
+    margin: 12px;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-specialty-row {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-specialty-count,
+  body[data-page="ubs-patient"] .ubs-patient-specialty-row .btn {
+    grid-column: auto;
+    grid-row: auto;
+    width: 100%;
+    margin-left: 0;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-history-content > header,
+  body[data-page="ubs-patient"] .ubs-patient-record-view form > footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-record-view form > footer > div {
+    flex-direction: column;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-record-view form > footer .btn {
+    width: 100%;
+  }
+}
+
+/* Keep the current CADH/UBS subsection visibly selected after navigation. */
+:is(
+  body.siselo-sidebar-shell,
+  body.siselo-auto-shell,
+  body[data-page="home"],
+  body[data-page="cadh"],
+  body[data-page="ubs"]
+) .home-sidebar .menu .siselo-module-subnav a.active {
+  background: #315f86 !important;
+  color: #fff !important;
+  font-weight: 800 !important;
+}
+
+:is(
+  body.siselo-sidebar-shell,
+  body.siselo-auto-shell,
+  body[data-page="home"],
+  body[data-page="cadh"],
+  body[data-page="ubs"]
+) .home-sidebar .menu .siselo-module-subnav a.active span {
+  color: #fff !important;
+}
+
+/*
+ * Settings and legacy pages are mounted in `.siselo-auto-shell` at runtime.
+ * Keep that shell on the same responsive contract as Home/CADH/UBS: the
+ * navigation owns only the free vertical space and the account footer always
+ * remains inside the viewport.
+ */
+body.siselo-auto-shell {
+  --siselo-sidebar-width: 216px;
+  --siselo-sidebar-collapsed-width: 72px;
+  overflow-x: hidden;
+}
+
+body.siselo-auto-shell .siselo-app-shell {
+  min-height: 100dvh;
+}
+
+body.siselo-auto-shell .home-sidebar {
+  width: var(--siselo-sidebar-width) !important;
+  min-width: var(--siselo-sidebar-width) !important;
+  height: 100dvh !important;
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0 !important;
+  overflow: hidden !important;
+}
+
+body.siselo-auto-shell .home-sidebar .topbar-left,
+body.siselo-auto-shell .home-sidebar-brand,
+body.siselo-auto-shell .home-sidebar-footer {
+  flex: 0 0 auto !important;
+}
+
+body.siselo-auto-shell .home-sidebar-brand {
+  min-height: 76px !important;
+  padding: 14px 16px !important;
+}
+
+body.siselo-auto-shell .home-sidebar-mark {
+  inline-size: 36px !important;
+  block-size: 36px !important;
+}
+
+body.siselo-auto-shell .home-sidebar-nav {
+  min-height: 0 !important;
+  flex: 1 1 auto !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  padding: 16px 10px 12px !important;
+  scrollbar-width: thin;
+  scrollbar-color: rgb(255 255 255 / 18%) transparent;
+}
+
+body.siselo-auto-shell .home-sidebar-label {
+  margin: 0 8px 10px !important;
+  font-size: 8px !important;
+}
+
+body.siselo-auto-shell .home-sidebar .menu {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 4px !important;
+}
+
+body.siselo-auto-shell .home-sidebar .menu > a {
+  width: 100% !important;
+  min-height: 46px !important;
+  grid-template-columns: 22px minmax(0, 1fr) 12px !important;
+  place-items: initial !important;
+  align-items: center !important;
+  gap: 9px !important;
+  padding: 7px 10px !important;
+  border-radius: 9px !important;
+}
+
+body.siselo-auto-shell .home-sidebar-nav-icon,
+body.siselo-auto-shell .home-sidebar-nav-icon svg {
+  inline-size: 17px !important;
+  block-size: 17px !important;
+}
+
+body.siselo-auto-shell .home-sidebar-nav-copy strong {
+  font-size: 13px !important;
+  line-height: 1.15 !important;
+}
+
+body.siselo-auto-shell .home-sidebar-nav-copy small {
+  font-size: 9px !important;
+  line-height: 1.2 !important;
+}
+
+body.siselo-auto-shell .home-sidebar-footer {
+  width: 100% !important;
+  min-height: 72px !important;
+  margin-top: 0 !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 40px !important;
+  gap: 4px !important;
+  padding: 6px !important;
+  background: #062c4f !important;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 10%) !important;
+}
+
+body.siselo-auto-shell .home-sidebar-footer .topbar-settings {
+  grid-column: 1 / -1 !important;
+  min-height: 28px !important;
+  justify-content: flex-start !important;
+  padding: 3px 7px !important;
+  font-size: 10px !important;
+}
+
+body.siselo-auto-shell .home-sidebar-footer .topbar-account {
+  min-height: 39px !important;
+  grid-template-columns: 28px minmax(0, 1fr) !important;
+  place-items: initial !important;
+  align-items: center !important;
+  padding: 4px 6px !important;
+}
+
+body.siselo-auto-shell .home-sidebar-user-icon {
+  inline-size: 28px !important;
+  block-size: 28px !important;
+}
+
+body.siselo-auto-shell .home-sidebar-user-copy strong {
+  font-size: 10px !important;
+}
+
+body.siselo-auto-shell .home-sidebar-user-copy small {
+  font-size: 7px !important;
+}
+
+body.siselo-auto-shell .home-sidebar-footer .topbar-logout {
+  inline-size: 40px !important;
+  block-size: 39px !important;
+  min-inline-size: 40px !important;
+}
+
+body.siselo-auto-shell .siselo-main-shell {
+  min-width: 0 !important;
+  margin-left: var(--siselo-sidebar-width) !important;
+}
+
+body.siselo-auto-shell .siselo-sidebar-toggle {
+  left: calc(var(--siselo-sidebar-width) - 12px) !important;
+  bottom: 68px !important;
+}
+
+body.siselo-auto-shell.home-sidebar-is-collapsed .home-sidebar {
+  width: var(--siselo-sidebar-collapsed-width) !important;
+  min-width: var(--siselo-sidebar-collapsed-width) !important;
+}
+
+body.siselo-auto-shell.home-sidebar-is-collapsed .siselo-main-shell {
+  margin-left: var(--siselo-sidebar-collapsed-width) !important;
+}
+
+body.siselo-auto-shell.home-sidebar-is-collapsed .siselo-sidebar-toggle {
+  left: calc(var(--siselo-sidebar-collapsed-width) - 12px) !important;
+}
+
+body[data-page="admin-users-list"] .table-scroll,
+body[data-page="admin-users-form"] .table-scroll {
+  max-width: 100%;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+}
+
+body[data-page="admin-users-list"] .admin-table {
+  min-width: 1060px !important;
+  table-layout: auto !important;
+}
+
+body[data-page="admin-users-list"] .admin-table th {
+  white-space: nowrap;
+}
+
+body[data-page="admin-users-list"] .admin-table :is(th, td):nth-child(2),
+body[data-page="admin-users-list"] .admin-table :is(th, td):nth-child(3),
+body[data-page="admin-users-list"] .admin-table :is(th, td):nth-child(5),
+body[data-page="admin-users-list"] .admin-table :is(th, td):nth-child(6) {
+  overflow-wrap: anywhere;
+}
+
+body[data-page="admin-users-list"] .admin-table th:first-child,
+body[data-page="admin-users-list"] .admin-table td:first-child {
+  width: 62px;
+}
+
+body[data-page="admin-users-list"] .admin-table th:last-child,
+body[data-page="admin-users-list"] .admin-table td:last-child {
+  width: 120px;
+  white-space: nowrap;
+}
+
+body[data-page="admin-users-list"] .admin-table :is(th, td):nth-child(4),
+body[data-page="admin-users-list"] .admin-table :is(th, td):nth-child(7),
+body[data-page="admin-users-list"] .admin-table :is(th, td):nth-child(8) {
+  white-space: nowrap;
+}
+
+@media (max-width: 1180px) {
+  body.siselo-auto-shell {
+    --siselo-sidebar-width: 196px;
+  }
+}
+
+/*
+ * At 125–175% browser zoom the CSS viewport enters the old tablet
+ * breakpoint. Preserve the complete sidebar while there is still enough
+ * room for a desktop workspace.
+ */
+@media (min-width: 701px) and (max-width: 1180px) {
+  body.siselo-auto-shell .home-sidebar {
+    display: flex !important;
+    grid-template-columns: none !important;
+  }
+
+  body.siselo-auto-shell .home-sidebar-brand {
+    justify-content: flex-start !important;
+    padding-inline: 16px !important;
+  }
+
+  body.siselo-auto-shell .home-sidebar-brand-copy,
+  body.siselo-auto-shell .home-sidebar-nav-copy,
+  body.siselo-auto-shell .home-sidebar-user-copy {
+    display: grid !important;
+  }
+
+  body.siselo-auto-shell .home-sidebar-label,
+  body.siselo-auto-shell .home-sidebar-chevron {
+    display: block !important;
+  }
+
+  body.siselo-auto-shell .siselo-module-subnav {
+    display: grid !important;
+  }
+
+  body.siselo-auto-shell .home-sidebar-footer {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 40px !important;
+    padding: 6px !important;
+  }
+
+  body.siselo-auto-shell .home-sidebar-footer .topbar-settings {
+    grid-column: 1 / -1 !important;
+    inline-size: auto !important;
+    min-inline-size: 0 !important;
+  }
+
+  body.siselo-auto-shell .home-sidebar-footer .topbar-settings span {
+    display: inline !important;
+  }
+
+  body.siselo-auto-shell .home-sidebar-footer .topbar-account {
+    inline-size: auto !important;
+    min-inline-size: 0 !important;
+  }
+
+  body.siselo-auto-shell .home-sidebar-footer .topbar-logout {
+    display: grid !important;
+    inline-size: 40px !important;
+    min-inline-size: 40px !important;
+  }
+}
+
+@media (max-width: 700px) {
+  body.siselo-auto-shell {
+    --siselo-sidebar-width: 72px;
+  }
+
+  body.siselo-auto-shell .siselo-app-shell {
+    display: block !important;
+  }
+
+  body.siselo-auto-shell .home-sidebar {
+    position: fixed !important;
+    inset: 0 auto 0 0 !important;
+    width: var(--siselo-sidebar-width) !important;
+    min-width: var(--siselo-sidebar-width) !important;
+    height: 100dvh !important;
+    display: flex !important;
+    grid-template-columns: none !important;
+    padding: 0 !important;
+  }
+
+  body.siselo-auto-shell .home-sidebar .topbar-left {
+    width: 100% !important;
+  }
+
+  body.siselo-auto-shell .home-sidebar-brand {
+    min-height: 62px !important;
+    justify-content: center !important;
+    padding: 10px 8px !important;
+  }
+
+  body.siselo-auto-shell .home-sidebar-brand-copy,
+  body.siselo-auto-shell .home-sidebar-label,
+  body.siselo-auto-shell .home-sidebar-nav-copy,
+  body.siselo-auto-shell .home-sidebar-chevron,
+  body.siselo-auto-shell .home-sidebar-user-copy,
+  body.siselo-auto-shell .siselo-module-subnav,
+  body.siselo-auto-shell .home-sidebar-footer .topbar-settings span {
+    display: none !important;
+  }
+
+  body.siselo-auto-shell .home-sidebar-nav {
+    padding: 8px !important;
+  }
+
+  body.siselo-auto-shell .home-sidebar .menu {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+  }
+
+  body.siselo-auto-shell .home-sidebar .menu > a {
+    width: 52px !important;
+    min-height: 48px !important;
+    grid-template-columns: 1fr !important;
+    place-items: center !important;
+    justify-self: center !important;
+    padding: 0 !important;
+  }
+
+  body.siselo-auto-shell .home-sidebar-footer {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    justify-items: center !important;
+    gap: 4px !important;
+    padding: 6px !important;
+  }
+
+  body.siselo-auto-shell .home-sidebar-footer .topbar-settings,
+  body.siselo-auto-shell .home-sidebar-footer .topbar-account,
+  body.siselo-auto-shell .home-sidebar-footer .topbar-logout {
+    grid-column: auto !important;
+    inline-size: 40px !important;
+    block-size: 40px !important;
+    min-inline-size: 40px !important;
+    min-block-size: 40px !important;
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    place-items: center !important;
+    justify-self: center !important;
+    padding: 0 !important;
+  }
+
+  body.siselo-auto-shell .home-sidebar-user-icon {
+    inline-size: 28px !important;
+    block-size: 28px !important;
+  }
+
+  body.siselo-auto-shell .siselo-main-shell,
+  body.siselo-auto-shell.home-sidebar-is-collapsed .siselo-main-shell {
+    margin-left: var(--siselo-sidebar-width) !important;
+  }
+
+  body.siselo-auto-shell .siselo-sidebar-toggle {
+    display: none !important;
+  }
+
+  body.siselo-auto-shell .siselo-page-header {
+    position: sticky !important;
+    min-height: 54px !important;
+    padding: 8px 10px !important;
+  }
+
+  body.siselo-auto-shell .container {
+    width: calc(100% - 16px) !important;
+    margin: 8px auto 18px !important;
+  }
+}
+
+/* Collapsible UBS/CADH module groups. */
+body.siselo-auto-shell .siselo-module-subnav[hidden],
+.siselo-module-subnav[hidden] {
+  display: none !important;
+}
+
+.siselo-module-toggle .home-sidebar-chevron {
+  display: block !important;
+  opacity: 0.58 !important;
+  visibility: visible !important;
+  transform: rotate(0deg) !important;
+  transition: transform 160ms ease, opacity 160ms ease !important;
+}
+
+.siselo-module-toggle[aria-expanded="true"] .home-sidebar-chevron {
+  opacity: 0.9 !important;
+  transform: rotate(90deg) !important;
+}
+
+#nav-home .home-sidebar-chevron {
+  display: none !important;
+}
+
+/* Patient chart workspace: one follow-up group with isolated module views. */
+body[data-page="ubs-patient"] .ubs-patient-workspace {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 270px minmax(0, 1fr);
+  align-items: stretch;
+  gap: 16px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--ubs-patient-border);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 8px 22px rgb(32 67 98 / 7%);
+  overflow: hidden;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-heading {
+  padding: 16px 16px 10px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-heading p {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+  color: var(--ubs-patient-teal);
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-heading svg,
+body[data-page="ubs-patient"] .ubs-patient-context-area svg,
+body[data-page="ubs-patient"] .ubs-patient-context-group > strong svg,
+body[data-page="ubs-patient"] .ubs-patient-context-exit svg {
+  inline-size: 17px;
+  block-size: 17px;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context #ubs-patient-summary {
+  min-width: 0;
+  padding: 0 16px 16px;
+  border-bottom: 1px solid #dde6ed;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-profile {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr);
+  align-items: center;
+  gap: 11px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context .ubs-patient-avatar {
+  inline-size: 54px;
+  block-size: 54px;
+  border-radius: 15px;
+  font-size: 1rem;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context .ubs-patient-name-row {
+  gap: 6px;
+  margin: 0 0 3px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context .ubs-patient-name-row h2 {
+  font-size: 0.92rem;
+  line-height: 1.2;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context .ubs-patient-status {
+  padding: 3px 6px;
+  font-size: 0.56rem;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-cpf {
+  display: block;
+  color: #70869a;
+  font-size: 0.68rem;
+  overflow-wrap: anywhere;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-selected {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 11px;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: #e3f5f1;
+  color: #087b6d;
+  font-size: 0.62rem;
+  font-weight: 850;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-selected::before {
+  content: "⌕";
+  font-size: 0.75rem;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-details {
+  margin-top: 11px;
+  border: 1px solid #d7e2ea;
+  border-radius: 9px;
+  background: #fbfdfe;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-details summary {
+  padding: 9px 10px;
+  color: #37526c;
+  cursor: pointer;
+  font-size: 0.67rem;
+  font-weight: 850;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-meta {
+  max-height: 250px;
+  display: grid;
+  gap: 8px;
+  padding: 0 10px 10px;
+  overflow-y: auto;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-meta > div {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+  padding-top: 7px;
+  border-top: 1px solid #e3eaf0;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-meta span {
+  color: #6a8095;
+  font-size: 0.56rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-meta strong {
+  color: #2b4055;
+  font-size: 0.66rem;
+  font-weight: 750;
+  overflow-wrap: anywhere;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-area {
+  display: grid;
+  gap: 8px;
+  padding: 15px 16px 11px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-area p {
+  margin: 0;
+  color: #647b91;
+  font-size: 0.61rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-area strong,
+body[data-page="ubs-patient"] .ubs-patient-context-group > strong {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #20364c;
+  font-size: 0.76rem;
+  font-weight: 900;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-nav {
+  padding: 0 10px 14px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-group {
+  display: grid;
+  gap: 3px;
+  padding: 10px 7px 7px;
+  border: 1px solid #cad8e4;
+  border-radius: 11px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-group > strong {
+  padding: 0 6px 7px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-group button {
+  width: 100%;
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 9px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #63788d;
+  cursor: pointer;
+  font-size: 0.68rem;
+  font-weight: 800;
+  line-height: 1.25;
+  text-align: left;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-group button:hover {
+  background: #edf4f8;
+  color: #174c78;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-group button.active {
+  background: var(--ubs-patient-blue);
+  color: #fff;
+  box-shadow: 0 4px 10px rgb(7 87 149 / 18%);
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-group button[hidden] {
+  display: none !important;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-group button > span {
+  flex: 0 0 auto;
+  font-size: 0.86rem;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-exit {
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin: auto 10px 10px;
+  padding: 8px 10px;
+  border: 1px solid #f1a8a8;
+  border-radius: 9px;
+  color: #dc3030;
+  font-size: 0.68rem;
+  font-weight: 850;
+  text-decoration: none;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-context-exit:hover {
+  background: #fff5f5;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-followup-card {
+  min-height: 560px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-followup-card > .ubs-patient-section-heading {
+  align-items: center;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-followup-card > .ubs-patient-section-heading h1 {
+  font-size: 1.18rem;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-module-view[hidden] {
+  display: none !important;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-module-view {
+  min-width: 0;
+}
+
+body[data-page="ubs-patient"] #ubs-patient-history-view,
+body[data-page="ubs-patient"] #ubs-patient-referral-view {
+  padding: 16px 18px 18px;
+}
+
+body[data-page="ubs-patient"] .ubs-patient-module-view .ubs-patient-history-section,
+body[data-page="ubs-patient"] .ubs-patient-module-view .ubs-patient-referral-section {
+  margin: 0;
+}
+
+@media (max-width: 980px) {
+  body[data-page="ubs-patient"] .ubs-patient-workspace {
+    grid-template-columns: 1fr;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-context-nav {
+    padding-bottom: 10px;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-context-group {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-context-group > strong {
+    grid-column: 1 / -1;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-context-exit {
+    width: fit-content;
+    margin-top: 0;
+    align-self: flex-end;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-context-meta {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 620px) {
+  body[data-page="ubs-patient"] .ubs-patient-context-group {
+    grid-template-columns: 1fr;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-context-group > strong {
+    grid-column: auto;
+  }
+
+  body[data-page="ubs-patient"] .ubs-patient-context-meta {
+    grid-template-columns: 1fr;
+  }
+
+  body[data-page="ubs-patient"] #ubs-patient-history-view,
+  body[data-page="ubs-patient"] #ubs-patient-referral-view {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 700px) {
+  .siselo-module-toggle .home-sidebar-chevron {
+    display: none !important;
+  }
+
+  :is(
+    body.siselo-sidebar-shell,
+    body.siselo-auto-shell,
+    body[data-page="home"],
+    body[data-page="cadh"],
+    body[data-page="ubs"]
+  ) .siselo-module-toggle[aria-expanded="true"] + .siselo-module-subnav:not([hidden]) {
+    display: grid !important;
+    position: fixed !important;
+    z-index: 1200 !important;
+    top: var(--siselo-subnav-mobile-top, 68px) !important;
+    right: 8px !important;
+    left: 80px !important;
+    max-height: calc(100dvh - var(--siselo-subnav-mobile-top, 68px) - 8px) !important;
+    margin: 0 !important;
+    padding: 8px !important;
+    overflow-y: auto !important;
+    border: 1px solid rgb(255 255 255 / 12%) !important;
+    border-radius: 10px !important;
+    background: #062f55 !important;
+    box-shadow: 0 14px 30px rgb(1 25 47 / 28%) !important;
+  }
+}
+
+/* Medium typography shared by every UBS workspace tab. */
+body[data-page="ubs"] .siselo-module-subnav a,
+body[data-page="ubs"] .siselo-module-subnav-heading {
+  font-size: 11px;
+}
+
+body[data-page="ubs"] .ubs-module-metrics dd,
+body[data-page="ubs"] .ubs-patient-list-heading span,
+body[data-page="ubs"] .ubs-patient-list-filter-card header small,
+body[data-page="ubs"] .ubs-patient-list-filters label,
+body[data-page="ubs"] .ubs-patient-table-shell > footer,
+body[data-page="ubs"] .ubs-sharing-screen > header span,
+body[data-page="ubs"] .ubs-sharing-detail > header span,
+body[data-page="ubs"] .ubs-sharing-layout > label small {
+  font-size: 10px !important;
+}
+
+body[data-page="ubs"] .ubs-tab,
+body[data-page="ubs"] .ubs-patient-list-heading .btn,
+body[data-page="ubs"] .ubs-patient-list-filter-card header strong,
+body[data-page="ubs"] .ubs-patient-list-filters input,
+body[data-page="ubs"] .ubs-patient-list-filters select,
+body[data-page="ubs"] .ubs-patient-data-table thead th,
+body[data-page="ubs"] .ubs-sharing-layout > label > span,
+body[data-page="ubs"] .ubs-sharing-summary span,
+body[data-page="ubs"] .ubs-sharing-records article strong,
+body[data-page="ubs"] .ubs-sharing-records article span,
+body[data-page="ubs"] .ubs-sharing-records article p {
+  font-size: 11px !important;
+}
+
+body[data-page="ubs"] .ubs-search-label,
+body[data-page="ubs"] .ubs-table th,
+body[data-page="ubs"] .ubs-sharing-detail p,
+body[data-page="ubs"] .ubs-sharing-layout > label select {
+  font-size: 12px;
+}
+
+body[data-page="ubs"] .ubs-patient-search .cadh-block-title,
+body[data-page="ubs"] .ubs-patient-search .ubs-search-shell input,
+body[data-page="ubs"] .ubs-patient-search .cadh-search-button,
+body[data-page="ubs"] .ubs-patient-search .ubs-filter-button,
+body[data-page="ubs"] .ubs-patient-data-table td,
+body[data-page="ubs"] .ubs-table td,
+body[data-page="ubs"] .ubs-empty-state p {
+  font-size: 13px;
+}
+
+body[data-page="ubs"] .ubs-patient-data-table td strong,
+body[data-page="ubs"] .ubs-table td strong,
+body[data-page="ubs"] .ubs-empty-state strong {
+  font-size: 14px;
+}
+
+body[data-page="ubs"] .ubs-table td small {
+  font-size: 11px;
+}
+
+body[data-page="ubs"] .ubs-patient-list-heading strong,
+body[data-page="ubs"] .ubs-sharing-screen > header strong {
+  font-size: 17px;
+}
+
+body[data-page="cadh"] .cadh-received-actions .btn {
+  font-size: 12px;
+}
+
+body[data-page="cadh"] .cadh-modules-screen .cadh-screen-header h3 {
+  font-size: 15px;
+}
+
+body[data-page="cadh"] .cadh-specialty-label strong {
+  font-size: 11px;
+}
+
+body[data-page="cadh"] .cadh-specialty-actions :is(a, button) {
+  font-size: 9px;
+}
+
+/* CADH clinical workspace: readable sizing and complete specialty names. */
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-search .cadh-block-title {
+  font-size: 13px !important;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-search label {
+  font-size: 11px !important;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-search input {
+  height: 40px !important;
+  font-size: 13px !important;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-option {
+  min-height: 68px;
+  padding: 10px 12px !important;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-option-name {
+  font-size: 13px !important;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-option-meta {
+  font-size: 10px !important;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-option-status {
+  font-size: 9px !important;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-module-tabs,
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-tab-link {
+  min-height: 44px !important;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-tab-link {
+  font-size: 12px !important;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-tab-icon svg {
+  width: 16px !important;
+  height: 16px !important;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-inline-panel {
+  padding: 22px !important;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-modules-screen .cadh-screen-header h3 {
+  font-size: 17px;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-guidance-alert {
+  min-height: 40px;
+  padding: 11px 12px;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-specialty-grid-inline .cadh-specialty-card {
+  min-height: 92px !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-rows: auto auto;
+  align-content: space-between;
+  gap: 9px !important;
+  padding: 12px !important;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-specialty-label {
+  min-width: 0;
+  align-items: flex-start;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-specialty-label strong {
+  min-width: 0;
+  overflow: visible;
+  font-size: 12px;
+  line-height: 1.3;
+  overflow-wrap: normal;
+  text-overflow: clip;
+  white-space: normal;
+  word-break: normal;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-specialty-actions :is(a, button) {
+  min-height: 30px;
+  font-size: 10px;
+}
+
+@media (max-width: 1180px) {
+  body[data-page="cadh"] #cadh-clinical-workspace .cadh-specialty-grid-inline {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  body[data-page="cadh"] .cadh-specialty-schedule-fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 620px) {
+  body[data-page="cadh"] .cadh-specialty-schedule-fields {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* CADH selected patient: current visual pattern without legacy profile actions. */
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-result {
+  overflow-x: hidden;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-selected-patient-card {
+  width: 100%;
+  min-width: 0;
+  flex: 0 0 auto;
+  border-radius: 10px;
+  box-shadow: none;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-selected-patient-header {
+  grid-template-columns: 36px minmax(0, 1fr) 30px;
+  gap: 8px;
+  min-height: 60px;
+  padding: 11px 12px;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-selected-patient-header > div,
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-transition-cta > span {
+  min-width: 0;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-selected-patient-header strong {
+  overflow: visible;
+  font-size: 13px;
+  line-height: 1.25;
+  overflow-wrap: break-word;
+  text-overflow: clip;
+  white-space: normal;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-selected-patient-list {
+  padding: 8px 12px 10px;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-selected-patient-list > div {
+  grid-template-columns: 1fr;
+  gap: 3px;
+  min-height: 0;
+  padding: 8px 0;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-selected-patient-list dt {
+  font-size: 10px;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-selected-patient-list dd {
+  font-size: 12px;
+  line-height: 1.3;
+  text-align: left;
+  overflow-wrap: break-word;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-transition-cta {
+  width: 100%;
+  min-width: 0;
+  grid-template-columns: 36px minmax(0, 1fr) 18px;
+  gap: 8px;
+  min-height: 60px;
+  margin-top: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-transition-cta strong {
+  font-size: 12px;
+  line-height: 1.25;
+  overflow-wrap: break-word;
+  white-space: normal;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-transition-cta small {
+  font-size: 10px;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-overview {
+  min-width: 0;
+  padding: 22px !important;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-overview-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #d8e3ec;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-overview-heading p {
+  margin: 0 0 3px;
+  color: #078573;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-overview-heading h3 {
+  margin: 0;
+  color: #14263a;
+  font-size: 18px;
+  line-height: 1.25;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-overview-identity {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+  padding: 14px;
+  border: 1px solid #cfe0eb;
+  border-radius: 11px;
+  background: #f3faf9;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-overview-avatar {
+  inline-size: 52px;
+  block-size: 52px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: #c9f0e8;
+  color: #086f64;
+  font-size: 16px;
+  font-weight: 900;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-overview-identity h4 {
+  margin: 0 0 3px;
+  color: #12273c;
+  font-size: 18px;
+  line-height: 1.25;
+  overflow-wrap: break-word;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-overview-identity div > span {
+  color: #647b91;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-overview-grid {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 10px;
+  margin: 0;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-overview-grid > div {
+  min-width: 0;
+  min-height: 68px;
+  display: grid;
+  align-content: center;
+  gap: 5px;
+  padding: 11px 12px;
+  border: 1px solid #d6e1ea;
+  border-radius: 9px;
+  background: #fff;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-overview-grid dt,
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-overview-clinical span {
+  color: #587087;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-overview-grid dd {
+  min-width: 0;
+  margin: 0;
+  color: #14283d;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.35;
+  text-align: left;
+  overflow-wrap: break-word;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-overview-clinical {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-overview-clinical article {
+  min-width: 0;
+  min-height: 76px;
+  padding: 12px;
+  border: 1px solid #cfe0eb;
+  border-radius: 9px;
+  background: #f8fbfd;
+}
+
+body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-overview-clinical p {
+  margin: 7px 0 0;
+  color: #31495f;
+  font-size: 13px;
+  line-height: 1.4;
+  overflow-wrap: break-word;
+}
+
+@media (max-width: 700px) {
+  body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-overview {
+    padding: 16px !important;
+  }
+
+  body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-overview-heading {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-overview-grid,
+  body[data-page="cadh"] #cadh-clinical-workspace .cadh-patient-overview-clinical {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Histórico unificado de atendimentos do CADH */
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-dashboard {
+  display: grid;
+  align-content: start;
+  gap: 16px;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-panel {
+  min-width: 0;
+  overflow: hidden;
+  padding: 20px;
+  border: 1px solid #c9d9e6;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(18, 45, 68, .06);
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-heading {
+  min-width: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #d7e2eb;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-heading > div {
+  min-width: 0;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] #cadh-history-back {
+  display: inline-flex;
+  margin-bottom: 13px;
+  color: #075c9e;
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] #cadh-history-back:hover {
+  text-decoration: underline;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-heading p {
+  margin: 0 0 3px;
+  color: #078372;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-heading h2 {
+  margin: 0;
+  color: #13273c;
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-heading div > span {
+  display: block;
+  margin-top: 5px;
+  color: #657c92;
+  font-size: 13px;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] #cadh-history-count {
+  flex: 0 0 auto;
+  padding: 7px 11px;
+  border-radius: 999px;
+  background: #e9f1f7;
+  color: #3f5c75;
+  font-size: 12px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-patient {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 13px 14px;
+  border: 1px solid #bfe0dc;
+  border-radius: 10px;
+  background: #f0faf8;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-patient:empty {
+  display: none;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-avatar {
+  inline-size: 48px;
+  block-size: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  background: #c7eee7;
+  color: #087064;
+  font-size: 15px;
+  font-weight: 900;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-patient div {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-patient div > span {
+  color: #078372;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-patient strong {
+  color: #13273c;
+  font-size: 16px;
+  line-height: 1.25;
+  overflow-wrap: break-word;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-patient small {
+  color: #617990;
+  font-size: 12px;
+  line-height: 1.35;
+  overflow-wrap: break-word;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-filters {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(210px, 300px);
+  gap: 12px;
+  margin: 14px 0;
+  padding: 13px;
+  border: 1px solid #d3e0e9;
+  border-radius: 10px;
+  background: #f8fbfd;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-filters label {
+  min-width: 0;
+  display: grid;
+  gap: 6px;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-filters label > span {
+  color: #4d667e;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-filters input,
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-filters select {
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  padding: 9px 11px;
+  border: 1px solid #bfd0df;
+  border-radius: 8px;
+  background: #fff;
+  color: #1d344a;
+  font: inherit;
+  font-size: 13px;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-list {
+  min-width: 0;
+  display: grid;
+  gap: 11px;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-card {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #ccdae5;
+  border-left: 4px solid #149887;
+  border-radius: 10px;
+  background: #fff;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-card > header {
+  min-width: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 13px 14px 8px;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-card-tags {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-card-tags span {
+  color: #075b9d;
+  font-size: 15px;
+  font-weight: 900;
+  overflow-wrap: break-word;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-card-tags small {
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: #eaf2f8;
+  color: #536c84;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-card time {
+  flex: 0 0 auto;
+  color: #405a72;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-card-summary {
+  margin: 0;
+  padding: 0 14px 11px;
+  color: #2d455c;
+  font-size: 13px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-card-meta {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 14px;
+  border-top: 1px solid #e0e8ef;
+  background: #f8fbfd;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-card-meta span {
+  color: #6a8094;
+  font-size: 11px;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-card-meta a {
+  flex: 0 0 auto;
+  padding: 7px 10px;
+  border: 1px solid #a9c0d3;
+  border-radius: 7px;
+  background: #fff;
+  color: #075c9e;
+  font-size: 12px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-details {
+  border-top: 1px solid #dce6ed;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-details summary {
+  padding: 11px 14px;
+  color: #075c9e;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-details dl {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 9px;
+  margin: 0;
+  padding: 0 14px 14px;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-details dl > div {
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid #d7e2ea;
+  border-radius: 8px;
+  background: #fbfdfe;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-details dt {
+  margin-bottom: 5px;
+  color: #557088;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-details dd {
+  margin: 0;
+  color: #172c40;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-loading,
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-empty {
+  min-height: 180px;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 5px;
+  padding: 24px;
+  border: 1px dashed #bfd0de;
+  border-radius: 10px;
+  color: #536c83;
+  text-align: center;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-empty strong {
+  color: #182d42;
+  font-size: 15px;
+}
+
+body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-empty p {
+  margin: 0;
+  font-size: 12px;
+}
+
+@media (max-width: 700px) {
+  body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-panel {
+    padding: 15px;
+  }
+
+  body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-heading,
+  body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-card > header,
+  body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-card-meta {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-filters {
+    grid-template-columns: 1fr;
+  }
+
+  body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-card time {
+    white-space: normal;
+  }
+
+  body[data-page="cadh"][data-cadh-screen="history"] .cadh-history-details dl {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Plano de Cuidado vinculado ao paciente selecionado */
+body[data-page="care-plans-list"] .care-plans-overview-page,
+html.is-embedded body[data-page="care-plans-list"] .care-plans-overview-page {
+  width: min(1240px, calc(100% - 36px)) !important;
+  max-width: 1240px !important;
+  display: grid;
+  align-content: start;
+  gap: 16px;
+  margin: 20px auto 38px !important;
+}
+
+body[data-page="care-plans-list"] .care-plans-module-hero {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 15px 17px;
+  border: 1px solid #bcd5e5;
+  border-radius: 12px;
+  background: rgba(235, 246, 251, .9);
+}
+
+body[data-page="care-plans-list"] .care-plans-module-hero .cadh-module-hero-icon {
+  inline-size: 44px;
+  block-size: 44px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+  background: #075c9e;
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(7, 92, 158, .2);
+}
+
+body[data-page="care-plans-list"] .care-plans-module-hero .cadh-module-hero-icon svg {
+  inline-size: 23px;
+  block-size: 23px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+body[data-page="care-plans-list"] .care-plans-module-hero .cadh-module-hero-copy {
+  min-width: 0;
+}
+
+body[data-page="care-plans-list"] .care-plans-module-hero .cadh-module-hero-copy p {
+  margin: 0 0 3px;
+  color: #075c9e;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+body[data-page="care-plans-list"] .care-plans-module-hero .cadh-module-hero-copy h2 {
+  margin: 0;
+  color: #14293e;
+  font-size: 17px;
+  line-height: 1.25;
+  overflow-wrap: break-word;
+}
+
+body[data-page="care-plans-list"] .care-plans-overview-panel {
+  min-width: 0;
+  overflow: hidden;
+  padding: 20px;
+  border: 1px solid #c9d9e6;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(18, 45, 68, .07);
+}
+
+body[data-page="care-plans-list"] .care-plans-overview-heading {
+  min-width: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  padding-bottom: 17px;
+  border-bottom: 1px solid #d7e2eb;
+}
+
+body[data-page="care-plans-list"] .care-plans-overview-copy {
+  min-width: 0;
+}
+
+body[data-page="care-plans-list"] .care-plans-back-link {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 13px;
+  color: #075c9e;
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+body[data-page="care-plans-list"] .care-plans-back-link:hover {
+  text-decoration: underline;
+}
+
+body[data-page="care-plans-list"] .care-plans-overview-copy > p {
+  margin: 0 0 3px;
+  color: #078372;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+body[data-page="care-plans-list"] .care-plans-overview-copy h1 {
+  margin: 0;
+  color: #13273c;
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+body[data-page="care-plans-list"] .care-plans-overview-copy > span {
+  display: block;
+  margin-top: 5px;
+  color: #657c92;
+  font-size: 13px;
+}
+
+body[data-page="care-plans-list"] .care-plans-overview-actions {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+body[data-page="care-plans-list"] .care-plans-count {
+  padding: 7px 11px;
+  border-radius: 999px;
+  background: #e9f1f7;
+  color: #3f5c75;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+body[data-page="care-plans-list"] .care-plans-overview-actions .btn,
+body[data-page="care-plans-list"] .care-plan-record-action,
+body[data-page="care-plans-list"] .care-plans-empty .btn {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border: 1px solid #b9ccda;
+  border-radius: 8px;
+  background: #fff;
+  color: #173149;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.2;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+body[data-page="care-plans-list"] .care-plans-overview-actions .btn-primary,
+body[data-page="care-plans-list"] .care-plans-empty .btn-primary {
+  border-color: #087f72;
+  background: #087f72;
+  color: #fff;
+}
+
+body[data-page="care-plans-list"] .care-plans-patient-summary {
+  min-width: 0;
+  margin: 16px 0 14px;
+  padding: 14px;
+  border: 1px solid #bfe0dc;
+  border-radius: 10px;
+  background: #f0faf8;
+}
+
+body[data-page="care-plans-list"] .care-plans-patient-summary[hidden] {
+  display: none;
+}
+
+body[data-page="care-plans-list"] .care-plans-patient-identity {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+}
+
+body[data-page="care-plans-list"] .care-plans-patient-avatar {
+  inline-size: 48px;
+  block-size: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  background: #c7eee7;
+  color: #087064;
+  font-size: 15px;
+  font-weight: 900;
+}
+
+body[data-page="care-plans-list"] .care-plans-patient-identity > div {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+body[data-page="care-plans-list"] .care-plans-patient-identity div > span {
+  color: #078372;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+body[data-page="care-plans-list"] .care-plans-patient-identity strong {
+  color: #13273c;
+  font-size: 16px;
+  line-height: 1.25;
+  overflow-wrap: break-word;
+}
+
+body[data-page="care-plans-list"] .care-plans-patient-identity small {
+  color: #617990;
+  font-size: 12px;
+}
+
+body[data-page="care-plans-list"] .care-plans-patient-status,
+body[data-page="care-plans-list"] .care-plan-record-status {
+  padding: 6px 9px;
+  border-radius: 999px;
+  background: #dff8ea;
+  color: #07814a;
+  font-size: 11px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+body[data-page="care-plans-list"] .care-plans-patient-status.is-inactive {
+  background: #f1f4f6;
+  color: #667b8e;
+}
+
+body[data-page="care-plans-list"] .care-plans-patient-details {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 9px;
+  margin: 13px 0 0 60px;
+}
+
+body[data-page="care-plans-list"] .care-plans-patient-details > div {
+  min-width: 0;
+  padding: 9px 10px;
+  border: 1px solid #d4e4e3;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .8);
+}
+
+body[data-page="care-plans-list"] .care-plans-patient-details dt {
+  margin-bottom: 4px;
+  color: #587087;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+body[data-page="care-plans-list"] .care-plans-patient-details dd {
+  min-width: 0;
+  margin: 0;
+  color: #172c40;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.35;
+  overflow-wrap: break-word;
+}
+
+body[data-page="care-plans-list"] .care-plans-list {
+  min-width: 0;
+  display: grid;
+  gap: 11px;
+}
+
+body[data-page="care-plans-list"] .care-plan-record {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #ccdae5;
+  border-left: 4px solid #149887;
+  border-radius: 10px;
+  background: #fff;
+}
+
+body[data-page="care-plans-list"] .care-plan-record > header {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 13px 14px 11px;
+}
+
+body[data-page="care-plans-list"] .care-plan-record header div {
+  min-width: 0;
+}
+
+body[data-page="care-plans-list"] .care-plan-record header div > span {
+  color: #078372;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+body[data-page="care-plans-list"] .care-plan-record h2 {
+  margin: 3px 0 0;
+  color: #075b9d;
+  font-size: 16px;
+  line-height: 1.25;
+}
+
+body[data-page="care-plans-list"] .care-plan-record dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0 14px 14px;
+}
+
+body[data-page="care-plans-list"] .care-plan-record dl > div {
+  min-width: 0;
+  padding: 11px;
+  border: 1px solid #dbe5ed;
+  border-radius: 8px;
+  background: #f8fbfd;
+}
+
+body[data-page="care-plans-list"] .care-plan-record dt {
+  margin-bottom: 5px;
+  color: #5b7288;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+body[data-page="care-plans-list"] .care-plan-record dd {
+  margin: 0;
+  color: #172c40;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+body[data-page="care-plans-list"] .care-plan-record > footer {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px 14px;
+  border-top: 1px solid #e0e8ef;
+  background: #f8fbfd;
+}
+
+body[data-page="care-plans-list"] .care-plan-record-action.is-danger {
+  border-color: #f3bebe;
+  color: #c52c2c;
+}
+
+body[data-page="care-plans-list"] .care-plans-loading,
+body[data-page="care-plans-list"] .care-plans-empty {
+  min-height: 190px;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 6px;
+  padding: 24px;
+  border: 1px dashed #bfd0de;
+  border-radius: 10px;
+  color: #536c83;
+  text-align: center;
+}
+
+body[data-page="care-plans-list"] .care-plans-patient-summary .care-plans-loading {
+  min-height: 72px;
+  border: 0;
+}
+
+body[data-page="care-plans-list"] .care-plans-empty-icon {
+  inline-size: 38px;
+  block-size: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #e1f6ef;
+  color: #078372;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+body[data-page="care-plans-list"] .care-plans-empty strong {
+  color: #182d42;
+  font-size: 15px;
+}
+
+body[data-page="care-plans-list"] .care-plans-empty p {
+  max-width: 520px;
+  margin: 0 0 6px;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+body[data-page="care-plans-list"] .care-plans-empty.is-error {
+  border-color: #efb4b4;
+  background: #fff8f8;
+}
+
+@media (max-width: 760px) {
+  body[data-page="care-plans-list"] .care-plans-overview-page,
+  html.is-embedded body[data-page="care-plans-list"] .care-plans-overview-page {
+    width: calc(100% - 22px) !important;
+    margin-top: 14px !important;
+  }
+
+  body[data-page="care-plans-list"] .care-plans-overview-panel {
+    padding: 15px;
+  }
+
+  body[data-page="care-plans-list"] .care-plans-overview-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  body[data-page="care-plans-list"] .care-plans-overview-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  body[data-page="care-plans-list"] .care-plans-patient-identity {
+    grid-template-columns: 48px minmax(0, 1fr);
+  }
+
+  body[data-page="care-plans-list"] .care-plans-patient-status {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  body[data-page="care-plans-list"] .care-plans-patient-details {
+    grid-template-columns: 1fr;
+    margin-left: 0;
+  }
+
+  body[data-page="care-plans-list"] .care-plan-record dl {
+    grid-template-columns: 1fr;
+  }
+
+  body[data-page="care-plans-list"] .care-plan-record > footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  body[data-page="care-plans-list"] .care-plan-record-action {
+    width: 100%;
+  }
+}
+
+/* Planos ativos dentro de Compartilhamentos UBS/CADH */
+body[data-page="cadh"] .cadh-sharing-care-plans {
+  min-width: 0;
+  display: grid;
+  gap: 8px;
+}
+
+body[data-page="cadh"] .cadh-sharing-care-plans > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 2px 2px 4px;
+}
+
+body[data-page="cadh"] .cadh-sharing-care-plans > header strong {
+  color: #173b5d;
+  font-size: 13px;
+}
+
+body[data-page="cadh"] .cadh-sharing-care-plans > header span {
+  color: #657b90;
+  font-size: 11px;
+}
+
+body[data-page="cadh"] .cadh-sharing-care-plan {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 13px;
+  border: 1px solid #c9dbe7;
+  border-left: 4px solid #149887;
+  border-radius: 9px;
+  background: #fff;
+  color: inherit;
+  text-decoration: none;
+  transition: border-color .16s ease, background-color .16s ease, box-shadow .16s ease;
+}
+
+body[data-page="cadh"] .cadh-sharing-care-plan:hover,
+body[data-page="cadh"] .cadh-sharing-care-plan:focus-visible {
+  border-color: #75bdb2;
+  background: #f4fbfa;
+  box-shadow: 0 4px 12px rgba(14, 105, 94, .1);
+  outline: none;
+}
+
+body[data-page="cadh"] .cadh-sharing-care-plan > div {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+body[data-page="cadh"] .cadh-sharing-care-plan div > span {
+  color: #078372;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+body[data-page="cadh"] .cadh-sharing-care-plan div > strong {
+  color: #075b9d;
+  font-size: 13px;
+  line-height: 1.3;
+}
+
+body[data-page="cadh"] .cadh-sharing-care-plan p {
+  margin: 0;
+  color: #60768b;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+body[data-page="cadh"] .cadh-sharing-care-plan > span {
+  flex: 0 0 auto;
+  color: #087f72;
+  font-size: 11px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+  body[data-page="cadh"] .cadh-sharing-care-plans > header,
+  body[data-page="cadh"] .cadh-sharing-care-plan {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  body[data-page="cadh"] .cadh-sharing-care-plan > span {
+    white-space: normal;
+  }
+}
+
+/* Lixeira de Planos de Cuidado vinculada ao paciente */
+body[data-page="care-plans-trash"] {
+  min-height: 100vh;
+  background-color: #eef5f8;
+  background-image: radial-gradient(circle, rgba(11, 79, 136, .18) 1px, transparent 1.4px);
+  background-size: 26px 26px;
+}
+
+body[data-page="care-plans-trash"] .care-plans-overview-page,
+html.is-embedded body[data-page="care-plans-trash"] .care-plans-overview-page {
+  width: min(1240px, calc(100% - 36px)) !important;
+  max-width: 1240px !important;
+  display: grid;
+  align-content: start;
+  gap: 16px;
+  margin: 20px auto 38px !important;
+}
+
+body[data-page="care-plans-trash"] .care-plans-module-hero {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 15px 17px;
+  border: 1px solid #bcd5e5;
+  border-radius: 12px;
+  background: rgba(235, 246, 251, .9);
+}
+
+body[data-page="care-plans-trash"] .care-plans-module-hero .cadh-module-hero-icon {
+  inline-size: 44px;
+  block-size: 44px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+  background: #075c9e;
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(7, 92, 158, .2);
+}
+
+body[data-page="care-plans-trash"] .care-plans-module-hero .cadh-module-hero-icon svg {
+  inline-size: 23px;
+  block-size: 23px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+body[data-page="care-plans-trash"] .care-plans-module-hero .cadh-module-hero-copy {
+  min-width: 0;
+}
+
+body[data-page="care-plans-trash"] .care-plans-module-hero .cadh-module-hero-copy p {
+  margin: 0 0 3px;
+  color: #075c9e;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+body[data-page="care-plans-trash"] .care-plans-module-hero .cadh-module-hero-copy h2 {
+  margin: 0;
+  color: #14293e;
+  font-size: 17px;
+  line-height: 1.25;
+  overflow-wrap: break-word;
+}
+
+body[data-page="care-plans-trash"] .care-plans-overview-panel {
+  min-width: 0;
+  overflow: hidden;
+  padding: 20px;
+  border: 1px solid #c9d9e6;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(18, 45, 68, .07);
+}
+
+body[data-page="care-plans-trash"] .care-plans-overview-heading {
+  min-width: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  padding-bottom: 17px;
+  border-bottom: 1px solid #d7e2eb;
+}
+
+body[data-page="care-plans-trash"] .care-plans-overview-copy {
+  min-width: 0;
+}
+
+body[data-page="care-plans-trash"] .care-plans-back-link {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 13px;
+  color: #075c9e;
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+body[data-page="care-plans-trash"] .care-plans-overview-copy > p {
+  margin: 0 0 3px;
+  color: #8b5e14;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+body[data-page="care-plans-trash"] .care-plans-overview-copy h1 {
+  margin: 0;
+  color: #13273c;
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+body[data-page="care-plans-trash"] .care-plans-overview-copy > span {
+  display: block;
+  margin-top: 5px;
+  color: #657c92;
+  font-size: 13px;
+}
+
+body[data-page="care-plans-trash"] .care-plans-overview-actions {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+}
+
+body[data-page="care-plans-trash"] .care-plans-count {
+  padding: 7px 11px;
+  border-radius: 999px;
+  background: #f1f4f6;
+  color: #566b7f;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+body[data-page="care-plans-trash"] .care-plans-patient-summary {
+  min-width: 0;
+  margin: 16px 0 14px;
+  padding: 14px;
+  border: 1px solid #bfe0dc;
+  border-radius: 10px;
+  background: #f0faf8;
+}
+
+body[data-page="care-plans-trash"] .care-plans-patient-summary[hidden] {
+  display: none;
+}
+
+body[data-page="care-plans-trash"] .care-plans-patient-identity {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+}
+
+body[data-page="care-plans-trash"] .care-plans-patient-avatar {
+  inline-size: 48px;
+  block-size: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  background: #c7eee7;
+  color: #087064;
+  font-size: 15px;
+  font-weight: 900;
+}
+
+body[data-page="care-plans-trash"] .care-plans-patient-identity > div {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+body[data-page="care-plans-trash"] .care-plans-patient-identity div > span {
+  color: #078372;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+body[data-page="care-plans-trash"] .care-plans-patient-identity strong {
+  color: #13273c;
+  font-size: 16px;
+}
+
+body[data-page="care-plans-trash"] .care-plans-patient-identity small {
+  color: #617990;
+  font-size: 12px;
+}
+
+body[data-page="care-plans-trash"] .care-plans-patient-status {
+  padding: 6px 9px;
+  border-radius: 999px;
+  background: #dff8ea;
+  color: #07814a;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+body[data-page="care-plans-trash"] .care-plans-patient-details {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 9px;
+  margin: 13px 0 0 60px;
+}
+
+body[data-page="care-plans-trash"] .care-plans-patient-details > div {
+  min-width: 0;
+  padding: 9px 10px;
+  border: 1px solid #d4e4e3;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .8);
+}
+
+body[data-page="care-plans-trash"] .care-plans-patient-details dt,
+body[data-page="care-plans-trash"] .care-plan-record dt {
+  margin-bottom: 4px;
+  color: #587087;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+body[data-page="care-plans-trash"] .care-plans-patient-details dd,
+body[data-page="care-plans-trash"] .care-plan-record dd {
+  min-width: 0;
+  margin: 0;
+  color: #172c40;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.35;
+  overflow-wrap: break-word;
+}
+
+body[data-page="care-plans-trash"] .care-plans-list {
+  min-width: 0;
+  display: grid;
+  gap: 11px;
+}
+
+body[data-page="care-plans-trash"] .care-plan-record {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #d3dce4;
+  border-left: 4px solid #8b9aaa;
+  border-radius: 10px;
+  background: #fff;
+}
+
+body[data-page="care-plans-trash"] .care-plan-record > header {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 13px 14px 11px;
+}
+
+body[data-page="care-plans-trash"] .care-plan-record header div > span {
+  color: #7a5a26;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+body[data-page="care-plans-trash"] .care-plan-record h2 {
+  margin: 3px 0 0;
+  color: #405b73;
+  font-size: 16px;
+}
+
+body[data-page="care-plans-trash"] .care-plan-record-status {
+  padding: 6px 9px;
+  border-radius: 999px;
+  background: #eef1f4;
+  color: #5e7182;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+body[data-page="care-plans-trash"] .care-plan-trash-dates {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0 14px 14px;
+}
+
+body[data-page="care-plans-trash"] .care-plan-trash-dates > div {
+  min-width: 0;
+  padding: 11px;
+  border: 1px solid #dbe5ed;
+  border-radius: 8px;
+  background: #f8fbfd;
+}
+
+body[data-page="care-plans-trash"] .care-plan-record > footer {
+  min-width: 0;
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px 14px;
+  border-top: 1px solid #e0e8ef;
+  background: #f8fbfd;
+}
+
+body[data-page="care-plans-trash"] .care-plan-record-action,
+body[data-page="care-plans-trash"] .care-plans-empty .btn {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border: 1px solid #b9ccda;
+  border-radius: 8px;
+  background: #fff;
+  color: #173149;
+  font-size: 12px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+body[data-page="care-plans-trash"] .care-plan-record-action.is-restore {
+  border-color: #82c9bb;
+  background: #effaf7;
+  color: #087f72;
+}
+
+body[data-page="care-plans-trash"] .care-plan-record-action.is-danger {
+  border-color: #f3bebe;
+  color: #c52c2c;
+}
+
+body[data-page="care-plans-trash"] .care-plans-loading,
+body[data-page="care-plans-trash"] .care-plans-empty {
+  min-height: 190px;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 6px;
+  padding: 24px;
+  border: 1px dashed #bfd0de;
+  border-radius: 10px;
+  color: #536c83;
+  text-align: center;
+}
+
+body[data-page="care-plans-trash"] .care-plans-patient-summary .care-plans-loading {
+  min-height: 72px;
+  border: 0;
+}
+
+body[data-page="care-plans-trash"] .care-plans-empty-icon {
+  inline-size: 38px;
+  block-size: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #e1f6ef;
+  color: #078372;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+body[data-page="care-plans-trash"] .care-plans-empty strong {
+  color: #182d42;
+  font-size: 15px;
+}
+
+body[data-page="care-plans-trash"] .care-plans-empty p {
+  max-width: 520px;
+  margin: 0 0 6px;
+  font-size: 12px;
+}
+
+@media (max-width: 760px) {
+  body[data-page="care-plans-trash"] .care-plans-overview-page,
+  html.is-embedded body[data-page="care-plans-trash"] .care-plans-overview-page {
+    width: calc(100% - 22px) !important;
+    margin-top: 14px !important;
+  }
+
+  body[data-page="care-plans-trash"] .care-plans-overview-panel {
+    padding: 15px;
+  }
+
+  body[data-page="care-plans-trash"] .care-plans-overview-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  body[data-page="care-plans-trash"] .care-plans-patient-identity {
+    grid-template-columns: 48px minmax(0, 1fr);
+  }
+
+  body[data-page="care-plans-trash"] .care-plans-patient-status {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  body[data-page="care-plans-trash"] .care-plans-patient-details,
+  body[data-page="care-plans-trash"] .care-plan-trash-dates {
+    grid-template-columns: 1fr;
+    margin-left: 0;
+  }
+
+  body[data-page="care-plans-trash"] .care-plan-record > footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  body[data-page="care-plans-trash"] .care-plan-record-action {
+    width: 100%;
+  }
+}

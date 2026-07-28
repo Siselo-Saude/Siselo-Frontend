@@ -24,9 +24,11 @@ const UBS_STATUS_OPTIONS = [
 ];
 
 let ubsPermissions = new Set();
+let ubsCanCreatePatients = false;
 let ubsTransitions = [];
+let ubsPatients = [];
 let ubsFollowups = [];
-let ubsActiveTab = 'transitioned';
+let ubsActiveTab = 'patients';
 let ubsFiltersOpen = false;
 let ubsFollowupFormOpen = false;
 let ubsSelectedTransitionId = '';
@@ -50,18 +52,26 @@ async function setupUbsPage() {
   if (!user) return;
 
   ubsPermissions = SISELO.getUiPermissions(user);
+  ubsCanCreatePatients = ubsPermissions.has('patients.create') && (
+    String(user.user_type || '').toUpperCase() === 'UBS' ||
+    ubsPermissions.has('admin.manage')
+  );
+  const newPatientLink = document.getElementById('ubs-new-patient-link');
+  if (newPatientLink) {
+    newPatientLink.hidden = !ubsCanCreatePatients;
+  }
   SISELO.bindShell('ubs');
   setupUbsHeaderDate();
   setupUbsSidebar(user);
 
   ubsFollowups = readUbsFollowups();
-  await loadUbsTransitions();
+  await Promise.all([loadUbsPatients(), loadUbsTransitions()]);
 
   bindUbsTabs();
   bindUbsFilterControls();
   syncUbsFilterSidebar();
   updateUbsMetrics();
-  activateUbsTab('transitioned');
+  activateUbsTab(SISELO.queryParam('tab') || 'patients');
 }
 
 function setupUbsHeaderDate() {
@@ -124,11 +134,35 @@ function setupUbsSidebar(user) {
 async function loadUbsTransitions() {
   try {
     const data = await SISELO.apiRequest('/transitions/list.php');
-    ubsTransitions = (Array.isArray(data.rows) ? data.rows : [])
-      .filter((row) => normalizeUbsText(row.status) !== 'cancelada')
-      .sort((first, second) => compareUbsDateDesc(first.transition_date, second.transition_date));
+    const rows = (Array.isArray(data.rows) ? data.rows : [])
+      .filter((row) => (
+        normalizeUbsText(row.status) !== 'cancelada' &&
+        normalizeUbsText(row.care_status) !== 'finalizado' &&
+        isUbsReferralToCadh(row)
+      ))
+      .sort((first, second) => (
+        compareUbsDateDesc(first.transition_date, second.transition_date) ||
+        Number(second.id || 0) - Number(first.id || 0)
+      ));
+    const latestByPatient = new Map();
+    rows.forEach((row) => {
+      const patientKey = String(row.patient_id || row.cpf || row.id || '');
+      if (patientKey && !latestByPatient.has(patientKey)) {
+        latestByPatient.set(patientKey, row);
+      }
+    });
+    ubsTransitions = Array.from(latestByPatient.values());
   } catch (error) {
     ubsTransitions = [];
+  }
+}
+
+async function loadUbsPatients() {
+  try {
+    const data = await SISELO.apiRequest('/patients/list.php');
+    ubsPatients = Array.isArray(data.rows) ? data.rows : [];
+  } catch (error) {
+    ubsPatients = [];
   }
 }
 
@@ -141,7 +175,16 @@ function bindUbsTabs() {
 }
 
 function activateUbsTab(tabKey) {
-  ubsActiveTab = ['transitioned', 'followup', 'next'].includes(tabKey) ? tabKey : 'transitioned';
+  ubsActiveTab = ['patients', 'transitioned', 'next', 'sharing'].includes(tabKey) ? tabKey : 'patients';
+  document.body.dataset.ubsView = ubsActiveTab;
+
+  const url = new URL(window.location.href);
+  if (ubsActiveTab === 'patients') {
+    url.searchParams.delete('tab');
+  } else {
+    url.searchParams.set('tab', ubsActiveTab);
+  }
+  window.history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`);
 
   document.querySelectorAll('[data-ubs-tab]').forEach((button) => {
     const isActive = button.dataset.ubsTab === ubsActiveTab;
@@ -153,8 +196,13 @@ function activateUbsTab(tabKey) {
     }
   });
 
-  if (ubsActiveTab === 'followup') {
-    renderUbsFollowupTab();
+  if (ubsActiveTab === 'patients') {
+    renderUbsPatientsTab();
+    return;
+  }
+
+  if (ubsActiveTab === 'sharing') {
+    renderUbsSharingTab();
     return;
   }
 
@@ -166,6 +214,142 @@ function activateUbsTab(tabKey) {
   renderUbsTransitionedTab();
 }
 
+function renderUbsPatientsTab() {
+  const panel = document.getElementById('ubs-tab-panel');
+  if (!panel) return;
+  const ubsOptions = [...new Set(ubsPatients.map((row) => String(row.ubs_ref || '').trim()).filter(Boolean))].sort();
+  const teamOptions = [...new Set(ubsPatients.map((row) => String(row.team_ref || '').trim()).filter(Boolean))].sort();
+  panel.innerHTML = `
+    <div class="ubs-patient-list-heading">
+      <div><span>DADOS DO PACIENTE</span><strong>Lista de usuários</strong></div>
+      <button id="ubs-patient-list-clear" class="btn" type="button">×&nbsp; Limpar</button>
+    </div>
+    <section class="ubs-patient-list-filter-card">
+      <header><span aria-hidden="true">▽</span><div><strong>Filtros da lista</strong><small>Escolha os dados antes de consultar os pacientes.</small></div></header>
+      <div class="ubs-patient-list-filters">
+        <label><span>Nome ou CPF</span><input id="ubs-patient-list-search" placeholder="Digite para buscar..."></label>
+        <label><span>Idade mínima</span><input id="ubs-patient-min-age" type="number" min="0"></label>
+        <label><span>Idade máxima</span><input id="ubs-patient-max-age" type="number" min="0"></label>
+        <label><span>UBS</span><select id="ubs-patient-ubs"><option value="">Todas as UBS</option>${ubsOptions.map((value) => `<option>${SISELO.escapeHtml(value)}</option>`).join('')}</select></label>
+        <label><span>Equipe</span><select id="ubs-patient-team"><option value="">Todas as equipes</option>${teamOptions.map((value) => `<option>${SISELO.escapeHtml(value)}</option>`).join('')}</select></label>
+      </div>
+    </section>
+    <div class="ubs-patient-table-shell">
+      <div class="table-scroll">
+        <table class="data-table ubs-patient-data-table">
+          <thead><tr><th>Nº</th><th>Nome do paciente</th><th>CPF</th><th>Idade</th><th>UBS</th><th>Equipe</th></tr></thead>
+          <tbody id="ubs-patient-list-body"></tbody>
+        </table>
+      </div>
+      <footer><span id="ubs-patient-list-count"></span><span>1 de 1</span></footer>
+    </div>
+  `;
+  const renderRows = () => {
+    const query = normalizeUbsText(document.getElementById('ubs-patient-list-search')?.value);
+    const min = Number(document.getElementById('ubs-patient-min-age')?.value || 0);
+    const max = Number(document.getElementById('ubs-patient-max-age')?.value || 999);
+    const selectedUbs = document.getElementById('ubs-patient-ubs')?.value || '';
+    const selectedTeam = document.getElementById('ubs-patient-team')?.value || '';
+    const rows = ubsPatients.filter((row) => {
+      const age = Number.parseInt(row.age_label, 10) || 0;
+      const matches = !query || normalizeUbsText(`${row.full_name} ${row.cpf}`).includes(query);
+      return matches && age >= min && age <= max &&
+        (!selectedUbs || row.ubs_ref === selectedUbs) &&
+        (!selectedTeam || row.team_ref === selectedTeam);
+    });
+    const count = document.getElementById('ubs-patient-list-count');
+    if (count) count.textContent = `Mostrando 1-${rows.length} de ${rows.length}`;
+    document.getElementById('ubs-patient-list-body').innerHTML = rows.length
+      ? rows.map((row, index) => `
+          <tr data-ubs-patient-row="${row.id}" tabindex="0" title="Abrir prontuário de ${SISELO.escapeHtml(row.full_name || 'paciente')}">
+            <td>${index + 1}</td><td><strong>${SISELO.escapeHtml(row.full_name || '-')}</strong></td>
+            <td>${SISELO.escapeHtml(row.cpf || '-')}</td><td>${SISELO.escapeHtml(row.age_label || '-')}</td>
+            <td>${SISELO.escapeHtml(row.ubs_ref || '-')}</td><td>${SISELO.escapeHtml(SISELO.formatTeamName(row.team_ref) || '-')}</td>
+          </tr>
+        `).join('')
+      : '<tr><td colspan="6">Nenhum usuário encontrado.</td></tr>';
+    panel.querySelectorAll('[data-ubs-patient-row]').forEach((row) => {
+      const open = () => {
+        window.location.href = `/ubs/patient.html?id=${encodeURIComponent(row.dataset.ubsPatientRow)}`;
+      };
+      row.addEventListener('click', open);
+      row.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') open();
+      });
+    });
+  };
+  panel.querySelectorAll('input, select').forEach((input) => {
+    input.addEventListener(input instanceof HTMLSelectElement ? 'change' : 'input', renderRows);
+  });
+  document.getElementById('ubs-patient-list-clear')?.addEventListener('click', () => {
+    panel.querySelectorAll('input').forEach((input) => { input.value = ''; });
+    panel.querySelectorAll('select').forEach((select) => { select.value = ''; });
+    renderRows();
+  });
+  renderRows();
+}
+
+function renderUbsSharingTab() {
+  const panel = document.getElementById('ubs-tab-panel');
+  if (!panel) return;
+
+  panel.innerHTML = `
+    <section class="ubs-sharing-screen">
+      <header>
+        <div><span>COMPARTILHAMENTOS UBS/CADH</span><strong>Plano de Cuidado compartilhado</strong></div>
+      </header>
+      <div class="ubs-sharing-layout">
+        <label>
+          <span>Paciente</span>
+          <select id="ubs-sharing-patient">
+            <option value="">Selecione um paciente...</option>
+            ${ubsPatients.map((row) => `<option value="${row.id}">${SISELO.escapeHtml(row.full_name || '-')}</option>`).join('')}
+          </select>
+          <small>Consulte o Plano de Cuidado e os registros compartilhados entre UBS e CADH.</small>
+        </label>
+        <div id="ubs-sharing-detail" class="ubs-sharing-detail">
+          <strong>Nenhum paciente selecionado</strong>
+          <p>Selecione um paciente para visualizar o Plano de Cuidado.</p>
+        </div>
+      </div>
+    </section>
+  `;
+
+  document.getElementById('ubs-sharing-patient')?.addEventListener('change', async (event) => {
+    const patientId = event.currentTarget.value;
+    const patient = ubsPatients.find((row) => String(row.id) === String(patientId));
+    const target = document.getElementById('ubs-sharing-detail');
+    if (!target) return;
+    if (!patient) {
+      target.innerHTML = '<strong>Nenhum paciente selecionado</strong><p>Selecione um paciente para visualizar o Plano de Cuidado.</p>';
+      return;
+    }
+    target.innerHTML = '<p>Carregando Plano de Cuidado...</p>';
+    try {
+      const data = await SISELO.apiRequest(`/patients/show.php?id=${encodeURIComponent(patientId)}`);
+      const plans = Array.isArray(data.care_plans) ? data.care_plans : [];
+      const encounters = Array.isArray(data.encounters) ? data.encounters : [];
+      const plan = plans[0] || null;
+      target.innerHTML = `
+        <header><div><span>PLANO DE CUIDADO</span><strong>${SISELO.escapeHtml(patient.full_name || '-')}</strong></div>
+          <a class="btn btn-primary" href="/care-plans/form.html?patient_id=${encodeURIComponent(patientId)}${plan ? `&id=${encodeURIComponent(plan.id)}` : ''}">
+            ${plan ? 'Abrir Plano de Cuidado' : 'Iniciar Plano de Cuidado'}
+          </a>
+        </header>
+        <div class="ubs-sharing-summary">
+          <span><strong>${plans.length}</strong> plano(s) de cuidado</span>
+          <span><strong>${encounters.length}</strong> registro(s) clínico(s)</span>
+        </div>
+        ${encounters.length
+          ? `<div class="ubs-sharing-records">${encounters.slice(0, 6).map((row) => `<article><strong>${SISELO.escapeHtml(row.specialty || 'Acompanhamento')}</strong><span>${SISELO.escapeHtml(formatUbsDate(row.encounter_date))}</span><p>${SISELO.escapeHtml(row.summary || 'Registro compartilhado.')}</p></article>`).join('')}</div>`
+          : '<p>Ainda não há registros clínicos compartilhados para este paciente.</p>'}
+      `;
+    } catch (error) {
+      target.innerHTML = `<strong>Não foi possível carregar o compartilhamento.</strong><p>${SISELO.escapeHtml(error.message || '')}</p>`;
+    }
+  });
+}
+
 function renderUbsTransitionedTab() {
   const panel = document.getElementById('ubs-tab-panel');
   if (!panel) return;
@@ -175,11 +359,10 @@ function renderUbsTransitionedTab() {
 
   panel.innerHTML = `
     <div class="ubs-table-card">
-      ${rows.length ? renderUbsTransitionedTable(rows) : renderUbsEmptyState('transition', 'Nenhuma transição do cuidado registrada.', 'Ajuste os filtros ou registre uma transição no CADH.')}
+      ${rows.length ? renderUbsTransitionedTable(rows) : renderUbsEmptyState('transition', 'Nenhum encaminhamento ao CADH registrado.', 'Ajuste os filtros ou encaminhe um paciente para o CADH.')}
     </div>
   `;
 
-  bindUbsTransitionedControls();
 }
 
 function renderUbsTransitionedTable(rows) {
@@ -187,17 +370,14 @@ function renderUbsTransitionedTable(rows) {
     <table class="ubs-table">
       <thead>
         <tr>
-          <th>Usuário</th>
-          <th>UBS / ESF</th>
-          <th>Transição</th>
-          <th>Acompanhamentos</th>
-          <th></th>
+          <th>Paciente</th>
+          <th>Destino</th>
+          <th>Encaminhamento</th>
         </tr>
       </thead>
       <tbody>
         ${rows.map((row) => {
           const destination = parseUbsDestination(row);
-          const count = getUbsFollowupsForTransition(row).length;
           return `
             <tr>
               <td>
@@ -209,24 +389,12 @@ function renderUbsTransitionedTable(rows) {
                 <small>${SISELO.escapeHtml(destination.esf || row.notes || '')}</small>
               </td>
               <td>${SISELO.escapeHtml(formatUbsDate(row.transition_date))}</td>
-              <td>${renderUbsCountBadge(count)}</td>
-              <td><button class="ubs-row-action" type="button" data-ubs-follow="${SISELO.escapeHtml(row.id)}">Acompanhar</button></td>
             </tr>
           `;
         }).join('')}
       </tbody>
     </table>
   `;
-}
-
-function bindUbsTransitionedControls() {
-  document.querySelectorAll('[data-ubs-follow]').forEach((button) => {
-    button.addEventListener('click', () => {
-      ubsSelectedTransitionId = button.dataset.ubsFollow || '';
-      ubsFollowupFormOpen = true;
-      activateUbsTab('followup');
-    });
-  });
 }
 
 function bindUbsFilterControls() {
@@ -551,7 +719,14 @@ function getSelectedUbsTransition() {
 
 function getUbsFollowupsForTransition(row) {
   return ubsFollowups
-    .filter((record) => String(record.transition_id) === String(row.id))
+    .filter((record) => (
+      String(record.transition_id) === String(row.id) ||
+      (
+        record.patient_id &&
+        row.patient_id &&
+        String(record.patient_id) === String(row.patient_id)
+      )
+    ))
     .sort((first, second) => compareUbsDateDesc(first.date, second.date));
 }
 
@@ -562,8 +737,16 @@ function getUbsNextContacts() {
 
   return ubsFollowups
     .filter((record) => {
+      const stillActive = ubsTransitions.some((row) => (
+        String(row.id) === String(record.transition_id) ||
+        (
+          record.patient_id &&
+          row.patient_id &&
+          String(record.patient_id) === String(row.patient_id)
+        )
+      ));
       const date = SISELO.parseDateInputValue(record.next_contact);
-      return date && date >= today && date <= limit;
+      return stillActive && date && date >= today && date <= limit;
     })
     .sort((first, second) => compareUbsDateAsc(first.next_contact, second.next_contact));
 }
@@ -648,4 +831,9 @@ function normalizeUbsText(value) {
     .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .trim();
+}
+
+function isUbsReferralToCadh(row) {
+  const destination = normalizeUbsText(row && row.to_service);
+  return destination === 'cadh' || destination.startsWith('cadh -');
 }

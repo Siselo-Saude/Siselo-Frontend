@@ -2,7 +2,6 @@ const CADH_SEARCH_KEY = 'siselo_cadh_search';
 
 const CADH_MANAGEMENT_TABS = {
   users: 'cadh-patients-card',
-  careplans: 'cadh-careplans-card',
   encounters: 'cadh-encounters-card',
   transitions: 'cadh-transitions-card',
 };
@@ -21,7 +20,7 @@ const CADH_DEFAULT_CARE_PLAN_ITEMS = [
   { item_type: 'meta', title: 'Prioridades e recomendações da equipe especializada', situation: '', difficulty: '', recommendation: '', goal: '', sort_order: 11 },
 ];
 
-const CADH_TRANSITION_ORIGIN = 'CADH — Centro de Atenção Domiciliar Hospitalar';
+const CADH_TRANSITION_ORIGIN = 'CADH — Centro de Atenção ao Diabetes e Hipertensão';
 
 const CADH_UBS_TEAM_GROUPS = [
   { ubs: 'UBS 01 PARANOÁ', teams: ['ESF EQUIPE 08 - BRANCA', 'ESF EQUIPE 09 - AMARELA', 'ESF EQUIPE 10 - AZUL', 'ESF EQUIPE 11 - VERDE', 'ESF EQUIPE 12 - ROSA', 'ESF EQUIPE 13 - LILÁS', 'ESF EQUIPE 14 - MARROM', 'ESF EQUIPE 15 - DOURADA', 'ESF EQUIPE 16 - LARANJA', 'ESF EQUIPE 17 - PRATA', 'EMULTI AROEIRA', 'ECR MESTRE DAMIÃO'] },
@@ -72,6 +71,8 @@ let cadhPermissions = new Set();
 let cadhCurrentPatient = null;
 let cadhClinicalContext = null;
 let cadhActiveTab = 'users';
+let cadhFollowupPatients = [];
+let cadhSchedulingSpecialty = '';
 
 document.addEventListener('DOMContentLoaded', () => {
   if (!['cadh', 'ubs'].includes(document.body.dataset.page)) {
@@ -85,18 +86,20 @@ async function setupCadhPage() {
   if (!user) return;
 
   cadhPermissions = SISELO.getUiPermissions(user);
+  const requestedTab = SISELO.queryParam('view') || 'users';
+  cadhActiveTab = CADH_MANAGEMENT_TABS[requestedTab] ? requestedTab : 'users';
   const shellKey = document.body.dataset.page === 'ubs' ? 'ubs' : 'cadh';
   SISELO.bindShell(shellKey);
   applyCadhModulePermissions(cadhPermissions);
   bindCadhManagementTabs();
-  bindCadhPatientSearch(cadhPermissions);
+  await bindCadhPatientSearch(cadhPermissions);
   setupCadhHeaderDate();
   setupCadhSidebar(user);
 
   if (!await restoreCadhPatientSearch(cadhPermissions)) {
     setCadhPatientCardsUnlocked(false);
     syncCadhPendingIndicators([]);
-    renderCadhEmptyManagementState();
+    await activateCadhManagementTab(cadhActiveTab);
   }
 }
 
@@ -196,7 +199,7 @@ function bindCadhManagementTabs() {
   });
 }
 
-function bindCadhPatientSearch(permissions) {
+async function bindCadhPatientSearch(permissions) {
   const form = document.getElementById('cadh-cpf-search');
   const input = document.getElementById('cadh-cpf-input');
   if (!form || !input) {
@@ -221,19 +224,32 @@ function bindCadhPatientSearch(permissions) {
   let debounceTimer = 0;
   let currentPatients = [];
 
+  try {
+    const data = await SISELO.apiRequest('/care_flow/list.php?care_status=active');
+    currentPatients = Array.isArray(data.rows) ? data.rows : [];
+    cadhFollowupPatients = currentPatients;
+    renderPatientSuggestions('');
+  } catch (error) {
+    currentPatients = [];
+    cadhFollowupPatients = [];
+    renderPatientSuggestions('');
+  }
+
   input.addEventListener('input', () => {
     const query = input.value.trim();
     clearCadhSelectedPatient({ keepInput: true });
 
     if (query.length < 1) {
-      renderCadhPatientMessage('Digite o nome ou CPF para localizar o usuário.');
+      renderPatientSuggestions('');
       return;
     }
 
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(async () => {
       try {
-        const data = await SISELO.apiRequest('/patients/list.php?q=' + encodeURIComponent(query));
+        const data = await SISELO.apiRequest(
+          '/care_flow/list.php?care_status=active&q=' + encodeURIComponent(query)
+        );
         currentPatients = Array.isArray(data.rows) ? data.rows : [];
         renderPatientSuggestions(query);
       } catch (error) {
@@ -247,17 +263,21 @@ function bindCadhPatientSearch(permissions) {
     const result = document.getElementById('cadh-patient-result');
     if (!result) return;
 
-    const matching = SISELO.filterPatientsForSearch(currentPatients, query).slice(0, 10);
+    const matching = (query
+      ? SISELO.filterPatientsForSearch(currentPatients, query)
+      : currentPatients
+    ).slice(0, 20);
 
     if (!matching.length) {
-      result.innerHTML = '<div class="cadh-patient-message is-error">Nenhum usuário encontrado.</div>';
+      result.innerHTML = '<div class="cadh-patient-message is-error">Nenhum paciente encaminhado pela UBS encontrado.</div>';
       return;
     }
 
     result.innerHTML = matching.map((patient) => `
       <button type="button" class="cadh-patient-option" data-patient-id="${patient.id}">
         <span class="cadh-patient-option-name">${SISELO.escapeHtml(patient.full_name || 'Usuário sem nome')}</span>
-        <span class="cadh-patient-option-meta">CPF: ${SISELO.escapeHtml(patient.cpf || '-')} | Equipe: ${SISELO.escapeHtml(formatCadhTeamName(patient.team_ref))}</span>
+        <span class="cadh-patient-option-meta">${SISELO.escapeHtml(patient.cpf || '-')}</span>
+        <span class="cadh-patient-option-status">${SISELO.escapeHtml(patient.status_label || 'Ativo')}</span>
       </button>
     `).join('');
 
@@ -284,8 +304,11 @@ async function restoreCadhPatientSearch(permissions) {
   const patient = state && state.patient ? state.patient : null;
   const patientId = SISELO.normalizeEntityId(patient && patient.id);
   const input = document.getElementById('cadh-cpf-input');
+  const patientIsEligible = cadhFollowupPatients.some(
+    (row) => String(SISELO.normalizeEntityId(row && row.id)) === String(patientId)
+  );
 
-  if (!patientId || !input) {
+  if (!patientId || !input || !patientIsEligible) {
     clearCadhSearchState();
     return false;
   }
@@ -326,6 +349,7 @@ function clearCadhSelectedPatient(options = {}) {
   cadhCurrentPatient = null;
   cadhClinicalContext = null;
   cadhActiveTab = 'users';
+  cadhSchedulingSpecialty = '';
   clearCadhSearchState();
   setCadhPatientCardPatient('');
   setCadhPatientCardsUnlocked(false);
@@ -341,7 +365,7 @@ function clearCadhSelectedPatient(options = {}) {
     input.value = '';
   }
 
-  renderCadhEmptyManagementState();
+  activateCadhManagementTab('users');
 }
 
 function setCadhPatientCardsUnlocked(unlocked) {
@@ -395,6 +419,13 @@ async function renderCadhPatientFromContext(patient, permissions) {
 async function activateCadhManagementTab(tabKey) {
   const normalizedTab = CADH_MANAGEMENT_TABS[tabKey] ? tabKey : 'users';
   cadhActiveTab = normalizedTab;
+  const url = new URL(window.location.href);
+  if (normalizedTab === 'users') {
+    url.searchParams.delete('view');
+  } else {
+    url.searchParams.set('view', normalizedTab);
+  }
+  window.history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`);
 
   Object.entries(CADH_MANAGEMENT_TABS).forEach(([key, id]) => {
     const tab = document.getElementById(id);
@@ -408,8 +439,13 @@ async function activateCadhManagementTab(tabKey) {
     }
   });
 
+  if (normalizedTab === 'encounters') {
+    renderCadhEncountersTab(cadhCurrentPatient);
+    return;
+  }
+
   if (!cadhCurrentPatient) {
-    renderCadhEmptyManagementState();
+    renderCadhEmptyManagementState(normalizedTab);
     return;
   }
 
@@ -418,35 +454,18 @@ async function activateCadhManagementTab(tabKey) {
     return;
   }
 
-  if (normalizedTab === 'careplans') {
-    await renderCadhCarePlanTab(cadhCurrentPatient);
-    return;
-  }
-
-  if (normalizedTab === 'encounters') {
-    renderCadhEncountersTab(cadhCurrentPatient);
-    return;
-  }
-
   renderCadhTransitionTab(cadhCurrentPatient);
 }
 
-function renderCadhEmptyManagementState() {
+function renderCadhEmptyManagementState(tabKey = 'users') {
   const detail = document.getElementById('cadh-patient-detail');
   if (!detail) return;
-  const canCreatePatient = cadhPermissions.has('patients.create');
-
+  const isTransition = tabKey === 'transitions';
   detail.innerHTML = `
     <div class="cadh-empty-state">
-      <span class="cadh-empty-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#cadh-icon-users"></use></svg></span>
-      <strong>Nenhum usuário selecionado</strong>
-      <p>Busque e selecione um usuário ao lado para visualizar e gerenciar suas informações de cuidado.</p>
-      ${canCreatePatient ? `
-        <a class="cadh-empty-new-patient-link btn btn-primary" href="/patients/form.html">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM3.5 19a5.5 5.5 0 0 1 11 0M18 8v6M15 11h6"/></svg>
-          Novo usuário
-        </a>
-      ` : ''}
+      <span class="cadh-empty-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#${isTransition ? 'cadh-icon-transition' : 'cadh-icon-users'}"></use></svg></span>
+      <strong>Nenhum paciente selecionado</strong>
+      <p>Selecione um paciente na lista ao lado para ${isTransition ? 'registrar o encaminhamento do cuidado' : 'acessar o prontuário'}.</p>
     </div>
   `;
   SISELO.applyUiComponents(detail);
@@ -472,18 +491,15 @@ function renderCadhSelectedPatientSummary(patient) {
       </header>
       <dl class="cadh-selected-patient-list">
         ${renderCadhDefinition('CPF', patient.cpf)}
+        ${renderCadhDefinition('UBS de origem', patient.ubs_ref || '-')}
         ${renderCadhDefinition('Equipe', formatCadhTeamName(patient.team_ref), { strongClass: 'is-team' })}
-        ${renderCadhDefinition('Nascimento', formatCadhDate(patient.birth_date))}
-        ${renderCadhDefinition('Idade', patient.age_label)}
-        ${renderCadhDefinition('Raça/Cor', formatCadhRace(patient.race))}
-        ${renderCadhDefinition('Telefone', patient.phone)}
       </dl>
     </article>
     <button class="cadh-transition-cta" type="button">
       <span class="cadh-transition-cta-icon" aria-hidden="true">
         <svg viewBox="0 0 24 24"><path d="M4 4v6h6M20 20v-6h-6"/><path d="M5 19a8 8 0 0 0 13-3M19 5a8 8 0 0 0-13 3"/></svg>
       </span>
-      <span><strong>Transição do Cuidado</strong><small>CADH &rarr; UBS</small></span>
+      <span><strong>Encaminhamento do Cuidado</strong><small>CADH &rarr; UBS</small></span>
       <svg class="cadh-transition-cta-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
     </button>
   `;
@@ -504,34 +520,57 @@ function renderCadhUserDetailsTab(patient) {
 
   const status = String(patient.status_label || patient.status || 'Ativo');
   const statusClass = normalizeCadhText(status).includes('inativo') ? 'is-inactive' : 'is-active';
+  const patientName = String(patient.full_name || 'Paciente');
+  const initials = patientName
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part.charAt(0))
+    .join('')
+    .toUpperCase() || 'P';
+
   detail.innerHTML = `
-    <section class="cadh-user-panel">
-      <div class="cadh-user-panel-header">
-        <h3>Dados Cadastrais do Usuário do SUS</h3>
+    <section class="cadh-user-panel cadh-patient-overview">
+      <header class="cadh-patient-overview-heading">
+        <div>
+          <p>Prontuário CADH</p>
+          <h3>Informações do paciente</h3>
+        </div>
         <span class="cadh-user-status ${statusClass}">${SISELO.escapeHtml(status)}</span>
+      </header>
+
+      <div class="cadh-patient-overview-identity">
+        <span class="cadh-patient-overview-avatar" aria-hidden="true">${SISELO.escapeHtml(initials)}</span>
+        <div>
+          <h4>${SISELO.escapeHtml(patientName)}</h4>
+          <span>CPF ${SISELO.escapeHtml(patient.cpf || '-')}</span>
+        </div>
       </div>
-      <div class="cadh-user-data-grid">
-        <dl>
-          ${renderCadhDefinition('Nome Completo', patient.full_name)}
-          ${renderCadhDefinition('CPF', patient.cpf)}
-          ${renderCadhDefinition('Data de Nascimento', formatCadhDate(patient.birth_date))}
-          ${renderCadhDefinition('Idade', patient.age_label)}
-          ${renderCadhDefinition('Raça/Cor', formatCadhRace(patient.race))}
-          ${renderCadhDefinition('Sexo', formatCadhSex(patient.sex || patient.gender_label))}
-        </dl>
-        <dl>
-          ${renderCadhDefinition('Telefone', patient.phone)}
-          ${renderCadhDefinition('Endereço', patient.address)}
-          ${renderCadhDefinition('UBS de Origem', patient.ubs_ref || formatCadhTeamName(patient.team_ref))}
-          ${renderCadhDefinition('Equipe de Saúde da Família', formatCadhTeamName(patient.team_ref))}
-          ${renderCadhDefinition('1º Atendimento no CADH', formatCadhDate(patient.first_cadh_date))}
-          ${renderCadhDefinition('Apoio Familiar', patient.responsible_name)}
-          ${renderCadhDefinition('Apoio Comunitário', patient.emergency_contact)}
-        </dl>
-      </div>
-      <div class="cadh-tab-actions">
-        <a class="btn" href="/patients/show.html?id=${encodeURIComponent(patient.id)}">Abrir Usuário 360</a>
-        ${cadhPermissions.has('patients.update') ? `<a class="btn btn-primary" href="/patients/form.html?id=${encodeURIComponent(patient.id)}">Editar cadastro</a>` : ''}
+
+      <dl class="cadh-patient-overview-grid">
+        ${renderCadhDefinition('Data de nascimento', formatCadhDate(patient.birth_date))}
+        ${renderCadhDefinition('Idade', patient.age_label)}
+        ${renderCadhDefinition('Sexo', formatCadhSex(patient.sex || patient.gender_label))}
+        ${renderCadhDefinition('Raça/Cor', formatCadhRace(patient.race))}
+        ${renderCadhDefinition('Telefone', patient.phone)}
+        ${renderCadhDefinition('E-mail', patient.email)}
+        ${renderCadhDefinition('Endereço', patient.address)}
+        ${renderCadhDefinition('UBS de origem', patient.ubs_ref || formatCadhTeamName(patient.team_ref))}
+        ${renderCadhDefinition('Equipe de Saúde da Família', formatCadhTeamName(patient.team_ref))}
+        ${renderCadhDefinition('1º atendimento no CADH', formatCadhDate(patient.first_cadh_date))}
+        ${renderCadhDefinition('Apoio familiar', patient.responsible_name)}
+        ${renderCadhDefinition('Apoio comunitário', patient.emergency_contact)}
+      </dl>
+
+      <div class="cadh-patient-overview-clinical">
+        <article>
+          <span>Alergias</span>
+          <p>${SISELO.escapeHtml(patient.allergies || 'Não informado')}</p>
+        </article>
+        <article>
+          <span>Condições crônicas</span>
+          <p>${SISELO.escapeHtml(patient.chronic_conditions || 'Não informado')}</p>
+        </article>
       </div>
     </section>
   `;
@@ -595,7 +634,7 @@ async function renderCadhCarePlanTab(patient, options = {}) {
           <li>Cada especialidade preenche seus campos durante o atendimento do usuário.</li>
           <li>Ao final do ciclo, o Gestor do Cuidado convoca reunião interdisciplinar.</li>
           <li>Na reunião, o plano é reaberto para discussão e pactuação das metas terapêuticas.</li>
-          <li>Com o usuário estabilizado, o Plano subsidia a decisão de Transição do Cuidado para a APS.</li>
+          <li>Com o paciente estabilizado, o Plano subsidia a decisão de encaminhamento do cuidado para a APS.</li>
         </ol>
       </div>
 
@@ -853,39 +892,204 @@ function renderCadhEncountersTab(patient) {
   const detail = document.getElementById('cadh-patient-detail');
   if (!detail) return;
 
-  const patientId = SISELO.normalizeEntityId(patient.id);
-  const rows = getCadhEncounterRows();
-  const canCreate = cadhPermissions.has('encounters.create');
-  const canUpdate = cadhPermissions.has('encounters.update');
-  const listHref = `/encounters/list.html?patient_id=${encodeURIComponent(patientId)}`;
-  const createHref = `/encounters/form.html?patient_id=${encodeURIComponent(patientId)}`;
+  const patientId = SISELO.normalizeEntityId(patient && patient.id);
+  const specialtySource = document.querySelector('.cadh-specialties-section .cadh-specialty-grid');
+  const specialtyMarkup = specialtySource
+    ? Array.from(specialtySource.children).map((card) => {
+        const href = patientId ? card.getAttribute('href') || '#' : '#';
+        const icon = card.querySelector('.cadh-specialty-icon')?.outerHTML || '';
+        const label = card.querySelector('span:last-child')?.textContent?.trim() || 'Especialidade';
+        const themeClass = Array.from(card.classList).find((name) => name.startsWith('cadh-specialty-') && name !== 'cadh-specialty-card') || '';
+        return `
+          <article class="cadh-specialty-card ${themeClass} ${patientId ? '' : 'is-locked'}">
+            <div class="cadh-specialty-label">${icon}<strong>${SISELO.escapeHtml(label)}</strong></div>
+            <div class="cadh-specialty-actions">
+              <a href="${SISELO.escapeHtml(href)}" ${patientId ? '' : 'aria-disabled="true" tabindex="-1"'}>Registrar</a>
+              <button type="button" data-cadh-schedule-specialty="${SISELO.escapeHtml(label)}" ${patientId ? '' : 'disabled'}>Agendar</button>
+            </div>
+          </article>
+        `;
+      }).join('')
+    : '';
 
   detail.innerHTML = `
-    <section class="cadh-inline-panel cadh-tab-screen cadh-encounters-screen">
+    <section class="cadh-inline-panel cadh-tab-screen cadh-modules-screen">
       <div class="cadh-screen-header">
-        <h3>Atendimentos &mdash; ${SISELO.escapeHtml(patient.full_name || '-')}</h3>
-        <div class="cadh-screen-actions">
-          <a class="btn" href="${SISELO.escapeHtml(listHref)}">Abrir lista</a>
-          ${canCreate ? `<a class="btn btn-primary" href="${SISELO.escapeHtml(createHref)}">Novo atendimento</a>` : ''}
-        </div>
+        <h3>Módulos Clínicos por Especialidade</h3>
+        ${patient ? `<span class="cadh-selected-patient-chip">${SISELO.escapeHtml(patient.full_name || '-')}</span>` : ''}
       </div>
-
-      <p class="cadh-guidance-alert">Cada especialidade possui roteiro de atendimento específico conforme o ciclo assistencial do CADH.</p>
-
-      ${rows.length ? `
-        <div class="cadh-encounter-list">
-          ${rows.map((row) => renderCadhEncounterCard(row, { canUpdate })).join('')}
-        </div>
-        <p class="cadh-list-end-note">Nenhum outro atendimento registrado.</p>
-      ` : `
-        <div class="cadh-empty-module">
-          <strong>Nenhum atendimento registrado.</strong>
-          <p>Os registros criados nas especialidades do CADH aparecerão aqui para acompanhamento rápido.</p>
-          ${canCreate ? `<a class="btn btn-primary" href="${SISELO.escapeHtml(createHref)}">Registrar atendimento</a>` : ''}
-        </div>
-      `}
+      ${patient
+        ? ''
+        : '<p class="cadh-guidance-alert">Selecione um paciente na lista ao lado para registrar atendimentos ou agendar consultas.</p>'}
+      <div class="cadh-specialty-grid cadh-specialty-grid-inline">${specialtyMarkup}</div>
+      ${patientId && cadhSchedulingSpecialty
+        ? renderCadhSpecialtyScheduleForm(patient, cadhSchedulingSpecialty)
+        : ''}
+      ${patientId ? `<div class="cadh-tab-actions"><a class="btn" href="/cadh/history.html?patient_id=${encodeURIComponent(patientId)}">Histórico de atendimentos</a></div>` : ''}
     </section>
   `;
+
+  detail.querySelectorAll('a[aria-disabled="true"]').forEach((link) => {
+    link.addEventListener('click', (event) => event.preventDefault());
+  });
+  detail.querySelectorAll('[data-cadh-schedule-specialty]').forEach((button) => {
+    button.addEventListener('click', () => {
+      cadhSchedulingSpecialty = button.dataset.cadhScheduleSpecialty || '';
+      renderCadhEncountersTab(patient);
+      detail.querySelector('#cadh-specialty-schedule-form')?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+      });
+    });
+  });
+  detail.querySelector('[data-cadh-cancel-schedule]')?.addEventListener('click', () => {
+    cadhSchedulingSpecialty = '';
+    renderCadhEncountersTab(patient);
+  });
+  detail.querySelector('#cadh-specialty-schedule-form')?.addEventListener('submit', (event) => {
+    saveCadhSpecialtySchedule(event, patient);
+  });
+  enhanceCadhScheduleDateTime(detail.querySelector('#cadh-specialty-schedule-form'));
+}
+
+function renderCadhSpecialtyScheduleForm(patient, specialty) {
+  const today = getCadhScheduleLocalDate();
+  return `
+    <form id="cadh-specialty-schedule-form" class="cadh-specialty-schedule-form">
+      <header>
+        <strong>Agendar — ${SISELO.escapeHtml(specialty)} — ${SISELO.escapeHtml(patient.full_name || '-')}</strong>
+      </header>
+      <div class="cadh-specialty-schedule-fields">
+        <label>
+          <span>Data</span>
+          <input id="cadh-schedule-date" name="schedule_date" type="date" min="${today}" required>
+        </label>
+        <label>
+          <span>Hora</span>
+          <div class="cadh-time-picker" role="group" aria-label="Horário do agendamento">
+            <select data-cadh-schedule-hour aria-label="Hora" required>
+              <option value="">Hora</option>
+              ${renderCadhTimeOptions(23)}
+            </select>
+            <span class="cadh-time-picker-separator" aria-hidden="true">:</span>
+            <select data-cadh-schedule-minute aria-label="Minuto" required>
+              <option value="">Min.</option>
+              ${renderCadhTimeOptions(59)}
+            </select>
+            <span class="cadh-time-picker-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="9"/>
+                <path d="M12 7v5l3 2"/>
+              </svg>
+            </span>
+            <input name="schedule_time" type="hidden">
+          </div>
+        </label>
+        <label>
+          <span>Modalidade</span>
+          <select name="modality">
+            <option value="Presencial">Presencial</option>
+            <option value="Teleatendimento">Teleatendimento</option>
+          </select>
+        </label>
+        <label>
+          <span>Profissional</span>
+          <input name="professional" placeholder="Nome do profissional...">
+        </label>
+        <label>
+          <span>Equipe</span>
+          <input name="team" value="${SISELO.escapeHtml(formatCadhTeamName(patient.team_ref) || patient.team_ref || '')}">
+        </label>
+        <label>
+          <span>Prioridade</span>
+          <select name="priority">
+            <option value="nao">Não</option>
+            <option value="sim">Sim</option>
+          </select>
+        </label>
+      </div>
+      <div id="cadh-specialty-schedule-alert" class="alert" hidden></div>
+      <footer>
+        <button class="btn btn-primary" type="submit">Confirmar Agendamento</button>
+        <button class="btn" type="button" data-cadh-cancel-schedule>Cancelar</button>
+      </footer>
+    </form>
+  `;
+}
+
+function enhanceCadhScheduleDateTime(form) {
+  if (!form) return;
+
+  const dateInput = form.querySelector('[name="schedule_date"]');
+  if (dateInput) {
+    dateInput.dataset.dateLabel = 'Data';
+    SISELO.enhanceDateInput(dateInput, { min: getCadhScheduleLocalDate() });
+  }
+
+  const hourSelect = form.querySelector('[data-cadh-schedule-hour]');
+  const minuteSelect = form.querySelector('[data-cadh-schedule-minute]');
+  const timeInput = form.querySelector('[name="schedule_time"]');
+  const syncTime = () => {
+    timeInput.value = hourSelect.value && minuteSelect.value
+      ? `${hourSelect.value}:${minuteSelect.value}`
+      : '';
+  };
+  hourSelect?.addEventListener('change', syncTime);
+  minuteSelect?.addEventListener('change', syncTime);
+  syncTime();
+}
+
+function renderCadhTimeOptions(maximum) {
+  return Array.from({ length: maximum + 1 }, (_, value) => {
+    const label = String(value).padStart(2, '0');
+    return `<option value="${label}">${label}</option>`;
+  }).join('');
+}
+
+async function saveCadhSpecialtySchedule(event, patient) {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const submit = form.querySelector('button[type="submit"]');
+  const formData = new FormData(form);
+  const scheduleDate = String(formData.get('schedule_date') || '');
+  const scheduleTime = String(formData.get('schedule_time') || '');
+  const alert = form.querySelector('#cadh-specialty-schedule-alert');
+
+  if (!SISELO.validateEnhancedDateInputs(form, { alertId: 'cadh-specialty-schedule-alert' })) {
+    return;
+  }
+
+  submit.disabled = true;
+  try {
+    await SISELO.apiRequest('/care_flow/action.php', {
+      method: 'POST',
+      body: {
+        action: 'schedule',
+        patient_id: Number(patient.id),
+        scheduled_at: `${scheduleDate}T${scheduleTime}`,
+        specialty: cadhSchedulingSpecialty,
+        modality: String(formData.get('modality') || ''),
+        professional: String(formData.get('professional') || ''),
+        team: String(formData.get('team') || ''),
+        priority: String(formData.get('priority') || 'nao'),
+      },
+    });
+    cadhSchedulingSpecialty = '';
+    window.location.assign('/cadh/index.html?flow=schedule');
+  } catch (error) {
+    submit.disabled = false;
+    if (alert) {
+      alert.hidden = false;
+      alert.className = 'alert alert-error';
+      alert.textContent = error.message || 'Não foi possível salvar o agendamento.';
+    }
+  }
+}
+
+function getCadhScheduleLocalDate() {
+  const now = new Date();
+  now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+  return now.toISOString().slice(0, 10);
 }
 
 function renderCadhEncounterCard(row, options = {}) {
@@ -920,12 +1124,12 @@ function renderCadhTransitionTab(patient, options = {}) {
     detail.innerHTML = `
       <section class="cadh-inline-panel cadh-tab-screen">
         <div class="cadh-screen-header">
-          <h3>Transição do Cuidado &mdash; ${SISELO.escapeHtml(patient.full_name || '-')}</h3>
+          <h3>Encaminhamento do Cuidado &mdash; ${SISELO.escapeHtml(patient.full_name || '-')}</h3>
           <div class="cadh-screen-actions">
             <a class="btn" href="${SISELO.escapeHtml(listHref)}">Abrir histórico</a>
           </div>
         </div>
-        <p class="cadh-inline-empty">Você pode visualizar o histórico, mas não tem permissão para registrar uma nova transição nesta tela.</p>
+        <p class="cadh-inline-empty">Você pode visualizar o histórico, mas não tem permissão para registrar um novo encaminhamento nesta tela.</p>
       </section>
     `;
     return;
@@ -934,7 +1138,7 @@ function renderCadhTransitionTab(patient, options = {}) {
   detail.innerHTML = `
     <section class="cadh-inline-panel cadh-tab-screen cadh-transition-screen">
       <div class="cadh-screen-header">
-        <h3>Transição do Cuidado &mdash; ${SISELO.escapeHtml(patient.full_name || '-')}</h3>
+        <h3>Encaminhamento do Cuidado &mdash; ${SISELO.escapeHtml(patient.full_name || '-')}</h3>
         <div class="cadh-screen-actions">
           <a class="btn" href="${SISELO.escapeHtml(listHref)}">Abrir histórico</a>
         </div>
@@ -943,7 +1147,7 @@ function renderCadhTransitionTab(patient, options = {}) {
       <div id="cadh-transition-alert" class="alert ${options.success ? 'alert-success' : ''}" ${options.success ? '' : 'hidden'}>${options.success ? SISELO.escapeHtml(options.success) : ''}</div>
       ${options.warning ? `<p class="cadh-inline-empty is-warning">${SISELO.escapeHtml(options.warning)}</p>` : ''}
 
-      <p class="cadh-info-alert">A transição ocorre quando o usuário está estabilizado. A origem é sempre o <strong>CADH</strong>. Após o registro, o usuário será inativado no CADH e vinculado à equipe de referência da UBS quando o perfil tiver permissão para editar o cadastro.</p>
+      <p class="cadh-info-alert">O encaminhamento ocorre quando o paciente está estabilizado. A origem é sempre o <strong>CADH</strong>. Após o registro, o paciente será inativado no CADH e vinculado à equipe de referência da UBS quando o perfil tiver permissão para editar o cadastro.</p>
 
       <form id="cadh-transition-form" class="cadh-transition-form">
         <input type="hidden" name="patient_id" value="${SISELO.escapeHtml(patientId)}">
@@ -972,10 +1176,10 @@ function renderCadhTransitionTab(patient, options = {}) {
 
         <label class="cadh-transition-field is-wide">
           <span>Observações</span>
-          <textarea name="notes" rows="4" placeholder="Observações sobre a transição..."></textarea>
+          <textarea name="notes" rows="4" placeholder="Observações sobre o encaminhamento..."></textarea>
         </label>
 
-        <button class="cadh-transition-submit" type="submit" disabled>Registrar Transição do Cuidado</button>
+        <button class="cadh-transition-submit" type="submit" disabled>Registrar Encaminhamento do Cuidado</button>
       </form>
     </section>
   `;
@@ -1059,7 +1263,7 @@ async function saveCadhTransitionForm(patient, form) {
   setCadhInlineAlert(alert, '', 'info');
 
   if (!ubsLabel) {
-    setCadhInlineAlert(alert, 'Selecione a UBS de destino antes de registrar a transição.', 'error');
+    setCadhInlineAlert(alert, 'Selecione a UBS de destino antes de registrar o encaminhamento.', 'error');
     ubsSelect?.focus();
     return;
   }
@@ -1101,15 +1305,15 @@ async function saveCadhTransitionForm(patient, form) {
 
     await renderCadhTransitionTab(cadhCurrentPatient || patient, {
       success: updateResult.updated
-        ? 'Transição registrada e cadastro atualizado com sucesso.'
-        : 'Transição registrada com sucesso.',
+        ? 'Encaminhamento registrado e cadastro atualizado com sucesso.'
+        : 'Encaminhamento registrado com sucesso.',
       warning: updateResult.warning || '',
     });
   } catch (error) {
-    setCadhInlineAlert(alert, error.message || 'Não foi possível registrar a transição do cuidado.', 'error');
+    setCadhInlineAlert(alert, error.message || 'Não foi possível registrar o encaminhamento do cuidado.', 'error');
     if (submitButton instanceof HTMLButtonElement) {
       submitButton.disabled = false;
-      submitButton.textContent = 'Registrar Transição do Cuidado';
+      submitButton.textContent = 'Registrar Encaminhamento do Cuidado';
     }
   }
 }
@@ -1118,7 +1322,7 @@ async function updateCadhPatientAfterTransition(patient, transitionData) {
   if (!cadhPermissions.has('patients.update')) {
     return {
       updated: false,
-      warning: 'Transição salva. O cadastro do usuário não foi alterado porque este perfil não possui permissão de edição.',
+      warning: 'Encaminhamento salvo. O cadastro do paciente não foi alterado porque este perfil não possui permissão de edição.',
     };
   }
 
@@ -1134,7 +1338,7 @@ async function updateCadhPatientAfterTransition(patient, transitionData) {
   } catch (error) {
     return {
       updated: false,
-      warning: error.message || 'Transição salva, mas não foi possível atualizar o cadastro do usuário automaticamente.',
+      warning: error.message || 'Encaminhamento salvo, mas não foi possível atualizar o cadastro do paciente automaticamente.',
     };
   }
 }
@@ -1212,11 +1416,11 @@ function renderCadhTransitionRecord(row, config) {
   return `
     <article class="cadh-record-card">
       <div>
-        <strong>${SISELO.escapeHtml(row.status_label || row.status || 'Transição')}</strong>
+        <strong>${SISELO.escapeHtml(row.status_label || row.status || 'Encaminhamento')}</strong>
         <span>${SISELO.escapeHtml(formatCadhDate(row.transition_date))}</span>
         <p>${SISELO.escapeHtml(row.from_service || '-')} -> ${SISELO.escapeHtml(row.to_service || '-')}</p>
       </div>
-      ${cadhPermissions.has(config.updatePermission) ? `<a class="icon-btn" href="${editHref}" title="Editar transição" aria-label="Editar transição"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17.3V20h2.7L18.9 7.8l-2.7-2.7L4 17.3Z"/><path d="m16.2 5.1 2.7 2.7"/></svg></a>` : ''}
+      ${cadhPermissions.has(config.updatePermission) ? `<a class="icon-btn" href="${editHref}" title="Editar encaminhamento" aria-label="Editar encaminhamento"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17.3V20h2.7L18.9 7.8l-2.7-2.7L4 17.3Z"/><path d="m16.2 5.1 2.7 2.7"/></svg></a>` : ''}
     </article>
   `;
 }
@@ -1346,13 +1550,13 @@ function buildCadhCareSummary(clinicalContext, permissions) {
       key: 'encounters',
       permission: 'encounters.view',
       label: 'Atendimento',
-      href: patientId ? `/encounters/list.html?patient_id=${encodeURIComponent(patientId)}` : '',
+      href: patientId ? `/cadh/history.html?patient_id=${encodeURIComponent(patientId)}` : '',
       rows: Array.isArray(clinicalContext.encounters) ? clinicalContext.encounters : [],
     },
     {
       key: 'transitions',
       permission: 'transitions.view',
-      label: 'Transição do cuidado',
+      label: 'Encaminhamento do cuidado',
       href: patientId ? `/transitions/list.html?patient_id=${encodeURIComponent(patientId)}` : '',
       rows: Array.isArray(clinicalContext.transitions) ? clinicalContext.transitions : [],
     },

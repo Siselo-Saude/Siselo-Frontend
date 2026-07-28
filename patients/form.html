@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Usu&aacute;rio CADH - SISELO</title>
+  <title>Cadastro de Paciente UBS - SISELO</title>
   <link rel="stylesheet" href="/assets/app.css">
 </head>
 <body data-page="patients-form">
@@ -30,8 +30,8 @@
         </svg>
       </span>
       <div class="patient-form-heading-copy">
-        <span>CADH</span>
-        <h1 id="form-title" class="page-title">Cadastro do Usu&aacute;rio CADH / CADHin</h1>
+        <span>UBS</span>
+        <h1 id="form-title" class="page-title">Cadastro de Paciente</h1>
       </div>
     </header>
 
@@ -46,7 +46,7 @@
 
           <div class="transition-panel-grid">
             <div class="field">
-              <label for="attendance_date">Data do 1&ordm; Atendimento no CADH <span class="required-marker">*</span></label>
+              <label for="attendance_date">Data do Compartilhamento com o CADH <span class="required-marker">*</span></label>
               <input id="attendance_date" name="attendance_date" data-field="first_cadh_date" type="text" inputmode="numeric" autocomplete="off" placeholder="dd/mm/aaaa" required>
               <div class="field-error" data-error-for="first_cadh_date"></div>
             </div>
@@ -155,11 +155,20 @@
           </div>
 
           <div class="transition-panel-grid">
+            <div class="field">
+              <label for="risk_classification">Classifica&ccedil;&atilde;o de Risco <span class="required-marker">*</span></label>
+              <select id="risk_classification" name="risk_classification" required>
+                <option value="alto_risco">Alto Risco</option>
+                <option value="muito_alto_risco">Muito Alto Risco</option>
+              </select>
+              <div class="field-error" data-error-for="risk_classification"></div>
+            </div>
+
             <div class="field patient-status-field patient-form-status-card">
               <span class="patient-form-status-dot" aria-hidden="true"></span>
               <div>
                 <strong data-patient-status-title>Ativo &mdash; Nova Admiss&atilde;o</strong>
-                <p data-patient-status-copy>O status &eacute; automaticamente definido como <b>Ativo</b> no primeiro cadastro, pois representa nova admiss&atilde;o ao CADH.</p>
+                <p data-patient-status-copy>O status &eacute; automaticamente definido como <b>Ativo</b> no cadastro realizado pela UBS.</p>
               </div>
               <select id="patient-status" name="status" class="status-dropdown patient-status-native" data-native-select="true" aria-label="Status do usu&aacute;rio">
                 <option value="ativo">Ativo</option>

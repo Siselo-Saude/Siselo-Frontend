@@ -208,6 +208,7 @@
     const patient = await loadContextPatient();
     renderSpecialtyContent(config, patient);
     bindSpecialtyForm(config, patient);
+    loadRequestedSpecialtyRecord(config, patient);
   }
 
   function renderShell(config) {
@@ -236,7 +237,7 @@
               </a>
               <a id="nav-cadh" href="/cadh/index.html">
                 <span class="home-sidebar-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 13h4l2-7 4 14 2-7h6"/></svg></span>
-                <span class="home-sidebar-nav-copy"><strong>CADH</strong><small>Atenção Domiciliar</small></span>
+                <span class="home-sidebar-nav-copy"><strong>CADH</strong><small>Atenção secundária</small></span>
                 <svg class="home-sidebar-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
               </a>
               <a id="nav-ubs" href="/ubs/index.html">
@@ -379,7 +380,7 @@
     const root = document.getElementById("clinical-specialty-root");
     if (!root) return;
 
-    const titlebar = renderTitlebar(config);
+    const titlebar = renderTitlebar(config, patient);
     if (!patient || !patient.id) {
       root.innerHTML = `
         ${titlebar}
@@ -394,14 +395,13 @@
 
     root.innerHTML = `
       ${titlebar}
-      ${renderSpecialtyRecords(config, patient)}
       <form id="clinical-specialty-form" class="clinical-specialty-form" autocomplete="off" novalidate>
         <input type="hidden" name="record_id" value="">
         <input type="hidden" name="patient_id" value="${SISELO.escapeHtml(patient.id)}">
         <div id="clinical-specialty-alert" class="alert" hidden></div>
         ${config.sections.map(renderSection).join("")}
         <div class="clinical-specialty-actions">
-          <a class="btn clinical-secondary-action" href="/cadh/index.html">Cancelar</a>
+          <a class="btn clinical-secondary-action" href="${SISELO.escapeHtml(getSpecialtyReturnHref(patient))}">Cancelar</a>
           <button class="btn btn-primary clinical-save-action" type="submit">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h12l2 2v16H5V3Z"/><path d="M8 3v6h8V3M8 21v-7h8v7"/></svg>
             ${SISELO.escapeHtml(config.submitLabel || "Salvar Atendimento")}
@@ -409,8 +409,19 @@
         </div>
       </form>
     `;
+  }
 
-    bindSpecialtyRecordActions(config, patient);
+  function loadRequestedSpecialtyRecord(config, patient) {
+    const recordId = String(SISELO.queryParam("record_id") || "").trim();
+    if (!recordId || !patient || !patient.id) return;
+
+    const record = findPatientRecord(config, patient.id, recordId);
+    if (!record) {
+      SISELO.showAlert("clinical-specialty-alert", "Registro não encontrado para edição.", "error");
+      return;
+    }
+
+    loadSpecialtyRecordIntoForm(config, record);
   }
 
   function renderSpecialtyRecords(config, patient) {
@@ -684,15 +695,23 @@
     `;
   }
 
-  function renderTitlebar(config) {
+  function renderTitlebar(config, patient) {
     return `
       <div class="clinical-specialty-titlebar">
-        <a class="clinical-back-link" href="/cadh/index.html" aria-label="Voltar ao CADH">
+        <a class="clinical-back-link" href="${SISELO.escapeHtml(getSpecialtyReturnHref(patient))}" aria-label="Voltar">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
         </a>
         <span class="clinical-specialty-pill">${SISELO.escapeHtml(config.title)}</span>
       </div>
     `;
+  }
+
+  function getSpecialtyReturnHref(patient) {
+    const patientId = SISELO.normalizeEntityId(patient && patient.id);
+    if (SISELO.queryParam("return") === "history" && patientId) {
+      return `/cadh/history.html?patient_id=${encodeURIComponent(patientId)}`;
+    }
+    return "/cadh/index.html?flow=followup&view=encounters";
   }
 
   function renderSection(sectionConfig) {
@@ -919,7 +938,6 @@
     renderSpecialtyContent(config, patient);
     bindSpecialtyForm(config, patient);
     SISELO.showAlert("clinical-specialty-alert", "Atendimento salvo com sucesso.", "success");
-    document.getElementById("clinical-specialty-records")?.scrollIntoView({ block: "nearest" });
   }
 
   function getFirstInvalidField(form) {

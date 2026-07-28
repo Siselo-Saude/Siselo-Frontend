@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Histórico de Atendimentos | SISELO</title>
+  <link rel="stylesheet" href="/assets/app.css">
+</head>
+<body data-page="cadh" data-cadh-view="followup" data-cadh-screen="history">
+  <div class="cadh-app-shell">
+    <aside class="topbar home-sidebar cadh-sidebar" aria-label="Navegação do SISELO">
+      <div class="topbar-left">
+        <div class="topbar-brand home-sidebar-brand">
+          <span class="home-sidebar-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false">
+              <circle cx="12" cy="12" r="7"/>
+              <path d="M5 12h14M12 5c2 2.1 3 4.4 3 7s-1 4.9-3 7M12 5c-2 2.1-3 4.4-3 7s1 4.9 3 7"/>
+            </svg>
+          </span>
+          <span class="home-sidebar-brand-copy">
+            <strong>SISELO</strong>
+            <small>Sistema de Saúde</small>
+          </span>
+        </div>
+      </div>
+
+      <div class="home-sidebar-nav">
+        <p class="home-sidebar-label">Módulos</p>
+        <nav class="menu" aria-label="Módulos principais">
+          <a id="nav-home" href="/index.html">
+            <span class="home-sidebar-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m4 10 8-6 8 6v10H4V10Z"/><path d="M9 20v-6h6v6"/></svg></span>
+            <span class="home-sidebar-nav-copy"><strong>Início</strong><small>Painel geral</small></span>
+          </a>
+          <a id="nav-cadh" href="/cadh/index.html">
+            <span class="home-sidebar-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 13h4l2-7 4 14 2-7h6"/></svg></span>
+            <span class="home-sidebar-nav-copy"><strong>CADH</strong><small>Atenção secundária</small></span>
+            <svg class="home-sidebar-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
+          </a>
+          <a id="nav-ubs" href="/ubs/index.html">
+            <span class="home-sidebar-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 21s7-5.2 7-12a7 7 0 1 0-14 0c0 6.8 7 12 7 12Z"/><circle cx="12" cy="9" r="2.5"/></svg></span>
+            <span class="home-sidebar-nav-copy"><strong>UBS</strong><small>Atenção primária</small></span>
+            <svg class="home-sidebar-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
+          </a>
+        </nav>
+      </div>
+
+      <div class="topbar-actions home-sidebar-footer"></div>
+      <button class="home-sidebar-toggle" type="button" data-unified-sidebar-toggle aria-label="Recolher menu lateral" aria-expanded="true">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg>
+      </button>
+    </aside>
+
+    <div class="cadh-main-shell">
+      <header class="cadh-page-header">
+        <div class="cadh-breadcrumb-heading">
+          <p><a class="cadh-breadcrumb-link" href="/index.html">Módulos</a><span aria-hidden="true">›</span><strong>CADH</strong></p>
+          <h1>CADH — Centro de Atenção ao Diabetes e Hipertensão</h1>
+        </div>
+        <div class="home-page-status">
+          <span class="home-system-status home-user-role-status home-user-role-admin">
+            <span class="home-system-status-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M12 3 20 7v5c0 5-3.4 8-8 9-4.6-1-8-4-8-9V7l8-4Z"/><path d="M9 12l2 2 4-5"/></svg>
+            </span>
+            <span>Administrador</span>
+          </span>
+          <time id="cadh-history-current-date" class="home-current-date"></time>
+        </div>
+      </header>
+
+      <main class="container cadh-dashboard cadh-history-dashboard">
+        <section class="cadh-module-hero" aria-labelledby="cadh-history-module-title">
+          <span class="cadh-module-hero-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M7 3h7l4 4v14H7V3Z"/><path d="M14 3v5h5M10 12h6M10 16h6"/></svg>
+          </span>
+          <div class="cadh-module-hero-copy">
+            <p>Módulo clínico — atenção secundária</p>
+            <h2 id="cadh-history-module-title">Centro de Atenção ao Diabetes e Hipertensão — CADH</h2>
+          </div>
+        </section>
+
+        <section class="cadh-history-panel" aria-labelledby="cadh-history-title">
+          <header class="cadh-history-heading">
+            <div>
+              <a id="cadh-history-back" href="/cadh/index.html?flow=followup&view=encounters">← Voltar aos módulos clínicos</a>
+              <p>Prontuário CADH</p>
+              <h2 id="cadh-history-title">Histórico de Atendimentos</h2>
+              <span>Registros clínicos realizados por todas as especialidades.</span>
+            </div>
+            <strong id="cadh-history-count">0 registros</strong>
+          </header>
+
+          <div id="cadh-history-alert" class="alert" hidden></div>
+          <section id="cadh-history-patient" class="cadh-history-patient" aria-label="Paciente selecionado"></section>
+
+          <form id="cadh-history-filters" class="cadh-history-filters">
+            <label>
+              <span>Buscar no histórico</span>
+              <input id="cadh-history-query" type="search" placeholder="Especialidade, consulta ou informação registrada..." autocomplete="off">
+            </label>
+            <label>
+              <span>Especialidade</span>
+              <select id="cadh-history-specialty">
+                <option value="">Todas as especialidades</option>
+              </select>
+            </label>
+          </form>
+
+          <div id="cadh-history-list" class="cadh-history-list" aria-live="polite">
+            <div class="cadh-history-loading">Carregando histórico...</div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script src="/assets/config.js"></script>
+  <script src="/assets/app.js"></script>
+  <script src="/assets/cadh-history.js"></script>
+</body>
+</html>

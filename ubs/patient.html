@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Informações do Paciente | SISELO</title>
+  <link rel="stylesheet" href="/assets/app.css">
+</head>
+<body data-page="ubs-patient">
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-brand">SISELO</div>
+    </div>
+    <nav class="menu" aria-label="Módulos principais">
+      <a id="nav-home" href="/index.html">Início</a>
+      <a id="nav-cadh" href="/cadh/index.html">CADH</a>
+      <a id="nav-ubs" href="/ubs/index.html">UBS</a>
+    </nav>
+  </header>
+
+  <main class="container ubs-patient-page">
+    <section class="ubs-patient-module-hero" aria-label="Unidade Básica de Saúde">
+      <span class="ubs-patient-module-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M12 21s7-5.2 7-12a7 7 0 1 0-14 0c0 6.8 7 12 7 12Z"/><circle cx="12" cy="9" r="2.5"/></svg>
+      </span>
+      <div>
+        <p>Atenção primária à saúde</p>
+        <strong>Unidade Básica de Saúde</strong>
+      </div>
+    </section>
+
+    <div id="ubs-patient-alert" class="alert" hidden></div>
+
+    <section class="ubs-patient-workspace" aria-label="Prontuário do paciente">
+      <aside class="ubs-patient-context">
+        <header class="ubs-patient-context-heading">
+          <p>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v5c0 4.6 2.9 8.4 7 10 4.1-1.6 7-5.4 7-10V6l-7-3Z"/><path d="m9 12 2 2 4-5"/></svg>
+            Prontuário em atendimento
+          </p>
+        </header>
+
+        <div id="ubs-patient-summary" aria-live="polite">
+          <div class="ubs-patient-loading">Carregando paciente...</div>
+        </div>
+
+        <div class="ubs-patient-context-area">
+          <p>Área exclusiva do paciente</p>
+          <strong>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l3 3v15H6Z"/><path d="M14 3v4h4M9 11h6M9 15h6"/></svg>
+            UBS
+          </strong>
+        </div>
+
+        <nav class="ubs-patient-context-nav" aria-label="Acompanhamento do paciente">
+          <div class="ubs-patient-context-group">
+            <strong>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l3 3v15H6Z"/><path d="M14 3v4h4M9 11h6M9 15h6"/></svg>
+              Acompanhamento
+            </strong>
+            <button type="button" class="active" data-ubs-patient-view="history" aria-current="page">
+              <span aria-hidden="true">＋</span>
+              Histórico do usuário
+            </button>
+            <button id="ubs-patient-new-record" type="button" data-ubs-patient-view="specialties">
+              <span aria-hidden="true">＋</span>
+              Cadastrar registro
+            </button>
+            <button type="button" data-ubs-patient-view="referral">
+              <span aria-hidden="true">＋</span>
+              Encaminhamento ao CADH
+            </button>
+          </div>
+        </nav>
+
+        <a class="ubs-patient-context-exit" href="/ubs/index.html?tab=patients">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7"/><path d="M9 12h11"/></svg>
+          Voltar à lista de pacientes
+        </a>
+      </aside>
+
+      <section class="ubs-patient-followup-card" aria-labelledby="ubs-patient-followup-title">
+        <header class="ubs-patient-section-heading ubs-patient-followup-heading">
+          <div>
+            <p>Prontuário UBS</p>
+            <h1 id="ubs-patient-followup-title">Acompanhamento</h1>
+            <span>Selecione uma opção ao lado para consultar ou registrar informações.</span>
+          </div>
+        </header>
+
+        <section id="ubs-patient-history-view" class="ubs-patient-module-view" aria-labelledby="ubs-patient-history-title">
+          <section class="ubs-patient-history-section">
+          <header>
+            <div>
+              <p>Histórico do Usuário</p>
+              <h3 id="ubs-patient-history-title">Registros clínicos</h3>
+            </div>
+            <span id="ubs-patient-record-count" class="ubs-patient-count-badge">0 registros</span>
+          </header>
+          <div id="ubs-patient-history"></div>
+          </section>
+        </section>
+
+        <section id="ubs-patient-referral-view" class="ubs-patient-module-view" hidden aria-labelledby="ubs-patient-referral-title">
+          <section class="ubs-patient-referral-section">
+          <header>
+            <div>
+              <p>Encaminhamento UBS → CADH</p>
+              <h3 id="ubs-patient-referral-title">Encaminhar para o CADH</h3>
+              <span>Classifique o risco e encaminhe o paciente para o cuidado especializado.</span>
+            </div>
+          </header>
+          <form id="ubs-patient-referral-form">
+            <div id="ubs-patient-referral-person" class="ubs-patient-referral-person"></div>
+            <label>
+              <span>Classificação de risco</span>
+              <select id="ubs-patient-risk" name="risk_classification" required>
+                <option value="alto_risco">Alto Risco</option>
+                <option value="muito_alto_risco">Muito Alto Risco</option>
+              </select>
+            </label>
+            <div class="ubs-patient-referral-action">
+              <span id="ubs-patient-referral-status"></span>
+              <button id="ubs-patient-referral-submit" class="btn btn-primary" type="submit">Encaminhar</button>
+            </div>
+          </form>
+          </section>
+        </section>
+
+        <section id="ubs-patient-specialty-view" class="ubs-patient-specialty-view ubs-patient-module-view" hidden aria-labelledby="ubs-patient-specialty-title">
+        <header class="ubs-patient-subview-heading">
+          <div>
+            <p>Novo registro clínico</p>
+            <h3 id="ubs-patient-specialty-title">Selecione a especialidade</h3>
+          </div>
+          <button class="btn" type="button" data-ubs-patient-view="history">Voltar ao histórico</button>
+        </header>
+        <div id="ubs-patient-specialties" class="ubs-patient-specialty-list"></div>
+        </section>
+
+        <section id="ubs-patient-record-view" class="ubs-patient-record-view ubs-patient-module-view" hidden aria-labelledby="ubs-patient-record-title">
+        <header class="ubs-patient-record-header">
+          <p>Registro clínico</p>
+          <h3 id="ubs-patient-record-title">Cadastrar Registro</h3>
+        </header>
+        <form id="ubs-patient-record-form">
+          <fieldset class="ubs-patient-record-types">
+            <legend>Categoria no Histórico do Usuário</legend>
+            <label><input type="radio" name="record_type" value="diagnostico"><span>Diagnóstico</span></label>
+            <label><input type="radio" name="record_type" value="exame"><span>Exame</span></label>
+            <label><input type="radio" name="record_type" value="consulta" checked><span>Consulta</span></label>
+          </fieldset>
+
+          <label class="ubs-patient-record-specialty">
+            <span>Especialidade</span>
+            <input id="ubs-patient-record-specialty" name="specialty" readonly>
+          </label>
+
+          <label class="ubs-patient-record-description">
+            <span>Descrição / Anamnese <b aria-hidden="true">*</b></span>
+            <textarea id="ubs-patient-record-summary" name="summary" required placeholder="Registre a anamnese do paciente..."></textarea>
+          </label>
+
+          <footer>
+            <small>O registro será incluído no Histórico do Usuário dentro de Acompanhamento.</small>
+            <div>
+              <button class="btn" type="button" data-ubs-patient-specialties>Voltar às especialidades</button>
+              <button id="ubs-patient-record-submit" class="btn btn-primary" type="submit">Salvar registro</button>
+            </div>
+          </footer>
+        </form>
+        </section>
+      </section>
+    </section>
+  </main>
+
+  <script src="/assets/config.js"></script>
+  <script src="/assets/app.js"></script>
+  <script src="/assets/ubs-patient.js"></script>
+</body>
+</html>

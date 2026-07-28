@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>CADH — Centro de Atenção Domiciliar Hospitalar | SISELO</title>
+  <title>CADH — Centro de Atenção ao Diabetes e Hipertensão | SISELO</title>
   <link rel="stylesheet" href="/assets/app.css">
 </head>
 <body data-page="cadh">
@@ -30,12 +30,11 @@
           <a id="nav-home" href="/index.html">
             <span class="home-sidebar-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m4 10 8-6 8 6v10H4V10Z"/><path d="M9 20v-6h6v6"/></svg></span>
             <span class="home-sidebar-nav-copy"><strong>Início</strong><small>Painel geral</small></span>
-            <svg class="home-sidebar-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
           </a>
 
           <a id="nav-cadh" href="/cadh/index.html">
             <span class="home-sidebar-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 13h4l2-7 4 14 2-7h6"/></svg></span>
-            <span class="home-sidebar-nav-copy"><strong>CADH</strong><small>Atenção Domiciliar</small></span>
+            <span class="home-sidebar-nav-copy"><strong>CADH</strong><small>Atenção secundária</small></span>
             <svg class="home-sidebar-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
           </a>
 
@@ -57,12 +56,14 @@
       <header class="cadh-page-header">
         <div class="cadh-breadcrumb-heading">
           <p><a class="cadh-breadcrumb-link" href="/index.html">Módulos</a><span aria-hidden="true">›</span><strong>CADH</strong></p>
-          <h1>CADH — Centro de Atenção Domiciliar Hospitalar</h1>
+          <h1>CADH — Centro de Atenção ao Diabetes e Hipertensão</h1>
         </div>
         <div class="home-page-status">
-          <span class="home-operational-status cadh-operational-status">
-            <span class="home-operational-status-dot" aria-hidden="true"></span>
-            <span class="home-operational-status-label">Operacional</span>
+          <span class="home-system-status home-user-role-status home-user-role-admin">
+            <span class="home-system-status-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M12 3 20 7v5c0 5-3.4 8-8 9-4.6-1-8-4-8-9V7l8-4Z"/><path d="M9 12l2 2 4-5"/></svg>
+            </span>
+            <span>Administrador</span>
           </span>
           <time id="cadh-current-date" class="home-current-date"></time>
         </div>
@@ -92,15 +93,33 @@
             <svg viewBox="0 0 24 24"><use href="#cadh-icon-enfermagem"></use></svg>
           </span>
           <div class="cadh-module-hero-copy">
-            <p>Módulo clínico</p>
-            <h2 id="cadh-module-hero-title">Centro de Atenção Domiciliar Hospitalar</h2>
+            <p>Módulo clínico — atenção secundária</p>
+            <h2 id="cadh-module-hero-title">Centro de Atenção ao Diabetes e Hipertensão — CADH</h2>
           </div>
         </section>
 
+        <section id="cadh-flow-workspace" class="cadh-flow-workspace" aria-labelledby="cadh-flow-title">
+          <header class="cadh-flow-header">
+            <div>
+              <p id="cadh-flow-title">Compartilhamentos UBS → CADH</p>
+            </div>
+            <div id="cadh-risk-alert-summary" class="cadh-risk-alert-summary" hidden></div>
+          </header>
+
+          <nav class="cadh-flow-tabs" aria-label="Fluxo assistencial">
+            <button class="active" type="button" data-cadh-flow-tab="received">Recebidos UBS <span id="cadh-flow-received-count">0</span></button>
+            <button type="button" data-cadh-flow-tab="schedule">Agendamentos</button>
+          </nav>
+
+          <div id="cadh-flow-alert" class="alert" hidden></div>
+          <div id="cadh-flow-panel" class="cadh-flow-panel"></div>
+        </section>
+
+        <div id="cadh-clinical-workspace" hidden>
         <div class="cadh-primary-grid">
           <aside class="cadh-search-column">
             <form id="cadh-cpf-search" class="cadh-patient-search" data-ui-card="true">
-              <h2 class="cadh-block-title">Buscar usuário</h2>
+              <h2 class="cadh-block-title">Buscar paciente</h2>
               <label for="cadh-cpf-input">Nome ou CPF</label>
               <input id="cadh-cpf-input" name="cpf" placeholder="Nome ou CPF..." autocomplete="off">
               <button class="cadh-search-button" type="submit">Buscar</button>
@@ -109,26 +128,21 @@
           </aside>
 
           <section class="cadh-management-section" aria-labelledby="cadh-management-title">
-            <h2 id="cadh-management-title" class="cadh-block-title">Gestão do usuário</h2>
+            <h2 id="cadh-management-title" class="cadh-block-title" hidden>Gestão do usuário</h2>
             <div class="cadh-management-card" data-ui-card="true">
               <nav class="cadh-module-tabs" aria-label="Módulos assistenciais" data-ui-tabs="true">
                 <a id="cadh-patients-card" class="cadh-tab-link active" href="/patients/list.html">
-                  <span class="cadh-tab-icon"><svg><use href="#cadh-icon-users"></use></svg></span>
-                  <span>Usuários</span>
-                </a>
-                <a id="cadh-careplans-card" class="cadh-tab-link is-locked" href="#" data-base-href="/care-plans/list.html" data-requires-patient="true" data-module-key="careplans" aria-disabled="true">
                   <span class="cadh-tab-icon"><svg><use href="#cadh-icon-file"></use></svg></span>
-                  <span>Plano de Cuidado</span>
-                  <span class="cadh-module-badge" data-pending-badge title="Documentação pendente" aria-label="Documentação pendente" hidden></span>
+                  <span>Prontuário / Histórico</span>
                 </a>
-                <a id="cadh-encounters-card" class="cadh-tab-link is-locked" href="#" data-base-href="/encounters/list.html" data-requires-patient="true" data-module-key="encounters" aria-disabled="true">
+                <a id="cadh-encounters-card" class="cadh-tab-link" href="#" data-module-key="encounters">
                   <span class="cadh-tab-icon"><svg><use href="#cadh-icon-care"></use></svg></span>
-                  <span>Atendimentos</span>
+                  <span>Módulos Clínicos</span>
                   <span class="cadh-module-badge" data-pending-badge title="Documentação pendente" aria-label="Documentação pendente" hidden></span>
                 </a>
-                <a id="cadh-transitions-card" class="cadh-tab-link is-locked" href="#" data-base-href="/transitions/list.html" data-requires-patient="true" data-module-key="transitions" aria-disabled="true">
+                <a id="cadh-transitions-card" class="cadh-tab-link" href="#" data-module-key="transitions">
                   <span class="cadh-tab-icon"><svg><use href="#cadh-icon-transition"></use></svg></span>
-                  <span>Transição do Cuidado</span>
+                  <span>Encaminhamento do Cuidado</span>
                   <span class="cadh-module-badge" data-pending-badge title="Documentação pendente" aria-label="Documentação pendente" hidden></span>
                 </a>
               </nav>
@@ -147,10 +161,6 @@
         <section class="cadh-specialties-section" aria-labelledby="cadh-specialties-title">
           <div class="cadh-specialties-heading">
             <h2 id="cadh-specialties-title" class="cadh-block-title cadh-block-title-green">Módulos clínicos por especialidade</h2>
-            <a id="cadh-new-patient-link" class="cadh-new-patient-link" href="/patients/form.html">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM3.5 19a5.5 5.5 0 0 1 11 0M18 8v6M15 11h6"/></svg>
-              Novo usuário
-            </a>
           </div>
 
           <p class="cadh-specialty-guidance" data-ui-alert="true">Selecione um usuário ao lado para registrar atendimentos nas especialidades.</p>
@@ -169,6 +179,7 @@
             <a class="cadh-specialty-card cadh-specialty-farma is-locked" href="#" data-ui-card="true" data-ui-button="true" data-base-href="/cadh/farmacia.html" data-requires-patient="true" aria-disabled="true"><span class="cadh-specialty-icon"><svg><use href="#cadh-icon-farmacia"></use></svg></span><span>Farmácia Clínica</span></a>
           </div>
         </section>
+        </div>
       </main>
     </div>
   </div>
@@ -176,5 +187,6 @@
   <script src="/assets/config.js"></script>
   <script src="/assets/app.js"></script>
   <script src="/assets/cadh.js"></script>
+  <script src="/assets/cadh-flow.js"></script>
 </body>
 </html>

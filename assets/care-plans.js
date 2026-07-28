@@ -20,76 +20,206 @@ async function setupCarePlansListPage() {
 
   const permissions = SISELO.getUiPermissions(user);
   SISELO.bindShell("careplans");
-  const query = SISELO.queryParam("q") || "";
-  const patientId = SISELO.normalizeEntityId(SISELO.queryParam("patient_id"));
-  const searchInput = document.getElementById("search-input");
-  const searchForm = document.getElementById("search-form");
+  SISELO.syncCurrentDate?.();
+
+  const patientId = getCarePlansSelectedPatientId();
   const newPlanLink = document.getElementById("new-plan-link");
   const trashLink = document.getElementById("trash-link");
+  const count = document.getElementById("care-plans-count");
+  const list = document.getElementById("care-plans-list");
   const canCreatePlan = permissions.has("careplans.create");
-  const newPlanHref =
-    "/care-plans/form.html" +
-    (patientId ? "?patient_id=" + encodeURIComponent(patientId) : "");
-  const trashHref =
-    "/care-plans/trash.html" +
-    (patientId ? "?patient_id=" + encodeURIComponent(patientId) : "");
-  searchInput.value = query;
-  newPlanLink.hidden = !canCreatePlan;
-  trashLink.hidden = !permissions.has("careplans.restore");
-  newPlanLink.href = newPlanHref;
-  trashLink.href = trashHref;
 
-  const url =
-    "/care_plans/list.php" +
-    (patientId ? "?patient_id=" + encodeURIComponent(patientId) : "");
-  let rows = [];
-
-  try {
-    const data = await SISELO.apiRequest(url);
-    rows = SISELO.filterRowsByPatientId(
-      Array.isArray(data.rows) ? data.rows : [],
-      patientId,
-    );
-  } catch (error) {
-    rows = [];
+  if (!patientId) {
+    newPlanLink.hidden = true;
+    trashLink.hidden = true;
+    count.hidden = true;
+    renderCarePlansPatientRequired();
+    return;
   }
 
-  const tbody = document.getElementById("care-plans-table-body");
-  SISELO.setupPatientSearchAutocomplete(searchInput, {
-    rows,
-    onPick: (patient) => {
-      location.href = `/care-plans/form.html?patient_id=${encodeURIComponent(patient.id)}`;
-    },
-  });
-  const applySearch = (value) => {
-    const filteredRows = filterCarePlanRows(rows, value);
-    newPlanLink.hidden = !canCreatePlan || filteredRows.length === 0;
-    renderCarePlansTable(
-      tbody,
-      filteredRows,
-      permissions,
-      value,
-      newPlanHref,
+  if (!SISELO.normalizeEntityId(SISELO.queryParam("patient_id"))) {
+    const currentUrl = new URL(window.location.href);
+    currentUrl.searchParams.set("patient_id", patientId);
+    window.history.replaceState({}, "", `${currentUrl.pathname}${currentUrl.search}${currentUrl.hash}`);
+  }
+
+  const sharingReturnTarget = `/cadh/index.html?flow=sharing&patient_id=${encodeURIComponent(patientId)}`;
+  const backLink = document.querySelector(".care-plans-back-link");
+  if (backLink) {
+    backLink.href = sharingReturnTarget;
+    backLink.dataset.fallback = sharingReturnTarget;
+  }
+
+  const returnTarget = `/care-plans/list.html?patient_id=${encodeURIComponent(patientId)}`;
+  const newPlanHref = `/care-plans/form.html?patient_id=${encodeURIComponent(patientId)}&return_to=${encodeURIComponent(returnTarget)}`;
+  newPlanLink.hidden = !canCreatePlan;
+  newPlanLink.href = newPlanHref;
+  trashLink.hidden = !permissions.has("careplans.restore");
+  trashLink.href = `/care-plans/trash.html?patient_id=${encodeURIComponent(patientId)}&return_to=${encodeURIComponent(returnTarget)}`;
+
+  try {
+    const [context, data] = await Promise.all([
+      SISELO.loadPatientClinicalContext(patientId),
+      SISELO.apiRequest(`/care_plans/list.php?patient_id=${encodeURIComponent(patientId)}`),
+    ]);
+    const rows = SISELO.filterRowsByPatientId(
+      Array.isArray(data && data.rows) ? data.rows : [],
       patientId,
     );
-    bindCarePlanListActions(tbody);
-    SISELO.syncSearchUrl(
-      "/care-plans/list.html",
-      value,
-      patientId ? { patient_id: patientId } : {},
-    );
-  };
+    const patient = context && context.patient
+      ? context.patient
+      : getCarePlansCachedPatient(patientId);
 
-  applySearch(query);
+    if (!patient) {
+      throw new Error("Não foi possível localizar o paciente selecionado.");
+    }
 
-  searchInput.addEventListener("input", (event) => {
-    applySearch(event.currentTarget.value);
-  });
+    renderCarePlansPatientSummary(patient);
+    count.textContent = `${rows.length} ${rows.length === 1 ? "plano" : "planos"}`;
+    renderCarePlansOverview(list, rows, permissions, patientId, newPlanHref);
+    bindCarePlanListActions(list);
+  } catch (error) {
+    count.textContent = "0 planos";
+    renderCarePlansLoadError(error.message || "Não foi possível carregar o Plano de Cuidado.");
+  }
+}
 
-  searchForm.addEventListener("submit", (event) => {
-    event.preventDefault();
-    applySearch(searchInput.value);
-  });
+function getCarePlansSelectedPatientId() {
+  const queryPatientId = SISELO.normalizeEntityId(SISELO.queryParam("patient_id"));
+  if (queryPatientId) return queryPatientId;
+
+  const cachedPatient = getCarePlansCachedPatient();
+  return SISELO.normalizeEntityId(cachedPatient && cachedPatient.id);
+}
+
+function getCarePlansCachedPatient(expectedPatientId = "") {
+  try {
+    const state = JSON.parse(sessionStorage.getItem("siselo_cadh_search") || "null");
+    const patient = state && state.patient ? state.patient : null;
+    const patientId = SISELO.normalizeEntityId(patient && patient.id);
+    const expectedId = SISELO.normalizeEntityId(expectedPatientId);
+    if (!patientId || (expectedId && patientId !== expectedId)) return null;
+    return patient;
+  } catch (error) {
+    return null;
+  }
+}
+
+function renderCarePlansPatientSummary(patient) {
+  const container = document.getElementById("care-plans-patient-summary");
+  if (!container) return;
+
+  const name = String(patient.full_name || "Paciente");
+  const initials = name
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part.charAt(0))
+    .join("")
+    .toUpperCase() || "P";
+  const status = String(patient.status_label || patient.status || "Ativo");
+  const statusClass = status.toLowerCase().includes("inativ") ? "is-inactive" : "is-active";
+
+  container.innerHTML = `
+    <div class="care-plans-patient-identity">
+      <span class="care-plans-patient-avatar" aria-hidden="true">${SISELO.escapeHtml(initials)}</span>
+      <div>
+        <span>Paciente selecionado</span>
+        <strong>${SISELO.escapeHtml(name)}</strong>
+        <small>CPF ${SISELO.escapeHtml(patient.cpf || "-")}</small>
+      </div>
+      <span class="care-plans-patient-status ${statusClass}">${SISELO.escapeHtml(status)}</span>
+    </div>
+    <dl class="care-plans-patient-details">
+      <div>
+        <dt>UBS de origem</dt>
+        <dd>${SISELO.escapeHtml(patient.ubs_ref || "Não informada")}</dd>
+      </div>
+      <div>
+        <dt>Equipe</dt>
+        <dd>${SISELO.escapeHtml(SISELO.formatTeamName(patient.team_ref) || "Não informada")}</dd>
+      </div>
+      <div>
+        <dt>Classificação de risco</dt>
+        <dd>${SISELO.escapeHtml(patient.risk_label || "Não informada")}</dd>
+      </div>
+    </dl>
+  `;
+}
+
+function renderCarePlansOverview(container, rows, permissions, patientId, newPlanHref) {
+  if (!container) return;
+
+  if (!rows.length) {
+    container.innerHTML = `
+      <div class="care-plans-empty">
+        <span class="care-plans-empty-icon" aria-hidden="true">✓</span>
+        <strong>Plano de Cuidado ainda não iniciado</strong>
+        <p>Este paciente ainda não possui um plano ativo cadastrado.</p>
+        ${permissions.has("careplans.create") ? `<a class="btn btn-primary" href="${SISELO.escapeHtml(newPlanHref)}">Iniciar Plano de Cuidado</a>` : ""}
+      </div>
+    `;
+    return;
+  }
+
+  const returnTarget = `/care-plans/list.html?patient_id=${encodeURIComponent(patientId)}`;
+  container.innerHTML = rows.map((row) => {
+    const editHref = `/care-plans/form.html?id=${encodeURIComponent(row.id)}&patient_id=${encodeURIComponent(patientId)}&return_to=${encodeURIComponent(returnTarget)}`;
+    return `
+      <article class="care-plan-record">
+        <header>
+          <div>
+            <span>Plano de Cuidado</span>
+            <h2>Plano nº ${SISELO.escapeHtml(row.id)}</h2>
+          </div>
+          <span class="care-plan-record-status">Ativo</span>
+        </header>
+        <dl>
+          <div>
+            <dt>Data de início</dt>
+            <dd>${SISELO.escapeHtml(formatCarePlanDate(row.start_date) || "Não informada")}</dd>
+          </div>
+          <div>
+            <dt>Previsão de revisão</dt>
+            <dd>${SISELO.escapeHtml(formatCarePlanDate(row.end_date) || "Sem data definida")}</dd>
+          </div>
+        </dl>
+        <footer>
+          <a class="btn care-plan-record-action" href="${SISELO.getApiBaseUrl()}/care_plans/pdf.php?id=${encodeURIComponent(row.id)}" target="_blank" rel="noreferrer">Gerar PDF</a>
+          ${permissions.has("careplans.update") ? `<a class="btn care-plan-record-action" href="${SISELO.escapeHtml(editHref)}">Editar plano</a>` : ""}
+          ${permissions.has("careplans.delete") ? `<button class="btn care-plan-record-action is-danger" type="button" data-delete-id="${SISELO.escapeHtml(row.id)}" data-delete-label="${SISELO.escapeHtml(row.full_name || `Plano ${row.id}`)}">Inativar plano</button>` : ""}
+        </footer>
+      </article>
+    `;
+  }).join("");
+}
+
+function renderCarePlansPatientRequired() {
+  const summary = document.getElementById("care-plans-patient-summary");
+  const list = document.getElementById("care-plans-list");
+  if (summary) summary.hidden = true;
+  if (list) {
+    list.innerHTML = `
+      <div class="care-plans-empty">
+        <strong>Nenhum paciente selecionado</strong>
+        <p>Retorne aos Compartilhamentos UBS/CADH e selecione um paciente antes de abrir o Plano de Cuidado.</p>
+        <a class="btn" href="/cadh/index.html?flow=sharing">Voltar para Compartilhamentos UBS/CADH</a>
+      </div>
+    `;
+  }
+}
+
+function renderCarePlansLoadError(message) {
+  const summary = document.getElementById("care-plans-patient-summary");
+  const list = document.getElementById("care-plans-list");
+  if (summary) summary.hidden = true;
+  if (list) {
+    list.innerHTML = `
+      <div class="care-plans-empty is-error">
+        <strong>Não foi possível carregar o Plano de Cuidado</strong>
+        <p>${SISELO.escapeHtml(message)}</p>
+      </div>
+    `;
+  }
 }
 
 async function setupCarePlansFormPage() {
@@ -613,60 +743,143 @@ async function setupCarePlansTrashPage() {
 
   const permissions = SISELO.getUiPermissions(user);
   SISELO.bindShell("careplans");
-  const query = SISELO.queryParam("q") || "";
-  const patientId = SISELO.normalizeEntityId(SISELO.queryParam("patient_id"));
-  const searchInput = document.getElementById("search-input");
-  const searchForm = document.getElementById("search-form");
-  searchInput.value = query;
+  SISELO.syncCurrentDate?.();
 
-  let rows = [];
+  const patientId = getCarePlansSelectedPatientId();
+  const count = document.getElementById("care-plans-trash-count");
+  const list = document.getElementById("care-plans-trash-list");
 
-  const url =
-    "/care_plans/trash.php" +
-    (patientId ? "?patient_id=" + encodeURIComponent(patientId) : "");
-
-  try {
-    const data = await SISELO.apiRequest(url);
-    rows = SISELO.filterRowsByPatientId(
-      Array.isArray(data.rows) ? data.rows : [],
-      patientId,
-    );
-  } catch (error) {
-    rows = [];
+  if (!patientId) {
+    count.hidden = true;
+    renderCarePlansTrashPatientRequired();
+    return;
   }
 
-  const tbody = document.getElementById("care-plans-table-body");
-  SISELO.setupPatientSearchAutocomplete(searchInput, {
-    rows,
-    onPick: (patient) => {
-      location.href = `/care-plans/trash.html?patient_id=${encodeURIComponent(patient.id)}`;
-    },
-  });
-  const applySearch = (value) => {
-    renderCarePlansTrashTable(
-      tbody,
-      filterCarePlanRows(rows, value),
-      permissions,
-      value,
+  if (!SISELO.normalizeEntityId(SISELO.queryParam("patient_id"))) {
+    const currentUrl = new URL(window.location.href);
+    currentUrl.searchParams.set("patient_id", patientId);
+    window.history.replaceState({}, "", `${currentUrl.pathname}${currentUrl.search}${currentUrl.hash}`);
+  }
+
+  const activePlansTarget = `/care-plans/list.html?patient_id=${encodeURIComponent(patientId)}`;
+  const backLink = document.querySelector(".care-plans-back-link");
+  if (backLink) {
+    backLink.href = activePlansTarget;
+    backLink.dataset.fallback = activePlansTarget;
+  }
+
+  try {
+    const [context, data] = await Promise.all([
+      SISELO.loadPatientClinicalContext(patientId),
+      SISELO.apiRequest(`/care_plans/trash.php?patient_id=${encodeURIComponent(patientId)}`),
+    ]);
+    const rows = SISELO.filterRowsByPatientId(
+      Array.isArray(data && data.rows) ? data.rows : [],
+      patientId,
     );
-    bindCarePlanTrashActions(tbody);
-    SISELO.syncSearchUrl(
-      "/care-plans/trash.html",
-      value,
-      patientId ? { patient_id: patientId } : {},
-    );
-  };
+    const patient = context && context.patient
+      ? context.patient
+      : getCarePlansCachedPatient(patientId);
 
-  applySearch(query);
+    if (!patient) {
+      throw new Error("Não foi possível localizar o paciente selecionado.");
+    }
 
-  searchInput.addEventListener("input", (event) => {
-    applySearch(event.currentTarget.value);
-  });
+    renderCarePlansPatientSummary(patient);
+    count.textContent = `${rows.length} ${rows.length === 1 ? "plano inativo" : "planos inativos"}`;
+    renderCarePlansTrashOverview(list, rows, permissions, patientId);
+    bindCarePlanTrashActions(list);
+  } catch (error) {
+    count.textContent = "0 planos inativos";
+    renderCarePlansTrashLoadError(error.message || "Não foi possível carregar os planos inativos.");
+  }
+}
 
-  searchForm.addEventListener("submit", (event) => {
-    event.preventDefault();
-    applySearch(searchInput.value);
-  });
+function renderCarePlansTrashOverview(container, rows, permissions, patientId) {
+  if (!container) return;
+
+  if (!rows.length) {
+    container.innerHTML = `
+      <div class="care-plans-empty">
+        <span class="care-plans-empty-icon" aria-hidden="true">✓</span>
+        <strong>Nenhum Plano de Cuidado inativo</strong>
+        <p>Este paciente não possui planos na lixeira.</p>
+        <a class="btn" href="/care-plans/list.html?patient_id=${encodeURIComponent(patientId)}">Voltar para planos ativos</a>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = rows.map((row) => `
+    <article class="care-plan-record is-inactive">
+      <header>
+        <div>
+          <span>Plano de Cuidado inativo</span>
+          <h2>Plano nº ${SISELO.escapeHtml(row.id)}</h2>
+        </div>
+        <span class="care-plan-record-status">Inativo</span>
+      </header>
+      <dl class="care-plan-trash-dates">
+        <div>
+          <dt>Data de início</dt>
+          <dd>${SISELO.escapeHtml(formatCarePlanDate(row.start_date) || "Não informada")}</dd>
+        </div>
+        <div>
+          <dt>Previsão de revisão</dt>
+          <dd>${SISELO.escapeHtml(formatCarePlanDate(row.end_date) || "Sem data definida")}</dd>
+        </div>
+        <div>
+          <dt>Inativado em</dt>
+          <dd>${SISELO.escapeHtml(formatCarePlanDateTime(row.deleted_at))}</dd>
+        </div>
+      </dl>
+      <footer>
+        ${permissions.has("careplans.restore") ? `<button class="btn care-plan-record-action is-restore" type="button" data-restore-id="${SISELO.escapeHtml(row.id)}">Restaurar plano</button>` : ""}
+        ${permissions.has("careplans.delete")
+          ? `<button class="btn care-plan-record-action is-danger" type="button" data-destroy-id="${SISELO.escapeHtml(row.id)}" data-destroy-label="${SISELO.escapeHtml(row.full_name || `Plano ${row.id}`)}">Excluir permanentemente</button>`
+          : ""}
+      </footer>
+    </article>
+  `).join("");
+}
+
+function renderCarePlansTrashPatientRequired() {
+  const summary = document.getElementById("care-plans-patient-summary");
+  const list = document.getElementById("care-plans-trash-list");
+  if (summary) summary.hidden = true;
+  if (list) {
+    list.innerHTML = `
+      <div class="care-plans-empty">
+        <strong>Nenhum paciente selecionado</strong>
+        <p>Retorne aos Planos de Cuidado ativos antes de consultar a lixeira.</p>
+        <a class="btn" href="/care-plans/list.html">Voltar para Planos de Cuidado</a>
+      </div>
+    `;
+  }
+}
+
+function renderCarePlansTrashLoadError(message) {
+  const summary = document.getElementById("care-plans-patient-summary");
+  const list = document.getElementById("care-plans-trash-list");
+  if (summary) summary.hidden = true;
+  if (list) {
+    list.innerHTML = `
+      <div class="care-plans-empty is-error">
+        <strong>Não foi possível carregar os planos inativos</strong>
+        <p>${SISELO.escapeHtml(message)}</p>
+      </div>
+    `;
+  }
+}
+
+function formatCarePlanDateTime(value) {
+  if (!value) return "Não informado";
+  const date = new Date(String(value).replace(" ", "T"));
+  if (Number.isNaN(date.getTime())) return String(value);
+  return new Intl.DateTimeFormat("pt-BR", {
+    dateStyle: "short",
+    timeStyle: "short",
+  }).format(date);
 }
 
 function renderCarePlansTable(
