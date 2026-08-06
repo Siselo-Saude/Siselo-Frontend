@@ -229,6 +229,8 @@ const PATIENT_UBS_TEAM_GROUPS = [
   },
 ];
 
+let patientUbsTeamGroups = [];
+
 async function setupPatientsListPage() {
   const user = await SISELO.requireSession();
   if (!user) {
@@ -375,6 +377,7 @@ async function setupPatientFormPage() {
 
   fillSelect("gender", options.gender_options, row.sex, true, "Selecione...");
   fillSelect("race", options.race_options, row.race, true, "Selecione...");
+  fillSelect("entry_condition", options.entry_condition_options, row.entry_condition, true, "Selecione...");
   setupPatientUbsTeamControls(options, row);
 
   Object.keys(row).forEach((key) => {
@@ -391,6 +394,12 @@ async function setupPatientFormPage() {
   attachPatientMasks();
   setupPatientStatusSelect(row.status || row.status_label || "ativo");
   syncPatientStatusCard(row.status || row.status_label || "ativo", data.editing);
+  setupPatientResponsibleRule(options.responsible_required_under_age || 18);
+  const patientStatusSelect = document.getElementById("patient-status");
+  if (patientStatusSelect && !data.editing) {
+    patientStatusSelect.value = "ativo";
+    patientStatusSelect.disabled = true;
+  }
   SISELO.enhanceChoiceSelects(document);
   SISELO.applyUiComponents(document);
 
@@ -507,7 +516,7 @@ async function setupPatientShowPage() {
   document.getElementById("patient-actions").innerHTML = `
     ${permissions.has("careplans.create") ? `<a class="btn" href="${buildPatientModuleActionHref("/care-plans/form.html", { patient_id: actionPatientId, return_to: returnTargets.planos })}">+ Novo plano</a>` : ""}
     ${permissions.has("encounters.create") ? `<a class="btn" href="${buildPatientModuleActionHref("/encounters/form.html", { patient_id: actionPatientId, return_to: returnTargets.atendimentos })}">+ Novo atendimento</a>` : ""}
-    ${permissions.has("transitions.create") ? `<a class="btn" href="${buildPatientModuleActionHref("/transitions/form.html", { patient_id: actionPatientId, return_to: returnTargets.transicoes })}">+ Novo encaminhamento</a>` : ""}
+    ${permissions.has("transitions.create") ? `<a class="btn" href="${buildPatientModuleActionHref("/cadh/index.html", { flow: "followup", view: "transitions", patient_id: actionPatientId })}">+ Nova transição</a>` : ""}
   `;
 
   renderCarePlanRows(
@@ -974,14 +983,14 @@ function setupPatientUbsTeamControls(options, row) {
 }
 
 function getPatientUbsOptions() {
-  return PATIENT_UBS_TEAM_GROUPS.reduce((options, group) => {
+  return patientUbsTeamGroups.reduce((options, group) => {
     options[group.ubs] = group.ubs;
     return options;
   }, {});
 }
 
 function getPatientPdfTeamOptions() {
-  return PATIENT_UBS_TEAM_GROUPS.reduce((options, group) => {
+  return patientUbsTeamGroups.reduce((options, group) => {
     group.teams.forEach((team) => {
       options[team] = team;
     });
@@ -991,7 +1000,7 @@ function getPatientPdfTeamOptions() {
 
 function getPatientTeamOptionsForUbs(ubs, currentTeam = "") {
   const normalizedUbs = normalizePatientComparableValue(ubs);
-  const group = PATIENT_UBS_TEAM_GROUPS.find((item) => {
+  const group = patientUbsTeamGroups.find((item) => {
     return normalizePatientComparableValue(item.ubs) === normalizedUbs;
   });
 
@@ -1102,6 +1111,9 @@ function configurePatientBackLink(activeTab) {
 
 function getPatientFormOptions(options) {
   const safeOptions = options || {};
+  if (Array.isArray(safeOptions.ubs_team_groups) && safeOptions.ubs_team_groups.length > 0) {
+    patientUbsTeamGroups = safeOptions.ubs_team_groups;
+  }
   const defaultRaceOptions = {
     branca: "Branco",
     preta: "Preto",
@@ -1142,7 +1154,14 @@ function getPatientFormOptions(options) {
       alto_risco: "Alto Risco",
       muito_alto_risco: "Muito Alto Risco",
     },
-    ubs_options: getPatientUbsOptions(),
+    entry_condition_options: safeOptions.entry_condition_options || {
+      hipertensao: "Hipertensão",
+      diabetes: "Diabetes",
+      hipertensao_diabetes: "Hipertensão + Diabetes",
+      diabetes_infantojuvenil: "Diabetes infantojuvenil",
+    },
+    responsible_required_under_age: Number(safeOptions.responsible_required_under_age || 18),
+    ubs_options: safeOptions.ubs_options || getPatientUbsOptions(),
     team_options: teamOptions,
   };
 }
@@ -1179,6 +1198,7 @@ function getEmptyPatientFormContext() {
       emergency_contact: "",
       allergies: "",
       chronic_conditions: "",
+      entry_condition: "",
       status: "ativo",
       risk_classification: "alto_risco",
       care_status: "recebido",
@@ -1220,6 +1240,7 @@ const PATIENT_FIELD_LABELS = {
   emergency_contact: "Contato de emergência",
   allergies: "Alergias",
   chronic_conditions: "Condições crônicas",
+  entry_condition: "Condição de entrada",
   risk_classification: "Classificação de risco",
   ubs_ref: "UBS de referência",
   team_ref: "Equipe",
@@ -1360,6 +1381,7 @@ function buildPatientSavePayload(payload, row, options) {
   const validBloodTypes = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
   nextPayload.team_ref = teamValue;
+  nextPayload.status = nextPayload.status || (row && row.status) || "ativo";
   nextPayload.team_reference = teamValue;
   delete nextPayload.ses;
   nextPayload.health_insurance = String(
@@ -1553,6 +1575,43 @@ function configurePatientDateInputs() {
   birthInput.addEventListener("change", syncPatientDates);
   attendanceInput.addEventListener("change", syncPatientDates);
   syncPatientDates();
+}
+
+function setupPatientResponsibleRule(requiredUnderAge = 18) {
+  const birthInput = document.getElementById("birth_date");
+  const responsibleInput = document.getElementById("responsible");
+  const requirement = document.querySelector("[data-responsible-requirement]");
+  if (!birthInput || !responsibleInput) {
+    return;
+  }
+
+  const sync = () => {
+    const birthValue = String(birthInput.value || "");
+    const birth = /^\d{4}-\d{2}-\d{2}$/.test(birthValue)
+      ? new Date(`${birthValue}T12:00:00`)
+      : null;
+    const today = new Date();
+    let age = Number.POSITIVE_INFINITY;
+    if (birth && !Number.isNaN(birth.getTime())) {
+      age = today.getFullYear() - birth.getFullYear();
+      const beforeBirthday = today.getMonth() < birth.getMonth()
+        || (today.getMonth() === birth.getMonth() && today.getDate() < birth.getDate());
+      age -= beforeBirthday ? 1 : 0;
+    }
+    const required = age < Number(requiredUnderAge || 18);
+    responsibleInput.required = required;
+    if (requirement) {
+      requirement.textContent = required
+        ? "* obrigatório para menor de 18 anos"
+        : "(opcional para maiores de 18 anos)";
+      requirement.classList.toggle("required-marker", required);
+      requirement.classList.toggle("field-hint", !required);
+    }
+  };
+
+  birthInput.addEventListener("change", sync);
+  birthInput.addEventListener("input", sync);
+  sync();
 }
 
 function syncPatientClinicalTextareas() {

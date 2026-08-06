@@ -1,6 +1,8 @@
 const CADH_FLOW_COLUMNS = [
   { key: 'aguardando_agendamento', label: 'Aguardando Agendamento', withoutAppointment: true },
   { key: 'agendado', label: 'Agendados' },
+  { key: 'aguardando', label: 'Aguardando Atendimento' },
+  { key: 'em_atendimento', label: 'Em Atendimento' },
   { key: 'atendido', label: 'Atendidos' },
   { key: 'pendente', label: 'Pendentes' },
   { key: 'ausente', label: 'Ausentes' },
@@ -42,6 +44,9 @@ let cadhFlowReferralDetailPatientId = '';
 let cadhFlowSharingPatientId = '';
 let cadhFlowOutcomeAppointmentId = '';
 let cadhFlowOutcomeReasons = { ...CADH_DEFAULT_OUTCOME_REASONS };
+let cadhFlowAlerts = { sharing_without_appointment: [], ubs_without_monitoring: [] };
+let cadhFlowMetrics = {};
+let cadhFlowThresholds = { sharing_without_appointment_days: 7, ubs_without_monitoring_days: 90 };
 
 document.addEventListener('DOMContentLoaded', () => {
   if (document.body.dataset.page === 'cadh') {
@@ -113,6 +118,9 @@ async function loadCadhFlow() {
     cadhScheduleRows = Array.isArray(scheduleData.rows) ? scheduleData.rows : [];
     cadhFinalizedRows = Array.isArray(finalizedData.rows) ? finalizedData.rows : [];
     cadhFlowOutcomeReasons = activeData.options?.appointment_outcome_reasons || { ...CADH_DEFAULT_OUTCOME_REASONS };
+    cadhFlowAlerts = activeData.alerts || { sharing_without_appointment: [], ubs_without_monitoring: [] };
+    cadhFlowMetrics = activeData.metrics || {};
+    cadhFlowThresholds = activeData.options?.alert_thresholds || cadhFlowThresholds;
     updateCadhFlowIndicators();
     renderCadhFlowPanel();
   } catch (error) {
@@ -146,6 +154,11 @@ function renderCadhFlowPanel() {
 function renderCadhReceived(panel) {
   const rows = filterCadhFlowRows(cadhFlowRows);
   panel.innerHTML = `
+    ${cadhFlowAlerts.sharing_without_appointment?.length ? `
+      <div class="alert alert-warning cadh-flow-contract-alert" role="status">
+        <strong>${cadhFlowAlerts.sharing_without_appointment.length}</strong> compartilhamento(s) sem agendamento há ${SISELO.escapeHtml(cadhFlowThresholds.sharing_without_appointment_days || 7)} dias ou mais.
+      </div>
+    ` : ''}
     <form id="cadh-received-filters" class="cadh-flow-filters">
       <label>
         <span>Nome do paciente</span>
@@ -374,6 +387,13 @@ function renderCadhKanban(panel) {
   panel.querySelectorAll('[data-cadh-register-appointment]').forEach((button) => {
     button.addEventListener('click', () => openCadhAppointmentRecord(button.dataset.cadhRegisterAppointment));
   });
+  panel.querySelectorAll('[data-cadh-move-appointment]').forEach((button) => {
+    button.addEventListener('click', () => moveCadhAppointment(
+      button.dataset.cadhMoveAppointment,
+      button.dataset.cadhMoveStatus,
+      button,
+    ));
+  });
   panel.querySelectorAll('[data-cadh-open-outcome]').forEach((button) => {
     button.addEventListener('click', () => {
       cadhFlowOutcomeAppointmentId = button.dataset.cadhOpenOutcome;
@@ -404,8 +424,8 @@ function renderCadhKanbanColumn(column, rows) {
 function renderCadhKanbanCard(row, status) {
   const veryHigh = row.risk_classification === 'muito_alto_risco';
   const normalizedStatus = normalizeCadhAppointmentStatus(status);
-  const canRegister = normalizedStatus === 'agendado' && canCadhFlow('encounters.create');
-  const canResolve = normalizedStatus === 'agendado' && canCadhFlow('careflow.update');
+  const canRegister = normalizedStatus === 'em_atendimento' && canCadhFlow('encounters.create');
+  const canResolve = ['agendado', 'aguardando', 'em_atendimento'].includes(normalizedStatus) && canCadhFlow('careflow.update');
   const canReschedule = ['pendente', 'ausente'].includes(normalizedStatus)
     && canCadhFlow('careflow.schedule');
   const outcomeLabel = row.appointment_outcome_reason_label || '';
@@ -415,8 +435,10 @@ function renderCadhKanbanCard(row, status) {
       <span>${SISELO.escapeHtml(row.scheduled_at ? formatCadhFlowDateTime(row.scheduled_at) : 'Sem data definida')}</span>
       <small>${SISELO.escapeHtml(row.appointment_specialty || row.ubs_ref || '')}</small>
       <span class="cadh-risk-chip ${veryHigh ? 'is-critical' : 'is-high'}">${SISELO.escapeHtml(row.risk_label || 'Alto Risco')}</span>
-      ${normalizedStatus === 'agendado' ? `
+      ${['agendado', 'aguardando', 'em_atendimento'].includes(normalizedStatus) ? `
         <div class="cadh-kanban-card-actions">
+          ${normalizedStatus === 'agendado' && canCadhFlow('careflow.update') ? `<button class="btn btn-primary" type="button" data-cadh-move-appointment="${row.appointment_id}" data-cadh-move-status="aguardando">Confirmar chegada</button>` : ''}
+          ${normalizedStatus === 'aguardando' && canCadhFlow('careflow.update') ? `<button class="btn btn-primary" type="button" data-cadh-move-appointment="${row.appointment_id}" data-cadh-move-status="em_atendimento">Iniciar atendimento</button>` : ''}
           ${canRegister ? `<button class="btn btn-primary" type="button" data-cadh-register-appointment="${row.appointment_id}">Registrar atendimento</button>` : ''}
           ${canResolve ? `<button class="btn" type="button" data-cadh-open-outcome="${row.appointment_id}">Não realizado</button>` : ''}
         </div>
@@ -758,10 +780,25 @@ function findCadhFlowAppointment(appointmentId) {
 }
 
 function normalizeCadhAppointmentStatus(status) {
-  if (status === 'aguardando' || status === 'em_atendimento') {
-    return 'agendado';
-  }
   return status || '';
+}
+
+async function moveCadhAppointment(appointmentId, status, button) {
+  const previousLabel = button.textContent;
+  button.disabled = true;
+  button.textContent = 'Atualizando...';
+  try {
+    await SISELO.apiRequest('/care_flow/action.php', {
+      method: 'POST',
+      body: { action: 'move', appointment_id: Number(appointmentId), status },
+    });
+    await loadCadhFlow();
+    activateCadhFlowTab('schedule');
+  } catch (error) {
+    button.disabled = false;
+    button.textContent = previousLabel;
+    showCadhFlowAlert(error.message || 'Não foi possível atualizar a fila.', 'error');
+  }
 }
 
 function normalizeCadhSpecialty(value) {

@@ -114,9 +114,9 @@ async function setupCadhHistoryPage() {
       throw new Error('Paciente não encontrado.');
     }
 
-    const specialtyRecords = collectCadhSpecialtyRecords(patientId, fieldLabels);
-    const clinicalRecords = collectCadhClinicalRecords(context && context.encounters, specialtyRecords, fieldLabels);
-    cadhHistoryRecords = [...specialtyRecords, ...clinicalRecords].sort(compareCadhHistoryRecords);
+    const clinicalRecords = collectCadhClinicalRecords(context && context.encounters, [], fieldLabels, patientId);
+    const careEvents = collectCadhCareEvents(context || {});
+    cadhHistoryRecords = [...clinicalRecords, ...careEvents].sort(compareCadhHistoryRecords);
 
     renderCadhHistoryPatient(cadhHistoryPatient);
     renderCadhHistorySpecialtyOptions(cadhHistoryRecords);
@@ -191,7 +191,7 @@ function collectCadhSpecialtyRecords(patientId, fieldLabels) {
   ));
 }
 
-function collectCadhClinicalRecords(rows, specialtyRecords = [], fieldLabels = {}) {
+function collectCadhClinicalRecords(rows, specialtyRecords = [], fieldLabels = {}, patientId = '') {
   const linkedEncounterIds = new Set(
     specialtyRecords.map((record) => String(record.encounterId || '')).filter(Boolean)
   );
@@ -208,17 +208,70 @@ function collectCadhClinicalRecords(rows, specialtyRecords = [], fieldLabels = {
       return {
         id: `clinical:${String(record.id || '')}`,
         recordId: String(record.id || ''),
-        source: 'clinical',
+        source: specialtyConfig ? 'specialty' : 'clinical',
         specialtyKey: normalizeCadhHistoryText(record.specialty || 'registro-clinico'),
         specialty: String(record.specialty || 'Registro clínico').trim(),
         date: String(record.appointment_scheduled_at || record.encounter_date || '').slice(0, 10),
         consultation: String(payload.consultation_number || formatCadhHistoryRecordType(record.record_type)).trim(),
         updatedAt: String(record.updated_at || record.created_at || '').trim(),
         summary: summary || 'Registro clínico realizado.',
+        author: record.professional_name || 'Profissional não identificado',
         details,
-        editHref: '',
+        editHref: specialtyConfig
+          ? `${specialtyConfig.path}?patient_id=${encodeURIComponent(patientId)}&record_id=${encodeURIComponent(record.id || '')}&return=history`
+          : '',
       };
     });
+}
+
+function collectCadhCareEvents(context) {
+  const transitions = (Array.isArray(context.transitions) ? context.transitions : []).map((row) => ({
+    id: `transition:${row.id}`,
+    recordId: String(row.id || ''),
+    source: 'care-event',
+    specialtyKey: 'fluxo-assistencial',
+    specialty: row.flow_type === 'care_sharing' ? 'Compartilhamento UBS → CADH' : 'Transição CADH → UBS',
+    date: String(row.transition_date || '').slice(0, 10),
+    consultation: row.status || 'Registro de fluxo',
+    updatedAt: row.updated_at || row.transition_date || '',
+    summary: row.justification || row.notes || `${row.from_service || '-'} → ${row.to_service || '-'}`,
+    author: row.created_by_name || 'Equipe assistencial',
+    details: [
+      { label: 'Origem', value: row.origin_ubs || row.from_service || '-' },
+      { label: 'Destino', value: row.destination_ubs || row.to_service || '-' },
+      { label: 'Equipe de destino', value: row.destination_team || '-' },
+    ],
+    editHref: '',
+  }));
+  const appointments = (Array.isArray(context.appointments) ? context.appointments : []).map((row) => ({
+    id: `appointment:${row.id}`,
+    recordId: String(row.id || ''),
+    source: 'care-event',
+    specialtyKey: 'agenda',
+    specialty: 'Agenda CADH',
+    date: String(row.scheduled_at || '').slice(0, 10),
+    consultation: row.status_label || row.status || 'Agendamento',
+    updatedAt: row.updated_at || row.scheduled_at || '',
+    summary: [row.specialty, row.professional, row.modality].filter(Boolean).join(' · ') || 'Agendamento assistencial.',
+    author: row.created_by_name || 'Equipe CADH',
+    details: [],
+    editHref: '',
+  }));
+  const plans = (Array.isArray(context.care_plans) ? context.care_plans : []).map((row) => ({
+    id: `plan:${row.id}`,
+    recordId: String(row.id || ''),
+    source: 'care-event',
+    specialtyKey: 'plano-de-cuidado',
+    specialty: 'Plano de Cuidado',
+    date: String(row.start_date || '').slice(0, 10),
+    consultation: row.state || 'Plano',
+    updatedAt: row.updated_at || row.start_date || '',
+    summary: row.interventions || 'Plano de cuidado registrado.',
+    author: row.created_by_name || 'Equipe CADH',
+    details: row.review_date ? [{ label: 'Revisão sugerida', value: formatCadhHistoryDate(row.review_date) }] : [],
+    editHref: '',
+  }));
+  return [...transitions, ...appointments, ...plans];
 }
 
 function findCadhHistorySpecialty(label) {
@@ -352,6 +405,7 @@ function renderCadhHistoryCard(record) {
       <p class="cadh-history-card-summary">${SISELO.escapeHtml(record.summary)}</p>
       <div class="cadh-history-card-meta">
         <span>Atualizado em ${SISELO.escapeHtml(formatCadhHistoryDateTime(record.updatedAt))}</span>
+        <span>Autor: ${SISELO.escapeHtml(record.author || 'Não identificado')}</span>
         ${canEdit ? `<a href="${SISELO.escapeHtml(record.editHref)}">Editar atendimento</a>` : ''}
       </div>
       ${record.details.length ? `
@@ -390,12 +444,8 @@ function renderCadhHistoryError(message) {
 }
 
 function readCadhHistoryStorage(storageKey) {
-  try {
-    const parsed = JSON.parse(localStorage.getItem(storageKey) || '[]');
-    return Array.isArray(parsed) ? parsed.filter(Boolean) : [];
-  } catch (error) {
-    return [];
-  }
+  void storageKey;
+  return [];
 }
 
 function compareCadhHistoryRecords(left, right) {
@@ -427,6 +477,7 @@ function formatCadhHistoryRecordType(value) {
     diagnostico: 'Diagnóstico',
     exame: 'Exame',
     consulta: 'Consulta',
+    ubs_acompanhamento: 'Acompanhamento pela UBS',
   };
   const key = normalizeCadhHistoryText(value).replace(/\s+/g, '_');
   return labels[key] || String(value || 'Atendimento');

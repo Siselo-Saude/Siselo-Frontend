@@ -89,6 +89,14 @@
           <a href="/cadh/index.html?flow=received" class="is-alert"><span>⚠</span><strong id="home-alert-count">0</strong><small>Alertas pendentes</small></a>
         </section>
 
+        <p class="clinical-home-section-label">INDICADORES ASSISTENCIAIS</p>
+        <section class="clinical-home-metrics" aria-label="Indicadores assistenciais">
+          <a href="/cadh/index.html?flow=received"><span>+</span><strong id="home-active-cadh-count">0</strong><small>CADH ativos</small></a>
+          <a href="/cadh/index.html?flow=received"><span>→</span><strong id="home-sharing-count">0</strong><small>Compartilhados com CADH</small></a>
+          <a href="/ubs/index.html?tab=transitioned"><span>✓</span><strong id="home-transitioned-count">0</strong><small>Transicionados à UBS</small></a>
+          <a href="/cadh/index.html?flow=schedule" class="is-alert"><span>!</span><strong id="home-awaiting-schedule-count">0</strong><small>Aguardando agendamento</small></a>
+        </section>
+
         <section class="clinical-home-grid">
           <article class="clinical-home-panel">
             <header><div><strong>Agenda de hoje</strong><span>Pacientes em ordem de horário</span></div><span>▣</span></header>
@@ -171,11 +179,19 @@
         const waiting = rows.filter((row) => row.appointment_status === 'aguardando');
         const inService = rows.filter((row) => row.appointment_status === 'em_atendimento');
         const alerts = rows.filter((row) => row.risk_classification === 'muito_alto_risco');
+        const contractAlerts = Array.isArray(data.alerts?.sharing_without_appointment)
+          ? data.alerts.sharing_without_appointment
+          : [];
+        const metrics = data.metrics || {};
 
         document.getElementById('home-scheduled-count').textContent = String(todayRows.length);
         document.getElementById('home-waiting-count').textContent = String(waiting.length);
         document.getElementById('home-service-count').textContent = String(inService.length);
-        document.getElementById('home-alert-count').textContent = String(alerts.length);
+        document.getElementById('home-alert-count').textContent = String(alerts.length + contractAlerts.length);
+        document.getElementById('home-active-cadh-count').textContent = String(metrics.active_cadh || 0);
+        document.getElementById('home-sharing-count').textContent = String(metrics.shared_with_cadh || 0);
+        document.getElementById('home-transitioned-count').textContent = String(metrics.transitioned || 0);
+        document.getElementById('home-awaiting-schedule-count').textContent = String(metrics.awaiting_schedule || 0);
 
         const agenda = document.getElementById('home-today-agenda');
         agenda.innerHTML = todayRows.length
@@ -188,10 +204,14 @@
           : '<div class="clinical-home-empty"><span>▣</span><strong>Nenhum paciente agendado hoje</strong><small>A agenda do dia está livre.</small></div>';
 
         const alertList = document.getElementById('home-risk-alerts');
-        alertList.innerHTML = alerts.length
-          ? alerts.map((row) => `
+        const alertItems = [
+          ...contractAlerts.map((row) => ({ ...row, alert_copy: `Compartilhamento sem agendamento há ${row.days_without_appointment || 7} dias` })),
+          ...alerts.map((row) => ({ ...row, alert_copy: 'Paciente classificado como Muito Alto Risco' })),
+        ];
+        alertList.innerHTML = alertItems.length
+          ? alertItems.map((row) => `
               <a href="/cadh/index.html?flow=received">
-                <i></i><div><strong>${SISELO.escapeHtml(row.full_name || '-')}</strong><span>Paciente classificado como Muito Alto Risco</span></div>
+                <i></i><div><strong>${SISELO.escapeHtml(row.full_name || '-')}</strong><span>${SISELO.escapeHtml(row.alert_copy)}</span></div>
               </a>
             `).join('')
           : '<div class="clinical-home-empty"><span>✓</span><strong>Nenhum alerta pendente</strong><small>Não há pacientes de Muito Alto Risco aguardando atenção.</small></div>';

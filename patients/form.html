@@ -46,8 +46,8 @@
 
           <div class="transition-panel-grid">
             <div class="field">
-              <label for="attendance_date">Data do Compartilhamento com o CADH <span class="required-marker">*</span></label>
-              <input id="attendance_date" name="attendance_date" data-field="first_cadh_date" type="text" inputmode="numeric" autocomplete="off" placeholder="dd/mm/aaaa" required>
+              <label for="attendance_date">Data do Compartilhamento com o CADH <span class="field-hint">(opcional)</span></label>
+              <input id="attendance_date" name="attendance_date" data-field="first_cadh_date" type="text" inputmode="numeric" autocomplete="off" placeholder="dd/mm/aaaa">
               <div class="field-error" data-error-for="first_cadh_date"></div>
             </div>
           </div>
@@ -90,8 +90,8 @@
             </div>
 
             <div class="field">
-              <label for="responsible">Respons&aacute;vel <span class="required-marker">*</span></label>
-              <input id="responsible" name="responsible" data-field="responsible_name" maxlength="180" placeholder="Nome do respons&aacute;vel" required>
+              <label for="responsible">Respons&aacute;vel <span data-responsible-requirement class="field-hint">(obrigat&oacute;rio para menores de 18 anos)</span></label>
+              <input id="responsible" name="responsible" data-field="responsible_name" maxlength="180" placeholder="Nome do respons&aacute;vel">
               <div class="field-error" data-error-for="responsible_name"></div>
             </div>
 
@@ -156,6 +156,12 @@
 
           <div class="transition-panel-grid">
             <div class="field">
+              <label for="entry_condition">Condi&ccedil;&atilde;o de Entrada <span class="required-marker">*</span></label>
+              <select id="entry_condition" name="entry_condition" required></select>
+              <div class="field-error" data-error-for="entry_condition"></div>
+            </div>
+
+            <div class="field">
               <label for="risk_classification">Classifica&ccedil;&atilde;o de Risco <span class="required-marker">*</span></label>
               <select id="risk_classification" name="risk_classification" required>
                 <option value="alto_risco">Alto Risco</option>
@@ -177,14 +183,14 @@
             </div>
 
             <div class="field patient-clinical-notes-field">
-              <label for="allergies">Alergias <span class="required-marker">*</span></label>
-              <textarea id="allergies" name="allergies" placeholder="Ex.: Dipirona, amendoim" required></textarea>
+              <label for="allergies">Alergias <span class="field-hint">(opcional)</span></label>
+              <textarea id="allergies" name="allergies" placeholder="Ex.: Dipirona, amendoim"></textarea>
               <div class="field-error" data-error-for="allergies"></div>
             </div>
 
             <div class="field patient-clinical-notes-field">
-              <label for="chronic_conditions">Condi&ccedil;&otilde;es Cr&ocirc;nicas <span class="required-marker">*</span></label>
-              <textarea id="chronic_conditions" name="chronic_conditions" placeholder="Ex.: Diabetes, hipertens&atilde;o" required></textarea>
+              <label for="chronic_conditions">Outras Condi&ccedil;&otilde;es Cr&ocirc;nicas <span class="field-hint">(opcional)</span></label>
+              <textarea id="chronic_conditions" name="chronic_conditions" placeholder="Ex.: doen&ccedil;a renal cr&ocirc;nica"></textarea>
               <div class="field-error" data-error-for="chronic_conditions"></div>
             </div>
           </div>

@@ -42,8 +42,8 @@ async function setupTransitionsListPage() {
   const trashLink = document.getElementById("trash-link");
   const canCreateTransition = permissions.has("transitions.create");
   const newTransitionHref =
-    "/transitions/form.html" +
-    (patientId ? "?patient_id=" + encodeURIComponent(patientId) : "");
+    "/cadh/index.html?flow=followup&view=transitions" +
+    (patientId ? "&patient_id=" + encodeURIComponent(patientId) : "");
   const trashHref =
     "/transitions/trash.html" +
     (patientId ? "?patient_id=" + encodeURIComponent(patientId) : "");
@@ -72,7 +72,7 @@ async function setupTransitionsListPage() {
   SISELO.setupPatientSearchAutocomplete(searchInput, {
     rows,
     onPick: (patient) => {
-      location.href = `/transitions/form.html?patient_id=${encodeURIComponent(patient.id)}`;
+      location.href = `/cadh/index.html?flow=followup&view=transitions&patient_id=${encodeURIComponent(patient.id)}`;
     },
   });
   const applySearch = (value) => {
@@ -114,6 +114,18 @@ async function setupTransitionFormPage() {
   SISELO.bindShell("transitions");
   const id = SISELO.normalizeEntityId(SISELO.queryParam("id"));
   const patientId = SISELO.normalizeEntityId(SISELO.queryParam("patient_id"));
+  if (patientId) {
+    location.replace(`/cadh/index.html?flow=followup&view=transitions&patient_id=${encodeURIComponent(patientId)}`);
+    return;
+  }
+  SISELO.setFlashAlert(
+    id
+      ? "A transição concluída é consultada no histórico; selecione o paciente no fluxo CADH para novos registros."
+      : "Selecione o paciente no fluxo CADH para registrar a transição de cuidado.",
+    "info",
+  );
+  location.replace("/cadh/index.html?flow=followup&view=transitions");
+  return;
   const endpointParams = new URLSearchParams();
   if (id) endpointParams.set("id", id);
   if (patientId) endpointParams.set("patient_id", patientId);

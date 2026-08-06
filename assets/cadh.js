@@ -73,6 +73,7 @@ let cadhClinicalContext = null;
 let cadhActiveTab = 'users';
 let cadhFollowupPatients = [];
 let cadhSchedulingSpecialty = '';
+let cadhCurrentUserId = '';
 
 document.addEventListener('DOMContentLoaded', () => {
   if (!['cadh', 'ubs'].includes(document.body.dataset.page)) {
@@ -86,7 +87,9 @@ async function setupCadhPage() {
   if (!user) return;
 
   cadhPermissions = SISELO.getUiPermissions(user);
+  cadhCurrentUserId = SISELO.normalizeEntityId(user.id);
   const requestedTab = SISELO.queryParam('view') || 'users';
+  const requestedPatientId = SISELO.normalizeEntityId(SISELO.queryParam('patient_id'));
   cadhActiveTab = CADH_MANAGEMENT_TABS[requestedTab] ? requestedTab : 'users';
   cadhSchedulingSpecialty = String(SISELO.queryParam('schedule_specialty') || '').trim();
   const shellKey = document.body.dataset.page === 'ubs' ? 'ubs' : 'cadh';
@@ -96,6 +99,11 @@ async function setupCadhPage() {
   await bindCadhPatientSearch(cadhPermissions);
   setupCadhHeaderDate();
   setupCadhSidebar(user);
+
+  if (requestedPatientId) {
+    await renderCadhPatientFromContext({ id: requestedPatientId }, cadhPermissions);
+    return;
+  }
 
   if (!await restoreCadhPatientSearch(cadhPermissions)) {
     setCadhPatientCardsUnlocked(false);
@@ -559,6 +567,7 @@ function renderCadhUserDetailsTab(patient) {
         ${renderCadhDefinition('UBS de origem', patient.ubs_ref || formatCadhTeamName(patient.team_ref))}
         ${renderCadhDefinition('Equipe de Saúde da Família', formatCadhTeamName(patient.team_ref))}
         ${renderCadhDefinition('1º atendimento no CADH', formatCadhDate(patient.first_cadh_date))}
+        ${renderCadhDefinition('Condição de entrada', patient.entry_condition_label || patient.entry_condition)}
         ${renderCadhDefinition('Apoio familiar', patient.responsible_name)}
         ${renderCadhDefinition('Apoio comunitário', patient.emergency_contact)}
       </dl>
@@ -587,7 +596,7 @@ async function renderCadhCarePlanTab(patient, options = {}) {
   const planId = SISELO.normalizeEntityId(currentPlan && currentPlan.id);
   const canCreate = cadhPermissions.has('careplans.create');
   const canUpdate = cadhPermissions.has('careplans.update');
-  const canEdit = planId ? canUpdate : canCreate;
+  const canEdit = planId ? canUpdate && canEditCadhAuthoredRecord(currentPlan) : canCreate;
   const formHref = `/care-plans/form.html?patient_id=${encodeURIComponent(patientId)}${planId ? `&id=${encodeURIComponent(planId)}` : ''}`;
   const newPlanHref = `/care-plans/form.html?patient_id=${encodeURIComponent(patientId)}`;
   const primaryLabel = planId ? 'Editar Plano de Cuidado' : 'Iniciar Plano de Cuidado';
@@ -606,9 +615,9 @@ async function renderCadhCarePlanTab(patient, options = {}) {
             <article class="cadh-care-plan-inline-row">
               <div>
                 <strong>${SISELO.escapeHtml(row.full_name || patient.full_name || 'Plano de cuidado')}</strong>
-                <span>Início: ${SISELO.escapeHtml(formatCadhDate(row.start_date) || '-')} ${row.end_date ? ` · Revisão: ${SISELO.escapeHtml(formatCadhDate(row.end_date))}` : ''}</span>
+                <span>${SISELO.escapeHtml(formatCadhCarePlanState(row.state))} · Início: ${SISELO.escapeHtml(formatCadhDate(row.start_date) || '-')} ${row.review_date ? ` · Revisão: ${SISELO.escapeHtml(formatCadhDate(row.review_date))}` : ''}</span>
               </div>
-              ${canUpdate && rowId ? `<a class="btn" href="${rowEditHref}">Editar plano</a>` : ''}
+              ${canUpdate && rowId && canEditCadhAuthoredRecord(row) ? `<a class="btn" href="${rowEditHref}">Editar plano</a>` : ''}
             </article>
           `;
         }).join('')}
@@ -702,12 +711,22 @@ async function renderCadhCarePlanTab(patient, options = {}) {
         <header>Plano de Cuidado</header>
         <div class="cadh-care-plan-grid">
           <label>
+            <span>Estado do plano</span>
+            <select name="state" required>
+              ${Object.entries(context.state_options || {}).map(([value, label]) => `<option value="${SISELO.escapeHtml(value)}" ${String(plan.state || 'em_elaboracao') === value ? 'selected' : ''}>${SISELO.escapeHtml(label)}</option>`).join('')}
+            </select>
+          </label>
+          <label>
             <span>Início</span>
             <input name="start_date" type="text" inputmode="numeric" autocomplete="off" placeholder="dd/mm/aaaa" value="${SISELO.escapeHtml(plan.start_date || SISELO.todayDateInputValue())}">
           </label>
           <label>
             <span>Fim</span>
             <input name="end_date" type="text" inputmode="numeric" autocomplete="off" placeholder="dd/mm/aaaa" value="${SISELO.escapeHtml(plan.end_date || '')}">
+          </label>
+          <label>
+            <span>Revisão sugerida</span>
+            <input name="review_date" type="text" inputmode="numeric" autocomplete="off" placeholder="dd/mm/aaaa" value="${SISELO.escapeHtml(plan.review_date || '')}">
           </label>
           <label class="is-wide">
             <span>Condutas terapêuticas</span>
@@ -821,6 +840,7 @@ function bindCadhCarePlanForm(patient) {
 function enhanceCadhCarePlanDates(form) {
   const startInput = form.querySelector('input[name="start_date"]');
   const endInput = form.querySelector('input[name="end_date"]');
+  const reviewInput = form.querySelector('input[name="review_date"]');
 
   if (!startInput || !endInput) {
     return;
@@ -833,6 +853,11 @@ function enhanceCadhCarePlanDates(form) {
 
   SISELO.enhanceDateInput(startInput, { min: '1900-01-01' });
   SISELO.enhanceDateInput(endInput, { min: '1900-01-01' });
+  if (reviewInput) {
+    reviewInput.id = reviewInput.id || 'cadh-plan-review-date';
+    reviewInput.dataset.dateLabel = 'Revisão sugerida';
+    SISELO.enhanceDateInput(reviewInput, { min: '1900-01-01' });
+  }
 
   const syncCarePlanDates = () => {
     startInput.max = endInput.value || '';
@@ -1103,7 +1128,7 @@ function renderCadhEncounterCard(row, options = {}) {
       </div>
       <div class="cadh-encounter-card-side">
         <time datetime="${SISELO.escapeHtml(row.encounter_date || '')}">${SISELO.escapeHtml(formatCadhDate(row.encounter_date))}</time>
-        ${options.canUpdate ? `<a class="icon-btn" href="${editHref}" title="Editar atendimento" aria-label="Editar atendimento"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17.3V20h2.7L18.9 7.8l-2.7-2.7L4 17.3Z"/><path d="m16.2 5.1 2.7 2.7"/></svg></a>` : ''}
+        ${options.canUpdate && canEditCadhAuthoredRecord(row, 'professional_user_id') ? `<a class="icon-btn" href="${editHref}" title="Editar atendimento" aria-label="Editar atendimento"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17.3V20h2.7L18.9 7.8l-2.7-2.7L4 17.3Z"/><path d="m16.2 5.1 2.7 2.7"/></svg></a>` : ''}
       </div>
     </article>
   `;
@@ -1146,7 +1171,7 @@ function renderCadhTransitionTab(patient, options = {}) {
       <div id="cadh-transition-alert" class="alert ${options.success ? 'alert-success' : ''}" ${options.success ? '' : 'hidden'}>${options.success ? SISELO.escapeHtml(options.success) : ''}</div>
       ${options.warning ? `<p class="cadh-inline-empty is-warning">${SISELO.escapeHtml(options.warning)}</p>` : ''}
 
-      <p class="cadh-info-alert">O encaminhamento ocorre quando o paciente está estabilizado. A origem é sempre o <strong>CADH</strong>. Após o registro, o paciente será inativado no CADH e vinculado à equipe de referência da UBS quando o perfil tiver permissão para editar o cadastro.</p>
+      <p class="cadh-info-alert">A transição ocorre quando o paciente está estabilizado. A origem é sempre o <strong>CADH</strong>; o registro conclui o acompanhamento especializado e atribui a responsabilidade à UBS/equipe selecionada, preservando o cadastro e o histórico.</p>
 
       <form id="cadh-transition-form" class="cadh-transition-form">
         <input type="hidden" name="patient_id" value="${SISELO.escapeHtml(patientId)}">
@@ -1266,13 +1291,19 @@ async function saveCadhTransitionForm(patient, form) {
     ubsSelect?.focus();
     return;
   }
+  if (!teamLabel || teamValue === 'sem_equipe') {
+    setCadhInlineAlert(alert, 'Selecione a equipe responsável na UBS de destino.', 'error');
+    teamSelect?.focus();
+    return;
+  }
 
   const payload = {
     patient_id: patientId,
     transition_date: SISELO.todayDateInputValue(),
     from_service: CADH_TRANSITION_ORIGIN,
-    to_service: teamLabel ? `${ubsLabel} - ${teamLabel}` : ubsLabel,
-    status: 'concluida',
+    to_service: ubsLabel,
+    destination_ubs: ubsLabel,
+    destination_team: teamValue,
     notes: String(form.elements.notes?.value || '').trim(),
   };
 
@@ -1287,11 +1318,6 @@ async function saveCadhTransitionForm(patient, form) {
       body: payload,
     });
 
-    const updateResult = await updateCadhPatientAfterTransition(patient, {
-      ubsRef: ubsLabel,
-      teamRef: teamValue,
-    });
-
     await SISELO.refreshCachedPatientContext(patientId);
     cadhClinicalContext = await SISELO.loadPatientClinicalContext(patientId);
     if (cadhClinicalContext && cadhClinicalContext.patient) {
@@ -1303,10 +1329,8 @@ async function saveCadhTransitionForm(patient, form) {
     syncCadhPendingIndicators(careSummary && Array.isArray(careSummary.missingModules) ? careSummary.missingModules : []);
 
     await renderCadhTransitionTab(cadhCurrentPatient || patient, {
-      success: updateResult.updated
-        ? 'Encaminhamento registrado e cadastro atualizado com sucesso.'
-        : 'Encaminhamento registrado com sucesso.',
-      warning: updateResult.warning || '',
+      success: 'Transição registrada e responsabilidade atribuída à UBS com sucesso.',
+      warning: '',
     });
   } catch (error) {
     setCadhInlineAlert(alert, error.message || 'Não foi possível registrar o encaminhamento do cuidado.', 'error');
@@ -1365,6 +1389,8 @@ function buildCadhPatientTransitionPayload(row, patient, transitionData) {
     emergency_contact: source.emergency_contact || '',
     allergies: source.allergies || '',
     chronic_conditions: source.chronic_conditions || '',
+    entry_condition: source.entry_condition || '',
+    entry_condition_label: source.entry_condition_label || '',
     status: 'inativo',
     ubs_ref: transitionData.ubsRef || '',
     uds_reference: transitionData.ubsRef || '',
@@ -1439,6 +1465,20 @@ function compareCadhDateDesc(firstValue, secondValue) {
   return secondTime - firstTime;
 }
 
+function formatCadhCarePlanState(value) {
+  return {
+    em_elaboracao: 'Em elaboração',
+    aguardando_reuniao: 'Aguardando reunião',
+    pactuado: 'Pactuado',
+    transicionado: 'Transicionado',
+  }[String(value || '')] || 'Em elaboração';
+}
+
+function canEditCadhAuthoredRecord(row, authorField = 'created_by_user_id') {
+  const authorId = SISELO.normalizeEntityId(row && row[authorField]);
+  return cadhPermissions.has('admin.manage') || !authorId || authorId === cadhCurrentUserId;
+}
+
 function formatCadhEncounterProfessional(row) {
   return row.professional_name ||
     row.professional ||
@@ -1460,22 +1500,24 @@ function getCadhUbsOptions(patient) {
     }
   };
 
-  addLabel(patient && patient.ubs_ref);
-  (Array.isArray(cadhClinicalContext && cadhClinicalContext.transitions) ? cadhClinicalContext.transitions : [])
-    .forEach((row) => {
-      const destination = String(row.to_service || '').split(' - ')[0];
-      if (normalizeCadhText(destination).includes('ubs')) {
-        addLabel(destination);
-      }
-    });
-  CADH_DEFAULT_UBS_OPTIONS.forEach(addLabel);
+  const contractGroups = cadhClinicalContext
+    && cadhClinicalContext.options
+    && Array.isArray(cadhClinicalContext.options.ubs_team_groups)
+    ? cadhClinicalContext.options.ubs_team_groups
+    : [];
+  contractGroups.forEach((group) => addLabel(group.ubs));
 
   return labels.map((label) => ({ value: label, label }));
 }
 
 function getCadhTeamOptionsForUbs(ubs, preferredTeam = '') {
   const normalizedUbs = normalizeCadhText(ubs);
-  const group = CADH_UBS_TEAM_GROUPS.find((item) => normalizeCadhText(item.ubs) === normalizedUbs);
+  const contractGroups = cadhClinicalContext
+    && cadhClinicalContext.options
+    && Array.isArray(cadhClinicalContext.options.ubs_team_groups)
+    ? cadhClinicalContext.options.ubs_team_groups
+    : [];
+  const group = contractGroups.find((item) => normalizeCadhText(item.ubs) === normalizedUbs);
   const teams = group ? [...group.teams] : [];
   const normalizedPreferred = normalizeCadhText(preferredTeam);
 

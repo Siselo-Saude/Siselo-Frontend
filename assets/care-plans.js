@@ -180,7 +180,7 @@ function renderCarePlansOverview(container, rows, permissions, patientId, newPla
           </div>
           <div>
             <dt>Previsão de revisão</dt>
-            <dd>${SISELO.escapeHtml(formatCarePlanDate(row.end_date) || "Sem data definida")}</dd>
+            <dd>${SISELO.escapeHtml(formatCarePlanDate(row.review_date || row.end_date) || "Sem data definida")}</dd>
           </div>
         </dl>
         <footer>
@@ -284,7 +284,19 @@ async function setupCarePlansFormPage() {
       items: Array.isArray(data.items) ? data.items : [],
       patient: selectedPatient,
       patientLocked: Boolean(patientId),
+      stateOptions: data.state_options || {},
     });
+    const startDateLabel = formBody.querySelector("#start_date")?.closest("label");
+    if (startDateLabel) {
+      startDateLabel.insertAdjacentHTML("beforebegin", `
+        <label>
+          <span>Estado do plano</span>
+          <select id="care_plan_state" name="state" required>
+            ${Object.entries(data.state_options || {}).map(([value, label]) => `<option value="${SISELO.escapeHtml(value)}" ${String(plan.state || "em_elaboracao") === value ? "selected" : ""}>${SISELO.escapeHtml(label)}</option>`).join("")}
+          </select>
+        </label>
+      `);
+    }
     SISELO.enhanceChoiceSelects(formBody);
     setupCarePlanGoalRepeater();
     SISELO.applyUiComponents(formBody);
@@ -413,7 +425,7 @@ function setupCarePlanFormShell(user) {
   }
 }
 
-function renderCarePlanSheet({ plan, items, patient, patientLocked }) {
+function renderCarePlanSheet({ plan, items, patient, patientLocked, stateOptions }) {
   const lookup = buildCarePlanItemLookup(items);
   const profileFields = [
     "Autocuidado",
@@ -465,7 +477,7 @@ function renderCarePlanSheet({ plan, items, patient, patientLocked }) {
         </label>
         <label>
           <span>Data da próxima revisão</span>
-          <input id="end_date" name="end_date" type="text" inputmode="numeric" autocomplete="off" placeholder="dd/mm/aaaa" value="${SISELO.escapeHtml(plan.end_date || "")}">
+          <input id="review_date" name="review_date" type="text" inputmode="numeric" autocomplete="off" placeholder="dd/mm/aaaa" value="${SISELO.escapeHtml(plan.review_date || "")}">
         </label>
       </div>
     </section>
@@ -526,7 +538,7 @@ function renderCarePlanSheet({ plan, items, patient, patientLocked }) {
       <div class="care-plan-two-column">
         <label>
           <span>Data da avaliação da APS</span>
-          <input id="aps_review_date" type="text" inputmode="numeric" autocomplete="off" placeholder="dd/mm/aaaa" value="${SISELO.escapeHtml(plan.end_date || "")}">
+          <input id="aps_review_date" type="text" inputmode="numeric" autocomplete="off" placeholder="dd/mm/aaaa" value="${SISELO.escapeHtml(plan.review_date || "")}">
         </label>
         <label>
           <span>Monitoramento na APS</span>
@@ -826,7 +838,7 @@ function renderCarePlansTrashOverview(container, rows, permissions, patientId) {
         </div>
         <div>
           <dt>Previsão de revisão</dt>
-          <dd>${SISELO.escapeHtml(formatCarePlanDate(row.end_date) || "Sem data definida")}</dd>
+          <dd>${SISELO.escapeHtml(formatCarePlanDate(row.review_date || row.end_date) || "Sem data definida")}</dd>
         </div>
         <div>
           <dt>Inativado em</dt>
@@ -908,7 +920,7 @@ function renderCarePlansTable(
       <td>${row.id}</td>
       <td><span class="patient-name">${SISELO.highlightPersonName(row.full_name, query)}</span></td>
       <td>${SISELO.escapeHtml(formatCarePlanDate(row.start_date))}</td>
-      <td>${SISELO.escapeHtml(formatCarePlanDate(row.end_date))}</td>
+      <td>${SISELO.escapeHtml(formatCarePlanDate(row.review_date || row.end_date))}</td>
       <td>
         <div class="table-actions">
           ${SISELO.iconLink("pdf", `${SISELO.getApiBaseUrl()}/care_plans/pdf.php?id=${row.id}`, "Gerar PDF", { target: "_blank", rel: "noreferrer" })}
@@ -935,7 +947,7 @@ function renderCarePlansTrashTable(tbody, rows, permissions, query = "") {
       <td>${row.id}</td>
       <td><span class="patient-name">${SISELO.highlightPersonName(row.full_name, query)}</span></td>
       <td>${SISELO.escapeHtml(formatCarePlanDate(row.start_date))}</td>
-      <td>${SISELO.escapeHtml(formatCarePlanDate(row.end_date))}</td>
+      <td>${SISELO.escapeHtml(formatCarePlanDate(row.review_date || row.end_date))}</td>
       <td>${SISELO.escapeHtml(row.deleted_at || "")}</td>
       <td>
         <div class="table-actions">
@@ -1040,12 +1052,20 @@ function getEmptyCarePlanContext(patientId) {
     editing: false,
     plan: {
       patient_id: patientId || "",
+      state: "em_elaboracao",
       start_date: "",
       end_date: "",
+      review_date: "",
       interventions: "",
     },
     items: [],
     patients: [],
+    state_options: {
+      em_elaboracao: "Em elaboração",
+      aguardando_reuniao: "Aguardando reunião",
+      pactuado: "Pactuado",
+      transicionado: "Transicionado",
+    },
   };
 }
 
@@ -1135,7 +1155,7 @@ function configureCarePlanDateInputs() {
   const startInput = SISELO.enhanceDateInput("start_date", {
     min: "1900-01-01",
   });
-  const endInput = SISELO.enhanceDateInput("end_date", {
+  const endInput = SISELO.enhanceDateInput("review_date", {
     min: "1900-01-01",
   });
   SISELO.enhanceDateInput("aps_review_date", {
@@ -1188,7 +1208,7 @@ function configureCarePlanDateInputs() {
 }
 
 function bindCarePlanDateMirrors() {
-  const endInput = document.getElementById("end_date");
+  const endInput = document.getElementById("review_date");
   const apsInput = document.getElementById("aps_review_date");
 
   if (!(endInput instanceof HTMLInputElement) || !(apsInput instanceof HTMLInputElement)) {

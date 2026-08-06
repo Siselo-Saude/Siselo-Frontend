@@ -1,5 +1,3 @@
-const UBS_FOLLOWUP_KEY = 'siselo_ubs_followups';
-
 const UBS_PROFESSIONAL_OPTIONS = [
   'Médico de Família e Comunidade',
   'Enfermeiro',
@@ -28,6 +26,8 @@ let ubsCanCreatePatients = false;
 let ubsTransitions = [];
 let ubsPatients = [];
 let ubsFollowups = [];
+let ubsMonitoringAlerts = [];
+let ubsMonitoringAlertDays = 90;
 let ubsActiveTab = 'patients';
 let ubsFiltersOpen = false;
 let ubsFollowupFormOpen = false;
@@ -64,8 +64,7 @@ async function setupUbsPage() {
   setupUbsHeaderDate();
   setupUbsSidebar(user);
 
-  ubsFollowups = readUbsFollowups();
-  await Promise.all([loadUbsPatients(), loadUbsTransitions()]);
+  await Promise.all([loadUbsPatients(), loadUbsTransitions(), loadUbsFollowups(), loadUbsAlerts()]);
 
   bindUbsTabs();
   bindUbsFilterControls();
@@ -138,7 +137,7 @@ async function loadUbsTransitions() {
       .filter((row) => (
         normalizeUbsText(row.status) !== 'cancelada' &&
         normalizeUbsText(row.care_status) !== 'finalizado' &&
-        isUbsReferralToCadh(row)
+        (row.flow_type === 'care_transition' || !row.flow_type)
       ))
       .sort((first, second) => (
         compareUbsDateDesc(first.transition_date, second.transition_date) ||
@@ -358,8 +357,9 @@ function renderUbsTransitionedTab() {
   syncUbsFilterSidebar();
 
   panel.innerHTML = `
+    ${ubsMonitoringAlerts.length ? `<div class="alert alert-warning"><strong>${ubsMonitoringAlerts.length}</strong> paciente(s) sem acompanhamento UBS há ${SISELO.escapeHtml(ubsMonitoringAlertDays)} dias ou mais.</div>` : ''}
     <div class="ubs-table-card">
-      ${rows.length ? renderUbsTransitionedTable(rows) : renderUbsEmptyState('transition', 'Nenhum encaminhamento ao CADH registrado.', 'Ajuste os filtros ou encaminhe um paciente para o CADH.')}
+      ${rows.length ? renderUbsTransitionedTable(rows) : renderUbsEmptyState('transition', 'Nenhuma transição recebida do CADH.', 'Ajuste os filtros para consultar outras transições de cuidado.')}
     </div>
   `;
 
@@ -373,6 +373,7 @@ function renderUbsTransitionedTable(rows) {
           <th>Paciente</th>
           <th>Destino</th>
           <th>Encaminhamento</th>
+          <th>Ações</th>
         </tr>
       </thead>
       <tbody>
@@ -389,6 +390,7 @@ function renderUbsTransitionedTable(rows) {
                 <small>${SISELO.escapeHtml(destination.esf || row.notes || '')}</small>
               </td>
               <td>${SISELO.escapeHtml(formatUbsDate(row.transition_date))}</td>
+              <td><a class="btn" href="/cadh/history.html?patient_id=${encodeURIComponent(row.patient_id)}">Histórico</a></td>
             </tr>
           `;
         }).join('')}
@@ -506,6 +508,7 @@ function renderUbsFollowupTab() {
   const records = selected ? getUbsFollowupsForTransition(selected) : [];
 
   panel.innerHTML = `
+    <div id="ubs-followup-alert" class="alert" hidden></div>
     <div class="ubs-followup-toolbar">
       <select id="ubs-followup-patient">
         <option value="">— Selecione o usuário —</option>
@@ -617,32 +620,57 @@ function bindUbsFollowupControls() {
   });
 }
 
-function saveUbsFollowup(formData) {
+async function saveUbsFollowup(formData) {
   const selected = getSelectedUbsTransition();
   if (!selected) return;
 
-  const record = {
-    id: `${Date.now()}-${Math.round(Math.random() * 1000)}`,
-    transition_id: String(selected.id || ''),
-    patient_id: String(selected.patient_id || ''),
-    full_name: selected.full_name || '',
-    cpf: selected.cpf || '',
-    destination: parseUbsDestination(selected).ubs,
+  const clinicalPayload = {
     professional: String(formData.get('professional') || ''),
     care_type: String(formData.get('care_type') || ''),
-    date: String(formData.get('date') || SISELO.todayDateInputValue()),
     status: String(formData.get('status') || 'Em Monitoramento'),
     conduct: String(formData.get('conduct') || '').trim(),
     evolution: String(formData.get('evolution') || '').trim(),
     next_contact: String(formData.get('next_contact') || ''),
-    created_at: new Date().toISOString(),
   };
+  const summary = clinicalPayload.evolution || clinicalPayload.conduct;
+  if (!summary) {
+    SISELO.showAlert('ubs-followup-alert', 'Informe a conduta ou a evolução do acompanhamento.', 'error');
+    return;
+  }
 
-  ubsFollowups.unshift(record);
-  writeUbsFollowups();
-  ubsFollowupFormOpen = false;
-  updateUbsMetrics();
-  renderUbsFollowupTab();
+  try {
+    await SISELO.apiRequest(`/encounters/form.php?patient_id=${encodeURIComponent(selected.patient_id)}`, {
+      method: 'POST',
+      body: {
+        patient_id: Number(selected.patient_id),
+        transition_id: Number(selected.id),
+        encounter_date: String(formData.get('date') || SISELO.todayDateInputValue()),
+        specialty: 'Atenção Primária',
+        record_type: 'ubs_acompanhamento',
+        schema_version: '1.0',
+        payload_json: clinicalPayload,
+        summary,
+      },
+    });
+    await loadUbsFollowups();
+    ubsFollowupFormOpen = false;
+    updateUbsMetrics();
+    renderUbsFollowupTab();
+  } catch (error) {
+    SISELO.showAlert('ubs-followup-alert', error.message || 'Não foi possível salvar o acompanhamento.', 'error');
+  }
+}
+
+async function loadUbsAlerts() {
+  try {
+    const data = await SISELO.apiRequest('/care_flow/list.php?care_status=all');
+    ubsMonitoringAlerts = Array.isArray(data.alerts?.ubs_without_monitoring)
+      ? data.alerts.ubs_without_monitoring
+      : [];
+    ubsMonitoringAlertDays = Number(data.options?.alert_thresholds?.ubs_without_monitoring_days || 90);
+  } catch (error) {
+    ubsMonitoringAlerts = [];
+  }
 }
 
 function renderUbsNextContactsTab() {
@@ -705,6 +733,12 @@ function getUbsDestinationOptions() {
 }
 
 function parseUbsDestination(row) {
+  if (row && (row.destination_ubs || row.destination_team)) {
+    return {
+      ubs: String(row.destination_ubs || row.to_service || '').trim(),
+      esf: String(row.destination_team || row.team_ref || '').trim(),
+    };
+  }
   const rawDestination = String(row && row.to_service || '').trim();
   const parts = rawDestination.split(/\s+-\s+/).map((part) => part.trim()).filter(Boolean);
   return {
@@ -719,14 +753,7 @@ function getSelectedUbsTransition() {
 
 function getUbsFollowupsForTransition(row) {
   return ubsFollowups
-    .filter((record) => (
-      String(record.transition_id) === String(row.id) ||
-      (
-        record.patient_id &&
-        row.patient_id &&
-        String(record.patient_id) === String(row.patient_id)
-      )
-    ))
+    .filter((record) => String(record.transition_id) === String(row.id))
     .sort((first, second) => compareUbsDateDesc(first.date, second.date));
 }
 
@@ -791,19 +818,33 @@ function getUbsStatusChipClass(status) {
   return '';
 }
 
-function readUbsFollowups() {
+async function loadUbsFollowups() {
   try {
-    const rows = JSON.parse(localStorage.getItem(UBS_FOLLOWUP_KEY) || '[]');
-    return Array.isArray(rows) ? rows : [];
+    const data = await SISELO.apiRequest('/encounters/list.php');
+    const rows = Array.isArray(data.rows) ? data.rows : [];
+    ubsFollowups = rows
+      .filter((row) => row.record_type === 'ubs_acompanhamento')
+      .map((row) => {
+        let payload = {};
+        try {
+          payload = typeof row.payload_json === 'string' ? JSON.parse(row.payload_json) : (row.payload_json || {});
+        } catch (error) {
+          payload = {};
+        }
+        return {
+          ...payload,
+          id: row.id,
+          transition_id: String(row.transition_id || ''),
+          patient_id: String(row.patient_id || ''),
+          full_name: row.full_name || '',
+          cpf: row.cpf || '',
+          professional: payload.professional || row.professional_name || '',
+          date: row.encounter_date,
+          evolution: payload.evolution || row.summary || '',
+        };
+      });
   } catch (error) {
-    return [];
-  }
-}
-
-function writeUbsFollowups() {
-  try {
-    localStorage.setItem(UBS_FOLLOWUP_KEY, JSON.stringify(ubsFollowups));
-  } catch (error) {
+    ubsFollowups = [];
   }
 }
 

@@ -1,5 +1,6 @@
 (() => {
   const CADH_SEARCH_KEY = "siselo_cadh_search";
+  const specialtyRecordCache = new Map();
   const INITIAL_CONSULTATION_LABEL = "1ª Consulta (inicial)";
 
   const configs = {
@@ -261,6 +262,7 @@
     setupSidebar(user);
 
     const patient = await loadContextPatient();
+    await loadSpecialtyRecords(config, patient);
     const appointmentContext = await loadSpecialtyAppointment(patient);
     renderSpecialtyContent(config, patient, appointmentContext.appointment);
     bindSpecialtyForm(config, patient, appointmentContext.appointment);
@@ -455,7 +457,7 @@
       if (!patient || String(appointment.patient_id) !== String(patient.id)) {
         return { appointment: null, error: "O agendamento não pertence ao paciente selecionado." };
       }
-      if (!["agendado", "atendido"].includes(String(appointment.status || ""))) {
+      if (!["agendado", "aguardando", "em_atendimento", "atendido"].includes(String(appointment.status || ""))) {
         return { appointment: null, error: "Este agendamento foi encerrado sem atendimento e não aceita registro clínico." };
       }
       return { appointment, error: "" };
@@ -628,6 +630,18 @@
         const record = findPatientRecord(config, patient.id, button.dataset.clinicalRecordDelete);
         if (!record || !(await SISELO.confirmPermanentDeletion(`o registro de ${config.title}`, record.consultation_number))) {
           return;
+        }
+
+        if (record.encounter_id) {
+          try {
+            await SISELO.apiRequest("/encounters/soft_delete.php", {
+              method: "POST",
+              body: { id: Number(record.encounter_id) },
+            });
+          } catch (error) {
+            SISELO.showAlert("clinical-specialty-alert", error.message || "Não foi possível excluir o registro.", "error");
+            return;
+          }
         }
 
         const records = readRecords(config.storageKey).filter((item) => String(item.id) !== String(record.id));
@@ -1104,7 +1118,7 @@
       record.encounter_id = existingRecord.encounter_id;
     }
 
-    if (appointment) {
+    {
       const submitButton = form.querySelector('button[type="submit"]');
       if (submitButton instanceof HTMLButtonElement) {
         submitButton.disabled = true;
@@ -1117,21 +1131,24 @@
           method: "POST",
           body: {
             patient_id: Number(patient.id),
-            appointment_id: Number(appointment.id),
-            encounter_date: parseSpecialtyAppointmentDateTime(appointment.scheduled_at).dateValue,
-            specialty: appointment.specialty || config.title,
+            appointment_id: appointment ? Number(appointment.id) : 0,
+            encounter_date: appointment
+              ? parseSpecialtyAppointmentDateTime(appointment.scheduled_at).dateValue
+              : (values.consultation_date || SISELO.todayDateInputValue()),
+            specialty: (appointment && appointment.specialty) || config.title,
             record_type: "consulta",
             schema_version: "1.0",
             payload_json: JSON.stringify({
               ...values,
-              scheduled_at: appointment.scheduled_at,
-              specialty: appointment.specialty || config.title,
-              professional: appointment.professional || "",
-              team: appointment.team || "",
+              _specialty_slug: config.slug,
+              scheduled_at: appointment ? appointment.scheduled_at : "",
+              specialty: (appointment && appointment.specialty) || config.title,
+              professional: appointment ? (appointment.professional || "") : "",
+              team: appointment ? (appointment.team || "") : "",
             }),
             summary: buildSpecialtySummary(config, values),
-            follow_up_date: followUp.date,
-            follow_up_time: followUp.time,
+            follow_up_date: appointment ? followUp.date : "",
+            follow_up_time: appointment ? followUp.time : "",
           },
         });
         record.encounter_id = response?.row?.id || record.encounter_id;
@@ -1237,19 +1254,52 @@
     return String(right.updated_at || "").localeCompare(String(left.updated_at || ""));
   }
 
-  function readRecords(storageKey) {
+  async function loadSpecialtyRecords(config, patient) {
+    if (!patient || !patient.id) {
+      specialtyRecordCache.set(config.storageKey, []);
+      return;
+    }
     try {
-      const parsed = JSON.parse(localStorage.getItem(storageKey) || "[]");
-      return Array.isArray(parsed) ? parsed.filter(Boolean) : [];
+      const data = await SISELO.apiRequest(`/encounters/list.php?patient_id=${encodeURIComponent(patient.id)}`);
+      const rows = Array.isArray(data.rows) ? data.rows : [];
+      const records = rows.map((row) => {
+        let payload = {};
+        try {
+          payload = typeof row.payload_json === "string" ? JSON.parse(row.payload_json) : (row.payload_json || {});
+        } catch (error) {
+          payload = {};
+        }
+        return {
+          ...payload,
+          id: String(row.id),
+          encounter_id: row.id,
+          patient_id: row.patient_id,
+          full_name: row.full_name || patient.full_name,
+          cpf: row.cpf || patient.cpf,
+          team_ref: row.team_ref || patient.team_ref,
+          consultation_date: payload.consultation_date || row.encounter_date,
+          updated_at: row.updated_at || row.encounter_date,
+          _api_specialty: row.specialty || "",
+        };
+      }).filter((record) => {
+        const slug = String(record._specialty_slug || "");
+        const specialty = SISELO.normalizeSearchText(record._api_specialty || "");
+        return slug === config.slug
+          || specialty.includes(SISELO.normalizeSearchText(config.title))
+          || specialty.includes(SISELO.normalizeSearchText(config.slug));
+      });
+      specialtyRecordCache.set(config.storageKey, records);
     } catch (error) {
-      return [];
+      specialtyRecordCache.set(config.storageKey, []);
     }
   }
 
+  function readRecords(storageKey) {
+    return [...(specialtyRecordCache.get(storageKey) || [])];
+  }
+
   function writeRecords(storageKey, records) {
-    try {
-      localStorage.setItem(storageKey, JSON.stringify((Array.isArray(records) ? records : []).filter(Boolean)));
-    } catch (error) {}
+    specialtyRecordCache.set(storageKey, (Array.isArray(records) ? records : []).filter(Boolean));
   }
 
   function formatSpecialtyDate(value) {

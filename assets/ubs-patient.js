@@ -133,6 +133,7 @@ function renderUbsPatientSummary(patient) {
     ['CPF', patient.cpf || '—'],
     ['Nascimento', formatUbsPatientDate(patient.birth_date)],
     ['Idade', patient.age_label || '—'],
+    ['Condição de entrada', patient.entry_condition_label || patient.entry_condition || '—'],
     ['Gênero', patient.gender_label || '—'],
     ['Telefone', patient.phone || '—'],
     ['E-mail', patient.email || '—'],
@@ -246,9 +247,11 @@ function renderUbsPatientHistory(encounters) {
 function renderUbsPatientReferral(patient, transitions) {
   const person = document.getElementById('ubs-patient-referral-person');
   const risk = document.getElementById('ubs-patient-risk');
+  const entryCondition = document.getElementById('ubs-patient-entry-condition');
+  const justification = document.getElementById('ubs-patient-justification');
   const status = document.getElementById('ubs-patient-referral-status');
   const submit = document.getElementById('ubs-patient-referral-submit');
-  if (!person || !risk || !status || !submit) return;
+  if (!person || !risk || !entryCondition || !justification || !status || !submit) return;
 
   const referral = transitions.find(isActiveUbsPatientReferral);
   person.innerHTML = `
@@ -256,6 +259,10 @@ function renderUbsPatientReferral(patient, transitions) {
     <span>${SISELO.escapeHtml(patient.ubs_ref || 'UBS')} · ${SISELO.escapeHtml(SISELO.formatTeamName(patient.team_ref) || 'Sem equipe')}</span>
   `;
   risk.value = patient.risk_classification === 'muito_alto_risco' ? 'muito_alto_risco' : 'alto_risco';
+  const entryOptions = ubsPatientData?.options?.entry_condition_options || {};
+  entryCondition.innerHTML = '<option value="">Selecione...</option>' + Object.entries(entryOptions)
+    .map(([value, label]) => `<option value="${SISELO.escapeHtml(value)}" ${String(patient.entry_condition || '') === value ? 'selected' : ''}>${SISELO.escapeHtml(label)}</option>`)
+    .join('');
 
   const canRefer = ubsPatientPermissions.has('careflow.update');
   if (referral) {
@@ -264,17 +271,23 @@ function renderUbsPatientReferral(patient, transitions) {
     submit.textContent = 'Encaminhado';
     submit.disabled = true;
     risk.disabled = true;
+    entryCondition.disabled = true;
+    justification.disabled = true;
   } else if (!canRefer) {
     status.className = '';
     status.textContent = 'Seu perfil não possui permissão para encaminhar.';
     submit.disabled = true;
     risk.disabled = true;
+    entryCondition.disabled = true;
+    justification.disabled = true;
   } else {
     status.className = '';
     status.textContent = 'Aguardando encaminhamento';
     submit.textContent = 'Encaminhar';
     submit.disabled = false;
     risk.disabled = false;
+    entryCondition.disabled = false;
+    justification.disabled = false;
   }
 }
 
@@ -377,6 +390,8 @@ async function referUbsPatientToCadh(event) {
   event.preventDefault();
   const submit = document.getElementById('ubs-patient-referral-submit');
   const risk = document.getElementById('ubs-patient-risk')?.value || '';
+  const entryCondition = document.getElementById('ubs-patient-entry-condition')?.value || '';
+  const justification = String(document.getElementById('ubs-patient-justification')?.value || '').trim();
   submit.disabled = true;
   submit.textContent = 'Encaminhando...';
 
@@ -387,6 +402,8 @@ async function referUbsPatientToCadh(event) {
         action: 'refer',
         patient_id: Number(ubsPatientId),
         risk_classification: risk,
+        entry_condition: entryCondition,
+        justification,
       },
     });
     await loadUbsPatient();
@@ -423,7 +440,8 @@ function matchUbsPatientSpecialty(value) {
 function isActiveUbsPatientReferral(row) {
   const destination = normalizeUbsPatientText(row?.to_service);
   const status = normalizeUbsPatientText(row?.status);
-  return destination.startsWith('cadh') && !['cancelada', 'concluida'].includes(status);
+  return (row?.flow_type === 'care_sharing' || destination.startsWith('cadh'))
+    && !['cancelado', 'cancelada', 'atendido', 'ausente'].includes(status);
 }
 
 function disableUbsPatientActions() {

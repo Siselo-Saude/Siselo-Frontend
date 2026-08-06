@@ -119,6 +119,14 @@
                 <option value="muito_alto_risco">Muito Alto Risco</option>
               </select>
             </label>
+            <label>
+              <span>Condi&ccedil;&atilde;o de entrada</span>
+              <select id="ubs-patient-entry-condition" name="entry_condition" required></select>
+            </label>
+            <label>
+              <span>Justificativa do compartilhamento</span>
+              <textarea id="ubs-patient-justification" name="justification" rows="3" required placeholder="Descreva o motivo e o contexto cl&iacute;nico para o compartilhamento."></textarea>
+            </label>
             <div class="ubs-patient-referral-action">
               <span id="ubs-patient-referral-status"></span>
               <button id="ubs-patient-referral-submit" class="btn btn-primary" type="submit">Encaminhar</button>
