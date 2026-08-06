@@ -11204,6 +11204,92 @@ body[data-page="cadh-specialty-form"] .clinical-specialty-form {
   gap: 18px;
 }
 
+body[data-page="cadh-specialty-form"] .clinical-appointment-context {
+  padding: 18px;
+  border: 1px solid #9bcfc4;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #f0fbf8, #f7fbfe);
+  box-shadow: 0 10px 24px rgba(24, 43, 65, 0.06);
+}
+
+body[data-page="cadh-specialty-form"] .clinical-appointment-context > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+body[data-page="cadh-specialty-form"] .clinical-appointment-context > header > div {
+  display: grid;
+  gap: 3px;
+}
+
+body[data-page="cadh-specialty-form"] .clinical-appointment-context > header span:first-child {
+  color: #087f72;
+  font-size: .68rem;
+  font-weight: 900;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+body[data-page="cadh-specialty-form"] .clinical-appointment-context > header strong {
+  color: #15354f;
+  font-size: 1rem;
+}
+
+body[data-page="cadh-specialty-form"] .clinical-appointment-status {
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: #d8f5e9;
+  color: #087653 !important;
+  font-size: .7rem !important;
+  font-weight: 850;
+}
+
+body[data-page="cadh-specialty-form"] .clinical-appointment-context-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 9px;
+  margin-top: 14px;
+}
+
+body[data-page="cadh-specialty-form"] .clinical-appointment-context-grid > div {
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+  padding: 10px 12px;
+  border: 1px solid #d3e3e2;
+  border-radius: 8px;
+  background: rgb(255 255 255 / 82%);
+}
+
+body[data-page="cadh-specialty-form"] .clinical-appointment-context-grid span {
+  color: #587089;
+  font-size: .68rem;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+body[data-page="cadh-specialty-form"] .clinical-appointment-context-grid strong {
+  overflow-wrap: anywhere;
+  color: #142c42;
+  font-size: .84rem;
+}
+
+body[data-page="cadh-specialty-form"] .clinical-appointment-context > p {
+  margin: 12px 0 0;
+  color: #527068;
+  font-size: .76rem;
+  line-height: 1.45;
+}
+
+body[data-page="cadh-specialty-form"] .clinical-specialty-field .date-picker.is-inherited .date-picker-trigger {
+  cursor: default;
+  opacity: 1;
+  background: #f3f7fa;
+  color: #30495f;
+}
+
 body[data-page="cadh-specialty-form"] .clinical-specialty-section {
   overflow: visible;
   border: 1px solid #cbd8e2;
@@ -11674,6 +11760,10 @@ body[data-page="cadh-specialty-form"].home-sidebar-is-collapsed .home-sidebar-fo
 }
 
 @media (max-width: 900px) {
+  body[data-page="cadh-specialty-form"] .clinical-appointment-context-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   body[data-page="cadh-specialty-form"] .clinical-specialty-grid {
     grid-template-columns: 1fr;
   }
@@ -11706,6 +11796,10 @@ body[data-page="cadh-specialty-form"].home-sidebar-is-collapsed .home-sidebar-fo
 
   body[data-page="cadh-specialty-form"] .clinical-specialty-board {
     padding: 18px 14px 26px;
+  }
+
+  body[data-page="cadh-specialty-form"] .clinical-appointment-context-grid {
+    grid-template-columns: 1fr;
   }
 
   body[data-page="cadh-specialty-form"] .home-sidebar-toggle {
@@ -17284,10 +17378,35 @@ body[data-page="cadh-specialty-form"].home-sidebar-is-collapsed .home-sidebar-fo
   font-size: 12px;
 }
 
-.cadh-kanban-card select {
+.cadh-kanban-card-actions {
+  display: grid;
+  gap: 6px;
+}
+
+.cadh-kanban-card-actions .btn {
   width: 100%;
-  min-height: 32px;
+  min-height: 34px;
+  padding: 7px 8px;
+  font-size: 11px;
+}
+
+.cadh-kanban-outcome {
+  display: grid;
+  gap: 3px;
+  padding-top: 7px;
+  border-top: 1px solid #e4ebf2;
+}
+
+.cadh-kanban-outcome strong {
+  color: #244966;
+  font-size: 11px;
+}
+
+.cadh-kanban-outcome span,
+.cadh-kanban-outcome time {
+  color: #687d91;
   font-size: 10px;
+  line-height: 1.4;
 }
 
 .cadh-kanban-empty {
@@ -17295,6 +17414,147 @@ body[data-page="cadh-specialty-form"].home-sidebar-is-collapsed .home-sidebar-fo
   color: #8998a8;
   font-size: 11px;
   text-align: center;
+}
+
+.cadh-outcome-modal-backdrop {
+  position: fixed;
+  z-index: 1600;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgb(15 35 54 / 48%);
+  backdrop-filter: blur(2px);
+}
+
+.cadh-outcome-modal {
+  width: min(620px, 100%);
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  padding: 22px;
+  border: 1px solid #cad8e5;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 24px 70px rgb(15 35 54 / 28%);
+}
+
+.cadh-outcome-modal:focus {
+  outline: none;
+}
+
+.cadh-outcome-modal > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.cadh-outcome-modal > header > div {
+  display: grid;
+  gap: 4px;
+}
+
+.cadh-outcome-modal > header span {
+  color: #087b68;
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.cadh-outcome-modal > header h3 {
+  margin: 0;
+  color: #15283b;
+  font-size: 20px;
+}
+
+.cadh-outcome-modal > header button {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #1c2d3f;
+  font-size: 23px;
+  cursor: pointer;
+}
+
+.cadh-outcome-modal > header button:hover {
+  background: #eef4f8;
+}
+
+.cadh-outcome-appointment {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 9px;
+  margin: 18px 0 14px;
+}
+
+.cadh-outcome-appointment > div {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  padding: 11px;
+  border: 1px solid #d4e0eb;
+  border-radius: 8px;
+  background: #f7fafc;
+}
+
+.cadh-outcome-appointment span,
+.cadh-outcome-modal form label > span {
+  color: #587089;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.cadh-outcome-appointment strong {
+  overflow-wrap: anywhere;
+  color: #18334f;
+  font-size: 12px;
+}
+
+.cadh-outcome-modal form,
+.cadh-outcome-modal form label {
+  display: grid;
+  gap: 7px;
+}
+
+.cadh-outcome-modal form {
+  gap: 12px;
+}
+
+.cadh-outcome-modal form select,
+.cadh-outcome-modal form textarea {
+  width: 100%;
+  border: 1px solid #bdccda;
+  border-radius: 8px;
+  background: #fff;
+  color: #18334f;
+  padding: 9px 11px;
+  font: inherit;
+}
+
+.cadh-outcome-modal form textarea {
+  resize: vertical;
+}
+
+.cadh-outcome-hint {
+  margin: 0;
+  padding: 10px 11px;
+  border-radius: 8px;
+  background: #edf6fb;
+  color: #4d667d;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.cadh-outcome-modal form footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
 }
 
 .cadh-sharing-layout {
@@ -17455,14 +17715,26 @@ body[data-page="cadh-specialty-form"].home-sidebar-is-collapsed .home-sidebar-fo
     padding: 12px;
   }
 
-  .cadh-referral-modal {
+  .cadh-referral-modal,
+  .cadh-outcome-modal {
     max-height: calc(100vh - 24px);
     padding: 18px;
   }
 
   .cadh-referral-route,
-  .cadh-referral-detail-grid {
+  .cadh-referral-detail-grid,
+  .cadh-outcome-appointment {
     grid-template-columns: 1fr;
+  }
+
+  .cadh-outcome-modal-backdrop {
+    align-items: end;
+    padding: 12px;
+  }
+
+  .cadh-outcome-modal form footer {
+    align-items: stretch;
+    flex-direction: column-reverse;
   }
 
   .cadh-referral-route span {
@@ -18229,6 +18501,10 @@ body[data-page="cadh"] .cadh-specialty-actions {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 5px;
+}
+
+body[data-page="cadh"] .cadh-specialty-actions.is-scheduling-only {
+  grid-template-columns: minmax(0, 1fr);
 }
 
 body[data-page="cadh"] .cadh-specialty-actions :is(a, button) {
