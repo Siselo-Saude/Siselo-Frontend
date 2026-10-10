@@ -1,0 +1,184 @@
+
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vincular Google - SISELO</title>
+  <link rel="stylesheet" href="/assets/app.css">
+</head>
+
+<body data-page="google-link">
+  <main class="auth-shell">
+    <div class="auth-shell-inner">
+
+      <header class="auth-heading">
+        <h1 class="auth-title">
+          Vincular conta Google
+        </h1>
+
+        <p class="auth-subtitle">
+          Conecte sua identidade Google à sua conta
+          já aprovada no SIS ELO.
+        </p>
+      </header>
+
+      <section class="card auth-card auth-card-centered">
+
+        <div id="page-alert" class="alert" hidden></div>
+
+        <h2>Minha conta SIS ELO</h2>
+
+        <p id="google-current-user">
+          Verificando sua sessão...
+        </p>
+
+        <p class="auth-field-hint">
+          A vinculação permite utilizar o Google
+          para entrar no sistema posteriormente.
+
+          Sua unidade, seu perfil e suas permissões
+          permanecem os mesmos.
+        </p>
+
+        <div class="actions"
+             style="display:flex;flex-direction:column;gap:12px;margin-top:24px;">
+
+          <button
+            id="google-link-button"
+            class="btn btn-primary auth-submit"
+            type="button"
+            disabled>
+            Vincular minha conta Google
+          </button>
+
+          <a
+            class="btn"
+            href="/index.html"
+            style="text-align:center;">
+            Voltar ao painel
+          </a>
+
+        </div>
+
+      </section>
+    </div>
+  </main>
+
+  <script src="/assets/config.js"></script>
+  <script src="/assets/app.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const button = document.getElementById(
+        'google-link-button'
+      );
+
+      const userLabel = document.getElementById(
+        'google-current-user'
+      );
+
+      let authenticatedUser = null;
+
+      // Confirmar a sessão diretamente no backend.
+      try {
+        const response = await SISELO.apiRequest(
+          '/auth/me.php'
+        );
+
+        if (!response || !response.user) {
+          throw new Error('Sessão não encontrada.');
+        }
+
+        authenticatedUser = response.user;
+
+        userLabel.textContent =
+          'Usuário autenticado: ' +
+          (authenticatedUser.name || 'Usuário SIS ELO');
+
+        button.disabled = false;
+
+      } catch (error) {
+        userLabel.textContent =
+          'É necessário entrar no SIS ELO primeiro.';
+
+        SISELO.showAlert(
+          'page-alert',
+          'Entre com seu e-mail e senha antes de vincular o Google.',
+          'error'
+        );
+
+        return;
+      }
+
+      button.addEventListener('click', async () => {
+        const confirmed = window.confirm(
+          'Deseja vincular a conta Google que você escolher ' +
+          'ao seu usuário atual do SIS ELO?\n\n' +
+          'Confirme apenas se esta for sua própria conta Google.'
+        );
+
+        if (!confirmed) {
+          return;
+        }
+
+        button.disabled = true;
+
+        SISELO.showAlert(
+          'page-alert',
+          'Preparando autenticação Google...',
+          'info'
+        );
+
+        try {
+          // POST exige sessão válida e token CSRF.
+          const response = await SISELO.apiRequest(
+            '/auth/google/start.php',
+            {
+              method: 'POST',
+              body: {}
+            }
+          );
+
+          if (
+            !response ||
+            response.mode !== 'link' ||
+            !response.authorization_url
+          ) {
+            throw new Error(
+              'O servidor não iniciou a vinculação.'
+            );
+          }
+
+          const destination = new URL(
+            response.authorization_url
+          );
+
+          if (
+            destination.protocol !== 'https:' ||
+            destination.hostname !== 'accounts.google.com'
+          ) {
+            throw new Error(
+              'Endereço de autenticação inválido.'
+            );
+          }
+
+          // A mesma janela mantém a sessão necessária
+          // para validar o retorno do Google.
+          window.location.assign(destination.href);
+
+        } catch (error) {
+          button.disabled = false;
+
+          SISELO.showAlert(
+            'page-alert',
+            error.message ||
+              'Não foi possível iniciar a vinculação.',
+            'error'
+          );
+        }
+      });
+    });
+  </script>
+</body>
+</html>
