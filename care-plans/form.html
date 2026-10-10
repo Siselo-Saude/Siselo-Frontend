@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="pt-br">
 <head>
@@ -5,10 +6,96 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Ficha Plano de Cuidado | SISELO</title>
   <link rel="stylesheet" href="/assets/app.css">
+
+  <style>
+    /* Botão Visualizar PDF - Plano de Cuidado */
+    .care-plan-bottom-actions #care-plan-pdf-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      width: auto;
+      min-width: 165px;
+      min-height: 42px;
+      padding: 10px 18px;
+      border: 1px solid #9bc3e7;
+      border-radius: 10px;
+      background: #edf7ff;
+      color: #075385;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.2;
+      white-space: nowrap;
+      vertical-align: middle;
+      box-shadow: 0 3px 9px rgba(10, 73, 120, 0.08);
+      cursor: pointer;
+      transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    .care-plan-bottom-actions #care-plan-pdf-button svg {
+      display: block;
+      width: 18px;
+      height: 18px;
+      min-width: 18px;
+      max-width: 18px;
+      min-height: 18px;
+      max-height: 18px;
+      flex: 0 0 18px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .care-plan-bottom-actions #care-plan-pdf-button:hover:not(:disabled) {
+      background: #dcefff;
+      border-color: #4d9ed5;
+      color: #06416a;
+      box-shadow: 0 5px 14px rgba(10, 73, 120, 0.15);
+      transform: translateY(-1px);
+    }
+
+    .care-plan-bottom-actions #care-plan-pdf-button:active:not(:disabled) {
+      transform: translateY(0);
+      box-shadow: 0 2px 6px rgba(10, 73, 120, 0.12);
+    }
+
+    .care-plan-bottom-actions #care-plan-pdf-button:focus-visible {
+      outline: 3px solid #75b9ea;
+      outline-offset: 3px;
+    }
+
+    .care-plan-bottom-actions #care-plan-pdf-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+
+    @media (max-width: 600px) {
+      .care-plan-bottom-actions #care-plan-pdf-button {
+        min-width: 0;
+        padding: 10px 12px;
+        font-size: 13px;
+      }
+    }
+  </style>
 </head>
+
 <body data-page="care-plans-form">
   <div class="care-plan-app-shell">
-    <aside class="topbar home-sidebar care-plan-sidebar" aria-label="Navegação do SISELO">
+
+    <aside
+      class="topbar home-sidebar care-plan-sidebar"
+      aria-label="Navegação do SISELO"
+    >
       <div class="topbar-left">
         <div class="topbar-brand home-sidebar-brand">
           <span class="home-sidebar-mark" aria-hidden="true">
@@ -17,6 +104,7 @@
               <path d="M5 12h14M12 5c2 2.1 3 4.4 3 7s-1 4.9-3 7M12 5c-2 2.1-3 4.4-3 7s1 4.9 3 7"/>
             </svg>
           </span>
+
           <span class="home-sidebar-brand-copy">
             <strong>SISELO</strong>
             <small>Sistema de Saúde</small>
@@ -26,30 +114,87 @@
 
       <div class="home-sidebar-nav">
         <p class="home-sidebar-label">Módulos</p>
+
         <nav class="menu" aria-label="Módulos principais">
           <a id="nav-home" href="/index.html">
-            <span class="home-sidebar-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m4 10 8-6 8 6v10H4V10Z"/><path d="M9 20v-6h6v6"/></svg></span>
-            <span class="home-sidebar-nav-copy"><strong>Início</strong><small>Painel geral</small></span>
-            <svg class="home-sidebar-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
+            <span class="home-sidebar-nav-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="m4 10 8-6 8 6v10H4V10Z"/>
+                <path d="M9 20v-6h6v6"/>
+              </svg>
+            </span>
+
+            <span class="home-sidebar-nav-copy">
+              <strong>Início</strong>
+              <small>Painel geral</small>
+            </span>
+
+            <svg
+              class="home-sidebar-chevron"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path d="m9 5 7 7-7 7"/>
+            </svg>
           </a>
 
           <a id="nav-cadh" href="/cadh/index.html">
-            <span class="home-sidebar-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 13h4l2-7 4 14 2-7h6"/></svg></span>
-            <span class="home-sidebar-nav-copy"><strong>CADH</strong><small>Atenção secundária</small></span>
-            <svg class="home-sidebar-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
+            <span class="home-sidebar-nav-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M3 13h4l2-7 4 14 2-7h6"/>
+              </svg>
+            </span>
+
+            <span class="home-sidebar-nav-copy">
+              <strong>CADH</strong>
+              <small>Atenção secundária</small>
+            </span>
+
+            <svg
+              class="home-sidebar-chevron"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path d="m9 5 7 7-7 7"/>
+            </svg>
           </a>
 
           <a id="nav-ubs" href="/ubs/index.html">
-            <span class="home-sidebar-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 21s7-5.2 7-12a7 7 0 1 0-14 0c0 6.8 7 12 7 12Z"/><circle cx="12" cy="9" r="2.5"/></svg></span>
-            <span class="home-sidebar-nav-copy"><strong>UBS</strong><small>Atenção Primária</small></span>
-            <svg class="home-sidebar-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
+            <span class="home-sidebar-nav-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M12 21s7-5.2 7-12a7 7 0 1 0-14 0c0 6.8 7 12 7 12Z"/>
+                <circle cx="12" cy="9" r="2.5"/>
+              </svg>
+            </span>
+
+            <span class="home-sidebar-nav-copy">
+              <strong>UBS</strong>
+              <small>Atenção Primária</small>
+            </span>
+
+            <svg
+              class="home-sidebar-chevron"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path d="m9 5 7 7-7 7"/>
+            </svg>
           </a>
         </nav>
       </div>
 
       <div class="topbar-actions home-sidebar-footer"></div>
-      <button id="care-plan-sidebar-toggle" class="home-sidebar-toggle" type="button" aria-label="Recolher menu lateral" aria-expanded="true">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg>
+
+      <button
+        id="care-plan-sidebar-toggle"
+        class="home-sidebar-toggle"
+        type="button"
+        aria-label="Recolher menu lateral"
+        aria-expanded="true"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="m15 5-7 7 7 7"/>
+        </svg>
       </button>
     </aside>
 
@@ -58,9 +203,15 @@
         <div>
           <p>Página</p>
         </div>
+
         <div class="home-page-status">
-          <span class="home-system-status home-user-role-status home-user-role-admin">
-            <span class="home-system-status-icon" aria-hidden="true">
+          <span
+            class="home-system-status home-user-role-status home-user-role-admin"
+          >
+            <span
+              class="home-system-status-icon"
+              aria-hidden="true"
+            >
               <svg viewBox="0 0 24 24" focusable="false">
                 <path d="M12 3 20 7v5c0 5-3.4 8-8 9-4.6-1-8-4-8-9V7l8-4Z"/>
                 <path d="M9 12l2 2 4-5"/>
@@ -68,44 +219,132 @@
             </span>
             <span>Administrador</span>
           </span>
-          <time id="care-plan-current-date" class="home-current-date"></time>
+
+          <time
+            id="care-plan-current-date"
+            class="home-current-date"
+          ></time>
         </div>
       </header>
 
       <main class="container care-plan-board">
-        <svg aria-hidden="true" class="visually-hidden">
-          <symbol id="care-plan-icon-file" viewBox="0 0 24 24"><path d="M7 3h7l4 4v14H7V3Z"/><path d="M14 3v5h5M10 12h6M10 16h4"/></symbol>
-          <symbol id="care-plan-icon-save" viewBox="0 0 24 24"><path d="M5 3h12l2 2v16H5V3Z"/><path d="M8 3v6h8V3M8 21v-7h8v7"/></symbol>
-          <symbol id="care-plan-icon-back" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></symbol>
-          <symbol id="care-plan-icon-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8.5 12.5 2.2 2.2 4.8-5.4"/></symbol>
+        <svg
+          aria-hidden="true"
+          class="visually-hidden"
+        >
+          <symbol id="care-plan-icon-file" viewBox="0 0 24 24">
+            <path d="M7 3h7l4 4v14H7V3Z"/>
+            <path d="M14 3v5h5M10 12h6M10 16h4"/>
+          </symbol>
+
+          <symbol id="care-plan-icon-save" viewBox="0 0 24 24">
+            <path d="M5 3h12l2 2v16H5V3Z"/>
+            <path d="M8 3v6h8V3M8 21v-7h8v7"/>
+          </symbol>
+
+          <symbol id="care-plan-icon-back" viewBox="0 0 24 24">
+            <path d="M19 12H5M12 5l-7 7 7 7"/>
+          </symbol>
+
+          <symbol id="care-plan-icon-check" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="9"/>
+            <path d="m8.5 12.5 2.2 2.2 4.8-5.4"/>
+          </symbol>
+
+          <symbol id="care-plan-icon-pdf" viewBox="0 0 24 24">
+            <path d="M7 3h7l4 4v14H7V3Z"/>
+            <path d="M14 3v5h5"/>
+            <path d="M9 13h6M9 16h6"/>
+          </symbol>
         </svg>
 
-        <section class="care-plan-full-header" aria-labelledby="form-title">
-          <a class="care-plan-back-link" href="/care-plans/list.html" data-back-link data-fallback="/care-plans/list.html" aria-label="Voltar">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#care-plan-icon-back"></use></svg>
+        <section
+          class="care-plan-full-header"
+          aria-labelledby="form-title"
+        >
+          <a
+            class="care-plan-back-link"
+            href="/care-plans/list.html"
+            data-back-link
+            data-fallback="/care-plans/list.html"
+            aria-label="Voltar"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <use href="#care-plan-icon-back"></use>
+            </svg>
           </a>
+
           <span class="care-plan-header-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><use href="#care-plan-icon-file"></use></svg>
+            <svg viewBox="0 0 24 24">
+              <use href="#care-plan-icon-file"></use>
+            </svg>
           </span>
+
           <div class="care-plan-title-copy">
             <p>CADH - Planificação da Atenção à Saúde / SUS</p>
             <h1 id="form-title">Ficha Plano de Cuidado</h1>
           </div>
         </section>
 
-        <div id="page-alert" class="alert" hidden></div>
+        <div
+          id="page-alert"
+          class="alert"
+          hidden
+        ></div>
 
-        <form id="care-plan-form" class="care-plan-sheet">
-          <div id="care-plan-form-body" class="care-plan-form-body">
-            <p class="care-plan-loading">Carregando ficha do plano de cuidado...</p>
+        <form
+          id="care-plan-form"
+          class="care-plan-sheet"
+        >
+          <div
+            id="care-plan-form-body"
+            class="care-plan-form-body"
+          >
+            <p class="care-plan-loading">
+              Carregando ficha do plano de cuidado...
+            </p>
           </div>
 
           <div class="care-plan-bottom-actions">
-            <a class="btn care-plan-secondary-action" href="/care-plans/list.html" data-back-link data-fallback="/care-plans/list.html">Voltar</a>
-            <button id="care-plan-bottom-save" class="btn btn-primary care-plan-save-button" type="submit">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#care-plan-icon-save"></use></svg>
+
+            <a
+              class="btn care-plan-secondary-action"
+              href="/care-plans/list.html"
+              data-back-link
+              data-fallback="/care-plans/list.html"
+            >
+              Voltar
+            </a>
+
+            <button
+              id="care-plan-pdf-button"
+              class="btn care-plan-secondary-action"
+              type="button"
+              title="Salve o plano para visualizar o PDF"
+              disabled
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <use href="#care-plan-icon-pdf"></use>
+              </svg>
+              <span>Visualizar PDF</span>
+            </button>
+
+            <button
+              id="care-plan-bottom-save"
+              class="btn btn-primary care-plan-save-button"
+              type="submit"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <use href="#care-plan-icon-save"></use>
+              </svg>
               Salvar Plano
             </button>
+
           </div>
         </form>
       </main>

@@ -1,14 +1,17 @@
+
 <!doctype html>
 <html lang="pt-br">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Login - SISELO</title>
+  <title>Acesso - SISELO</title>
   <link rel="stylesheet" href="/assets/app.css">
 </head>
+
 <body data-page="login">
   <main class="auth-shell">
     <div class="auth-shell-inner">
+
       <header class="auth-heading">
         <div class="auth-mark" aria-hidden="true">
           <svg viewBox="0 0 24 24" focusable="false">
@@ -17,83 +20,269 @@
             <path d="M15 12H3"/>
           </svg>
         </div>
-        <h1 id="auth-title" class="auth-title">Entrar no SISELO</h1>
-        <p id="auth-subtitle" class="auth-subtitle">Acesse com seu e-mail cadastrado.</p>
+
+        <h1 id="auth-title" class="auth-title">
+          Entrar no SISELO
+        </h1>
+
+        <p id="auth-subtitle" class="auth-subtitle">
+          Acesse com seu e-mail cadastrado.
+        </p>
       </header>
 
       <section class="card auth-card auth-card-centered">
-        <div class="auth-tabs" role="tablist" aria-label="Acesso ao SISELO">
-          <button id="auth-login-tab" class="auth-tab is-active" type="button" data-auth-mode="login" role="tab" aria-controls="login-form" aria-selected="true">Login</button>
-          <button id="auth-register-tab" class="auth-tab" type="button" data-auth-mode="register" role="tab" aria-controls="register-form" aria-selected="false">Cadastro</button>
+
+        <div class="auth-tabs"
+             role="tablist"
+             aria-label="Acesso ao SISELO">
+
+          <button
+            id="auth-login-tab"
+            class="auth-tab is-active"
+            type="button"
+            data-auth-mode="login"
+            role="tab"
+            aria-controls="login-form"
+            aria-selected="true">
+            Login
+          </button>
+
+          <button
+            id="auth-register-tab"
+            class="auth-tab"
+            type="button"
+            data-auth-mode="register"
+            role="tab"
+            aria-controls="register-form"
+            aria-selected="false">
+            Cadastro
+          </button>
+
         </div>
 
         <div id="page-alert" class="alert" hidden></div>
 
-        <form id="login-form" class="auth-form form-grid" style="grid-template-columns:1fr;" data-auth-form="login">
+        <!-- LOGIN EXISTENTE -->
+
+        <form
+          id="login-form"
+          class="auth-form form-grid"
+          style="grid-template-columns:1fr;"
+          data-auth-form="login">
+
           <div class="field-full auth-field auth-field-email">
             <label for="login-email">E-mail</label>
-            <input id="login-email" name="email" type="email" autocomplete="email" placeholder="voce@exemplo.com" required>
-            <p class="auth-field-hint">Utilize o mesmo e-mail cadastrado na Coopere.</p>
+
+            <input
+              id="login-email"
+              name="email"
+              type="email"
+              autocomplete="email"
+              placeholder="voce@exemplo.com"
+              required>
           </div>
 
           <div class="field-full auth-field auth-field-password">
             <label for="login-password">Senha</label>
-            <input id="login-password" name="password" type="password" autocomplete="current-password" required>
+
+            <input
+              id="login-password"
+              name="password"
+              type="password"
+              autocomplete="current-password"
+              required>
           </div>
 
           <div class="actions">
-            <button class="btn btn-primary auth-submit" type="submit">Entrar</button>
+            <button
+              class="btn btn-primary auth-submit"
+              type="submit">
+              Entrar
+            </button>
           </div>
+
         </form>
 
-        <form id="register-form" class="auth-form form-grid" style="grid-template-columns:1fr;" data-auth-form="register" hidden>
+        <!-- SOLICITACAO DE ACESSO -->
+
+        <form
+          id="register-form"
+          class="auth-form form-grid"
+          style="grid-template-columns:1fr;"
+          data-auth-form="register"
+          hidden>
+
           <div class="field-full auth-field auth-field-user">
             <label for="register-name">Nome completo</label>
-            <input id="register-name" name="name" autocomplete="name" required>
+
+            <input
+              id="register-name"
+              name="name"
+              type="text"
+              autocomplete="name"
+              required>
           </div>
 
           <div class="field-full auth-field auth-field-email">
             <label for="register-email">E-mail</label>
-            <input id="register-email" name="email" type="email" autocomplete="email" placeholder="voce@exemplo.com" required>
-            <p class="auth-field-hint">Utilize o mesmo e-mail cadastrado na Coopere.</p>
+
+            <input
+              id="register-email"
+              name="email"
+              type="email"
+              autocomplete="email"
+              placeholder="voce@exemplo.com"
+              required>
+
+            <p class="auth-field-hint">
+              Informe seu e-mail de contato.
+              A integração de login institucional
+              será disponibilizada posteriormente.
+            </p>
           </div>
 
           <div class="field-full auth-field auth-field-password">
             <label for="register-password">Senha</label>
-            <input id="register-password" name="password" type="password" autocomplete="new-password" required>
+
+            <input
+              id="register-password"
+              name="password"
+              type="password"
+              autocomplete="new-password"
+              minlength="8"
+              required>
           </div>
 
+          <!-- PERFIL SOLICITADO -->
+
           <fieldset class="auth-choice-group field-full">
-            <legend>Tipo de usuário</legend>
+
+            <legend>Perfil de acesso desejado</legend>
+
             <label class="auth-choice">
-              <input name="user_type" type="radio" value="CADH" required>
-              <span>CADH</span>
+              <input
+                name="requested_role"
+                type="radio"
+                value="alimentador"
+                required>
+
+              <span>Alimentador</span>
             </label>
+
             <label class="auth-choice">
-              <input name="user_type" type="radio" value="UBS" required>
-              <span>UBS</span>
+              <input
+                name="requested_role"
+                type="radio"
+                value="visualizador"
+                required>
+
+              <span>Visualizador</span>
             </label>
+
+            <p class="auth-field-hint">
+              Alimentador: solicita permissão para registrar
+              e atualizar informações.
+
+              Visualizador: solicita acesso de consulta,
+              sem edição.
+            </p>
+
           </fieldset>
 
+          <!-- UNIDADE SOLICITADA -->
+
+          <fieldset class="auth-choice-group field-full">
+
+            <legend>Unidade de atuação</legend>
+
+            <label class="auth-choice">
+              <input
+                name="user_type"
+                type="radio"
+                value="CADH"
+                required>
+
+              <span>CADH</span>
+            </label>
+
+            <label class="auth-choice">
+              <input
+                name="user_type"
+                type="radio"
+                value="UBS"
+                required>
+
+              <span>UBS</span>
+            </label>
+
+          </fieldset>
+
+          <!-- ESPECIALIDADE SOLICITADA -->
+
           <div class="field-full auth-specialty-field" hidden>
-            <label for="register-specialty">Especialidade</label>
-            <select id="register-specialty" name="specialty">
-              <option value="">Selecione a especialidade</option>
+
+            <label for="register-specialty">
+              Especialidade
+            </label>
+
+            <select
+              id="register-specialty"
+              name="specialty">
+
+              <option value="">
+                Selecione a especialidade
+              </option>
+
             </select>
+
+          </div>
+
+          <!-- AVISO DE APROVACAO -->
+
+          <div class="field-full">
+            <p class="auth-field-hint">
+              As informações acima são uma solicitação
+              de acesso. O administrador do SIS ELO
+              poderá confirmar ou alterar seu perfil,
+              unidade e especialidade.
+
+              Sua conta permanecerá sem acesso aos
+              módulos até a aprovação administrativa.
+            </p>
           </div>
 
           <div class="actions">
-            <button class="btn btn-primary auth-submit" type="submit">Criar conta</button>
+            <button
+              class="btn btn-primary auth-submit"
+              type="submit">
+              Solicitar acesso
+            </button>
           </div>
+
         </form>
+
       </section>
 
-      <p class="auth-switch" data-auth-switch-text>Ainda não possui uma conta? <button type="button" data-auth-switch>Cadastre-se</button></p>
+      <p
+        class="auth-switch"
+        data-auth-switch-text>
+
+        Ainda não possui uma conta?
+
+        <button
+          type="button"
+          data-auth-switch>
+          Cadastre-se
+        </button>
+
+      </p>
+
     </div>
   </main>
 
   <script src="/assets/config.js"></script>
   <script src="/assets/app.js"></script>
   <script src="/assets/auth.js"></script>
+
 </body>
 </html>
