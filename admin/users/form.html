@@ -1,14 +1,18 @@
+
 <!doctype html>
 <html lang="pt-br">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Admin - Formulario de Usuario</title>
+  <title>Administração de Usuários - SISELO</title>
   <link rel="stylesheet" href="/assets/app.css">
 </head>
+
 <body data-page="admin-users-form">
+
   <header class="topbar">
     <div class="topbar-brand">Intranet CADH</div>
+
     <nav class="menu">
       <a id="nav-home" href="/index.html">Home</a>
       <a id="nav-cadh" href="/cadh/index.html">CADH</a>
@@ -18,65 +22,212 @@
 
   <main class="container">
     <section class="card">
-      <a class="btn" href="/admin/users/list.html" data-back-link data-fallback="/admin/users/list.html">&larr; Voltar</a>
-      <h1 id="form-title" class="page-title" style="margin-top:14px;">Novo Usuario</h1>
+
+      <a
+        class="btn"
+        href="/admin/users/list.html"
+        data-back-link
+        data-fallback="/admin/users/list.html">
+        &larr; Voltar
+      </a>
+
+      <h1
+        id="form-title"
+        class="page-title"
+        style="margin-top:14px;">
+        Novo Usuário
+      </h1>
 
       <div id="page-alert" class="alert" hidden></div>
 
+      <!-- SOLICITACAO DE ACESSO -->
+      <!-- Preenchida posteriormente pelo admin-users.js. -->
+
+      <section
+        id="access-request-panel"
+        hidden
+        aria-labelledby="access-request-title"
+        style="
+          border:1px solid #d3dae4;
+          border-radius:12px;
+          padding:18px;
+          margin:18px 0;
+        ">
+
+        <h2
+          id="access-request-title"
+          style="margin-top:0;">
+          Solicitação de acesso
+        </h2>
+
+        <p>
+          Confira as informações fornecidas pelo usuário.
+          Elas representam uma solicitação, não permissões
+          já autorizadas.
+        </p>
+
+        <div class="form-grid">
+
+          <div class="field">
+            <strong>Perfil solicitado</strong>
+            <p id="requested-role">-</p>
+          </div>
+
+          <div class="field">
+            <strong>Unidade solicitada</strong>
+            <p id="requested-unit">-</p>
+          </div>
+
+          <div class="field">
+            <strong>Especialidade solicitada</strong>
+            <p id="requested-specialty">-</p>
+          </div>
+
+          <div class="field">
+            <strong>Situação da solicitação</strong>
+            <p id="requested-status">-</p>
+          </div>
+
+          <div class="field-full">
+            <strong>Data da solicitação</strong>
+            <p id="requested-date">-</p>
+          </div>
+
+        </div>
+
+        <p class="auth-field-hint">
+          O administrador deverá conferir ou modificar
+          o perfil, a unidade e a especialidade no
+          formulário abaixo.
+
+          Salvar os dados não aprova automaticamente
+          uma conta pendente.
+        </p>
+
+      </section>
+
+      <!-- AVISO PARA CADASTROS ANTIGOS -->
+      <div
+        id="legacy-request-message"
+        class="alert"
+        hidden>
+      </div>
+
+      <!-- DADOS E PERMISSOES AUTORIZADAS -->
+
       <form id="admin-user-form" class="form-grid">
+
         <div class="field">
-          <label for="name">Nome</label>
-          <input id="name" name="name" placeholder="Nome completo" required>
+          <label for="name">Nome completo</label>
+
+          <input
+            id="name"
+            name="name"
+            placeholder="Nome completo"
+            required>
         </div>
 
         <div class="field">
-          <label for="email">Email</label>
-          <input id="email" name="email" type="email" placeholder="email@instituicao.com" required>
+          <label for="email">E-mail</label>
+
+          <input
+            id="email"
+            name="email"
+            type="email"
+            placeholder="email@instituicao.com"
+            required>
         </div>
 
         <div class="field">
-          <label for="user_type">Tipo de usuário</label>
+          <label for="user_type">
+            Unidade de atuação autorizada
+          </label>
+
           <select id="user_type" name="user_type">
-            <option value="">Não informado</option>
+            <option value="">Não definida</option>
             <option value="CADH">CADH</option>
             <option value="UBS">UBS</option>
           </select>
         </div>
 
         <div id="specialty-field" class="field" hidden>
-          <label for="specialty">Especialidade</label>
+          <label for="specialty">
+            Especialidade autorizada
+          </label>
+
           <select id="specialty" name="specialty">
-            <option value="">Selecione a especialidade</option>
+            <option value="">
+              Selecione a especialidade
+            </option>
           </select>
         </div>
 
         <div id="active-field" class="field-full">
-          <label style="display:flex; align-items:center; gap:8px;">
-            <input id="is_active" name="is_active" type="checkbox" style="width:auto; min-height:auto;">
-            Ativo
+          <label
+            style="
+              display:flex;
+              align-items:center;
+              gap:8px;
+            ">
+
+            <input
+              id="is_active"
+              name="is_active"
+              type="checkbox"
+              style="width:auto; min-height:auto;">
+
+            Conta ativa
           </label>
         </div>
 
         <div id="temp-password-field" class="field-full">
-          <label for="temp_password">Senha temporaria</label>
-          <input id="temp_password" name="temp_password" placeholder="Ex: Temporaria@123">
+          <label for="temp_password">
+            Senha temporária
+          </label>
+
+          <input
+            id="temp_password"
+            name="temp_password"
+            type="password"
+            autocomplete="new-password"
+            placeholder="Informe uma senha temporária forte">
         </div>
 
         <div id="roles-field" class="field-full">
-          <label>Roles</label>
+          <label>Perfil de acesso autorizado</label>
+
+          <p class="auth-field-hint">
+            Somente o administrador pode definir
+            as permissões efetivas do usuário.
+          </p>
+
           <div id="roles-container"></div>
         </div>
 
         <div class="form-actions field-full">
-          <a class="btn" href="/admin/users/list.html" data-back-link data-fallback="/admin/users/list.html">Cancelar</a>
-          <button class="btn btn-primary" type="submit">Salvar</button>
+          <a
+            class="btn"
+            href="/admin/users/list.html"
+            data-back-link
+            data-fallback="/admin/users/list.html">
+            Cancelar
+          </a>
+
+          <button
+            class="btn btn-primary"
+            type="submit">
+            Salvar
+          </button>
         </div>
+
       </form>
+
     </section>
   </main>
 
   <script src="/assets/config.js"></script>
   <script src="/assets/app.js"></script>
   <script src="/assets/admin-users.js"></script>
+
 </body>
 </html>

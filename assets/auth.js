@@ -1,5 +1,7 @@
+
 document.addEventListener('DOMContentLoaded', () => {
   const page = document.body.dataset.page;
+
   if (page === 'login') {
     setupLoginPage();
   }
@@ -31,33 +33,54 @@ function setupLoginPage() {
   const subtitle = document.getElementById('auth-subtitle');
   const switchText = document.querySelector('[data-auth-switch-text]');
   const switchButton = document.querySelector('[data-auth-switch]');
-  const tabs = Array.from(document.querySelectorAll('[data-auth-mode]'));
+
+  const tabs = Array.from(
+    document.querySelectorAll('[data-auth-mode]')
+  );
+
   const alertId = 'page-alert';
   let mode = 'login';
 
-  const syncRegisterSpecialty = setupAuthSpecialtyControls(registerForm);
+  // Mantem a selecao dinamica de especialidade para CADH.
+  const syncRegisterSpecialty =
+    setupAuthSpecialtyControls(registerForm);
+
   SISELO.enhanceChoiceSelects(document);
   syncRegisterSpecialty();
 
   const setMode = (nextMode) => {
     mode = nextMode === 'register' ? 'register' : 'login';
+
     const isRegister = mode === 'register';
 
     loginForm.hidden = isRegister;
     registerForm.hidden = !isRegister;
-    title.textContent = isRegister ? 'Criar uma conta' : 'Entrar no SISELO';
+
+    title.textContent = isRegister
+      ? 'Solicitar acesso ao SISELO'
+      : 'Entrar no SISELO';
+
     subtitle.textContent = isRegister
-      ? 'Preencha os dados e aguarde a aprova\u00e7\u00e3o do administrador.'
+      ? 'Informe seus dados e o acesso desejado. A liberacao depende da aprovacao administrativa.'
       : 'Acesse com seu e-mail cadastrado.';
+
     switchText.firstChild.textContent = isRegister
       ? 'J\u00e1 possui uma conta? '
       : 'Ainda n\u00e3o possui uma conta? ';
-    switchButton.textContent = isRegister ? 'Fazer login' : 'Cadastre-se';
+
+    switchButton.textContent = isRegister
+      ? 'Fazer login'
+      : 'Cadastre-se';
 
     tabs.forEach((tab) => {
       const isActive = tab.dataset.authMode === mode;
+
       tab.classList.toggle('is-active', isActive);
-      tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+
+      tab.setAttribute(
+        'aria-selected',
+        isActive ? 'true' : 'false'
+      );
     });
 
     syncRegisterSpecialty();
@@ -66,15 +89,21 @@ function setupLoginPage() {
   };
 
   tabs.forEach((tab) => {
-    tab.addEventListener('click', () => setMode(tab.dataset.authMode));
+    tab.addEventListener('click', () => {
+      setMode(tab.dataset.authMode);
+    });
   });
 
   switchButton.addEventListener('click', () => {
     setMode(mode === 'login' ? 'register' : 'login');
   });
 
+  // LOGIN LOCAL
+  // A integracao SSO da Coopere sera implementada
+  // separadamente, apos a configuracao institucional.
   loginForm.addEventListener('submit', async (event) => {
     event.preventDefault();
+
     SISELO.showAlert(alertId, '', 'info');
 
     const formData = new FormData(loginForm);
@@ -89,42 +118,70 @@ function setupLoginPage() {
       });
 
       location.href = '/index.html';
+
     } catch (error) {
-      SISELO.showAlert(alertId, error.message, 'error');
+      SISELO.showAlert(
+        alertId,
+        error.message,
+        'error'
+      );
     }
   });
 
+  // SOLICITACAO DE ACESSO
+  // As preferencias informadas sao enviadas para
+  // user_access_requests e nao representam autorizacao.
   registerForm.addEventListener('submit', async (event) => {
     event.preventDefault();
+
     SISELO.showAlert(alertId, '', 'info');
+
+    syncRegisterSpecialty();
 
     const formData = new FormData(registerForm);
 
     try {
-      const data = await SISELO.apiRequest('/auth/register.php', {
-        method: 'POST',
-        body: {
-          name: formData.get('name'),
-          email: formData.get('email'),
-          password: formData.get('password'),
-          user_type: formData.get('user_type'),
-          specialty: formData.get('specialty'),
-        },
-      });
+      const data = await SISELO.apiRequest(
+        '/auth/register.php',
+        {
+          method: 'POST',
+          body: {
+            name: formData.get('name'),
+            email: formData.get('email'),
+            password: formData.get('password'),
+
+            // Perfil solicitado pelo usuario.
+            requested_role: formData.get('requested_role'),
+
+            // Unidade e especialidade solicitadas.
+            user_type: formData.get('user_type'),
+            specialty: formData.get('specialty'),
+          },
+        }
+      );
 
       registerForm.reset();
+
       syncRegisterSpecialty();
+
       SISELO.clearSession();
+
       setMode('login');
+
       SISELO.showAlert(
         alertId,
         data && data.message
           ? data.message
-          : 'Cadastro recebido com sucesso. Aguarde a aprova\u00e7\u00e3o do administrador.',
+          : 'Solicitacao recebida com sucesso. Aguarde a aprovacao do administrador.',
         'success'
       );
+
     } catch (error) {
-      SISELO.showAlert(alertId, error.message, 'error');
+      SISELO.showAlert(
+        alertId,
+        error.message,
+        'error'
+      );
     }
   });
 }
@@ -134,31 +191,53 @@ function setupAuthSpecialtyControls(form) {
     return () => {};
   }
 
-  const field = form.querySelector('.auth-specialty-field');
-  const select = form.querySelector('select[name="specialty"]');
-  const userTypeInputs = Array.from(form.querySelectorAll('input[name="user_type"]'));
+  const field = form.querySelector(
+    '.auth-specialty-field'
+  );
+
+  const select = form.querySelector(
+    'select[name="specialty"]'
+  );
+
+  const userTypeInputs = Array.from(
+    form.querySelectorAll('input[name="user_type"]')
+  );
 
   if (!field || !select || userTypeInputs.length === 0) {
     return () => {};
   }
 
-  select.innerHTML = '<option value="">Selecione a especialidade</option>' + AUTH_SPECIALTIES.map((specialty) => (
-    `<option value="${SISELO.escapeHtml(specialty)}">${SISELO.escapeHtml(specialty)}</option>`
-  )).join('');
+  // Carrega as especialidades autorizadas pelo sistema.
+  select.innerHTML =
+    '<option value="">Selecione a especialidade</option>' +
+    AUTH_SPECIALTIES.map((specialty) => {
+      const escaped = SISELO.escapeHtml(specialty);
+
+      return `<option value="${escaped}">${escaped}</option>`;
+    }).join('');
 
   const sync = () => {
-    const selectedType = userTypeInputs.find((input) => input.checked);
-    const isCadh = selectedType && selectedType.value === 'CADH';
+    const selectedType = userTypeInputs.find(
+      (input) => input.checked
+    );
+
+    const isCadh = Boolean(
+      selectedType && selectedType.value === 'CADH'
+    );
+
     const previousValue = select.value;
 
     field.hidden = !isCadh;
-    select.required = Boolean(isCadh);
+    select.required = isCadh;
+
     if (!isCadh) {
       select.value = '';
     }
 
     if (select.value !== previousValue) {
-      select.dispatchEvent(new Event('change', { bubbles: true }));
+      select.dispatchEvent(
+        new Event('change', { bubbles: true })
+      );
     }
   };
 
@@ -167,36 +246,52 @@ function setupAuthSpecialtyControls(form) {
   });
 
   sync();
+
   return sync;
 }
 
 async function setupChangePasswordPage() {
   const user = await SISELO.requireSession();
+
   if (!user) {
     return;
   }
 
-  const form = document.getElementById('change-password-form');
+  const form = document.getElementById(
+    'change-password-form'
+  );
+
   const alertId = 'page-alert';
 
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
+
     SISELO.showAlert(alertId, '', 'info');
 
     const formData = new FormData(form);
 
     try {
-      await SISELO.apiRequest('/auth/change_password.php', {
-        method: 'POST',
-        body: {
-          password: formData.get('password'),
-          password_confirm: formData.get('password_confirm'),
-        },
-      });
+      await SISELO.apiRequest(
+        '/auth/change_password.php',
+        {
+          method: 'POST',
+          body: {
+            password: formData.get('password'),
+            password_confirm: formData.get(
+              'password_confirm'
+            ),
+          },
+        }
+      );
 
       location.href = '/index.html';
+
     } catch (error) {
-      SISELO.showAlert(alertId, error.message, 'error');
+      SISELO.showAlert(
+        alertId,
+        error.message,
+        'error'
+      );
     }
   });
 }
