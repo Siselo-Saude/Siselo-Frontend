@@ -787,7 +787,12 @@ function renderPatientOverview(patient) {
     ["Telefone", patient.phone || "-"],
     ["Email", patient.email || "-"],
     ["UBS", patient.ubs_ref || "-"],
-    ["Contato de emergência", patient.emergency_contact || "-"],
+    [
+      "Contato de emergência",
+      [patient.emergency_contact_name, patient.emergency_contact]
+        .filter(Boolean)
+        .join(" · ") || "-",
+    ],
   ];
 
   return `
@@ -1177,6 +1182,7 @@ function getEmptyPatientFormContext() {
       address: "",
       email: "",
       emergency_contact: "",
+      emergency_contact_name: "",
       allergies: "",
       chronic_conditions: "",
       status: "ativo",
@@ -1201,6 +1207,7 @@ function getEmptyPatientSummary() {
     ubs_ref: "",
     team_ref: "",
     emergency_contact: "",
+    emergency_contact_name: "",
     allergies: "",
     chronic_conditions: "",
   };
@@ -1217,7 +1224,8 @@ const PATIENT_FIELD_LABELS = {
   phone: "Telefone",
   address: "Endereço",
   email: "E-mail",
-  emergency_contact: "Contato de emergência",
+  emergency_contact: "Telefone do contato de emergência",
+  emergency_contact_name: "Nome do contato de emergência",
   allergies: "Alergias",
   chronic_conditions: "Condições crônicas",
   risk_classification: "Classificação de risco",

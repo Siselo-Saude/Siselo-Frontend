@@ -560,7 +560,7 @@ function renderCadhUserDetailsTab(patient) {
         ${renderCadhDefinition('Equipe de Saúde da Família', formatCadhTeamName(patient.team_ref))}
         ${renderCadhDefinition('1º atendimento no CADH', formatCadhDate(patient.first_cadh_date))}
         ${renderCadhDefinition('Apoio familiar', patient.responsible_name)}
-        ${renderCadhDefinition('Apoio comunitário', patient.emergency_contact)}
+        ${renderCadhDefinition('Contato de emergência', [patient.emergency_contact_name, patient.emergency_contact].filter(Boolean).join(' · '))}
       </dl>
 
       <div class="cadh-patient-overview-clinical">
@@ -1363,6 +1363,7 @@ function buildCadhPatientTransitionPayload(row, patient, transitionData) {
     address: source.address || '',
     email: source.email || '',
     emergency_contact: source.emergency_contact || '',
+    emergency_contact_name: source.emergency_contact_name || '',
     allergies: source.allergies || '',
     chronic_conditions: source.chronic_conditions || '',
     status: 'inativo',
@@ -1627,6 +1628,7 @@ function normalizeCadhPatient(patient) {
     ubs_ref: source.ubs_ref || '',
     responsible_name: source.responsible_name || '',
     emergency_contact: source.emergency_contact || '',
+    emergency_contact_name: source.emergency_contact_name || '',
   };
 }
 

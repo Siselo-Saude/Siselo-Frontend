@@ -136,8 +136,14 @@
 
           <div class="transition-panel-grid">
             <div class="field">
-              <label for="emergency_contact">Contato de Emerg&ecirc;ncia <span class="required-marker">*</span></label>
-              <input id="emergency_contact" name="emergency_contact" maxlength="15" placeholder="(61) 9 0000-0000" required>
+              <label for="emergency_contact_name">Nome do Contato de Emerg&ecirc;ncia</label>
+              <input id="emergency_contact_name" name="emergency_contact_name" maxlength="180" autocomplete="off" placeholder="Nome da pessoa de apoio (familiar, vizinho, etc.)">
+              <div class="field-error" data-error-for="emergency_contact_name"></div>
+            </div>
+
+            <div class="field">
+              <label for="emergency_contact">Telefone do Contato de Emerg&ecirc;ncia</label>
+              <input id="emergency_contact" name="emergency_contact" type="tel" maxlength="15" autocomplete="off" placeholder="(61) 9 0000-0000" aria-describedby="emergency_contact_name">
               <div class="field-error" data-error-for="emergency_contact"></div>
             </div>
 

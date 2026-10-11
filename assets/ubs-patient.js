@@ -138,7 +138,7 @@ function renderUbsPatientSummary(patient) {
     ['E-mail', patient.email || '—'],
     ['UBS', patient.ubs_ref || '—'],
     ['Equipe', SISELO.formatTeamName(patient.team_ref) || '—'],
-    ['Contato de emergência', patient.emergency_contact || '—'],
+    ['Contato de emergência', [patient.emergency_contact_name, patient.emergency_contact].filter(Boolean).join(' · ') || '—'],
   ];
   const active = normalizeUbsPatientText(patient.status || 'ativo') !== 'inativo';
   document.title = `${patient.full_name || 'Paciente'} | SISELO`;
