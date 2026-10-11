@@ -1,0 +1,139 @@
+
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1">
+
+  <title>Conectando à Coopere - SIS ELO</title>
+
+  <link rel="stylesheet" href="/assets/app.css">
+</head>
+
+<body>
+  <main class="auth-shell">
+    <div class="auth-shell-inner">
+
+      <header class="auth-heading">
+        <h1 class="auth-title">
+          Conectando ao SIS ELO
+        </h1>
+
+        <p class="auth-subtitle">
+          Estamos verificando sua identidade
+          para abrir o sistema com segurança.
+        </p>
+      </header>
+
+      <section class="card auth-card auth-card-centered">
+
+        <p id="sso-status"
+           role="status"
+           aria-live="polite"
+           style="text-align:center;">
+          Iniciando autenticação Google...
+        </p>
+
+        <div id="sso-error"
+             class="alert"
+             role="alert"
+             hidden>
+        </div>
+
+        <div class="actions">
+          <a href="/login.html"
+             class="btn btn-primary auth-submit">
+            Acessar login tradicional
+          </a>
+        </div>
+
+      </section>
+
+    </div>
+  </main>
+
+  <script src="/assets/config.js"></script>
+  <script src="/assets/app.js"></script>
+
+  <script>
+    (function () {
+      'use strict';
+
+      document.addEventListener(
+        'DOMContentLoaded',
+        async function () {
+
+          const status =
+            document.getElementById('sso-status');
+
+          const alert =
+            document.getElementById('sso-error');
+
+          try {
+            if (
+              !window.SISELO ||
+              typeof window.SISELO.apiRequest !== 'function'
+            ) {
+              throw new Error(
+                'A comunicação com o SIS ELO não está disponível.'
+              );
+            }
+
+            // Inicia o login Google existente.
+            // GET inicia login, nunca vinculação.
+            const result =
+              await window.SISELO.apiRequest(
+                '/auth/google/start.php'
+              );
+
+            if (
+              !result ||
+              result.mode !== 'login' ||
+              typeof result.authorization_url !== 'string'
+            ) {
+              throw new Error(
+                'Não foi possível iniciar a autenticação.'
+              );
+            }
+
+            const destination =
+              new URL(result.authorization_url);
+
+            // Aceita apenas o servidor oficial do Google.
+            if (
+              destination.protocol !== 'https:' ||
+              destination.hostname !== 'accounts.google.com' ||
+              destination.username ||
+              destination.password
+            ) {
+              throw new Error(
+                'Servidor de autenticação não autorizado.'
+              );
+            }
+
+            status.textContent =
+              'Redirecionando para autenticação segura...';
+
+            // Evita deixar esta página intermediária
+            // no histórico de navegação.
+            window.location.replace(destination.href);
+
+          } catch (error) {
+
+            status.textContent =
+              'Não foi possível conectar automaticamente.';
+
+            alert.textContent =
+              error && error.message
+                ? error.message
+                : 'Falha ao iniciar a autenticação.';
+
+            alert.hidden = false;
+          }
+        }
+      );
+    })();
+  </script>
+</body>
+</html>
