@@ -3,16 +3,92 @@
 <html lang="pt-br">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1, viewport-fit=cover">
+
   <title>Acesso - SISELO</title>
   <link rel="stylesheet" href="/assets/app.css">
+
+  <style>
+    /* Complementos visuais exclusivos do login Google */
+
+    .auth-google-separator {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin: 8px 0 3px;
+      color: #718198;
+      font-size: 0.86rem;
+      font-weight: 600;
+    }
+
+    .auth-google-separator::before,
+    .auth-google-separator::after {
+      content: "";
+      height: 1px;
+      background: #d7e1ed;
+      flex: 1;
+    }
+
+    .auth-google-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      width: 100%;
+      min-height: 50px;
+      padding: 12px 16px;
+      background: #fff;
+      border: 1px solid #cbd8e7;
+      border-radius: 11px;
+      color: #243b53;
+      font-size: 0.98rem;
+      font-weight: 650;
+      font-family: inherit;
+      cursor: pointer;
+      box-shadow: 0 3px 12px rgba(15, 50, 90, 0.06);
+      transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .auth-google-button:hover:not(:disabled) {
+      background: #f7faff;
+      border-color: #91b4d9;
+      box-shadow: 0 5px 16px rgba(15, 50, 90, 0.11);
+    }
+
+    .auth-google-button:focus-visible {
+      outline: 3px solid #4285f4;
+      outline-offset: 3px;
+    }
+
+    .auth-google-button:disabled {
+      opacity: 0.65;
+      cursor: wait;
+    }
+
+    .auth-google-icon {
+      width: 21px;
+      height: 21px;
+      flex-shrink: 0;
+    }
+
+    .auth-google-hint {
+      margin: 10px 0 0;
+      color: #718198;
+      font-size: 0.76rem;
+      line-height: 1.5;
+      text-align: center;
+    }
+  </style>
 </head>
 
 <body data-page="login">
+
   <main class="auth-shell">
     <div class="auth-shell-inner">
 
       <header class="auth-heading">
+
         <div class="auth-mark" aria-hidden="true">
           <svg viewBox="0 0 24 24" focusable="false">
             <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
@@ -26,11 +102,14 @@
         </h1>
 
         <p id="auth-subtitle" class="auth-subtitle">
-          Acesse com seu e-mail cadastrado.
+          Acesse com seu e-mail cadastrado ou sua conta Google vinculada.
         </p>
+
       </header>
 
       <section class="card auth-card auth-card-centered">
+
+        <!-- ABAS LOGIN E CADASTRO -->
 
         <div class="auth-tabs"
              role="tablist"
@@ -60,9 +139,17 @@
 
         </div>
 
-        <div id="page-alert" class="alert" hidden></div>
+        <!-- MENSAGENS DE ERRO E SUCESSO -->
 
-        <!-- LOGIN EXISTENTE -->
+        <div
+          id="page-alert"
+          class="alert"
+          role="status"
+          aria-live="polite"
+          hidden>
+        </div>
+
+        <!-- LOGIN POR EMAIL E SENHA -->
 
         <form
           id="login-form"
@@ -99,6 +186,57 @@
               type="submit">
               Entrar
             </button>
+          </div>
+
+          <!-- LOGIN GOOGLE -->
+
+          <div class="field-full">
+
+            <div class="auth-google-separator"
+                 aria-hidden="true">
+              ou continue com
+            </div>
+
+          </div>
+
+          <div class="field-full">
+
+            <button
+              id="google-login-button"
+              class="auth-google-button"
+              type="button">
+
+              <svg
+                class="auth-google-icon"
+                viewBox="0 0 48 48"
+                aria-hidden="true"
+                focusable="false">
+
+                <path fill="#EA4335"
+                  d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+
+                <path fill="#4285F4"
+                  d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.24 5.48-4.75 7.18l7.73 6C44.43 38.03 46.98 31.82 46.98 24.55z"/>
+
+                <path fill="#FBBC05"
+                  d="M10.53 28.59A14.4 14.4 0 0 1 9.75 24c0-1.59.27-3.13.76-4.59l-7.98-6.19A23.9 23.9 0 0 0 0 24c0 3.87.93 7.51 2.56 10.78z"/>
+
+                <path fill="#34A853"
+                  d="M24 48c6.48 0 11.93-2.13 15.91-5.8l-7.73-6c-2.15 1.45-4.92 2.3-8.18 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+
+              </svg>
+
+              <span id="google-login-label">
+                Entrar com Google
+              </span>
+
+            </button>
+
+            <p class="auth-google-hint">
+              Disponível para contas Google previamente
+              vinculadas a usuários aprovados no SIS ELO.
+            </p>
+
           </div>
 
         </form>
@@ -280,9 +418,187 @@
     </div>
   </main>
 
+  <!-- SCRIPTS EXISTENTES -->
+
   <script src="/assets/config.js"></script>
   <script src="/assets/app.js"></script>
   <script src="/assets/auth.js"></script>
+
+  <!-- INTEGRACAO GOOGLE OAUTH -->
+
+  <script>
+    (function () {
+      'use strict';
+
+      const googleErrorMessages = {
+        sessao_expirada:
+          'A sessão de autenticação expirou. Tente novamente.',
+
+        autorizacao_cancelada:
+          'A autenticação pelo Google foi cancelada.',
+
+        codigo_ausente:
+          'O Google não retornou o código de autorização.',
+
+        configuracao_incompleta:
+          'A autenticação Google ainda não está configurada corretamente.',
+
+        falha_comunicacao_google:
+          'Não foi possível comunicar com o Google.',
+
+        falha_troca_token:
+          'Não foi possível concluir a autenticação Google.',
+
+        token_ausente:
+          'O Google não forneceu o token de identidade esperado.',
+
+        token_invalido:
+          'Não foi possível validar a identidade Google. Tente novamente.',
+
+        identidade_invalida:
+          'A identidade Google não passou nas verificações de segurança.',
+
+        conta_nao_vinculada:
+          'Esta conta Google ainda não está vinculada a um usuário do SIS ELO. Entre com e-mail e senha e vincule sua conta Google.',
+
+        usuario_nao_autorizado:
+          'Sua conta SIS ELO está inativa ou aguardando aprovação administrativa.',
+
+        modo_invalido:
+          'A operação de autenticação não foi reconhecida.',
+
+        falha_registro_login:
+          'Não foi possível concluir o registro de acesso.',
+
+        sessao_vinculacao_invalida:
+          'A sessão usada na vinculação não é mais válida.',
+
+        google_ja_vinculado:
+          'Esta conta Google já está vinculada a outro usuário.',
+
+        conta_ja_tem_google:
+          'Este usuário já possui uma conta Google vinculada.',
+
+        falha_vinculacao:
+          'Não foi possível concluir a vinculação da conta Google.'
+      };
+
+      document.addEventListener('DOMContentLoaded', function () {
+
+        const button = document.getElementById('google-login-button');
+        const label = document.getElementById('google-login-label');
+
+        if (!button) {
+          return;
+        }
+
+        function showMessage(message) {
+          if (
+            window.SISELO
+            && typeof window.SISELO.showAlert === 'function'
+          ) {
+            window.SISELO.showAlert('page-alert', message, 'error');
+          } else {
+            const alertElement = document.getElementById('page-alert');
+
+            if (alertElement) {
+              alertElement.textContent = message;
+              alertElement.hidden = false;
+            }
+          }
+        }
+
+        // Mensagens recebidas do callback Google.
+        const params = new URLSearchParams(window.location.search);
+        const googleError = params.get('google_error');
+
+        if (googleError) {
+          showMessage(
+            googleErrorMessages[googleError]
+            || 'Não foi possível concluir a autenticação Google.'
+          );
+        }
+
+        // Login Google sem necessidade de informar senha.
+        button.addEventListener('click', async function () {
+
+          if (button.disabled) {
+            return;
+          }
+
+          button.disabled = true;
+          button.setAttribute('aria-busy', 'true');
+
+          if (label) {
+            label.textContent = 'Conectando ao Google...';
+          }
+
+          try {
+
+            if (
+              !window.SISELO
+              || typeof window.SISELO.apiRequest !== 'function'
+            ) {
+              throw new Error(
+                'A comunicação com o SIS ELO não está disponível.'
+              );
+            }
+
+            // GET inicia o modo login.
+            // POST autenticado é reservado para vinculação.
+            const result = await window.SISELO.apiRequest(
+              '/auth/google/start.php'
+            );
+
+            if (
+              !result
+              || result.mode !== 'login'
+              || typeof result.authorization_url !== 'string'
+            ) {
+              throw new Error(
+                'O servidor não retornou uma autorização Google válida.'
+              );
+            }
+
+            const destination = new URL(result.authorization_url);
+
+            // Aceitar somente o destino oficial autorizado.
+            if (
+              destination.protocol !== 'https:'
+              || destination.hostname !== 'accounts.google.com'
+              || destination.username
+              || destination.password
+            ) {
+              throw new Error(
+                'O endereço de autenticação não é permitido.'
+              );
+            }
+
+            // Navegar para o Google.
+            window.location.assign(destination.href);
+
+          } catch (error) {
+
+            showMessage(
+              error && error.message
+                ? error.message
+                : 'Não foi possível iniciar o login Google.'
+            );
+
+            button.disabled = false;
+            button.removeAttribute('aria-busy');
+
+            if (label) {
+              label.textContent = 'Entrar com Google';
+            }
+          }
+
+        });
+
+      });
+
+    })();
+  </script>
 
 </body>
 </html>
