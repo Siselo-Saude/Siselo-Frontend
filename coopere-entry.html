@@ -80,8 +80,23 @@
               );
             }
 
-            // Inicia o login Google existente.
-            // GET inicia login, nunca vinculação.
+            // Se ja houver uma sessao SIS ELO aprovada, nao
+            // solicitar autenticacao Google novamente.
+            try {
+              const current = await window.SISELO.apiRequest(
+                '/auth/me.php'
+              );
+              if (current && current.user) {
+                status.textContent = 'Acesso autorizado. Abrindo painel...';
+                window.location.replace('/index.html');
+                return;
+              }
+            } catch (_ignored) {
+              // Nao ha sessao SIS ELO aprovada; iniciar Google.
+            }
+
+            // GET inicia login ou validacao para cadastro.
+            // Nunca concede permissoes por si so.
             const result =
               await window.SISELO.apiRequest(
                 '/auth/google/start.php'

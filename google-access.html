@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Solicitar acesso - SIS ELO</title>
+  <link rel="stylesheet" href="/assets/app.css">
+  <style>
+    .google-access-card { max-width: 620px; margin: 0 auto; }
+    .google-access-note { color: #596b80; line-height: 1.6; margin: 12px 0; }
+    .google-access-ident { background: #eef5fd; padding: 14px 16px; border-radius: 10px; margin: 16px 0; }
+    .google-access-ident strong { display: block; margin-bottom: 5px; }
+    .google-access-choice { display:flex; align-items:center; gap:10px; margin: 9px 0; }
+    .google-access-choice input { width:auto; }
+    .google-access-hidden { display:none !important; }
+  </style>
+</head>
+<body>
+  <main class="auth-shell">
+    <div class="auth-shell-inner">
+      <header class="auth-heading">
+        <h1 class="auth-title">Acesso ao SIS ELO</h1>
+        <p class="auth-subtitle">Identidade verificada pelo Google. Vamos consultar a situação do seu acesso.</p>
+      </header>
+      <section class="card auth-card google-access-card">
+        <div id="page-alert" class="alert" role="status" aria-live="polite" hidden></div>
+        <p id="loading-message" class="google-access-note">Consultando sua solicitação...</p>
+
+        <div id="identity" class="google-access-ident google-access-hidden">
+          <strong id="identity-name"></strong>
+          <span id="identity-email"></span>
+        </div>
+
+        <div id="pending-message" class="google-access-hidden">
+          <h2>Solicitação já registrada</h2>
+          <p class="google-access-note">Você já solicitou acesso ao SIS ELO. Aguarde a aprovação de um administrador.</p>
+          <p class="google-access-note">Quando seu acesso for autorizado, volte à Coopere e clique no botão SIS ELO. Sua conta Google será reconhecida e você entrará diretamente no painel.</p>
+        </div>
+
+        <div id="existing-pending-message" class="google-access-hidden">
+          <h2>Solicitação em análise</h2>
+          <p class="google-access-note">Já existe um cadastro pendente com este e-mail. Aguarde a análise do administrador. Como esse cadastro não foi iniciado com o Google, será necessário vincular a conta Google uma única vez depois da aprovação.</p>
+        </div>
+
+        <div id="needs-link-message" class="google-access-hidden">
+          <h2>Conta SIS ELO encontrada</h2>
+          <p class="google-access-note">Você já possui uma conta SIS ELO aprovada, mas ela ainda não está vinculada ao Google. Para sua segurança, entre uma vez com e-mail e senha e, depois, vincule sua conta Google.</p>
+          <a class="btn btn-primary auth-submit" href="/login.html">Entrar com e-mail e senha</a>
+          <p class="google-access-note">Depois de entrar, abra <a href="/google-account.html">Vincular conta Google</a> para concluir a associação uma única vez.</p>
+        </div>
+
+        <div id="approved-message" class="google-access-hidden">
+          <h2>Seu acesso foi aprovado!</h2>
+          <p class="google-access-note">Sua conta está autorizada. Volte ao botão SIS ELO na Coopere para entrar com o Google e abrir seu painel.</p>
+          <a class="btn btn-primary auth-submit" href="/coopere-entry.html">Abrir SIS ELO</a>
+        </div>
+
+        <div id="blocked-message" class="google-access-hidden">
+          <h2>Acesso indisponível</h2>
+          <p class="google-access-note">Esta conta está inativa ou bloqueada. Procure um administrador do SIS ELO.</p>
+        </div>
+
+        <form id="google-register-form" class="auth-form form-grid google-access-hidden" style="grid-template-columns:1fr">
+          <h2>Solicitar acesso ao SIS ELO</h2>
+          <p class="google-access-note">Seu e-mail já foi confirmado pelo Google. Escolha o acesso desejado. A aprovação e as permissões são definidas pela administração.</p>
+
+          <div class="field-full auth-field">
+            <label for="register-name">Nome completo</label>
+            <input id="register-name" name="name" type="text" maxlength="120" autocomplete="name" required>
+          </div>
+          <div class="field-full auth-field">
+            <label for="register-email">E-mail verificado pelo Google</label>
+            <input id="register-email" type="email" readonly>
+          </div>
+          <fieldset class="field-full auth-choice-group">
+            <legend>Perfil de acesso solicitado</legend>
+            <label class="google-access-choice"><input type="radio" name="requested_role" value="alimentador" required> Alimentador</label>
+            <label class="google-access-choice"><input type="radio" name="requested_role" value="visualizador" required> Visualizador</label>
+          </fieldset>
+          <fieldset class="field-full auth-choice-group">
+            <legend>Unidade de atuação</legend>
+            <label class="google-access-choice"><input type="radio" name="user_type" value="CADH" required> CADH</label>
+            <label class="google-access-choice"><input type="radio" name="user_type" value="UBS" required> UBS</label>
+          </fieldset>
+          <div class="field-full auth-field google-access-hidden" id="specialty-field">
+            <label for="register-specialty">Especialidade (CADH)</label>
+            <select id="register-specialty" name="specialty">
+              <option value="">Selecione a especialidade</option>
+              <option>Endocrinologia</option>
+              <option>Cardiologia</option>
+              <option>Psicologia</option>
+              <option>Enfermagem</option>
+              <option>Nutrição</option>
+              <option>Fisioterapia</option>
+              <option>Farmácia Clínica</option>
+              <option>Serviço Social</option>
+              <option>Oftalmologia</option>
+              <option>Nefrologia</option>
+              <option>Técnico de Enfermagem</option>
+              <option>Gestão do Cuidado</option>
+            </select>
+          </div>
+          <p class="google-access-note">Solicitar acesso não libera o sistema automaticamente. Você ficará aguardando aprovação administrativa.</p>
+          <div class="actions">
+            <button id="submit-access" class="btn btn-primary auth-submit" type="submit">Enviar solicitação de acesso</button>
+          </div>
+        </form>
+        <div class="actions" style="margin-top:20px">
+          <a href="/login.html" class="btn">Ir para o login tradicional</a>
+        </div>
+      </section>
+    </div>
+  </main>
+  <script src="/assets/config.js"></script>
+  <script src="/assets/app.js"></script>
+  <script>
+    (function () {
+      'use strict';
+      document.addEventListener('DOMContentLoaded', async function () {
+        const byId = (id) => document.getElementById(id);
+        const sections = ['pending-message', 'existing-pending-message',
+          'needs-link-message', 'blocked-message', 'approved-message',
+          'google-register-form'];
+        const form = byId('google-register-form');
+        const alert = byId('page-alert');
+        // Nunca exibir dados em cache de uma conta SIS ELO anterior.
+        if (window.SISELO && typeof SISELO.clearSession === 'function') {
+          SISELO.clearSession();
+        }
+        const hide = (id, hidden) => byId(id).classList.toggle('google-access-hidden', hidden);
+        function message(text) {
+          alert.textContent = text;
+          alert.hidden = !text;
+        }
+        function renderStatus(status) {
+          byId('loading-message').classList.add('google-access-hidden');
+          sections.forEach((id) => hide(id, true));
+          const sectionForStatus = {
+            pending: 'pending-message',
+            existing_pending: 'existing-pending-message',
+            needs_link: 'needs-link-message',
+            blocked: 'blocked-message',
+            approved: 'approved-message',
+            new: 'google-register-form',
+          };
+          const section = sectionForStatus[status];
+          if (section) {
+            hide(section, false);
+          } else {
+            message('Não foi possível determinar sua situação. Tente novamente pela Coopere.');
+          }
+        }
+        try {
+          const result = await SISELO.apiRequest('/auth/google/access.php');
+          byId('identity-name').textContent = result.name || 'Conta Google';
+          byId('identity-email').textContent = result.email || '';
+          byId('register-name').value = result.name || '';
+          byId('register-email').value = result.email || '';
+          hide('identity', false);
+          renderStatus(result.status);
+        } catch (error) {
+          byId('loading-message').textContent = 'Sua verificação Google expirou. Volte à Coopere e tente novamente.';
+          message(error && error.message ? error.message : 'Falha na consulta de acesso.');
+        }
+
+        const specialty = byId('register-specialty');
+        document.querySelectorAll('input[name="user_type"]').forEach((radio) => {
+          radio.addEventListener('change', () => {
+            const isCadh = form.querySelector('input[name="user_type"]:checked')?.value === 'CADH';
+            hide('specialty-field', !isCadh);
+            specialty.required = isCadh;
+            if (!isCadh) specialty.value = '';
+          });
+        });
+
+        form.addEventListener('submit', async (event) => {
+          event.preventDefault();
+          const button = byId('submit-access');
+          button.disabled = true;
+          message('');
+          try {
+            const fields = new FormData(form);
+            const result = await SISELO.apiRequest('/auth/google/access.php', {
+              method: 'POST',
+              body: {
+                name: fields.get('name'),
+                requested_role: fields.get('requested_role'),
+                user_type: fields.get('user_type'),
+                specialty: fields.get('specialty'),
+              },
+            });
+            renderStatus(result.status);
+          } catch (error) {
+            message(error && error.message ? error.message : 'Falha ao enviar a solicitação.');
+          } finally {
+            button.disabled = false;
+          }
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
