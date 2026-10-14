@@ -45,7 +45,8 @@
         <div id="needs-link-message" class="google-access-hidden">
           <h2>Conta SIS ELO encontrada</h2>
           <p class="google-access-note">Você já possui uma conta SIS ELO aprovada, mas ela ainda não está vinculada ao Google. Para sua segurança, entre uma vez com e-mail e senha e, depois, vincule sua conta Google.</p>
-          <a class="btn btn-primary auth-submit" href="/login.html">Entrar e vincular minha conta</a>
+          <a class="btn btn-primary auth-submit" href="/login.html">Entrar com e-mail e senha</a>
+          <p class="google-access-note">Depois de entrar, abra <a href="/google-account.html">Vincular conta Google</a> para concluir a associação uma única vez.</p>
         </div>
 
         <div id="approved-message" class="google-access-hidden">
@@ -122,6 +123,10 @@
           'google-register-form'];
         const form = byId('google-register-form');
         const alert = byId('page-alert');
+        // Nunca exibir dados em cache de uma conta SIS ELO anterior.
+        if (window.SISELO && typeof SISELO.clearSession === 'function') {
+          SISELO.clearSession();
+        }
         const hide = (id, hidden) => byId(id).classList.toggle('google-access-hidden', hidden);
         function message(text) {
           alert.textContent = text;
