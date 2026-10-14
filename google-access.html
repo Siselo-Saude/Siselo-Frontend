@@ -48,6 +48,12 @@
           <a class="btn btn-primary auth-submit" href="/login.html">Entrar e vincular minha conta</a>
         </div>
 
+        <div id="approved-message" class="google-access-hidden">
+          <h2>Seu acesso foi aprovado!</h2>
+          <p class="google-access-note">Sua conta está autorizada. Volte ao botão SIS ELO na Coopere para entrar com o Google e abrir seu painel.</p>
+          <a class="btn btn-primary auth-submit" href="/coopere-entry.html">Abrir SIS ELO</a>
+        </div>
+
         <div id="blocked-message" class="google-access-hidden">
           <h2>Acesso indisponível</h2>
           <p class="google-access-note">Esta conta está inativa ou bloqueada. Procure um administrador do SIS ELO.</p>
@@ -112,7 +118,8 @@
       document.addEventListener('DOMContentLoaded', async function () {
         const byId = (id) => document.getElementById(id);
         const sections = ['pending-message', 'existing-pending-message',
-          'needs-link-message', 'blocked-message', 'google-register-form'];
+          'needs-link-message', 'blocked-message', 'approved-message',
+          'google-register-form'];
         const form = byId('google-register-form');
         const alert = byId('page-alert');
         const hide = (id, hidden) => byId(id).classList.toggle('google-access-hidden', hidden);
@@ -128,6 +135,7 @@
             existing_pending: 'existing-pending-message',
             needs_link: 'needs-link-message',
             blocked: 'blocked-message',
+            approved: 'approved-message',
             new: 'google-register-form',
           };
           const section = sectionForStatus[status];
