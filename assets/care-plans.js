@@ -458,7 +458,7 @@ function renderCarePlanSheet({ plan, items, patient, patientLocked }) {
         ${renderCarePlanStaticField("Endereço", patient && patient.address)}
         ${renderCarePlanStaticField("Telefone", patient && patient.phone)}
         ${renderCarePlanStaticField("Apoio familiar (nome)", patient && patient.responsible_name)}
-        ${renderCarePlanStaticField("Apoio comunitário (nome)", patient && patient.emergency_contact)}
+        ${renderCarePlanStaticField("Contato de emergência", patient && [patient.emergency_contact_name, patient.emergency_contact].filter(Boolean).join(" · "))}
         <label>
           <span>Data de início</span>
           <input id="start_date" name="start_date" type="text" inputmode="numeric" autocomplete="off" placeholder="dd/mm/aaaa" value="${SISELO.escapeHtml(plan.start_date || SISELO.todayDateInputValue())}" required>

@@ -387,6 +387,7 @@ async function setupPatientFormPage() {
   });
 
   configurePatientDateInputs();
+  bindPatientResponsibleRule();
   syncPatientClinicalTextareas();
   attachPatientMasks();
   setupPatientStatusSelect(row.status || row.status_label || "ativo");
@@ -787,7 +788,12 @@ function renderPatientOverview(patient) {
     ["Telefone", patient.phone || "-"],
     ["Email", patient.email || "-"],
     ["UBS", patient.ubs_ref || "-"],
-    ["Contato de emergência", patient.emergency_contact || "-"],
+    [
+      "Contato de emergência",
+      [patient.emergency_contact_name, patient.emergency_contact]
+        .filter(Boolean)
+        .join(" · ") || "-",
+    ],
   ];
 
   return `
@@ -1177,6 +1183,7 @@ function getEmptyPatientFormContext() {
       address: "",
       email: "",
       emergency_contact: "",
+      emergency_contact_name: "",
       allergies: "",
       chronic_conditions: "",
       status: "ativo",
@@ -1201,6 +1208,7 @@ function getEmptyPatientSummary() {
     ubs_ref: "",
     team_ref: "",
     emergency_contact: "",
+    emergency_contact_name: "",
     allergies: "",
     chronic_conditions: "",
   };
@@ -1213,11 +1221,12 @@ const PATIENT_FIELD_LABELS = {
   birth_date: "Data de nascimento",
   sex: "Sexo",
   race: "Raça/Cor",
-  responsible_name: "Responsável",
+  responsible_name: "Responsável/Apoio Familiar",
   phone: "Telefone",
   address: "Endereço",
   email: "E-mail",
-  emergency_contact: "Contato de emergência",
+  emergency_contact: "Telefone do contato de emergência",
+  emergency_contact_name: "Nome do contato de emergência",
   allergies: "Alergias",
   chronic_conditions: "Condições crônicas",
   risk_classification: "Classificação de risco",
@@ -1503,6 +1512,37 @@ function focusPatientErrorTarget(target) {
   if (focusTarget instanceof HTMLElement) {
     setTimeout(() => focusTarget.focus({ preventScroll: true }), 200);
   }
+}
+
+const PATIENT_MINOR_AGE_LIMIT = 18;
+
+function bindPatientResponsibleRule() {
+  const birthInput = document.getElementById("birth_date");
+  const responsibleInput = document.getElementById("responsible");
+  const marker = document.getElementById("responsible-required-marker");
+
+  if (!birthInput || !responsibleInput) {
+    return;
+  }
+
+  const syncResponsibleRequirement = () => {
+    const birthDate = SISELO.resolveDateInputValue(birthInput.value);
+    const adultCutoff = SISELO.shiftDateInputValue(
+      SISELO.todayDateInputValue(),
+      { years: -PATIENT_MINOR_AGE_LIMIT },
+    );
+    const isMinor = Boolean(birthDate) && birthDate > adultCutoff;
+
+    responsibleInput.required = isMinor;
+    if (marker) {
+      marker.hidden = !isMinor;
+    }
+  };
+
+  ["input", "change"].forEach((eventName) => {
+    birthInput.addEventListener(eventName, syncResponsibleRequirement);
+  });
+  syncResponsibleRequirement();
 }
 
 function configurePatientDateInputs() {
