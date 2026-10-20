@@ -1123,7 +1123,7 @@ function renderCadhTransitionTab(patient, options = {}) {
     detail.innerHTML = `
       <section class="cadh-inline-panel cadh-tab-screen">
         <div class="cadh-screen-header">
-          <h3>Transição do Cuidado</h3>
+          <h3>Transição do Cuidado - ${SISELO.escapeHtml(patient.full_name || '-')}</h3>
           <div class="cadh-screen-actions">
             <a class="btn" href="${SISELO.escapeHtml(listHref)}">Abrir histórico</a>
           </div>
@@ -1137,7 +1137,7 @@ function renderCadhTransitionTab(patient, options = {}) {
   detail.innerHTML = `
     <section class="cadh-inline-panel cadh-tab-screen cadh-transition-screen">
       <div class="cadh-screen-header">
-        <h3>Transição do Cuidado</h3>
+        <h3>Transição do Cuidado - ${SISELO.escapeHtml(patient.full_name || '-')}</h3>
         <div class="cadh-screen-actions">
           <a class="btn" href="${SISELO.escapeHtml(listHref)}">Abrir histórico</a>
         </div>
