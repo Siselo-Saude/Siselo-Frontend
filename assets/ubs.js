@@ -20,7 +20,7 @@ const UBS_STATUS_OPTIONS = [
   'Em Monitoramento',
   'Estável',
   'Necessita Reavaliação',
-  'Alta',
+  'Transição do Cuidado',
 ];
 
 let ubsPermissions = new Set();
@@ -787,7 +787,7 @@ function getUbsActiveFilterCount() {
 function getUbsStatusChipClass(status) {
   const normalized = normalizeUbsText(status);
   if (normalized.includes('reavaliacao')) return 'is-orange';
-  if (normalized.includes('alta') || normalized.includes('estavel')) return 'is-green';
+  if (normalized.includes('transicao') || normalized.includes('alta') || normalized.includes('estavel')) return 'is-green';
   return '';
 }
 

@@ -135,12 +135,12 @@ async function setupTransitionFormPage() {
 
   if (id && (loadError || !data || !data.row)) {
     document.getElementById("form-title").textContent =
-      "Editar Encaminhamento do Cuidado";
+      "Editar Transição do Cuidado";
     SISELO.showAlert(
       "page-alert",
       loadError && loadError.message
         ? loadError.message
-        : "Não foi possível carregar o encaminhamento selecionado.",
+        : "Não foi possível carregar a transição do cuidado selecionada.",
       "error",
     );
     disableTransitionForm();
@@ -175,8 +175,8 @@ async function setupTransitionFormPage() {
 
   document.getElementById("form-title").textContent =
     id || context.editing
-      ? "Editar Encaminhamento do Cuidado"
-      : "Novo Encaminhamento do Cuidado";
+      ? "Editar Transição do Cuidado"
+      : "Nova Transição do Cuidado";
 
   fillTransitionStatusSelect(
     Array.isArray(context.statuses) && context.statuses.length
@@ -228,7 +228,7 @@ async function setupTransitionFormPage() {
       markTransitionSpecialtyInvalid();
       SISELO.showAlert(
         "page-alert",
-        "Selecione a especialidade antes de salvar o encaminhamento.",
+        "Selecione a especialidade antes de salvar a transição do cuidado.",
         "error",
       );
       return;
@@ -337,9 +337,9 @@ function renderTransitionsTable(
   if (!Array.isArray(safeRows) || safeRows.length === 0) {
     tbody.innerHTML = SISELO.emptyTableRow(
       7,
-      "Nenhum encaminhamento encontrado.",
+      "Nenhuma transição do cuidado encontrada.",
       permissions.has("transitions.create")
-        ? { label: "+ Novo encaminhamento", href: newTransitionHref }
+        ? { label: "+ Nova transição", href: newTransitionHref }
         : null,
     );
     return;
@@ -371,7 +371,7 @@ function renderTransitionsTable(
 function renderTransitionsTrashTable(tbody, rows, permissions, query = "") {
   const safeRows = uniqueTransitionRows(rows);
   if (!Array.isArray(safeRows) || safeRows.length === 0) {
-    tbody.innerHTML = SISELO.emptyTableRow(8, "Nenhum encaminhamento inativo encontrado.");
+    tbody.innerHTML = SISELO.emptyTableRow(8, "Nenhuma transição inativa encontrada.");
     return;
   }
 
@@ -388,7 +388,7 @@ function renderTransitionsTrashTable(tbody, rows, permissions, query = "") {
       <td>${renderTransitionStatusBadge(row.status)}</td>
       <td>
         <div class="table-actions">
-          ${SISELO.iconButton("restore", "Restaurar encaminhamento", { "data-restore-id": row.id })}
+          ${SISELO.iconButton("restore", "Restaurar transição do cuidado", { "data-restore-id": row.id })}
           ${permissions.has("transitions.delete")
             ? SISELO.iconButton("delete", "Apagar permanentemente", {
                 "data-destroy-id": row.id,
@@ -534,7 +534,7 @@ function renderTransitionEditAction(row, permissions, scopedPatientId = "") {
   return SISELO.iconLink(
     "edit",
     `/transitions/form.html?id=${encodeURIComponent(id)}${scopedPatientId ? `&patient_id=${encodeURIComponent(scopedPatientId)}` : ""}`,
-    "Editar encaminhamento",
+    "Editar transição do cuidado",
   );
 }
 
@@ -543,7 +543,7 @@ function renderTransitionDeleteAction(row, permissions) {
     return "";
   }
 
-  return SISELO.iconButton("delete", "Inativar encaminhamento", {
+  return SISELO.iconButton("delete", "Inativar transição do cuidado", {
     "data-delete-id": row.id,
     "data-delete-label": row.full_name || "",
   });
@@ -617,7 +617,7 @@ function bindTransitionListActions(tbody) {
     button.addEventListener("click", async () => {
       if (
         !(await SISELO.confirmDeletion(
-          "o encaminhamento de",
+          "a transição do cuidado de",
           button.dataset.deleteLabel,
         ))
       )
@@ -631,7 +631,7 @@ function bindTransitionListActions(tbody) {
         location.reload();
       } catch (error) {
         SISELO.showActionError(
-          error.message || "Não foi possível apagar o encaminhamento.",
+          error.message || "Não foi possível apagar a transição do cuidado.",
         );
       }
     });
@@ -653,7 +653,7 @@ function bindTransitionTrashActions(tbody) {
     button.addEventListener("click", async () => {
       if (
         !(await SISELO.confirmPermanentDeletion(
-          "o encaminhamento de",
+          "a transição do cuidado de",
           button.dataset.destroyLabel,
         ))
       ) {
@@ -668,7 +668,7 @@ function bindTransitionTrashActions(tbody) {
         location.reload();
       } catch (error) {
         SISELO.showActionError(
-          error.message || "Não foi possível apagar o encaminhamento permanentemente.",
+          error.message || "Não foi possível apagar a transição do cuidado permanentemente.",
         );
       }
     });

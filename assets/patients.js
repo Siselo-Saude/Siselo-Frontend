@@ -508,7 +508,7 @@ async function setupPatientShowPage() {
   document.getElementById("patient-actions").innerHTML = `
     ${permissions.has("careplans.create") ? `<a class="btn" href="${buildPatientModuleActionHref("/care-plans/form.html", { patient_id: actionPatientId, return_to: returnTargets.planos })}">+ Novo plano</a>` : ""}
     ${permissions.has("encounters.create") ? `<a class="btn" href="${buildPatientModuleActionHref("/encounters/form.html", { patient_id: actionPatientId, return_to: returnTargets.atendimentos })}">+ Novo atendimento</a>` : ""}
-    ${permissions.has("transitions.create") ? `<a class="btn" href="${buildPatientModuleActionHref("/transitions/form.html", { patient_id: actionPatientId, return_to: returnTargets.transicoes })}">+ Novo encaminhamento</a>` : ""}
+    ${permissions.has("transitions.create") ? `<a class="btn" href="${buildPatientModuleActionHref("/transitions/form.html", { patient_id: actionPatientId, return_to: returnTargets.transicoes })}">+ Nova transição</a>` : ""}
   `;
 
   renderCarePlanRows(
@@ -748,7 +748,7 @@ function renderTransitionRows(targetId, rows, permissions, returnTo = "") {
   const tbody = document.getElementById(targetId);
 
   if (!Array.isArray(rows) || rows.length === 0) {
-    tbody.innerHTML = SISELO.emptyTableRow(6, "Nenhum encaminhamento encontrado.");
+    tbody.innerHTML = SISELO.emptyTableRow(6, "Nenhuma transição do cuidado encontrada.");
     return;
   }
 
@@ -763,7 +763,7 @@ function renderTransitionRows(targetId, rows, permissions, returnTo = "") {
       <td>${SISELO.escapeHtml(row.notes || "")}</td>
       <td>
         <div class="table-actions">
-          ${permissions.has("transitions.update") ? SISELO.iconLink("edit", buildPatientModuleActionHref("/transitions/form.html", { id: row.id, patient_id: row.patient_id, return_to: returnTo }), "Editar encaminhamento") : ""}
+          ${permissions.has("transitions.update") ? SISELO.iconLink("edit", buildPatientModuleActionHref("/transitions/form.html", { id: row.id, patient_id: row.patient_id, return_to: returnTo }), "Editar transição do cuidado") : ""}
         </div>
       </td>
     </tr>
@@ -1035,7 +1035,7 @@ function getPatientTabLabel(key) {
   const labels = {
     planos: "Planos de Cuidado",
     atendimentos: "Atendimentos",
-    transicoes: "Encaminhamentos",
+    transicoes: "Transições do Cuidado",
   };
 
   return labels[key] || key;

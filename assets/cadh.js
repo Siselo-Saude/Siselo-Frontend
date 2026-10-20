@@ -466,7 +466,7 @@ function renderCadhEmptyManagementState(tabKey = 'users') {
     <div class="cadh-empty-state">
       <span class="cadh-empty-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#${isTransition ? 'cadh-icon-transition' : 'cadh-icon-users'}"></use></svg></span>
       <strong>Nenhum paciente selecionado</strong>
-      <p>Selecione um paciente na lista ao lado para ${isTransition ? 'registrar o encaminhamento do cuidado' : 'acessar o prontuário'}.</p>
+      <p>Selecione um paciente na lista ao lado para ${isTransition ? 'registrar a transição do cuidado' : 'acessar o prontuário'}.</p>
     </div>
   `;
   SISELO.applyUiComponents(detail);
@@ -500,7 +500,7 @@ function renderCadhSelectedPatientSummary(patient) {
       <span class="cadh-transition-cta-icon" aria-hidden="true">
         <svg viewBox="0 0 24 24"><path d="M4 4v6h6M20 20v-6h-6"/><path d="M5 19a8 8 0 0 0 13-3M19 5a8 8 0 0 0-13 3"/></svg>
       </span>
-      <span><strong>Encaminhamento do Cuidado</strong><small>CADH &rarr; UBS</small></span>
+      <span><strong>Transição do Cuidado</strong><small>CADH &rarr; UBS</small></span>
       <svg class="cadh-transition-cta-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
     </button>
   `;
@@ -635,7 +635,7 @@ async function renderCadhCarePlanTab(patient, options = {}) {
           <li>Cada especialidade preenche seus campos durante o atendimento do usuário.</li>
           <li>Ao final do ciclo, o Gestor do Cuidado convoca reunião interdisciplinar.</li>
           <li>Na reunião, o plano é reaberto para discussão e pactuação das metas terapêuticas.</li>
-          <li>Com o paciente estabilizado, o Plano subsidia a decisão de encaminhamento do cuidado para a APS.</li>
+          <li>Com o paciente estabilizado, o Plano subsidia a decisão de transição do cuidado para a APS.</li>
         </ol>
       </div>
 
@@ -1123,12 +1123,12 @@ function renderCadhTransitionTab(patient, options = {}) {
     detail.innerHTML = `
       <section class="cadh-inline-panel cadh-tab-screen">
         <div class="cadh-screen-header">
-          <h3>Encaminhamento do Cuidado &mdash; ${SISELO.escapeHtml(patient.full_name || '-')}</h3>
+          <h3>Transição do Cuidado &mdash; ${SISELO.escapeHtml(patient.full_name || '-')}</h3>
           <div class="cadh-screen-actions">
             <a class="btn" href="${SISELO.escapeHtml(listHref)}">Abrir histórico</a>
           </div>
         </div>
-        <p class="cadh-inline-empty">Você pode visualizar o histórico, mas não tem permissão para registrar um novo encaminhamento nesta tela.</p>
+        <p class="cadh-inline-empty">Você pode visualizar o histórico, mas não tem permissão para registrar uma nova transição do cuidado nesta tela.</p>
       </section>
     `;
     return;
@@ -1137,7 +1137,7 @@ function renderCadhTransitionTab(patient, options = {}) {
   detail.innerHTML = `
     <section class="cadh-inline-panel cadh-tab-screen cadh-transition-screen">
       <div class="cadh-screen-header">
-        <h3>Encaminhamento do Cuidado &mdash; ${SISELO.escapeHtml(patient.full_name || '-')}</h3>
+        <h3>Transição do Cuidado &mdash; ${SISELO.escapeHtml(patient.full_name || '-')}</h3>
         <div class="cadh-screen-actions">
           <a class="btn" href="${SISELO.escapeHtml(listHref)}">Abrir histórico</a>
         </div>
@@ -1146,7 +1146,7 @@ function renderCadhTransitionTab(patient, options = {}) {
       <div id="cadh-transition-alert" class="alert ${options.success ? 'alert-success' : ''}" ${options.success ? '' : 'hidden'}>${options.success ? SISELO.escapeHtml(options.success) : ''}</div>
       ${options.warning ? `<p class="cadh-inline-empty is-warning">${SISELO.escapeHtml(options.warning)}</p>` : ''}
 
-      <p class="cadh-info-alert">O encaminhamento ocorre quando o paciente está estabilizado. A origem é sempre o <strong>CADH</strong>. Após o registro, o paciente será inativado no CADH e vinculado à equipe de referência da UBS quando o perfil tiver permissão para editar o cadastro.</p>
+      <p class="cadh-info-alert">A transição do cuidado ocorre quando o paciente está estabilizado no CADH, retornando o acompanhamento regular para a Atenção Primária à Saúde (APS/UBS). A origem é o <strong>CADH</strong> e o cuidado terá continuidade na UBS de referência.</p>
 
       <form id="cadh-transition-form" class="cadh-transition-form">
         <input type="hidden" name="patient_id" value="${SISELO.escapeHtml(patientId)}">
@@ -1175,10 +1175,10 @@ function renderCadhTransitionTab(patient, options = {}) {
 
         <label class="cadh-transition-field is-wide">
           <span>Observações</span>
-          <textarea name="notes" rows="4" placeholder="Observações sobre o encaminhamento..."></textarea>
+          <textarea name="notes" rows="4" placeholder="Observações sobre a transição do cuidado..."></textarea>
         </label>
 
-        <button class="cadh-transition-submit" type="submit" disabled>Registrar Encaminhamento do Cuidado</button>
+        <button class="cadh-transition-submit" type="submit" disabled>Registrar Transição do Cuidado</button>
       </form>
     </section>
   `;
@@ -1262,7 +1262,7 @@ async function saveCadhTransitionForm(patient, form) {
   setCadhInlineAlert(alert, '', 'info');
 
   if (!ubsLabel) {
-    setCadhInlineAlert(alert, 'Selecione a UBS de destino antes de registrar o encaminhamento.', 'error');
+    setCadhInlineAlert(alert, 'Selecione a UBS de destino antes de registrar a transição do cuidado.', 'error');
     ubsSelect?.focus();
     return;
   }
@@ -1304,15 +1304,15 @@ async function saveCadhTransitionForm(patient, form) {
 
     await renderCadhTransitionTab(cadhCurrentPatient || patient, {
       success: updateResult.updated
-        ? 'Encaminhamento registrado e cadastro atualizado com sucesso.'
-        : 'Encaminhamento registrado com sucesso.',
+        ? 'Transição do cuidado registrada e cadastro atualizado com sucesso.'
+        : 'Transição do cuidado registrada com sucesso.',
       warning: updateResult.warning || '',
     });
   } catch (error) {
-    setCadhInlineAlert(alert, error.message || 'Não foi possível registrar o encaminhamento do cuidado.', 'error');
+    setCadhInlineAlert(alert, error.message || 'Não foi possível registrar a transição do cuidado.', 'error');
     if (submitButton instanceof HTMLButtonElement) {
       submitButton.disabled = false;
-      submitButton.textContent = 'Registrar Encaminhamento do Cuidado';
+      submitButton.textContent = 'Registrar Transição do Cuidado';
     }
   }
 }
@@ -1321,7 +1321,7 @@ async function updateCadhPatientAfterTransition(patient, transitionData) {
   if (!cadhPermissions.has('patients.update')) {
     return {
       updated: false,
-      warning: 'Encaminhamento salvo. O cadastro do paciente não foi alterado porque este perfil não possui permissão de edição.',
+      warning: 'Transição do cuidado salva. O cadastro do paciente não foi alterado porque este perfil não possui permissão de edição.',
     };
   }
 
@@ -1337,7 +1337,7 @@ async function updateCadhPatientAfterTransition(patient, transitionData) {
   } catch (error) {
     return {
       updated: false,
-      warning: error.message || 'Encaminhamento salvo, mas não foi possível atualizar o cadastro do paciente automaticamente.',
+      warning: error.message || 'Transição do cuidado salva, mas não foi possível atualizar o cadastro do paciente automaticamente.',
     };
   }
 }
@@ -1416,11 +1416,11 @@ function renderCadhTransitionRecord(row, config) {
   return `
     <article class="cadh-record-card">
       <div>
-        <strong>${SISELO.escapeHtml(row.status_label || row.status || 'Encaminhamento')}</strong>
+        <strong>${SISELO.escapeHtml(row.status_label || row.status || 'Transição do cuidado')}</strong>
         <span>${SISELO.escapeHtml(formatCadhDate(row.transition_date))}</span>
         <p>${SISELO.escapeHtml(row.from_service || '-')} -> ${SISELO.escapeHtml(row.to_service || '-')}</p>
       </div>
-      ${cadhPermissions.has(config.updatePermission) ? `<a class="icon-btn" href="${editHref}" title="Editar encaminhamento" aria-label="Editar encaminhamento"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17.3V20h2.7L18.9 7.8l-2.7-2.7L4 17.3Z"/><path d="m16.2 5.1 2.7 2.7"/></svg></a>` : ''}
+      ${cadhPermissions.has(config.updatePermission) ? `<a class="icon-btn" href="${editHref}" title="Editar transição do cuidado" aria-label="Editar transição do cuidado"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17.3V20h2.7L18.9 7.8l-2.7-2.7L4 17.3Z"/><path d="m16.2 5.1 2.7 2.7"/></svg></a>` : ''}
     </article>
   `;
 }
@@ -1556,7 +1556,7 @@ function buildCadhCareSummary(clinicalContext, permissions) {
     {
       key: 'transitions',
       permission: 'transitions.view',
-      label: 'Encaminhamento do cuidado',
+      label: 'Transição do cuidado',
       href: patientId ? `/transitions/list.html?patient_id=${encodeURIComponent(patientId)}` : '',
       rows: Array.isArray(clinicalContext.transitions) ? clinicalContext.transitions : [],
     },
