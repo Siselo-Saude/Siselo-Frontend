@@ -5081,14 +5081,14 @@ body[data-page="home"] .home-page-header > div:first-child strong {
   font-size: 0.84rem;
 }
 
-:is(body[data-page="home"], body[data-page="cadh"]) .home-page-status {
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-page-status {
   display: flex;
   align-items: center;
   gap: 9px;
 }
 
-:is(body[data-page="home"], body[data-page="cadh"]) .home-system-status,
-:is(body[data-page="home"], body[data-page="cadh"]) .home-current-date {
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-system-status,
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-current-date {
   min-height: 28px;
   display: inline-flex;
   align-items: center;
@@ -5098,7 +5098,7 @@ body[data-page="home"] .home-page-header > div:first-child strong {
   white-space: nowrap;
 }
 
-:is(body[data-page="home"], body[data-page="cadh"]) .home-system-status {
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-system-status {
   gap: 6px;
   padding: 6px 13px;
   border: 1px solid #9ee8bb;
@@ -5108,7 +5108,7 @@ body[data-page="home"] .home-page-header > div:first-child strong {
   text-transform: uppercase;
 }
 
-:is(body[data-page="home"], body[data-page="cadh"]) .home-system-status-dot {
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-system-status-dot {
   inline-size: 6px;
   block-size: 6px;
   border-radius: 50%;
@@ -5116,14 +5116,14 @@ body[data-page="home"] .home-page-header > div:first-child strong {
   box-shadow: 0 0 0 3px rgba(51, 212, 119, 0.1);
 }
 
-:is(body[data-page="home"], body[data-page="cadh"]) .home-user-role-status {
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-user-role-status {
   gap: 7px;
   border-color: #b7d7f0;
   background: #edf6ff;
   color: #0c4d86;
 }
 
-:is(body[data-page="home"], body[data-page="cadh"]) .home-system-status-icon {
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-system-status-icon {
   inline-size: 16px;
   block-size: 16px;
   display: grid;
@@ -5131,7 +5131,7 @@ body[data-page="home"] .home-page-header > div:first-child strong {
   flex: 0 0 auto;
 }
 
-:is(body[data-page="home"], body[data-page="cadh"]) .home-system-status-icon svg {
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-system-status-icon svg {
   inline-size: 16px;
   block-size: 16px;
   display: block;
@@ -5142,7 +5142,7 @@ body[data-page="home"] .home-page-header > div:first-child strong {
   stroke-linejoin: round;
 }
 
-:is(body[data-page="home"], body[data-page="cadh"]) .home-user-role-status > span:last-child {
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-user-role-status > span:last-child {
   max-width: 280px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -5184,27 +5184,27 @@ body[data-page="home"] .home-page-header > div:first-child strong {
   opacity: 0.55;
 }
 
-:is(body[data-page="home"], body[data-page="cadh"]) .home-user-role-admin {
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-user-role-admin {
   border-color: #a9d7f5;
   background: #eaf6ff;
   color: #0b4f88;
 }
 
-:is(body[data-page="home"], body[data-page="cadh"]) .home-user-role-editor,
-:is(body[data-page="home"], body[data-page="cadh"]) .home-user-role-clinical {
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-user-role-editor,
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-user-role-clinical {
   border-color: #9ee8bb;
   background: #ecfff3;
   color: #087b3d;
 }
 
-:is(body[data-page="home"], body[data-page="cadh"]) .home-user-role-viewer,
-:is(body[data-page="home"], body[data-page="cadh"]) .home-user-role-user {
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-user-role-viewer,
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-user-role-user {
   border-color: #ced9e3;
   background: #eef3f7;
   color: #49637f;
 }
 
-:is(body[data-page="home"], body[data-page="cadh"]) .home-current-date {
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-current-date {
   padding: 6px 14px;
   background: #e5ebf0;
   color: #49637f;
@@ -8065,11 +8065,11 @@ body[data-page="ubs"] {
   color: var(--ubs-ink);
 }
 
-body[data-page="ubs"] .ubs-app-shell {
+:is(body[data-page="ubs"], body[data-page="ubs-patient"]) .ubs-app-shell {
   min-height: 100vh;
 }
 
-body[data-page="ubs"] .ubs-sidebar {
+:is(body[data-page="ubs"], body[data-page="ubs-patient"]) .ubs-sidebar {
   position: fixed;
   inset: 0 auto 0 0;
   z-index: 950;
@@ -8086,16 +8086,16 @@ body[data-page="ubs"] .ubs-sidebar {
   transition: width 0.18s ease;
 }
 
-body[data-page="ubs"] .ubs-sidebar::after {
+:is(body[data-page="ubs"], body[data-page="ubs-patient"]) .ubs-sidebar::after {
   display: none;
 }
 
-body[data-page="ubs"] .ubs-sidebar .topbar-left {
+:is(body[data-page="ubs"], body[data-page="ubs-patient"]) .ubs-sidebar .topbar-left {
   width: 100%;
   display: block;
 }
 
-body[data-page="ubs"] .home-sidebar-brand {
+:is(body[data-page="ubs"], body[data-page="ubs-patient"]) .home-sidebar-brand {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -8420,143 +8420,126 @@ body[data-page="ubs"] .home-sidebar-toggle svg {
   stroke-linejoin: round;
 }
 
-body[data-page="ubs"] .ubs-main-shell {
+:is(body[data-page="ubs"], body[data-page="ubs-patient"]) .ubs-main-shell {
   min-width: 0;
   min-height: 100vh;
   margin-left: var(--ubs-sidebar-width);
   transition: margin-left 0.18s ease;
 }
 
-body[data-page="ubs"].home-sidebar-is-collapsed .ubs-sidebar {
+:is(body[data-page="ubs"], body[data-page="ubs-patient"]).home-sidebar-is-collapsed .ubs-sidebar {
   width: var(--ubs-sidebar-collapsed-width);
 }
 
-body[data-page="ubs"].home-sidebar-is-collapsed .ubs-sidebar .home-sidebar-brand-copy,
-body[data-page="ubs"].home-sidebar-is-collapsed .ubs-sidebar .home-sidebar-label,
-body[data-page="ubs"].home-sidebar-is-collapsed .ubs-sidebar .home-sidebar-nav-copy,
-body[data-page="ubs"].home-sidebar-is-collapsed .ubs-sidebar .home-sidebar-chevron,
-body[data-page="ubs"].home-sidebar-is-collapsed .ubs-sidebar .home-sidebar-user-copy,
-body[data-page="ubs"].home-sidebar-is-collapsed .ubs-sidebar .topbar-settings span {
+:is(body[data-page="ubs"], body[data-page="ubs-patient"]).home-sidebar-is-collapsed .ubs-sidebar .home-sidebar-brand-copy,
+:is(body[data-page="ubs"], body[data-page="ubs-patient"]).home-sidebar-is-collapsed .ubs-sidebar .home-sidebar-label,
+:is(body[data-page="ubs"], body[data-page="ubs-patient"]).home-sidebar-is-collapsed .ubs-sidebar .home-sidebar-nav-copy,
+:is(body[data-page="ubs"], body[data-page="ubs-patient"]).home-sidebar-is-collapsed .ubs-sidebar .home-sidebar-chevron,
+:is(body[data-page="ubs"], body[data-page="ubs-patient"]).home-sidebar-is-collapsed .ubs-sidebar .home-sidebar-user-copy,
+:is(body[data-page="ubs"], body[data-page="ubs-patient"]).home-sidebar-is-collapsed .ubs-sidebar .topbar-settings span {
   display: none;
 }
 
-body[data-page="ubs"].home-sidebar-is-collapsed .ubs-sidebar .menu {
+:is(body[data-page="ubs"], body[data-page="ubs-patient"]).home-sidebar-is-collapsed .ubs-sidebar .menu {
   grid-template-columns: 1fr;
 }
 
-body[data-page="ubs"].home-sidebar-is-collapsed .ubs-sidebar .menu a {
+:is(body[data-page="ubs"], body[data-page="ubs-patient"]).home-sidebar-is-collapsed .ubs-sidebar .menu a {
   grid-template-columns: 1fr;
   place-items: center;
   padding-inline: 8px;
 }
 
-body[data-page="ubs"].home-sidebar-is-collapsed .home-sidebar-brand {
+:is(body[data-page="ubs"], body[data-page="ubs-patient"]).home-sidebar-is-collapsed .home-sidebar-brand {
   justify-content: center;
   padding-inline: 0;
 }
 
-body[data-page="ubs"].home-sidebar-is-collapsed .home-sidebar-nav {
+:is(body[data-page="ubs"], body[data-page="ubs-patient"]).home-sidebar-is-collapsed .home-sidebar-nav {
   padding-inline: 14px;
 }
 
-body[data-page="ubs"].home-sidebar-is-collapsed .home-sidebar-footer {
+:is(body[data-page="ubs"], body[data-page="ubs-patient"]).home-sidebar-is-collapsed .home-sidebar-footer {
   grid-template-columns: 1fr;
   padding-inline: 14px;
 }
 
-body[data-page="ubs"].home-sidebar-is-collapsed .home-sidebar-footer .topbar-settings,
-body[data-page="ubs"].home-sidebar-is-collapsed .home-sidebar-footer .topbar-account,
-body[data-page="ubs"].home-sidebar-is-collapsed .home-sidebar-footer .topbar-logout {
+:is(body[data-page="ubs"], body[data-page="ubs-patient"]).home-sidebar-is-collapsed .home-sidebar-footer .topbar-settings,
+:is(body[data-page="ubs"], body[data-page="ubs-patient"]).home-sidebar-is-collapsed .home-sidebar-footer .topbar-account,
+:is(body[data-page="ubs"], body[data-page="ubs-patient"]).home-sidebar-is-collapsed .home-sidebar-footer .topbar-logout {
   min-inline-size: 48px;
   inline-size: 48px;
   justify-self: center;
   justify-content: center;
 }
 
-body[data-page="ubs"].home-sidebar-is-collapsed .ubs-main-shell {
+:is(body[data-page="ubs"], body[data-page="ubs-patient"]).home-sidebar-is-collapsed .ubs-main-shell {
   margin-left: var(--ubs-sidebar-collapsed-width);
 }
 
-body[data-page="ubs"].home-sidebar-is-collapsed .home-sidebar-toggle {
+:is(body[data-page="ubs"], body[data-page="ubs-patient"]).home-sidebar-is-collapsed .home-sidebar-toggle {
   left: calc(var(--ubs-sidebar-collapsed-width) - 12px);
 }
 
-body[data-page="ubs"].home-sidebar-is-collapsed .home-sidebar-toggle svg {
+:is(body[data-page="ubs"], body[data-page="ubs-patient"]).home-sidebar-is-collapsed .home-sidebar-toggle svg {
   transform: rotate(180deg);
 }
 
-body[data-page="ubs"] .ubs-page-header {
+:is(body[data-page="ubs"], body[data-page="ubs-patient"]) .ubs-page-header {
   position: sticky;
   top: 0;
   z-index: 800;
-  min-height: 66px;
+  min-height: 56px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 18px;
-  padding: 10px 26px 10px 30px;
-  border-bottom: 1px solid #d5e0e8;
-  background: rgba(255, 255, 255, 0.96);
-  box-shadow: 0 2px 8px rgba(24, 43, 65, 0.05);
-  backdrop-filter: blur(12px);
+  padding: 7px 22px;
+  border-bottom: 1px solid #d7e0e7;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 2px 10px rgba(24, 43, 65, 0.04);
 }
 
-body[data-page="ubs"] .cadh-breadcrumb-heading {
+:is(body[data-page="ubs"], body[data-page="ubs-patient"]) .cadh-breadcrumb-heading {
   display: grid;
-  gap: 2px;
+  gap: 4px;
 }
 
-body[data-page="ubs"] .cadh-breadcrumb-heading p {
+:is(body[data-page="ubs"], body[data-page="ubs-patient"]) .cadh-breadcrumb-heading p {
   display: flex;
   align-items: center;
   gap: 8px;
   margin: 0;
-  color: #60758b;
-  font-size: 0.68rem;
-  font-weight: 800;
+  color: #63768d;
+  font-size: 0.72rem;
+  font-weight: 900;
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
-body[data-page="ubs"] .cadh-breadcrumb-link {
+:is(body[data-page="ubs"], body[data-page="ubs-patient"]) .cadh-breadcrumb-link {
   color: inherit;
   text-decoration: none;
 }
 
-body[data-page="ubs"] .cadh-breadcrumb-link:hover,
-body[data-page="ubs"] .cadh-breadcrumb-link:focus-visible {
+:is(body[data-page="ubs"], body[data-page="ubs-patient"]) .cadh-breadcrumb-link:hover,
+:is(body[data-page="ubs"], body[data-page="ubs-patient"]) .cadh-breadcrumb-link:focus-visible {
   outline: none;
   color: var(--ubs-blue);
 }
 
-body[data-page="ubs"] .cadh-breadcrumb-heading h1 {
+:is(body[data-page="ubs"], body[data-page="ubs-patient"]) .cadh-breadcrumb-heading h1 {
   margin: 0;
-  color: #152235;
-  font-size: 1rem;
-  font-weight: 800;
+  color: #182536;
+  font-size: 13px !important;
+  font-weight: 900;
   line-height: 1.25;
 }
 
-body[data-page="ubs"] .home-page-status {
+:is(body[data-page="ubs"], body[data-page="ubs-patient"]) .home-page-status {
+  display: flex;
+  align-items: center;
   gap: 10px;
-}
-
-body[data-page="ubs"] .home-user-role-status {
-  min-height: 30px;
-  padding: 5px 14px;
-  border-radius: 999px;
-  font-size: 0.76rem;
-  font-weight: 900;
-}
-
-body[data-page="ubs"] .home-user-role-status svg {
-  inline-size: 14px;
-  block-size: 14px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
 }
 
 body[data-page="ubs"] .ubs-dashboard {
@@ -18067,13 +18050,13 @@ body.home-sidebar-is-collapsed .siselo-module-subnav {
 }
 
 /* Layout fidelity and responsive stability — references 24/07/2026 */
-:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) {
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) {
   --siselo-sidebar-width: 216px;
   --siselo-sidebar-collapsed-width: 72px;
   overflow-x: hidden;
 }
 
-:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar {
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-sidebar {
   width: var(--siselo-sidebar-width) !important;
   min-width: var(--siselo-sidebar-width) !important;
   height: 100dvh;
@@ -18082,32 +18065,32 @@ body.home-sidebar-is-collapsed .siselo-module-subnav {
   overflow: hidden !important;
 }
 
-:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar .topbar-left,
-:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-brand,
-:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-footer {
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-sidebar .topbar-left,
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-sidebar-brand,
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-sidebar-footer {
   flex: 0 0 auto;
 }
 
-:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-brand {
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-sidebar-brand {
   min-height: 76px !important;
   padding: 14px 16px !important;
 }
 
-:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-mark {
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-sidebar-mark {
   inline-size: 36px !important;
   block-size: 36px !important;
 }
 
-:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-brand-copy strong {
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-sidebar-brand-copy strong {
   font-size: 13px !important;
 }
 
-:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-brand-copy small {
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-sidebar-brand-copy small {
   font-size: 7px !important;
   letter-spacing: .18em !important;
 }
 
-:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-nav {
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-sidebar-nav {
   min-height: 0;
   flex: 1 1 auto;
   overflow-x: hidden;
@@ -18117,18 +18100,18 @@ body.home-sidebar-is-collapsed .siselo-module-subnav {
   scrollbar-color: rgb(255 255 255 / 18%) transparent;
 }
 
-:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-label {
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-sidebar-label {
   margin: 0 8px 10px !important;
   font-size: 8px !important;
 }
 
-:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar .menu {
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-sidebar .menu {
   display: grid !important;
   grid-template-columns: 1fr !important;
   gap: 4px !important;
 }
 
-:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar .menu > a {
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-sidebar .menu > a {
   min-height: 46px !important;
   grid-template-columns: 22px minmax(0, 1fr) 12px !important;
   gap: 9px !important;
@@ -18136,18 +18119,18 @@ body.home-sidebar-is-collapsed .siselo-module-subnav {
   border-radius: 9px !important;
 }
 
-:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-nav-icon,
-:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-nav-icon svg {
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-sidebar-nav-icon,
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-sidebar-nav-icon svg {
   inline-size: 17px !important;
   block-size: 17px !important;
 }
 
-:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-nav-copy strong {
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-sidebar-nav-copy strong {
   font-size: 13px !important;
   line-height: 1.15 !important;
 }
 
-:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-nav-copy small {
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-sidebar-nav-copy small {
   font-size: 9px !important;
   line-height: 1.2 !important;
 }
@@ -18176,9 +18159,9 @@ body.home-sidebar-is-collapsed .siselo-module-subnav {
   flex: 0 0 12px;
 }
 
-:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-footer,
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-sidebar-footer,
 body[data-page="cadh"] .cadh-sidebar .topbar-actions.home-sidebar-footer,
-body[data-page="ubs"] .ubs-sidebar .topbar-actions.home-sidebar-footer {
+:is(body[data-page="ubs"], body[data-page="ubs-patient"]) .ubs-sidebar .topbar-actions.home-sidebar-footer {
   width: 100%;
   min-height: 72px;
   margin-top: 0 !important;
@@ -18187,66 +18170,66 @@ body[data-page="ubs"] .ubs-sidebar .topbar-actions.home-sidebar-footer {
   background: #062c4f;
 }
 
-:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-footer .topbar-settings {
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-sidebar-footer .topbar-settings {
   min-height: 28px !important;
   padding: 3px 7px !important;
   font-size: 10px !important;
 }
 
-:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-footer .topbar-account {
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-sidebar-footer .topbar-account {
   min-height: 39px !important;
   padding: 4px 6px !important;
 }
 
-:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-user-icon {
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-sidebar-user-icon {
   inline-size: 28px !important;
   block-size: 28px !important;
 }
 
-:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-user-copy strong {
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-sidebar-user-copy strong {
   font-size: 10px !important;
 }
 
-:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-user-copy small {
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-sidebar-user-copy small {
   font-size: 7px !important;
 }
 
-:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-toggle {
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-sidebar-toggle {
   left: calc(var(--siselo-sidebar-width) - 12px) !important;
   bottom: 68px !important;
 }
 
 body[data-page="home"] .home-main-shell,
 body[data-page="cadh"] .cadh-main-shell,
-body[data-page="ubs"] .ubs-main-shell {
+:is(body[data-page="ubs"], body[data-page="ubs-patient"]) .ubs-main-shell {
   min-width: 0;
   margin-left: var(--siselo-sidebar-width) !important;
 }
 
-:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]).home-sidebar-is-collapsed .home-sidebar {
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]).home-sidebar-is-collapsed .home-sidebar {
   width: var(--siselo-sidebar-collapsed-width) !important;
   min-width: var(--siselo-sidebar-collapsed-width) !important;
 }
 
 body[data-page="home"].home-sidebar-is-collapsed .home-main-shell,
 body[data-page="cadh"].home-sidebar-is-collapsed .cadh-main-shell,
-body[data-page="ubs"].home-sidebar-is-collapsed .ubs-main-shell {
+:is(body[data-page="ubs"], body[data-page="ubs-patient"]).home-sidebar-is-collapsed .ubs-main-shell {
   margin-left: var(--siselo-sidebar-collapsed-width) !important;
 }
 
-:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]).home-sidebar-is-collapsed .home-sidebar-toggle {
+:is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]).home-sidebar-is-collapsed .home-sidebar-toggle {
   left: calc(var(--siselo-sidebar-collapsed-width) - 12px) !important;
 }
 
 /* CADH: one workspace at a time, with the density of the reference screens. */
 body[data-page="cadh"] .cadh-page-header,
-body[data-page="ubs"] .ubs-page-header {
+:is(body[data-page="ubs"], body[data-page="ubs-patient"]) .ubs-page-header {
   min-height: 56px !important;
   padding: 7px 22px !important;
 }
 
 body[data-page="cadh"] .cadh-breadcrumb-heading h1,
-body[data-page="ubs"] .cadh-breadcrumb-heading h1 {
+:is(body[data-page="ubs"], body[data-page="ubs-patient"]) .cadh-breadcrumb-heading h1 {
   font-size: 13px !important;
 }
 
@@ -19024,46 +19007,46 @@ body[data-page="ubs"] .ubs-tab-panel {
  * legacy icon-only breakpoint.
  */
 @media (min-width: 921px) and (max-width: 1180px) {
-  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-brand {
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-sidebar-brand {
     justify-content: flex-start !important;
     padding-inline: 16px !important;
   }
 
-  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-brand-copy,
-  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-nav-copy,
-  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-user-copy {
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-sidebar-brand-copy,
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-sidebar-nav-copy,
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-sidebar-user-copy {
     display: grid !important;
   }
 
-  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-label {
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-sidebar-label {
     display: block !important;
   }
 
-  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-chevron {
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-sidebar-chevron {
     display: block !important;
   }
 
-  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-footer .topbar-settings span {
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-sidebar-footer .topbar-settings span {
     display: inline !important;
   }
 
-  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar .menu > a {
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-sidebar .menu > a {
     grid-template-columns: 22px minmax(0, 1fr) 12px !important;
     place-items: initial !important;
     align-items: center !important;
     padding-inline: 10px !important;
   }
 
-  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-footer {
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-sidebar-footer {
     grid-template-columns: minmax(0, 1fr) 40px !important;
   }
 
-  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-footer .topbar-settings {
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-sidebar-footer .topbar-settings {
     grid-column: 1 / -1 !important;
     justify-content: flex-start !important;
   }
 
-  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-footer .topbar-account {
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-sidebar-footer .topbar-account {
     grid-template-columns: 28px minmax(0, 1fr) !important;
     place-items: initial !important;
     align-items: center !important;
@@ -19071,25 +19054,25 @@ body[data-page="ubs"] .ubs-tab-panel {
 }
 
 @media (max-width: 920px) {
-  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) {
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) {
     --siselo-sidebar-width: 72px;
   }
 
-  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-brand-copy,
-  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-label,
-  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-nav-copy,
-  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-chevron,
-  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-user-copy,
-  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .siselo-module-subnav {
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-sidebar-brand-copy,
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-sidebar-label,
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-sidebar-nav-copy,
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-sidebar-chevron,
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-sidebar-user-copy,
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .siselo-module-subnav {
     display: none !important;
   }
 
-  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-brand {
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-sidebar-brand {
     justify-content: center;
     padding-inline: 8px !important;
   }
 
-  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar .menu > a {
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-sidebar .menu > a {
     grid-template-columns: 1fr !important;
     place-items: center;
     padding-inline: 8px !important;
@@ -19109,7 +19092,7 @@ body[data-page="ubs"] .ubs-tab-panel {
 }
 
 @media (max-width: 700px) {
-  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar {
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-sidebar {
     position: sticky !important;
     inset: 0 0 auto !important;
     width: 100% !important;
@@ -19119,38 +19102,38 @@ body[data-page="ubs"] .ubs-tab-panel {
     grid-template-columns: 58px minmax(0, 1fr);
   }
 
-  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-brand {
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-sidebar-brand {
     min-height: 58px !important;
   }
 
-  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-nav {
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-sidebar-nav {
     padding: 6px !important;
     overflow-x: auto;
   }
 
-  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar .menu {
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-sidebar .menu {
     display: flex !important;
     grid-template-columns: none !important;
   }
 
-  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar .menu > a {
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-sidebar .menu > a {
     min-width: 44px;
     min-height: 44px !important;
   }
 
-  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-footer,
-  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"]) .home-sidebar-toggle {
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-sidebar-footer,
+  :is(body[data-page="home"], body[data-page="cadh"], body[data-page="ubs"], body[data-page="ubs-patient"]) .home-sidebar-toggle {
     display: none !important;
   }
 
   body[data-page="home"] .home-main-shell,
   body[data-page="cadh"] .cadh-main-shell,
-  body[data-page="ubs"] .ubs-main-shell {
+  :is(body[data-page="ubs"], body[data-page="ubs-patient"]) .ubs-main-shell {
     margin-left: 0 !important;
   }
 
   body[data-page="cadh"] .cadh-page-header,
-  body[data-page="ubs"] .ubs-page-header {
+  :is(body[data-page="ubs"], body[data-page="ubs-patient"]) .ubs-page-header {
     position: static;
     padding-inline: 12px !important;
   }

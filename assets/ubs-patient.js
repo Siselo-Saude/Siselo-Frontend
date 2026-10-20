@@ -54,7 +54,10 @@ async function setupUbsPatientPage() {
     ubsPatientCurrentView = requestedView;
   }
   SISELO.bindShell('ubs');
-  syncUbsPatientShellHeading();
+  if (SISELO.syncCurrentDate) {
+    SISELO.syncCurrentDate();
+  }
+  setupUbsPatientSidebar();
   bindUbsPatientActions();
 
   if (!ubsPatientId) {
@@ -66,11 +69,32 @@ async function setupUbsPatientPage() {
   await loadUbsPatient();
 }
 
-function syncUbsPatientShellHeading() {
-  const section = document.querySelector('[data-shell-section]');
-  const title = document.querySelector('[data-shell-title]');
-  if (section) section.textContent = 'Módulos › UBS';
-  if (title) title.textContent = 'UBS – Unidade Básica de Saúde';
+function setupUbsPatientSidebar() {
+  const sidebarToggle = document.getElementById('ubs-sidebar-toggle');
+  const collapsedKey = 'siselo_home_sidebar_collapsed';
+  const setSidebarCollapsed = (collapsed) => {
+    document.body.classList.toggle('home-sidebar-is-collapsed', collapsed);
+    if (sidebarToggle) {
+      sidebarToggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+      sidebarToggle.setAttribute('aria-label', collapsed ? 'Expandir menu lateral' : 'Recolher menu lateral');
+    }
+  };
+
+  let sidebarCollapsed = false;
+  try {
+    sidebarCollapsed = localStorage.getItem(collapsedKey) === 'true';
+  } catch (error) {
+  }
+  setSidebarCollapsed(sidebarCollapsed);
+
+  sidebarToggle?.addEventListener('click', () => {
+    sidebarCollapsed = !document.body.classList.contains('home-sidebar-is-collapsed');
+    setSidebarCollapsed(sidebarCollapsed);
+    try {
+      localStorage.setItem(collapsedKey, String(sidebarCollapsed));
+    } catch (error) {
+    }
+  });
 }
 
 function bindUbsPatientActions() {
