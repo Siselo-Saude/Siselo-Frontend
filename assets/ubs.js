@@ -359,7 +359,7 @@ function renderUbsTransitionedTab() {
 
   panel.innerHTML = `
     <div class="ubs-table-card">
-      ${rows.length ? renderUbsTransitionedTable(rows) : renderUbsEmptyState('transition', 'Nenhum encaminhamento ao CADH registrado.', 'Ajuste os filtros ou encaminhe um paciente para o CADH.')}
+      ${rows.length ? renderUbsTransitionedTable(rows) : renderUbsEmptyState('transition', 'Nenhum compartilhamento com o CADH registrado.', 'Ajuste os filtros ou compartilhe o cuidado de um paciente com o CADH.')}
     </div>
   `;
 
@@ -372,7 +372,7 @@ function renderUbsTransitionedTable(rows) {
         <tr>
           <th>Paciente</th>
           <th>Destino</th>
-          <th>Encaminhamento</th>
+          <th>Compartilhamento</th>
         </tr>
       </thead>
       <tbody>

@@ -192,7 +192,7 @@ function renderCadhReceivedCard(row) {
           : canCadhFlow('careflow.update')
             ? `<button class="btn btn-primary cadh-confirm-receipt" type="button" data-cadh-confirm-receipt="${row.id}">Confirmar recebimento</button>`
             : '<span class="cadh-receipt-pending">Aguardando confirmação</span>'}
-        <button class="btn cadh-referral-view" type="button" data-cadh-referral-detail="${row.id}" aria-label="Visualizar informações do encaminhamento de ${SISELO.escapeHtml(row.full_name || 'paciente')}">
+        <button class="btn cadh-referral-view" type="button" data-cadh-referral-detail="${row.id}" aria-label="Visualizar informações do compartilhamento de ${SISELO.escapeHtml(row.full_name || 'paciente')}">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/>
             <circle cx="12" cy="12" r="3"/>
@@ -219,10 +219,10 @@ function renderCadhReferralDetail(row) {
       >
         <header>
           <div>
-            <span>Encaminhamento UBS → CADH</span>
+            <span>Compartilhamento UBS → CADH</span>
             <h3 id="cadh-referral-modal-title">${SISELO.escapeHtml(row.full_name || 'Paciente')}</h3>
           </div>
-          <button type="button" data-cadh-close-referral aria-label="Fechar detalhes do encaminhamento">×</button>
+          <button type="button" data-cadh-close-referral aria-label="Fechar detalhes do compartilhamento">×</button>
         </header>
 
         <div class="cadh-referral-route">
@@ -237,7 +237,7 @@ function renderCadhReferralDetail(row) {
             <dd>${SISELO.escapeHtml(SISELO.formatTeamName(row.team_ref) || 'Não informada')}</dd>
           </div>
           <div>
-            <dt>Data do encaminhamento</dt>
+            <dt>Data do compartilhamento</dt>
             <dd>${SISELO.escapeHtml(formatCadhFlowDate(row.referral_date || row.first_cadh_date))}</dd>
           </div>
           <div>
@@ -645,7 +645,7 @@ async function loadCadhSharingDetail(patient) {
       <div class="cadh-sharing-metrics">
         <span><strong>${plans.length}</strong> ${plans.length === 1 ? 'plano ativo' : 'planos ativos'}</span>
         <span><strong>${plans.length ? 'Ativo' : '—'}</strong> situação do plano</span>
-        <span><strong>${transitions.length}</strong> ${transitions.length === 1 ? 'encaminhamento' : 'encaminhamentos'}</span>
+        <span><strong>${transitions.length}</strong> ${transitions.length === 1 ? 'compartilhamento' : 'compartilhamentos'}</span>
       </div>
       <section class="cadh-sharing-care-plans" aria-label="Planos de Cuidado ativos">
         <header>

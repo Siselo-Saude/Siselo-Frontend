@@ -270,7 +270,7 @@ async function bindCadhPatientSearch(permissions) {
     ).slice(0, 20);
 
     if (!matching.length) {
-      result.innerHTML = '<div class="cadh-patient-message is-error">Nenhum paciente encaminhado pela UBS encontrado.</div>';
+      result.innerHTML = '<div class="cadh-patient-message is-error">Nenhum paciente compartilhado pela UBS encontrado.</div>';
       return;
     }
 
