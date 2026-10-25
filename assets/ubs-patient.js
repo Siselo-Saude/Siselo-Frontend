@@ -54,7 +54,10 @@ async function setupUbsPatientPage() {
     ubsPatientCurrentView = requestedView;
   }
   SISELO.bindShell('ubs');
-  syncUbsPatientShellHeading();
+  if (SISELO.syncCurrentDate) {
+    SISELO.syncCurrentDate();
+  }
+  setupUbsPatientSidebar();
   bindUbsPatientActions();
 
   if (!ubsPatientId) {
@@ -66,11 +69,32 @@ async function setupUbsPatientPage() {
   await loadUbsPatient();
 }
 
-function syncUbsPatientShellHeading() {
-  const section = document.querySelector('[data-shell-section]');
-  const title = document.querySelector('[data-shell-title]');
-  if (section) section.textContent = 'Módulos › UBS';
-  if (title) title.textContent = 'UBS – Unidade Básica de Saúde';
+function setupUbsPatientSidebar() {
+  const sidebarToggle = document.getElementById('ubs-sidebar-toggle');
+  const collapsedKey = 'siselo_home_sidebar_collapsed';
+  const setSidebarCollapsed = (collapsed) => {
+    document.body.classList.toggle('home-sidebar-is-collapsed', collapsed);
+    if (sidebarToggle) {
+      sidebarToggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+      sidebarToggle.setAttribute('aria-label', collapsed ? 'Expandir menu lateral' : 'Recolher menu lateral');
+    }
+  };
+
+  let sidebarCollapsed = false;
+  try {
+    sidebarCollapsed = localStorage.getItem(collapsedKey) === 'true';
+  } catch (error) {
+  }
+  setSidebarCollapsed(sidebarCollapsed);
+
+  sidebarToggle?.addEventListener('click', () => {
+    sidebarCollapsed = !document.body.classList.contains('home-sidebar-is-collapsed');
+    setSidebarCollapsed(sidebarCollapsed);
+    try {
+      localStorage.setItem(collapsedKey, String(sidebarCollapsed));
+    } catch (error) {
+    }
+  });
 }
 
 function bindUbsPatientActions() {
@@ -260,19 +284,19 @@ function renderUbsPatientReferral(patient, transitions) {
   const canRefer = ubsPatientPermissions.has('careflow.update');
   if (referral) {
     status.className = 'is-referred';
-    status.textContent = `Encaminhado em ${formatUbsPatientDate(referral.transition_date)}`;
-    submit.textContent = 'Encaminhado';
+    status.textContent = `Compartilhado em ${formatUbsPatientDate(referral.transition_date)}`;
+    submit.textContent = 'Compartilhado';
     submit.disabled = true;
     risk.disabled = true;
   } else if (!canRefer) {
     status.className = '';
-    status.textContent = 'Seu perfil não possui permissão para encaminhar.';
+    status.textContent = 'Seu perfil não possui permissão para compartilhar o cuidado.';
     submit.disabled = true;
     risk.disabled = true;
   } else {
     status.className = '';
-    status.textContent = 'Aguardando encaminhamento';
-    submit.textContent = 'Encaminhar';
+    status.textContent = 'Aguardando compartilhamento do cuidado';
+    submit.textContent = 'Compartilhar Cuidado';
     submit.disabled = false;
     risk.disabled = false;
   }
@@ -378,7 +402,7 @@ async function referUbsPatientToCadh(event) {
   const submit = document.getElementById('ubs-patient-referral-submit');
   const risk = document.getElementById('ubs-patient-risk')?.value || '';
   submit.disabled = true;
-  submit.textContent = 'Encaminhando...';
+  submit.textContent = 'Compartilhando...';
 
   try {
     await SISELO.apiRequest('/care_flow/action.php', {
@@ -390,11 +414,11 @@ async function referUbsPatientToCadh(event) {
       },
     });
     await loadUbsPatient();
-    SISELO.showAlert('ubs-patient-alert', 'Paciente encaminhado para o CADH com sucesso.', 'success');
+    SISELO.showAlert('ubs-patient-alert', 'Cuidado compartilhado com o CADH com sucesso.', 'success');
   } catch (error) {
     submit.disabled = false;
-    submit.textContent = 'Encaminhar';
-    SISELO.showAlert('ubs-patient-alert', error.message || 'Não foi possível encaminhar o paciente.', 'error');
+    submit.textContent = 'Compartilhar Cuidado';
+    SISELO.showAlert('ubs-patient-alert', error.message || 'Não foi possível compartilhar o cuidado do paciente.', 'error');
   }
 }
 

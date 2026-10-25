@@ -1054,8 +1054,8 @@
         emptyDescription: '',
       },
       transitions: {
-        singular: 'encaminhamento do cuidado',
-        emptyTitle: 'Paciente sem encaminhamento do cuidado registrado.',
+        singular: 'transição do cuidado',
+        emptyTitle: 'Paciente sem transição do cuidado registrada.',
         emptyDescription: '',
       },
     };
@@ -2486,7 +2486,7 @@
     patients: { section: 'CADH', title: 'Usuários' },
     careplans: { section: 'CADH', title: 'Planos de Cuidado' },
     encounters: { section: 'CADH', title: 'Atendimentos' },
-    transitions: { section: 'CADH', title: 'Encaminhamentos do Cuidado' },
+    transitions: { section: 'CADH', title: 'Transições do Cuidado' },
     admin: { section: 'Configurações', title: 'Usuários do Sistema' },
   };
 

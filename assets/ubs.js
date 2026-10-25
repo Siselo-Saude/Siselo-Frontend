@@ -20,7 +20,7 @@ const UBS_STATUS_OPTIONS = [
   'Em Monitoramento',
   'Estável',
   'Necessita Reavaliação',
-  'Alta',
+  'Transição do Cuidado',
 ];
 
 let ubsPermissions = new Set();
@@ -359,7 +359,7 @@ function renderUbsTransitionedTab() {
 
   panel.innerHTML = `
     <div class="ubs-table-card">
-      ${rows.length ? renderUbsTransitionedTable(rows) : renderUbsEmptyState('transition', 'Nenhum encaminhamento ao CADH registrado.', 'Ajuste os filtros ou encaminhe um paciente para o CADH.')}
+      ${rows.length ? renderUbsTransitionedTable(rows) : renderUbsEmptyState('transition', 'Nenhum compartilhamento com o CADH registrado.', 'Ajuste os filtros ou compartilhe o cuidado de um paciente com o CADH.')}
     </div>
   `;
 
@@ -372,7 +372,7 @@ function renderUbsTransitionedTable(rows) {
         <tr>
           <th>Paciente</th>
           <th>Destino</th>
-          <th>Encaminhamento</th>
+          <th>Compartilhamento</th>
         </tr>
       </thead>
       <tbody>
@@ -787,7 +787,7 @@ function getUbsActiveFilterCount() {
 function getUbsStatusChipClass(status) {
   const normalized = normalizeUbsText(status);
   if (normalized.includes('reavaliacao')) return 'is-orange';
-  if (normalized.includes('alta') || normalized.includes('estavel')) return 'is-green';
+  if (normalized.includes('transicao') || normalized.includes('alta') || normalized.includes('estavel')) return 'is-green';
   return '';
 }
 
